@@ -1,9 +1,9 @@
 package com.developeek.circleon.data.source.remote.retrofit
 
 enum class StatusCode(
-    val code: Int,
-    val detailCode: String,
-    val message: String,
+    private val responseCode: Int,
+    private val detailCode: String,
+    private val message: String,
 ) {
     SUCCESS(200, "0", "성공"),
     NO_CONTENTS(204, "0", "컨텐츠 없음"),
@@ -19,5 +19,12 @@ enum class StatusCode(
     NO_AUTHORIZATION(403, "004", "권한 없음"),
     FAIL_EMAIL_VALIDATION(409, "021", "이메일 중복 검증 실패"),
     FAIL_CIRCLE_RESIGN_UNREGISTERED(409, "041", "동아리 탈퇴 실패 - 미가입"),
-    SERVER_ERROR(500, "5", "서버 에러"),
+    SERVER_ERROR(500, "5", "서버 에러"), ;
+
+    fun isSame(
+        responseCode: Int,
+        detailCode: String,
+    ) = this.responseCode == responseCode && this.detailCode == detailCode
+
+    fun message() = this.message
 }
