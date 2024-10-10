@@ -1,6 +1,8 @@
 [versions]
 agp = "8.4.0"
 kotlin = "1.9.0"
+ktlint = "12.1.1"
+hilt = "2.44"
 coreKtx = "1.13.1"
 junit = "4.13.2"
 junitVersion = "1.2.1"
@@ -21,9 +23,12 @@ material = { group = "com.google.android.material", name = "material", version.r
 androidx-activity = { group = "androidx.activity", name = "activity", version.ref = "activity" }
 androidx-constraintlayout = { group = "androidx.constraintlayout", name = "constraintlayout", version.ref = "constraintlayout" }
 okhttp3-interceptor = { group = "com.squareup.okhttp3", name = "logging-interceptor", version.ref = "interceptor" }
+google-dagger-hilt-android = { group = "com.google.dagger", name = "hilt-android", version.ref = "hilt" }
+google-dagger-hilt-android-compiler = { group = "com.google.dagger", name = "hilt-android-compiler", version.ref = "hilt" }
 
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
 jetbrains-kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
-
+jlleitschuh-ktlint = { id = "org.jlleitschuh.gradle.ktlint", version.ref = "ktlint" }
+google-dagger-hilt-android = { id = "com.google.dagger.hilt.android", version.ref = "hilt" }
