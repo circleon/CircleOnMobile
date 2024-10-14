@@ -19,7 +19,7 @@ android {
         versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
-        buildConfigField("String", "TOKEN_PREFERENCE_KEY", getApiKey("token.preference.key"))
+        buildConfigField("String", "TOKEN_PREFERENCE_KEY", getLocalValue("token.preference.key"))
     }
 
     buildTypes {
@@ -45,8 +45,8 @@ android {
     }
 }
 
-fun getApiKey(key: String): String {
-    return gradleLocalProperties(rootDir, providers).getProperty(key)
+fun getLocalValue(key: String): String {
+    return gradleLocalProperties(rootDir, providers).getProperty(key) ?: ""
 }
 
 dependencies {
