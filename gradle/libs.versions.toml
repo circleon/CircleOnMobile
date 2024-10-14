@@ -15,6 +15,7 @@ constraintlayout = "2.1.4"
 interceptor = "3.12.1"
 gson = "2.10.1"
 retrofit = "2.9.0"
+viewmodel = "2.8.6"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -31,6 +32,7 @@ google-dagger-hilt-android-compiler = { group = "com.google.dagger", name = "hil
 google-code-gson = { group = "com.google.code.gson", name = "gson", version.ref = "gson" }
 squareup-retrofit2 = { group = "com.squareup.retrofit2", name = "retrofit", version.ref = "retrofit" }
 squareup-retrofit2-converter = { group = "com.squareup.retrofit2", name = "converter-gson", version.ref = "retrofit" }
+androidx-lifecycle-viewmodel = { group = "androidx.lifecycle", name = "lifecycle-viewmodel-ktx", version.ref = "viewmodel" }
 
 
 [plugins]

@@ -1,15 +1,51 @@
 package com.developeek.circleon.view.screen
 
+import android.app.Activity
+import android.content.Intent
 import android.os.Bundle
+import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.LifecycleOwner
+import androidx.lifecycle.Observer
 import com.developeek.circleon.databinding.ActivityLoginBinding
+import com.developeek.circleon.domain.state.UiState
+import com.developeek.circleon.view.viewmodelimpl.LoginViewModelImpl
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class LoginActivity : AppCompatActivity() {
     private lateinit var binding: ActivityLoginBinding
+    private val viewModel: LoginViewModelImpl by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityLoginBinding.inflate(layoutInflater)
         setContentView(binding.root)
+
+        initObserver(this)
     }
+
+    private fun initObserver(activity: Activity) {
+        viewModel.state.observe(
+            activity as LifecycleOwner,
+            stateObserver(activity),
+        )
+    }
+
+    private fun stateObserver(activity: Activity) =
+        Observer<UiState> {
+            when (it) {
+                UiState.Success -> sendUserToHomeScreen(activity)
+                UiState.Timeout, UiState.Error -> showDialog(viewModel.error)
+                else -> {}
+            }
+        }
+
+    private fun sendUserToHomeScreen(activity: Activity) {
+        val intent = Intent(activity, HomeActivity::class.java)
+
+        startActivity(intent)
+    }
+
+    private fun showDialog(text: String) {}
 }

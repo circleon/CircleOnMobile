@@ -1,0 +1,20 @@
+package com.developeek.circleon.data.di
+
+import com.developeek.circleon.data.repository.LoginRepository
+import com.developeek.circleon.data.repositoryimpl.LoginRepositoryImpl
+import com.developeek.circleon.data.source.remote.retrofit.service.LoginService
+import dagger.Module
+import dagger.Provides
+import dagger.hilt.InstallIn
+import dagger.hilt.components.SingletonComponent
+import javax.inject.Singleton
+
+@InstallIn(SingletonComponent::class)
+@Module
+object RepositoryModule {
+    @Provides
+    @Singleton
+    fun provideLoginRepository(service: LoginService): LoginRepository {
+        return LoginRepositoryImpl(service)
+    }
+}
