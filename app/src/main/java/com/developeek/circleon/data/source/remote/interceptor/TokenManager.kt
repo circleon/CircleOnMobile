@@ -19,10 +19,10 @@ class TokenManager
             return preferences.getString(REFRESH_TOKEN_KEY, null)
         }
 
-        fun setAccessToken(token: String): Boolean {
+        fun setAccessToken(token: String) {
             return with(preferences.edit()) {
                 putString(ACCESS_TOKEN_KEY, token)
-            }.commit()
+            }.apply()
         }
 
         fun setRefreshToken(token: String) {
