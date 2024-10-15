@@ -34,6 +34,7 @@ android {
 
     buildFeatures {
         buildConfig = true
+        viewBinding = true
     }
 
     compileOptions {
@@ -58,6 +59,10 @@ dependencies {
     implementation(libs.androidx.constraintlayout)
     implementation(libs.okhttp3.interceptor)
     implementation(libs.google.dagger.hilt.android)
+    implementation(libs.google.code.gson)
+    implementation(libs.squareup.retrofit2)
+    implementation(libs.squareup.retrofit2.converter)
+    implementation(libs.androidx.lifecycle.viewmodel)
     kapt(libs.google.dagger.hilt.android.compiler)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)

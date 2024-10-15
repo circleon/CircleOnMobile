@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/white"
+    android:paddingHorizontal="44dp"
+    android:gravity="center"
+    android:orientation="vertical"
+    tools:context=".view.screen.LoginActivity">
+
+    <androidx.appcompat.widget.AppCompatImageView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/logo_login" />
+
+    <androidx.appcompat.widget.AppCompatEditText
+        android:id="@+id/edtEmail"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="32dp"
+        android:background="@drawable/bg_rounded_grey_rectangle"
+        android:paddingHorizontal="@dimen/margin_padding_large"
+        android:paddingVertical="@dimen/margin_padding_default"
+        android:hint="@string/hint_email"
+        android:textColorHint="@color/grey_5"
+        android:textSize="@dimen/text_size_default"/>
+
+    <androidx.appcompat.widget.AppCompatEditText
+        android:id="@+id/edtPassword"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/margin_padding_small"
+        android:background="@drawable/bg_rounded_grey_rectangle"
+        android:paddingHorizontal="@dimen/margin_padding_large"
+        android:paddingVertical="@dimen/margin_padding_default"
+        android:hint="@string/hint_password"
+        android:textColorHint="@color/grey_5"
+        android:textSize="@dimen/text_size_default"/>
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/btnLogin"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/margin_padding_small"
+        android:paddingHorizontal="@dimen/margin_padding_large"
+        android:paddingVertical="@dimen/margin_padding_default"
+        android:gravity="center"
+        android:text="@string/text_login"
+        android:textSize="@dimen/text_size_default"
+        android:textColor="@color/white"
+        android:background="@drawable/bg_rounded_purple_rectangle" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:layout_marginTop="@dimen/margin_padding_large"
+        android:orientation="horizontal">
+
+        <TextView
+            android:id="@+id/btnSearchIdPassword"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/text_find_id_password"
+            android:textSize="@dimen/text_size_small"
+            android:textColor="@color/grey_6"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="|"
+            android:layout_marginHorizontal="@dimen/margin_padding_extremely_large"/>
+
+        <TextView
+            android:id="@+id/btnSignUp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/text_sign_up"
+            android:textSize="@dimen/text_size_small"
+            android:textColor="@color/grey_7"
+            android:textStyle="bold"/>
+
+    </LinearLayout>
+
+</LinearLayout>

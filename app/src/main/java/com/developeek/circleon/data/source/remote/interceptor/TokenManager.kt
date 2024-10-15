@@ -44,7 +44,7 @@ class TokenManager
         }
 
         companion object {
-            private const val ACCESS_TOKEN_KEY = "access token"
-            private const val REFRESH_TOKEN_KEY = "refresh token"
+            private const val ACCESS_TOKEN_KEY = "accessToken"
+            private const val REFRESH_TOKEN_KEY = "refreshToken"
         }
     }
