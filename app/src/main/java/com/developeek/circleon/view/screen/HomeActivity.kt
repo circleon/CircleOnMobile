@@ -15,6 +15,7 @@ class HomeActivity : AppCompatActivity() {
         binding = ActivityHomeBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
+        // TODO: access 토큰 갱신 결과에 따라 화면 분기하도록 수정
         val intent = Intent(this, LoginActivity::class.java)
         startActivity(intent)
     }

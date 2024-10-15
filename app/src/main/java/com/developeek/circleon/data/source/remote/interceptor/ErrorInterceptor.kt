@@ -1,5 +1,6 @@
 package com.developeek.circleon.data.source.remote.interceptor
 
+import android.util.Log
 import com.developeek.circleon.data.exception.ExceptionMessage
 import com.developeek.circleon.data.exception.ServiceException
 import com.developeek.circleon.data.source.remote.retrofit.StatusCode
@@ -44,7 +45,8 @@ class ErrorInterceptor
                 val detailCode = parseDetailCode(jsonObject)
                 val statusCode = findStatusCode(responseCode, detailCode)
 
-                throwExceptionWhenErrorStatus(statusCode, request)
+                errorLog(statusCode)
+                throwException(statusCode, request)
 
                 val newResponseBody = ResponseBody.create(MediaType.get(contentType!!), responseString)
                 return response.newBuilder().body(newResponseBody).build()
@@ -72,19 +74,38 @@ class ErrorInterceptor
             }
         }
 
-        private fun throwExceptionWhenErrorStatus(
+        private fun errorLog(statusCode: StatusCode) {
+            when (statusCode) {
+                StatusCode.SUCCESS -> {}
+                else -> {
+                    Log.e(ExceptionMessage.TAG_ERROR_STATUS, statusCode.message())
+                }
+            }
+        }
+
+        private fun throwException(
             statusCode: StatusCode,
             request: Request,
         ) {
             when (statusCode) {
                 StatusCode.SUCCESS -> {}
+                StatusCode.NO_CONTENTS -> {
+                    throw ServiceException.NoResultException(statusCode.message())
+                }
                 StatusCode.FAIL_ACCESS_TOKEN_VALIDATION -> {
                     tokenManager.getRefreshToken()
-                        ?: throw ServiceException.RefreshTokenExpiredException(ExceptionMessage.EXPIRED_REFRESH_TOKEN)
+                        ?: throw ServiceException.RefreshTokenExpiredException(statusCode.message())
                     tokenRequester.add(request)
                 }
                 StatusCode.FAIL_REFRESH_TOKEN_VALIDATION -> {
-                    throw ServiceException.RefreshTokenExpiredException(ExceptionMessage.EXPIRED_REFRESH_TOKEN)
+                    throw ServiceException.RefreshTokenExpiredException(statusCode.message())
+                }
+                // 서버 혹은 통신 문제인 경우
+                StatusCode.WRONG_REQUEST_FORMAT,
+                StatusCode.WRONG_INPUT_DATA_FORMAT,
+                StatusCode.SERVER_ERROR,
+                -> {
+                    throw IOException(String.format(ExceptionMessage.MESSAGE_FAIL_REQUEST, statusCode.code()))
                 }
                 else -> {
                     throw IOException(statusCode.message())

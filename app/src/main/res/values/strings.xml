@@ -7,4 +7,5 @@
     <string name="text_login">로그인</string>
     <string name="text_find_id_password">아이디/비밀번호 찾기</string>
     <string name="text_sign_up">회원가입</string>
+
 </resources>

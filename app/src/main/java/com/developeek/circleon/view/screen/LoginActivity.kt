@@ -23,6 +23,7 @@ class LoginActivity : AppCompatActivity() {
         setContentView(binding.root)
 
         initObserver(this)
+        initListener()
     }
 
     private fun initObserver(activity: Activity) {
@@ -47,5 +48,20 @@ class LoginActivity : AppCompatActivity() {
         startActivity(intent)
     }
 
-    private fun showDialog(text: String) {}
+    private fun showDialog(text: String) {
+        // TODO: dialog
+    }
+
+    private fun initListener() {
+        setBtnLoginListener()
+    }
+
+    private fun setBtnLoginListener() {
+        binding.btnLogin.setOnClickListener {
+            viewModel.login(
+                binding.edtEmail.text.toString(),
+                binding.edtPassword.text.toString(),
+            )
+        }
+    }
 }
