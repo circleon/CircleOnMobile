@@ -1,4 +1,4 @@
-package com.developeek.circleon.view.screen
+package com.developeek.circleon.view.screen.login
 
 import android.app.Activity
 import android.content.Intent
@@ -9,6 +9,7 @@ import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.Observer
 import com.developeek.circleon.databinding.ActivityLoginBinding
 import com.developeek.circleon.domain.state.UiState
+import com.developeek.circleon.view.screen.home.HomeActivity
 import com.developeek.circleon.view.viewmodelimpl.LoginViewModelImpl
 import com.developeek.circleon.view.widget.CustomAlertDialog
 import dagger.hilt.android.AndroidEntryPoint
@@ -24,7 +25,7 @@ class LoginActivity : AppCompatActivity() {
         setContentView(binding.root)
 
         initObserver(this)
-        initListener()
+        initListener(this)
     }
 
     private fun initObserver(activity: Activity) {
@@ -53,8 +54,9 @@ class LoginActivity : AppCompatActivity() {
         startActivity(intent)
     }
 
-    private fun initListener() {
+    private fun initListener(activity: Activity) {
         setBtnLoginListener()
+        setBtnSignUpListener(activity)
     }
 
     private fun setBtnLoginListener() {
@@ -64,5 +66,17 @@ class LoginActivity : AppCompatActivity() {
                 binding.edtPassword.text.toString(),
             )
         }
+    }
+
+    private fun setBtnSignUpListener(activity: Activity) {
+        binding.btnSignUp.setOnClickListener {
+            sendUserToSignUpScreen(activity)
+        }
+    }
+
+    private fun sendUserToSignUpScreen(activity: Activity) {
+        val intent = Intent(activity, SignUpActivity::class.java)
+
+        startActivity(intent)
     }
 }

@@ -7,5 +7,17 @@
     <string name="text_login">로그인</string>
     <string name="text_find_id_password">아이디/비밀번호 찾기</string>
     <string name="text_sign_up">회원가입</string>
+    
+    <!--Sign Up-->
+    <string name="content_title_1">학교 이메일 인증이 필요해요</string>
+    <string name="content_title_2">비밀번호를 설정해주세요</string>
+    <string name="text_school_email">학교 이메일</string>
+    <string name="hint_school_email">example@ajou.ac.kr</string>
+    <string name="text_email_authentication_code">인증 번호</string>
+    <string name="hint_email_authentication_code">1234</string>
+    <string name="text_password">비밀번호</string>
+    <string name="condition_password">*영문, 숫자, 특수문자 포함 8~12자</string>
+    <string name="text_password_check">비밀번호 확인</string>
+    <string name="hint_password_check">****</string>
 
 </resources>
