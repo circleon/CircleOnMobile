@@ -1,4 +1,4 @@
-package com.developeek.circleon.data.entity
+package com.developeek.circleon.data.entity.login
 
 import com.google.gson.annotations.SerializedName
 

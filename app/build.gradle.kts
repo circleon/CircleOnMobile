@@ -63,6 +63,7 @@ dependencies {
     implementation(libs.squareup.retrofit2)
     implementation(libs.squareup.retrofit2.converter)
     implementation(libs.androidx.lifecycle.viewmodel)
+    implementation(libs.androidx.fragment)
     kapt(libs.google.dagger.hilt.android.compiler)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
