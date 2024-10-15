@@ -6,7 +6,9 @@ import androidx.fragment.app.FragmentManager
 import androidx.lifecycle.Lifecycle
 import com.developeek.circleon.databinding.ActivitySignUpBinding
 import com.developeek.circleon.view.adapter.SignUpFragmentAdapter
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class SignUpActivity : AppCompatActivity() {
     private lateinit var binding: ActivitySignUpBinding
 

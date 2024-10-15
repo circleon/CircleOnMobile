@@ -5,13 +5,13 @@
     android:layout_height="match_parent"
     android:orientation="vertical"
     android:background="@color/white"
-    tools:context=".view.screen.login.SignUpEmailFragment">
+    tools:context=".view.screen.login.SignUpNameFragment">
 
     <androidx.appcompat.widget.AppCompatTextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:paddingVertical="@dimen/margin_padding_large"
-        android:text="@string/content_title_2"
+        android:text="@string/content_title_1"
         android:textAppearance="@style/content_title"/>
 
     <androidx.appcompat.widget.LinearLayoutCompat
@@ -28,11 +28,11 @@
             <androidx.appcompat.widget.AppCompatTextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/text_school_email"
+                android:text="@string/text_name"
                 android:textSize="@dimen/text_size_small"/>
 
             <androidx.appcompat.widget.AppCompatTextView
-                android:id="@+id/txtEmailValidation"
+                android:id="@+id/txtNameValidation"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="@dimen/margin_padding_small"
@@ -41,61 +41,18 @@
         </androidx.appcompat.widget.LinearLayoutCompat>
 
         <androidx.appcompat.widget.AppCompatEditText
-            android:id="@+id/edtEmail"
+            android:id="@+id/edtName"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:padding="@dimen/margin_padding_large"
             android:maxLines="1"
             android:maxLength="30"
             android:inputType="textEmailAddress"
-            android:hint="@string/hint_school_email"
+            android:hint="@string/hint_name"
             android:textColorHint="@color/grey_7"
             android:textSize="@dimen/text_size_default"
             android:backgroundTint="@drawable/selector_edit_text"
             />
-
-    </androidx.appcompat.widget.LinearLayoutCompat>
-
-    <androidx.appcompat.widget.LinearLayoutCompat
-        android:id="@+id/llEmailAuthentication"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/margin_padding_large"
-        android:orientation="vertical"
-        android:visibility="gone">
-
-        <androidx.appcompat.widget.LinearLayoutCompat
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal">
-
-            <androidx.appcompat.widget.AppCompatTextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/text_email_authentication_code"
-                android:textSize="@dimen/text_size_small"/>
-
-            <androidx.appcompat.widget.AppCompatTextView
-                android:id="@+id/txtEmailAuthenticationCodeValidation"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="@dimen/margin_padding_small"
-                android:textSize="@dimen/text_size_small"/>
-
-        </androidx.appcompat.widget.LinearLayoutCompat>
-
-        <androidx.appcompat.widget.AppCompatEditText
-            android:id="@+id/edtEmailAuthenticationCode"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:padding="@dimen/margin_padding_large"
-            android:maxLines="1"
-            android:maxLength="30"
-            android:inputType="number"
-            android:hint="@string/hint_email_authentication_code"
-            android:textColorHint="@color/grey_7"
-            android:textSize="@dimen/text_size_default"
-            android:backgroundTint="@drawable/selector_edit_text"/>
 
     </androidx.appcompat.widget.LinearLayoutCompat>
 

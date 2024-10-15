@@ -7,10 +7,13 @@
     <string name="text_login">로그인</string>
     <string name="text_find_id_password">아이디/비밀번호 찾기</string>
     <string name="text_sign_up">회원가입</string>
-    
+
     <!--Sign Up-->
-    <string name="content_title_1">학교 이메일 인증이 필요해요</string>
-    <string name="content_title_2">비밀번호를 설정해주세요</string>
+    <string name="content_title_1">이름을 입력해주세요</string>
+    <string name="content_title_2">학교 이메일 인증이 필요해요</string>
+    <string name="content_title_3">비밀번호를 설정해주세요</string>
+    <string name="text_name">이름</string>
+    <string name="hint_name">홍길동</string>
     <string name="text_school_email">학교 이메일</string>
     <string name="hint_school_email">example@ajou.ac.kr</string>
     <string name="text_email_authentication_code">인증 번호</string>
