@@ -15,4 +15,14 @@ class LoginRepositoryImpl(
 
         return Result.success(true)
     }
+
+    override suspend fun signUp(
+        email: String,
+        userName: String,
+        password: String,
+    ): Result<Boolean> {
+        // TODO: service.signUp(email, userName, password)
+
+        return Result.success(true)
+    }
 }

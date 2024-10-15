@@ -7,4 +7,10 @@ interface LoginRepository {
         email: String,
         password: String,
     ): Result<Boolean>
+
+    suspend fun signUp(
+        email: String,
+        userName: String,
+        password: String,
+    ): Result<Boolean>
 }
