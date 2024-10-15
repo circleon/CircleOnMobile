@@ -10,6 +10,7 @@ import androidx.lifecycle.Observer
 import com.developeek.circleon.databinding.ActivityLoginBinding
 import com.developeek.circleon.domain.state.UiState
 import com.developeek.circleon.view.viewmodelimpl.LoginViewModelImpl
+import com.developeek.circleon.view.widget.CustomAlertDialog
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -37,7 +38,11 @@ class LoginActivity : AppCompatActivity() {
         Observer<UiState> {
             when (it) {
                 UiState.Success -> sendUserToHomeScreen(activity)
-                UiState.Timeout, UiState.Error -> showDialog(viewModel.error)
+                UiState.Timeout, UiState.Error ->
+                    CustomAlertDialog(
+                        activity,
+                        viewModel.error,
+                    ).show()
                 else -> {}
             }
         }
@@ -46,10 +51,6 @@ class LoginActivity : AppCompatActivity() {
         val intent = Intent(activity, HomeActivity::class.java)
 
         startActivity(intent)
-    }
-
-    private fun showDialog(text: String) {
-        // TODO: dialog
     }
 
     private fun initListener() {

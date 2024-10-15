@@ -18,7 +18,7 @@ class Success<T>(val data: T) : Result<T>()
 class Error<T>(private val error: Exception) : Result<T>() {
     fun message() =
         if (error is UnknownHostException) {
-            ExceptionMessage.INTERNET_CONNECTION_FAIL_EXCEPTION
+            ExceptionMessage.MESSAGE_FAIL_INTERNET_CONNECTION
         } else {
             error.message ?: error.toString()
         }
