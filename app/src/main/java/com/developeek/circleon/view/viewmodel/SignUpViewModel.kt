@@ -8,6 +8,8 @@ interface SignUpViewModel {
     val validation: LiveData<String>
     var error: String
 
+    fun signUp()
+
     fun setName(name: String)
 
     fun setEmail(email: String)
@@ -19,6 +21,4 @@ interface SignUpViewModel {
     fun setPassword(password: String)
 
     fun setPasswordCheck(passwordCheck: String)
-
-    fun signUp()
 }

@@ -48,6 +48,10 @@ class SignUpViewModelImpl
         override var error =
             Const.EMPTY_TEXT
 
+        override fun signUp() {
+            TODO("Not yet implemented")
+        }
+
         override fun setName(name: String) {
             val result = InputValidator.checkName(name)
 
@@ -138,9 +142,5 @@ class SignUpViewModelImpl
                 this.passwordMatched = false
                 validationMessage.postValue((result as Invalid).message())
             }
-        }
-
-        override fun signUp() {
-            TODO("Not yet implemented")
         }
     }

@@ -3,6 +3,9 @@ package com.developeek.circleon.data.repositoryimpl
 import com.developeek.circleon.data.repository.LoginRepository
 import com.developeek.circleon.data.source.Result
 import com.developeek.circleon.data.source.remote.retrofit.service.LoginService
+import com.developeek.circleon.domain.vo.Email
+import com.developeek.circleon.domain.vo.Name
+import com.developeek.circleon.domain.vo.Password
 
 class LoginRepositoryImpl(
     private val service: LoginService,
@@ -17,29 +20,23 @@ class LoginRepositoryImpl(
     }
 
     override suspend fun signUp(
-        email: String,
-        userName: String,
-        password: String,
+        email: Email,
+        userName: Name,
+        password: Password,
     ): Result<Boolean> {
         // TODO: service.signUp(email, userName, password)
 
         return Result.success(true)
     }
 
-    override suspend fun checkEmailDuplication(email: String): Result<Boolean> {
-        // TODO: service.checkEmailDuplication(email)
-
-        return Result.success(true)
-    }
-
-    override suspend fun requestEmailAuthenticationCode(email: String): Result<Boolean> {
+    override suspend fun requestEmailAuthenticationCode(email: Email): Result<Boolean> {
         // TODO: service.requestEmailAuthenticationCode(email)
 
         return Result.success(true)
     }
 
     override suspend fun authenticateEmail(
-        email: String,
+        email: Email,
         code: String,
     ): Result<Boolean> {
         // TODO: service.authenticateEmail(email, code)
