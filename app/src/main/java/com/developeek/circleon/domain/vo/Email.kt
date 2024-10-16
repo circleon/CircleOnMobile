@@ -11,6 +11,8 @@ data class Email(
         require(isEmailFormat()) { String.format(ExceptionMessage.MESSAGE_WRONG_FORMAT_EMAIL) }
     }
 
+    private fun get() = data
+
     private fun isNotEmpty() = data.isNotEmpty()
 
     private fun isEmailFormat(): Boolean {

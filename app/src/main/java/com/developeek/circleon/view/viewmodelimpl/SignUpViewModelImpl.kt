@@ -12,6 +12,9 @@ import com.developeek.circleon.domain.utils.Const
 import com.developeek.circleon.domain.utils.InputValidator
 import com.developeek.circleon.domain.utils.Invalid
 import com.developeek.circleon.domain.utils.Valid
+import com.developeek.circleon.domain.vo.Email
+import com.developeek.circleon.domain.vo.Name
+import com.developeek.circleon.domain.vo.Password
 import com.developeek.circleon.view.viewmodel.SignUpViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
@@ -28,41 +31,19 @@ class SignUpViewModelImpl
             get() = uiState
         private val uiState = MutableLiveData<UiState>()
 
-        override val nameValidation: LiveData<String>
-            get() = nameMessage
-        private val nameMessage = MutableLiveData<String>()
+        override val validation: LiveData<String>
+            get() = validationMessage
+        private val validationMessage = MutableLiveData<String>()
 
-        override val emailValidation: LiveData<String>
-            get() = emailMessage
-        private val emailMessage = MutableLiveData<String>()
-
-        override val emailDuplication: LiveData<Boolean>
-            get() = checkEmailDuplication
-        private val checkEmailDuplication = MutableLiveData<Boolean>()
-
-        override val emailAuthenticationCodeRequest: LiveData<Boolean>
-            get() = checkEmailAuthenticationCodeRequest
-        private val checkEmailAuthenticationCodeRequest = MutableLiveData<Boolean>()
-
-        override val passwordValidation: LiveData<String>
-            get() = passwordMessage
-        private val passwordMessage = MutableLiveData<String>()
-
-        override val passwordCheckValidation: LiveData<String>
-            get() = passwordCheckMessage
-        private val passwordCheckMessage = MutableLiveData<String>()
-
-        private var name: String? = null
-        private var email: String? = null
-        private var emailCode = Const.EMPTY_TEXT
-        private var emailDuplicated: Boolean = true
+        private var name: Name? = null
+        private var email: Email? = null
+        private var password: Password? = null
+        private var passwordMatched: Boolean = false
         private var emailAuthenticated: Boolean = false
-        private var password: String? = null
-        private var passwordCheck: String? = null
 
-        private var checkDuplicationJob: Job? = null
         private var authenticationCodeJob: Job? = null
         private var authenticationJob: Job? = null
+        private var signUpJob: Job? = null
 
         override var error =
             Const.EMPTY_TEXT
@@ -71,97 +52,63 @@ class SignUpViewModelImpl
             val result = InputValidator.checkName(name)
 
             if (result is Valid) {
-                this.name = name
-                nameMessage.postValue(SUCCESS)
+                this.name = result.data
+                validationMessage.postValue(Const.EMPTY_TEXT)
             } else {
-                if (this.name != null) this.name = null
-                nameMessage.postValue((result as Invalid).message())
+                this.name = null
+                validationMessage.postValue((result as Invalid).message())
             }
         }
 
         override fun setEmail(email: String) {
-            emailDuplicated = true // 중복 검사 이후 수정 방지용
             emailAuthenticated = false
             val result = InputValidator.checkEmail(email)
 
             if (result is Valid) {
-                this.email = email
-                emailMessage.postValue(SUCCESS)
+                this.email = result.data
+                validationMessage.postValue(Const.EMPTY_TEXT)
             } else {
-                if (this.email != null) this.email = null
-                emailMessage.postValue((result as Invalid).message())
+                this.email = null
+                validationMessage.postValue((result as Invalid).message())
             }
         }
 
-        override fun checkEmailDuplication() {
-            checkDuplicationJob?.cancel()
-
-            checkDuplicationJob =
-                viewModelScope.launch {
-                    withContext(Dispatchers.IO) {
-                        emailDuplicationCheck()
-                    }
-                }
-        }
-
-        private suspend fun emailDuplicationCheck() {
-            val result = repository.checkEmailDuplication(email!!)
-
-            if (result is Success) {
-                this.emailDuplicated = false
-                checkEmailDuplication.postValue(false)
-            } else {
-                this.emailDuplicated = true
-                error = (result as Error).message()
-                uiState.postValue(UiState.Error)
-            }
-        }
-
-        override fun requestEmailAuthenticationCode() {
+        override fun requestEmailCode() {
             authenticationCodeJob?.cancel()
 
             authenticationCodeJob =
                 viewModelScope.launch {
                     withContext(Dispatchers.IO) {
-                        emailAuthenticationCodeRequest()
+                        requestEmailAuthenticationCode()
                     }
                 }
         }
 
-        private suspend fun emailAuthenticationCodeRequest() {
-            val result = repository.requestEmailAuthenticationCode(email!!)
+        private suspend fun requestEmailAuthenticationCode() {
+            val result = repository.requestEmailAuthenticationCode(email)
 
-            if (result is Success) {
-                checkEmailAuthenticationCodeRequest.postValue(true)
-            } else {
-                error = (result as Error).message()
+            if (result is Error) {
+                error = result.message()
                 uiState.postValue(UiState.Error)
             }
         }
 
-        override fun setEmailCode(code: String) {
-            this.emailCode = code
-        }
-
-        override fun authenticateEmail() {
+        override fun authenticateEmail(code: String) {
             authenticationJob?.cancel()
 
             authenticationJob =
                 viewModelScope.launch {
                     withContext(Dispatchers.IO) {
-                        if (email != Const.EMPTY_TEXT) {
-                            emailAuthenticate()
-                        }
+                        emailAuthenticate(code)
                     }
                 }
         }
 
-        private suspend fun emailAuthenticate() {
-            val result = repository.authenticateEmail(email!!, emailCode)
+        private suspend fun emailAuthenticate(code: String) {
+            val result = repository.authenticateEmail(email, code)
 
             if (result is Success) {
                 emailAuthenticated = true
-                uiState.postValue(UiState.Success)
             } else {
                 emailAuthenticated = false
                 error = (result as Error).message()
@@ -170,18 +117,30 @@ class SignUpViewModelImpl
         }
 
         override fun setPassword(password: String) {
-            TODO("Not yet implemented")
+            val result = InputValidator.checkPassword(password)
+
+            if (result is Valid) {
+                this.password = result.data
+                validationMessage.postValue(Const.EMPTY_TEXT)
+            } else {
+                this.password = null
+                validationMessage.postValue((result as Invalid).message())
+            }
         }
 
         override fun setPasswordCheck(passwordCheck: String) {
-            TODO("Not yet implemented")
+            val result = InputValidator.checkPasswordMatch(password, passwordCheck)
+
+            if (result is Valid) {
+                this.passwordMatched = true
+                validationMessage.postValue(Const.EMPTY_TEXT)
+            } else {
+                this.passwordMatched = false
+                validationMessage.postValue((result as Invalid).message())
+            }
         }
 
         override fun signUp() {
             TODO("Not yet implemented")
-        }
-
-        companion object {
-            private const val SUCCESS = ""
         }
     }

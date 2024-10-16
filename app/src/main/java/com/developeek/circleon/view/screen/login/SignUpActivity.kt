@@ -150,7 +150,7 @@ class SignUpActivity : AppCompatActivity() {
 
     private fun setBtnBottomAsEmailAuthenticateCodeButton() {
         binding.btnBottom.setOnClickListener {
-            viewModel.requestEmailAuthenticationCode()
+            viewModel.requestEmailCode()
         }
         binding.btnBottom.text = BUTTON_REQUEST_AUTHENTICATION_CODE
     }

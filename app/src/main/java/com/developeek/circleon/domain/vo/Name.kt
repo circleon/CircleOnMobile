@@ -10,6 +10,8 @@ data class Name(
         require(isNotEmpty()) { String.format(ExceptionMessage.MESSAGE_INPUT_VALIDATION_NO_DATA, NAME) }
     }
 
+    private fun get() = data
+
     private fun isNotEmpty() = data.isNotEmpty()
 
     companion object {

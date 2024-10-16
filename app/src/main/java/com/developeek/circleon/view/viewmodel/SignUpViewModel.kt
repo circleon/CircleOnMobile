@@ -5,25 +5,16 @@ import com.developeek.circleon.domain.state.UiState
 
 interface SignUpViewModel {
     val state: LiveData<UiState>
-    val nameValidation: LiveData<String>
-    val emailValidation: LiveData<String>
-    val emailDuplication: LiveData<Boolean>
-    val emailAuthenticationCodeRequest: LiveData<Boolean>
-    val passwordValidation: LiveData<String>
-    val passwordCheckValidation: LiveData<String>
+    val validation: LiveData<String>
     var error: String
 
     fun setName(name: String)
 
     fun setEmail(email: String)
 
-    fun checkEmailDuplication()
+    fun requestEmailCode()
 
-    fun requestEmailAuthenticationCode()
-
-    fun setEmailCode(code: String)
-
-    fun authenticateEmail()
+    fun authenticateEmail(code: String)
 
     fun setPassword(password: String)
 
