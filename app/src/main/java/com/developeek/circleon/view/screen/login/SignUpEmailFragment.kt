@@ -6,18 +6,16 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.inputmethod.InputMethodManager
-import androidx.core.content.ContextCompat
+import androidx.core.view.isVisible
 import androidx.core.widget.doOnTextChanged
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.Observer
-import com.developeek.circleon.R
 import com.developeek.circleon.databinding.FragmentSignUpEmailBinding
+import com.developeek.circleon.domain.utils.Const
 import com.developeek.circleon.view.viewmodelimpl.SignUpViewModelImpl
-import dagger.hilt.android.AndroidEntryPoint
 
-@AndroidEntryPoint
 class SignUpEmailFragment : Fragment() {
     private lateinit var binding: FragmentSignUpEmailBinding
     private val viewModel: SignUpViewModelImpl by activityViewModels()
@@ -29,58 +27,30 @@ class SignUpEmailFragment : Fragment() {
     ): View {
         binding = FragmentSignUpEmailBinding.inflate(layoutInflater)
 
+        initObserver(requireActivity())
+        initListener()
+
         return binding.root
     }
 
-    override fun onViewCreated(
-        view: View,
-        savedInstanceState: Bundle?,
-    ) {
-        super.onViewCreated(view, savedInstanceState)
-
-        initObserver(requireActivity())
-        initListener()
-        initFocus(requireActivity())
-    }
-
     private fun initObserver(activity: Activity) {
-        viewModel.emailValidation.observe(
+        viewModel.validation.observe(
             activity as LifecycleOwner,
-            emailValidationObserver(activity),
-        )
-
-        viewModel.emailDuplication.observe(
-            activity as LifecycleOwner,
-            emailDuplicationObserver(activity),
+            validationObserver(),
         )
     }
 
-    private fun emailValidationObserver(activity: Activity) =
+    private fun validationObserver() =
         Observer<String> {
-            if (it == SUCCESS) {
-                binding.txtEmailValidation.text = SUCCESS
-                binding.txtEmailValidation.setTextColor(ContextCompat.getColor(activity, R.color.green_5))
-            } else {
+            if (binding.edtEmail.hasFocus()) {
                 binding.txtEmailValidation.text = it
-                binding.txtEmailValidation.setTextColor(ContextCompat.getColor(activity, R.color.error))
+                if (it == EMAIL_VALIDATED) binding.txtEmailValidation.text = Const.EMPTY_TEXT
             }
-        }
-
-    private fun emailDuplicationObserver(activity: Activity) =
-        Observer<Boolean> {
-            if (!it) {
-                binding.txtEmailValidation.text = MESSAGE_SUCCESS
-                binding.txtEmailValidation.setTextColor(ContextCompat.getColor(activity, R.color.green_5))
-                binding.llEmailAuthentication.visibility = View.VISIBLE
-                binding.edtEmailAuthenticationCode.post {
-                    showSoftInput(binding.edtEmailAuthenticationCode, activity)
-                }
-            }
+            binding.llEmailAuthentication.isVisible = it == EMAIL_VALIDATED
         }
 
     private fun initListener() {
         initEdtEmailListener()
-        initEdtEmailAuthenticationCodeListener()
     }
 
     private fun initEdtEmailListener() {
@@ -89,15 +59,11 @@ class SignUpEmailFragment : Fragment() {
         }
     }
 
-    private fun initEdtEmailAuthenticationCodeListener() {
-        binding.edtEmailAuthenticationCode.doOnTextChanged { text, _, _, _ ->
-            viewModel.setEmailCode(text.toString())
-        }
-    }
+    override fun onResume() {
+        super.onResume()
 
-    private fun initFocus(activity: Activity) {
         binding.edtEmail.post {
-            showSoftInput(binding.edtEmail, activity)
+            showSoftInput(binding.edtEmail, requireActivity())
         }
     }
 
@@ -112,7 +78,6 @@ class SignUpEmailFragment : Fragment() {
     }
 
     companion object {
-        private const val SUCCESS = ""
-        private const val MESSAGE_SUCCESS = "✓"
+        private const val EMAIL_VALIDATED = "2"
     }
 }

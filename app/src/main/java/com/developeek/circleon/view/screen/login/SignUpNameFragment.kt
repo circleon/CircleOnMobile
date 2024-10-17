@@ -6,14 +6,13 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.inputmethod.InputMethodManager
-import androidx.core.content.ContextCompat
 import androidx.core.widget.doOnTextChanged
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.Observer
-import com.developeek.circleon.R
 import com.developeek.circleon.databinding.FragmentSignUpNameBinding
+import com.developeek.circleon.domain.utils.Const
 import com.developeek.circleon.view.viewmodelimpl.SignUpViewModelImpl
 
 class SignUpNameFragment : Fragment() {
@@ -27,35 +26,24 @@ class SignUpNameFragment : Fragment() {
     ): View {
         binding = FragmentSignUpNameBinding.inflate(layoutInflater)
 
+        initObserver(requireActivity())
+        initListener()
+
         return binding.root
     }
 
-    override fun onViewCreated(
-        view: View,
-        savedInstanceState: Bundle?,
-    ) {
-        super.onViewCreated(view, savedInstanceState)
-
-        initObserver(requireActivity())
-        initListener()
-        initFocus(requireActivity())
-    }
-
     private fun initObserver(activity: Activity) {
-        viewModel.nameValidation.observe(
+        viewModel.validation.observe(
             activity as LifecycleOwner,
-            nameValidationObserver(activity),
+            validationObserver(),
         )
     }
 
-    private fun nameValidationObserver(activity: Activity) =
+    private fun validationObserver() =
         Observer<String> {
-            if (it == SUCCESS) {
-                binding.txtNameValidation.text = MESSAGE_SUCCESS
-                binding.txtNameValidation.setTextColor(ContextCompat.getColor(activity, R.color.green_5))
-            } else {
+            if (binding.edtName.hasFocus()) {
                 binding.txtNameValidation.text = it
-                binding.txtNameValidation.setTextColor(ContextCompat.getColor(activity, R.color.error))
+                if (it == NAME_VALIDATED) binding.txtNameValidation.text = Const.EMPTY_TEXT
             }
         }
 
@@ -69,9 +57,11 @@ class SignUpNameFragment : Fragment() {
         }
     }
 
-    private fun initFocus(activity: Activity) {
+    override fun onResume() {
+        super.onResume()
+
         binding.edtName.post {
-            showSoftInput(binding.edtName, activity)
+            showSoftInput(binding.edtName, requireActivity())
         }
     }
 
@@ -86,7 +76,6 @@ class SignUpNameFragment : Fragment() {
     }
 
     companion object {
-        private const val SUCCESS = ""
-        private const val MESSAGE_SUCCESS = "✓"
+        private const val NAME_VALIDATED = "1"
     }
 }

@@ -2,13 +2,13 @@ package com.developeek.circleon.view.screen.login
 
 import android.app.Activity
 import android.os.Bundle
+import android.view.MenuItem
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.FragmentManager
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.Observer
-import androidx.viewpager2.widget.ViewPager2
 import com.developeek.circleon.databinding.ActivitySignUpBinding
 import com.developeek.circleon.domain.state.UiState
 import com.developeek.circleon.view.adapter.SignUpFragmentAdapter
@@ -29,6 +29,9 @@ class SignUpActivity : AppCompatActivity() {
         initViewPager(supportFragmentManager, lifecycle)
         initObserver(this)
         initListener()
+
+        setSupportActionBar(binding.tbSignUp)
+        supportActionBar?.setDisplayHomeAsUpEnabled(true)
     }
 
     private fun initViewPager(
@@ -37,28 +40,13 @@ class SignUpActivity : AppCompatActivity() {
     ) {
         binding.vpgSignUp.adapter = SignUpFragmentAdapter(fragmentManager, lifecycle)
         binding.vpgSignUp.isUserInputEnabled = false
+        binding.vpgSignUp.offscreenPageLimit = 1
     }
 
     private fun initObserver(activity: Activity) {
         viewModel.state.observe(
             activity as LifecycleOwner,
             stateObserver(activity),
-        )
-        viewModel.nameValidation.observe(
-            activity as LifecycleOwner,
-            nameValidationObserver(),
-        )
-        viewModel.emailValidation.observe(
-            activity as LifecycleOwner,
-            emailValidationObserver(),
-        )
-        viewModel.emailDuplication.observe(
-            activity as LifecycleOwner,
-            emailDuplicationObserver(),
-        )
-        viewModel.emailAuthenticationCodeRequest.observe(
-            activity as LifecycleOwner,
-            emailAuthenticationCodeRequestObserver(),
         )
     }
 
@@ -75,33 +63,9 @@ class SignUpActivity : AppCompatActivity() {
             }
         }
 
-    private fun nameValidationObserver() =
-        Observer<String> {
-            binding.btnBottom.isClickable = it == SUCCESS
-        }
-
-    private fun emailValidationObserver() =
-        Observer<String> {
-            binding.btnBottom.isClickable = it == SUCCESS
-        }
-
-    private fun emailDuplicationObserver() =
-        Observer<Boolean> {
-            if (!it) {
-                setBtnBottomAsEmailAuthenticateCodeButton()
-            }
-        }
-
-    private fun emailAuthenticationCodeRequestObserver() =
-        Observer<Boolean> {
-            if (it) {
-                setBtnBottomAsEmailAuthenticationButton()
-            }
-        }
-
     private fun initListener() {
         setBtnFinishListener()
-        setVpgSignUpListener()
+        setBtnNextListener()
     }
 
     private fun setBtnFinishListener() {
@@ -110,71 +74,21 @@ class SignUpActivity : AppCompatActivity() {
         }
     }
 
-    private fun setVpgSignUpListener() {
-        binding.vpgSignUp.registerOnPageChangeCallback(
-            object : ViewPager2.OnPageChangeCallback() {
-                override fun onPageSelected(position: Int) {
-                    super.onPageSelected(position)
-
-                    when (position) {
-                        0 -> {
-                            setBtnBottomAsNextButton()
-                        }
-                        1 -> {
-                            setBtnBottomAsEmailCheckButton()
-                        }
-                        2 -> {
-                            setBtnBottomAsSignUpButton()
-                        }
-                    }
-                }
-            },
-        )
-    }
-
-    private fun setBtnBottomAsNextButton() {
-        binding.btnBottom.setOnClickListener {
+    private fun setBtnNextListener() {
+        binding.btnNext.setOnClickListener {
             binding.vpgSignUp.currentItem += 1
         }
-        binding.btnBottom.text = BUTTON_NEXT
-        binding.btnBottom.isClickable = false
     }
 
-    private fun setBtnBottomAsEmailCheckButton() {
-        binding.btnBottom.setOnClickListener {
-            viewModel.checkEmailDuplication()
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        return when (item.itemId) {
+            android.R.id.home -> {
+                binding.vpgSignUp.currentItem -= 1
+                true
+            }
+            else -> {
+                super.onOptionsItemSelected(item)
+            }
         }
-        binding.btnBottom.text = BUTTON_CHECK_EMAIL_DUPLICATION
-        binding.btnBottom.isClickable = false
-    }
-
-    private fun setBtnBottomAsEmailAuthenticateCodeButton() {
-        binding.btnBottom.setOnClickListener {
-            viewModel.requestEmailCode()
-        }
-        binding.btnBottom.text = BUTTON_REQUEST_AUTHENTICATION_CODE
-    }
-
-    private fun setBtnBottomAsEmailAuthenticationButton() {
-        binding.btnBottom.setOnClickListener {
-            viewModel.authenticateEmail()
-        }
-        binding.btnBottom.text = BUTTON_AUTHENTICATE_EMAIL
-    }
-
-    private fun setBtnBottomAsSignUpButton() {
-        binding.btnBottom.setOnClickListener {
-            viewModel.signUp()
-        }
-        binding.btnBottom.text = BUTTON_REQUEST_SIGN_UP
-    }
-
-    companion object {
-        private const val SUCCESS = ""
-        private const val BUTTON_NEXT = "다음"
-        private const val BUTTON_CHECK_EMAIL_DUPLICATION = "중복 검사하기"
-        private const val BUTTON_REQUEST_AUTHENTICATION_CODE = "인증 번호 요청하기"
-        private const val BUTTON_AUTHENTICATE_EMAIL = "인증하기"
-        private const val BUTTON_REQUEST_SIGN_UP = "회원 가입"
     }
 }

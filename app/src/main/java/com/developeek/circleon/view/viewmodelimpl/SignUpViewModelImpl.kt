@@ -57,7 +57,7 @@ class SignUpViewModelImpl
 
             if (result is Valid) {
                 this.name = result.data
-                validationMessage.postValue(Const.EMPTY_TEXT)
+                validationMessage.postValue(NAME_VALIDATED)
             } else {
                 this.name = null
                 validationMessage.postValue((result as Invalid).message())
@@ -70,7 +70,7 @@ class SignUpViewModelImpl
 
             if (result is Valid) {
                 this.email = result.data
-                validationMessage.postValue(Const.EMPTY_TEXT)
+                validationMessage.postValue(EMAIL_VALIDATED)
             } else {
                 this.email = null
                 validationMessage.postValue((result as Invalid).message())
@@ -89,7 +89,7 @@ class SignUpViewModelImpl
         }
 
         private suspend fun requestEmailAuthenticationCode() {
-            val result = repository.requestEmailAuthenticationCode(email)
+            val result = repository.requestEmailAuthenticationCode(email!!)
 
             if (result is Error) {
                 error = result.message()
@@ -109,7 +109,7 @@ class SignUpViewModelImpl
         }
 
         private suspend fun emailAuthenticate(code: String) {
-            val result = repository.authenticateEmail(email, code)
+            val result = repository.authenticateEmail(email!!, code)
 
             if (result is Success) {
                 emailAuthenticated = true
@@ -125,7 +125,7 @@ class SignUpViewModelImpl
 
             if (result is Valid) {
                 this.password = result.data
-                validationMessage.postValue(Const.EMPTY_TEXT)
+                validationMessage.postValue(PASSWORD_VALIDATED)
             } else {
                 this.password = null
                 validationMessage.postValue((result as Invalid).message())
@@ -137,10 +137,17 @@ class SignUpViewModelImpl
 
             if (result is Valid) {
                 this.passwordMatched = true
-                validationMessage.postValue(Const.EMPTY_TEXT)
+                validationMessage.postValue(PASSWORD_CHECK_VALIDATED)
             } else {
                 this.passwordMatched = false
                 validationMessage.postValue((result as Invalid).message())
             }
+        }
+
+        companion object {
+            private const val NAME_VALIDATED = "1"
+            private const val EMAIL_VALIDATED = "2"
+            private const val PASSWORD_VALIDATED = "3"
+            private const val PASSWORD_CHECK_VALIDATED = "4"
         }
     }
