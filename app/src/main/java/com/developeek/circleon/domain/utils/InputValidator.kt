@@ -36,7 +36,7 @@ object InputValidator {
     ): InputValidationResult<Boolean> {
         return try {
             if (password == null) {
-                throw IllegalArgumentException(String.format(ExceptionMessage.MESSAGE_WRONG_FORMAT_EMAIL))
+                throw IllegalArgumentException(String.format(ExceptionMessage.MESSAGE_WRONG_PASSWORD_CHECK))
             }
             password.check(data)
             InputValidationResult.valid(true)

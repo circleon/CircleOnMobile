@@ -11,5 +11,5 @@ object ExceptionMessage {
     const val MESSAGE_INPUT_VALIDATION_NO_DATA = "*%s (을)를 입력해주시기 바랍니다"
     const val MESSAGE_WRONG_FORMAT_EMAIL = "*이메일 주소 형식이 올바르지 않습니다"
     const val MESSAGE_WRONG_FORMAT_PASSWORD = "*비밀번호 형식이 올바르지 않습니다"
-    const val MESSAGE_WRONG_FORMAT_PASSWORD_CHECK = "*비밀번호가 일치하지 않습니다"
+    const val MESSAGE_WRONG_PASSWORD_CHECK = "*비밀번호가 일치하지 않습니다"
 }

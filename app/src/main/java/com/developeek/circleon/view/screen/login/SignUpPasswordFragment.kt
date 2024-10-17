@@ -6,11 +6,13 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.inputmethod.InputMethodManager
+import androidx.core.content.ContextCompat
 import androidx.core.widget.doOnTextChanged
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.Observer
+import com.developeek.circleon.R
 import com.developeek.circleon.databinding.FragmentSignUpPasswordBinding
 import com.developeek.circleon.domain.utils.Const
 import com.developeek.circleon.view.viewmodelimpl.SignUpViewModelImpl
@@ -35,15 +37,18 @@ class SignUpPasswordFragment : Fragment() {
     private fun initObserver(activity: Activity) {
         viewModel.validation.observe(
             activity as LifecycleOwner,
-            validationObserver(),
+            validationObserver(activity),
         )
     }
 
-    private fun validationObserver() =
+    private fun validationObserver(activity: Activity) =
         Observer<String> {
             if (binding.edtPassword.hasFocus()) {
-                binding.txtPasswordValidation.text = it
-                if (it == PASSWORD_VALIDATED) binding.txtPasswordValidation.text = Const.EMPTY_TEXT
+                if (it == PASSWORD_VALIDATED) {
+                    binding.txtPasswordValidation.setTextColor(ContextCompat.getColor(activity, R.color.grey_5))
+                } else {
+                    binding.txtPasswordValidation.setTextColor(ContextCompat.getColor(activity, R.color.error))
+                }
             }
             if (binding.edtPasswordCheck.hasFocus()) {
                 binding.txtPasswordCheckValidation.text = it

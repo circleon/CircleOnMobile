@@ -50,7 +50,7 @@
             android:maxLength="30"
             android:inputType="textEmailAddress"
             android:hint="@string/hint_name"
-            android:textColorHint="@color/grey_7"
+            android:textColorHint="@color/grey_5"
             android:textSize="@dimen/text_size_default"
             android:backgroundTint="@drawable/selector_edit_text"
             />

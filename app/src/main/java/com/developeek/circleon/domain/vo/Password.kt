@@ -22,7 +22,7 @@ data class Password(
     }
 
     fun check(password: String) {
-        require(data == password) { String.format(ExceptionMessage.MESSAGE_WRONG_FORMAT_EMAIL) }
+        require(data == password) { String.format(ExceptionMessage.MESSAGE_WRONG_PASSWORD_CHECK) }
     }
 
     companion object {
