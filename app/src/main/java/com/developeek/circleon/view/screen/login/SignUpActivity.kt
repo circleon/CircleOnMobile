@@ -2,6 +2,7 @@ package com.developeek.circleon.view.screen.login
 
 import android.app.Activity
 import android.os.Bundle
+import android.view.KeyEvent
 import android.view.MenuItem
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
@@ -83,12 +84,32 @@ class SignUpActivity : AppCompatActivity() {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
             android.R.id.home -> {
-                binding.vpgSignUp.currentItem -= 1
+                if (binding.vpgSignUp.currentItem == 0) {
+                    finish()
+                } else {
+                    binding.vpgSignUp.currentItem -= 1
+                }
                 true
             }
             else -> {
                 super.onOptionsItemSelected(item)
             }
+        }
+    }
+
+    override fun onKeyDown(
+        keyCode: Int,
+        event: KeyEvent?,
+    ): Boolean {
+        if (keyCode == KeyEvent.KEYCODE_BACK) {
+            if (binding.vpgSignUp.currentItem == 0) {
+                return super.onKeyDown(keyCode, event)
+            } else {
+                binding.vpgSignUp.currentItem -= 1
+                return true
+            }
+        } else {
+            return super.onKeyDown(keyCode, event)
         }
     }
 }
