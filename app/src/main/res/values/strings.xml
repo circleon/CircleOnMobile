@@ -9,16 +9,19 @@
     <string name="text_sign_up">회원가입</string>
 
     <!--Sign Up-->
-    <string name="btn_next">다음</string>
-    <string name="content_title_1">이름을 입력해주세요</string>
-    <string name="content_title_2">학교 이메일 인증이 필요해요</string>
-    <string name="content_title_3">비밀번호를 설정해주세요</string>
+    <string name="btn_next">다음 단계로</string>
+    <string name="sign_up_content_title_1">반가워요! 이름을 알려주세요</string>
+    <string name="sign_up_content_title_2">학교 이메일 인증이 필요해요</string>
+    <string name="sign_up_content_title_3">이메일로 인증번호를 전송했어요</string>
+    <string name="sign_up_content_title_4">비밀번호를 설정해주세요</string>
     <string name="text_name">이름</string>
     <string name="hint_name">이름 입력</string>
     <string name="text_school_email">학교 이메일</string>
     <string name="hint_school_email">이메일 입력</string>
-    <string name="text_email_authentication_code">인증 번호</string>
-    <string name="hint_email_authentication_code">1234</string>
+    <string name="text_email_authentication_code">인증번호</string>
+    <string name="hint_email_authentication_code">인증번호 입력</string>
+    <string name="info_email_no_authentication_code">혹시 인증번호가 전송되지 않았나요?</string>
+    <string name="btn_resend_authentication_code">다시 전송하기</string>
     <string name="text_password">비밀번호</string>
     <string name="condition_password">*영문, 숫자, 특수문자 포함 8~12자</string>
     <string name="text_password_check">비밀번호 확인</string>

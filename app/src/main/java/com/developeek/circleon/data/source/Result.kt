@@ -1,7 +1,7 @@
 package com.developeek.circleon.data.source
 
-import com.developeek.circleon.data.exception.ExceptionMessage
 import com.developeek.circleon.data.exception.ServiceException
+import com.developeek.circleon.data.exception.ServiceExceptionMessage
 import java.net.SocketTimeoutException
 import java.net.UnknownHostException
 
@@ -18,7 +18,7 @@ class Success<T>(val data: T) : Result<T>()
 class Error<T>(private val error: Exception) : Result<T>() {
     fun message() =
         if (error is UnknownHostException) {
-            ExceptionMessage.MESSAGE_FAIL_INTERNET_CONNECTION
+            ServiceExceptionMessage.MESSAGE_FAIL_INTERNET_CONNECTION
         } else {
             error.message ?: error.toString()
         }

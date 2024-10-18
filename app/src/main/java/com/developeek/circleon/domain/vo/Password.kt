@@ -1,14 +1,14 @@
 package com.developeek.circleon.domain.vo
 
-import com.developeek.circleon.data.exception.ExceptionMessage
+import com.developeek.circleon.domain.utils.validator.ValidatorExceptionMessage
 import java.io.Serializable
 
 data class Password(
     private val data: String,
 ) : Serializable {
     init {
-        require(isNotEmpty()) { String.format(ExceptionMessage.MESSAGE_INPUT_VALIDATION_NO_DATA, PASSWORD) }
-        require(isPasswordFormat()) { String.format(ExceptionMessage.MESSAGE_WRONG_FORMAT_PASSWORD) }
+        require(isNotEmpty()) { String.format(ValidatorExceptionMessage.MESSAGE_INPUT_VALIDATION_NO_DATA, PASSWORD) }
+        require(isPasswordFormat()) { String.format(ValidatorExceptionMessage.MESSAGE_WRONG_FORMAT) }
     }
 
     private fun get() = data
@@ -22,7 +22,7 @@ data class Password(
     }
 
     fun check(password: String) {
-        require(data == password) { String.format(ExceptionMessage.MESSAGE_WRONG_PASSWORD_CHECK) }
+        require(data == password) { String.format(ValidatorExceptionMessage.MESSAGE_WRONG_PASSWORD_CHECK) }
     }
 
     companion object {

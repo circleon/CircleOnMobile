@@ -9,9 +9,9 @@ import com.developeek.circleon.data.source.Error
 import com.developeek.circleon.data.source.Success
 import com.developeek.circleon.domain.state.UiState
 import com.developeek.circleon.domain.utils.Const
-import com.developeek.circleon.domain.utils.InputValidator
-import com.developeek.circleon.domain.utils.Invalid
-import com.developeek.circleon.domain.utils.Valid
+import com.developeek.circleon.domain.utils.validator.Invalid
+import com.developeek.circleon.domain.utils.validator.Valid
+import com.developeek.circleon.domain.utils.validator.Validator
 import com.developeek.circleon.domain.vo.Email
 import com.developeek.circleon.domain.vo.Name
 import com.developeek.circleon.domain.vo.Password
@@ -53,7 +53,7 @@ class SignUpViewModelImpl
         }
 
         override fun setName(name: String) {
-            val result = InputValidator.checkName(name)
+            val result = Validator.checkName(name)
 
             if (result is Valid) {
                 this.name = result.data
@@ -66,7 +66,7 @@ class SignUpViewModelImpl
 
         override fun setEmail(email: String) {
             emailAuthenticated = false
-            val result = InputValidator.checkEmail(email)
+            val result = Validator.checkEmail(email)
 
             if (result is Valid) {
                 this.email = result.data
@@ -121,7 +121,7 @@ class SignUpViewModelImpl
         }
 
         override fun setPassword(password: String) {
-            val result = InputValidator.checkPassword(password)
+            val result = Validator.checkPassword(password)
 
             if (result is Valid) {
                 this.password = result.data
@@ -133,7 +133,7 @@ class SignUpViewModelImpl
         }
 
         override fun setPasswordCheck(passwordCheck: String) {
-            val result = InputValidator.checkPasswordMatch(password, passwordCheck)
+            val result = Validator.checkPasswordMatch(password, passwordCheck)
 
             if (result is Valid) {
                 this.passwordMatched = true

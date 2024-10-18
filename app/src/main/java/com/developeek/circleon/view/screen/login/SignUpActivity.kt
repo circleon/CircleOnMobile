@@ -85,11 +85,11 @@ class SignUpActivity : AppCompatActivity() {
         return when (item.itemId) {
             android.R.id.home -> {
                 if (binding.vpgSignUp.currentItem == 0) {
-                    finish()
+                    return super.onOptionsItemSelected(item)
                 } else {
                     binding.vpgSignUp.currentItem -= 1
+                    return true
                 }
-                true
             }
             else -> {
                 super.onOptionsItemSelected(item)

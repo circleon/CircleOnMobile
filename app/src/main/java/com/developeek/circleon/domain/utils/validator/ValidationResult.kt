@@ -1,4 +1,4 @@
-package com.developeek.circleon.domain.utils
+package com.developeek.circleon.domain.utils.validator
 
 abstract class InputValidationResult<T> {
     companion object {

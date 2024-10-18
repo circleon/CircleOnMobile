@@ -1,11 +1,10 @@
-package com.developeek.circleon.domain.utils
+package com.developeek.circleon.domain.utils.validator
 
-import com.developeek.circleon.data.exception.ExceptionMessage
 import com.developeek.circleon.domain.vo.Email
 import com.developeek.circleon.domain.vo.Name
 import com.developeek.circleon.domain.vo.Password
 
-object InputValidator {
+object Validator {
     fun checkName(data: String): InputValidationResult<Name> {
         return try {
             InputValidationResult.valid(Name(data))
@@ -36,7 +35,7 @@ object InputValidator {
     ): InputValidationResult<Boolean> {
         return try {
             if (password == null) {
-                throw IllegalArgumentException(String.format(ExceptionMessage.MESSAGE_WRONG_PASSWORD_CHECK))
+                throw IllegalArgumentException(String.format(ValidatorExceptionMessage.MESSAGE_WRONG_PASSWORD_CHECK))
             }
             password.check(data)
             InputValidationResult.valid(true)

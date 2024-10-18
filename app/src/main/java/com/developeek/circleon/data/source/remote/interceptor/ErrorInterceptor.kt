@@ -1,8 +1,8 @@
 package com.developeek.circleon.data.source.remote.interceptor
 
 import android.util.Log
-import com.developeek.circleon.data.exception.ExceptionMessage
 import com.developeek.circleon.data.exception.ServiceException
+import com.developeek.circleon.data.exception.ServiceExceptionMessage
 import com.developeek.circleon.data.source.remote.retrofit.StatusCode
 import okhttp3.Interceptor
 import okhttp3.MediaType
@@ -51,7 +51,7 @@ class ErrorInterceptor
                 val newResponseBody = ResponseBody.create(MediaType.get(contentType!!), responseString)
                 return response.newBuilder().body(newResponseBody).build()
             } else {
-                throw IOException(ExceptionMessage.NO_RESPONSE_BODY)
+                throw IOException(ServiceExceptionMessage.NO_RESPONSE_BODY)
             }
         }
 
@@ -59,7 +59,7 @@ class ErrorInterceptor
             try {
                 return data.getString(PARAM_NAME_DETAIL_CODE)
             } catch (e: JSONException) {
-                throw IOException(ExceptionMessage.UNDEFINED_DETAIL_CODE)
+                throw IOException(ServiceExceptionMessage.UNDEFINED_DETAIL_CODE)
             }
         }
 
@@ -70,7 +70,7 @@ class ErrorInterceptor
             try {
                 return StatusCode.entries.single { it.isSame(responseCode, detailCode) }
             } catch (e: NoSuchElementException) {
-                throw IOException(ExceptionMessage.UNDEFINED_STATUS_CODE)
+                throw IOException(ServiceExceptionMessage.UNDEFINED_STATUS_CODE)
             }
         }
 
@@ -78,7 +78,7 @@ class ErrorInterceptor
             when (statusCode) {
                 StatusCode.SUCCESS -> {}
                 else -> {
-                    Log.e(ExceptionMessage.TAG_ERROR_STATUS, statusCode.message())
+                    Log.e(ServiceExceptionMessage.TAG_ERROR_STATUS, statusCode.message())
                 }
             }
         }
@@ -105,7 +105,7 @@ class ErrorInterceptor
                 StatusCode.WRONG_INPUT_DATA_FORMAT,
                 StatusCode.SERVER_ERROR,
                 -> {
-                    throw IOException(String.format(ExceptionMessage.MESSAGE_FAIL_REQUEST, statusCode.code()))
+                    throw IOException(String.format(ServiceExceptionMessage.MESSAGE_FAIL_REQUEST, statusCode.code()))
                 }
                 else -> {
                     throw IOException(statusCode.message())
