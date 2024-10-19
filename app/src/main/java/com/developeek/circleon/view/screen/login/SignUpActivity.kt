@@ -3,6 +3,7 @@ package com.developeek.circleon.view.screen.login
 import android.app.Activity
 import android.os.Bundle
 import android.view.KeyEvent
+import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
@@ -50,7 +51,7 @@ class SignUpActivity : AppCompatActivity() {
         )
         viewModel.validation.observe(
             activity as LifecycleOwner,
-            validationObserver(),
+            validationObserver(activity),
         )
     }
 
@@ -67,7 +68,7 @@ class SignUpActivity : AppCompatActivity() {
             }
         }
 
-    private fun validationObserver() =
+    private fun validationObserver(activity: Activity) =
         Observer<String> {
             when (it) {
                 NAME_VALIDATED -> {
@@ -90,6 +91,7 @@ class SignUpActivity : AppCompatActivity() {
                     setBtnBottomAsSignUp()
                 }
                 SIGN_UP_COMPLETED -> {
+                    Toast.makeText(activity, "회원 가입 완료", Toast.LENGTH_SHORT).show()
                     finish()
                 }
                 else -> {

@@ -50,7 +50,33 @@ class SignUpViewModelImpl
             Const.EMPTY_TEXT
 
         override fun signUp() {
-            TODO("Not yet implemented")
+            signUpJob?.cancel()
+
+            signUpJob =
+                viewModelScope.launch {
+                    withContext(Dispatchers.IO) {
+                        if (name != null && email != null && password != null &&
+                            emailAuthenticated && passwordMatched
+                        ) {
+                            requestSignUp(name!!, email!!, password!!)
+                        }
+                    }
+                }
+        }
+
+        private suspend fun requestSignUp(
+            name: Name,
+            email: Email,
+            password: Password,
+        ) {
+            val result = repository.signUp(email, name, password)
+
+            if (result is Success) {
+                validationMessage.postValue(SIGN_UP_COMPLETED)
+            } else {
+                error = (result as Error).message()
+                uiState.postValue(UiState.Error)
+            }
         }
 
         override fun setName(name: String) {
@@ -84,13 +110,15 @@ class SignUpViewModelImpl
             authenticationCodeJob =
                 viewModelScope.launch {
                     withContext(Dispatchers.IO) {
-                        requestEmailAuthenticationCode()
+                        email?.let {
+                            requestEmailAuthenticationCode(it)
+                        }
                     }
                 }
         }
 
-        private suspend fun requestEmailAuthenticationCode() {
-            val result = repository.requestEmailAuthenticationCode(email!!)
+        private suspend fun requestEmailAuthenticationCode(email: Email) {
+            val result = repository.requestEmailAuthenticationCode(email)
 
             if (result is Success) {
                 validationMessage.postValue(EMAIL_CODE_REQUESTED)
