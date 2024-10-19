@@ -92,7 +92,7 @@ class SignUpPasswordFragment : Fragment() {
     }
 
     companion object {
-        private const val PASSWORD_VALIDATED = "3"
-        private const val PASSWORD_CHECK_VALIDATED = "4"
+        private const val PASSWORD_VALIDATED = "5"
+        private const val PASSWORD_CHECK_VALIDATED = "6"
     }
 }

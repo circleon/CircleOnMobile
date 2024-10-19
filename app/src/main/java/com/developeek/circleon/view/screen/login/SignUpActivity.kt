@@ -3,7 +3,6 @@ package com.developeek.circleon.view.screen.login
 import android.app.Activity
 import android.os.Bundle
 import android.view.KeyEvent
-import android.view.MenuItem
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
@@ -33,9 +32,6 @@ class SignUpActivity : AppCompatActivity() {
         initViewPager(supportFragmentManager, lifecycle)
         initObserver(this)
         initListener(this)
-
-        setSupportActionBar(binding.tbSignUp)
-        supportActionBar?.setDisplayHomeAsUpEnabled(true)
     }
 
     private fun initViewPager(
@@ -75,22 +71,31 @@ class SignUpActivity : AppCompatActivity() {
         Observer<String> {
             when (it) {
                 NAME_VALIDATED -> {
+                    binding.btnNext.isClickable = true
                     setBtnBottomAsNext()
                 }
                 EMAIL_VALIDATED -> {
+                    binding.btnNext.isClickable = true
                     setBtnBottomAsRequestEmailCode()
                 }
                 EMAIL_CODE_REQUESTED -> {
+                    binding.btnNext.isClickable = true
                     setBtnBottomAsAuthenticateEmail()
                 }
                 EMAIL_AUTHENTICATED -> {
                     binding.vpgSignUp.currentItem += 1
                 }
                 PASSWORD_VALIDATED, PASSWORD_CHECK_VALIDATED -> {
+                    binding.btnNext.isClickable = true
                     setBtnBottomAsSignUp()
                 }
                 SIGN_UP_COMPLETED -> {
                     finish()
+                }
+                else -> {
+                    if (binding.btnNext.isClickable) {
+                        binding.btnNext.isClickable = false
+                    }
                 }
             }
         }
@@ -130,7 +135,7 @@ class SignUpActivity : AppCompatActivity() {
             object : ViewPager2.OnPageChangeCallback() {
                 override fun onPageSelected(position: Int) {
                     super.onPageSelected(position)
-                    binding.btnNext.setOnClickListener {}
+                    binding.btnNext.isClickable = false
                     if (position == 3) {
                         binding.btnNext.text = ContextCompat.getString(activity, R.string.btn_sign_up)
                     }
@@ -145,35 +150,18 @@ class SignUpActivity : AppCompatActivity() {
         }
     }
 
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        return when (item.itemId) {
-            android.R.id.home -> {
-                if (binding.vpgSignUp.currentItem == 0) {
-                    return super.onOptionsItemSelected(item)
-                } else {
-                    binding.vpgSignUp.currentItem -= 1
-                    return true
-                }
-            }
-            else -> {
-                super.onOptionsItemSelected(item)
-            }
-        }
-    }
-
     override fun onKeyDown(
         keyCode: Int,
         event: KeyEvent?,
     ): Boolean {
-        if (keyCode == KeyEvent.KEYCODE_BACK) {
+        return if (keyCode == KeyEvent.KEYCODE_BACK) {
             if (binding.vpgSignUp.currentItem == 0) {
-                return super.onKeyDown(keyCode, event)
+                super.onKeyDown(keyCode, event)
             } else {
-                binding.vpgSignUp.currentItem -= 1
-                return true
+                true
             }
         } else {
-            return super.onKeyDown(keyCode, event)
+            super.onKeyDown(keyCode, event)
         }
     }
 
