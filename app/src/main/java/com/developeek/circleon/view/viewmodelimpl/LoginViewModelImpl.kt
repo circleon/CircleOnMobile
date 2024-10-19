@@ -3,17 +3,18 @@ package com.developeek.circleon.view.viewmodelimpl
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import com.developeek.circleon.data.Error
-import com.developeek.circleon.data.Success
+import androidx.lifecycle.viewModelScope
 import com.developeek.circleon.data.repository.LoginRepository
+import com.developeek.circleon.data.source.Error
+import com.developeek.circleon.data.source.Success
 import com.developeek.circleon.domain.state.UiState
 import com.developeek.circleon.domain.utils.Const
 import com.developeek.circleon.view.viewmodel.LoginViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 @HiltViewModel
@@ -36,8 +37,10 @@ class LoginViewModelImpl
             loginJob?.cancel()
 
             loginJob =
-                CoroutineScope(Dispatchers.IO).launch {
-                    userLogin(email, password)
+                viewModelScope.launch {
+                    withContext(Dispatchers.IO) {
+                        userLogin(email, password)
+                    }
                 }
         }
 
@@ -50,13 +53,8 @@ class LoginViewModelImpl
             if (result is Success) {
                 uiState.postValue(UiState.Success)
             } else {
-                if ((result as Error).isTimeOut()) {
-                    error = result.message()
-                    uiState.postValue(UiState.Timeout)
-                }
-                if ((result).isRefreshExpired()) {
-                    uiState.postValue(UiState.RefreshExpiration)
-                }
+                error = (result as Error).message()
+                uiState.postValue(UiState.Error)
             }
         }
     }

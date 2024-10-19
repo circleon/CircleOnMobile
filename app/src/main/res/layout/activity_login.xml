@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.appcompat.widget.LinearLayoutCompat xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/main"
@@ -9,7 +9,7 @@
     android:paddingHorizontal="44dp"
     android:gravity="center"
     android:orientation="vertical"
-    tools:context=".view.screen.LoginActivity">
+    tools:context=".view.screen.login.LoginActivity">
 
     <androidx.appcompat.widget.AppCompatImageView
         android:layout_width="wrap_content"
@@ -53,14 +53,14 @@
         android:textColor="@color/white"
         android:background="@drawable/bg_rounded_purple_rectangle" />
 
-    <LinearLayout
+    <androidx.appcompat.widget.LinearLayoutCompat
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:gravity="center"
         android:layout_marginTop="@dimen/margin_padding_large"
         android:orientation="horizontal">
 
-        <TextView
+        <androidx.appcompat.widget.AppCompatTextView
             android:id="@+id/btnSearchIdPassword"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -68,13 +68,13 @@
             android:textSize="@dimen/text_size_small"
             android:textColor="@color/grey_6"/>
 
-        <TextView
+        <androidx.appcompat.widget.AppCompatTextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="|"
             android:layout_marginHorizontal="@dimen/margin_padding_extremely_large"/>
 
-        <TextView
+        <androidx.appcompat.widget.AppCompatTextView
             android:id="@+id/btnSignUp"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -83,6 +83,6 @@
             android:textColor="@color/grey_7"
             android:textStyle="bold"/>
 
-    </LinearLayout>
+    </androidx.appcompat.widget.LinearLayoutCompat>
 
-</LinearLayout>
+</androidx.appcompat.widget.LinearLayoutCompat>

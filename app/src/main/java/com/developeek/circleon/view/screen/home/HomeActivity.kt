@@ -1,9 +1,10 @@
-package com.developeek.circleon.view.screen
+package com.developeek.circleon.view.screen.home
 
 import android.content.Intent
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import com.developeek.circleon.databinding.ActivityHomeBinding
+import com.developeek.circleon.view.screen.login.LoginActivity
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
