@@ -37,6 +37,7 @@ class SignUpViewModelImpl
 
         private var name: Name? = null
         private var email: Email? = null
+        private var emailCode: String? = null
         private var password: Password? = null
         private var passwordMatched: Boolean = false
         private var emailAuthenticated: Boolean = false
@@ -91,19 +92,27 @@ class SignUpViewModelImpl
         private suspend fun requestEmailAuthenticationCode() {
             val result = repository.requestEmailAuthenticationCode(email!!)
 
-            if (result is Error) {
-                error = result.message()
+            if (result is Success) {
+                validationMessage.postValue(EMAIL_CODE_REQUESTED)
+            } else {
+                error = (result as Error).message()
                 uiState.postValue(UiState.Error)
             }
         }
 
-        override fun authenticateEmail(code: String) {
+        override fun setEmailCode(code: String) {
+            this.emailCode = code
+        }
+
+        override fun authenticateEmail() {
             authenticationJob?.cancel()
 
             authenticationJob =
                 viewModelScope.launch {
                     withContext(Dispatchers.IO) {
-                        emailAuthenticate(code)
+                        emailCode?.let {
+                            emailAuthenticate(it)
+                        }
                     }
                 }
         }
@@ -113,6 +122,7 @@ class SignUpViewModelImpl
 
             if (result is Success) {
                 emailAuthenticated = true
+                validationMessage.postValue(EMAIL_AUTHENTICATED)
             } else {
                 emailAuthenticated = false
                 error = (result as Error).message()
@@ -145,9 +155,12 @@ class SignUpViewModelImpl
         }
 
         companion object {
-            private const val NAME_VALIDATED = "1"
-            private const val EMAIL_VALIDATED = "2"
-            private const val PASSWORD_VALIDATED = "3"
-            private const val PASSWORD_CHECK_VALIDATED = "4"
+            const val NAME_VALIDATED = "1"
+            const val EMAIL_VALIDATED = "2"
+            const val EMAIL_CODE_REQUESTED = "3"
+            const val EMAIL_AUTHENTICATED = "4"
+            const val PASSWORD_VALIDATED = "5"
+            const val PASSWORD_CHECK_VALIDATED = "6"
+            const val SIGN_UP_COMPLETED = "7"
         }
     }

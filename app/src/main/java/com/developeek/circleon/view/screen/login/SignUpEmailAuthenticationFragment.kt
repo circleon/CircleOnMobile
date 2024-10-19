@@ -1,9 +1,12 @@
 package com.developeek.circleon.view.screen.login
 
+import android.app.Activity
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.inputmethod.InputMethodManager
+import androidx.core.widget.doOnTextChanged
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import com.developeek.circleon.databinding.FragmentSignUpEmailAuthenticationBinding
@@ -19,6 +22,44 @@ class SignUpEmailAuthenticationFragment : Fragment() {
         savedInstanceState: Bundle?,
     ): View {
         binding = FragmentSignUpEmailAuthenticationBinding.inflate(layoutInflater)
+
+        initListener()
+
         return binding.root
+    }
+
+    private fun initListener() {
+        setEdtEmailCodeListener()
+        setBtnResendAuthenticationCodeListener()
+    }
+
+    private fun setEdtEmailCodeListener() {
+        binding.edtEmailAuthenticationCode.doOnTextChanged { text, _, _, _ ->
+            viewModel.setEmailCode(text.toString())
+        }
+    }
+
+    private fun setBtnResendAuthenticationCodeListener() {
+        binding.btnResendAuthenticationCode.setOnClickListener {
+            viewModel.requestEmailCode()
+        }
+    }
+
+    override fun onResume() {
+        super.onResume()
+
+        binding.edtEmailAuthenticationCode.post {
+            showSoftInput(binding.edtEmailAuthenticationCode, requireActivity())
+        }
+    }
+
+    private fun showSoftInput(
+        view: View,
+        activity: Activity,
+    ) {
+        if (view.requestFocus()) {
+            val imm = activity.getSystemService(InputMethodManager::class.java)
+            imm.showSoftInput(view, InputMethodManager.SHOW_IMPLICIT)
+        }
     }
 }

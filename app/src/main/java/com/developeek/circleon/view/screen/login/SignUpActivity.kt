@@ -6,10 +6,13 @@ import android.view.KeyEvent
 import android.view.MenuItem
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.FragmentManager
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.Observer
+import androidx.viewpager2.widget.ViewPager2
+import com.developeek.circleon.R
 import com.developeek.circleon.databinding.ActivitySignUpBinding
 import com.developeek.circleon.domain.state.UiState
 import com.developeek.circleon.view.adapter.SignUpFragmentAdapter
@@ -29,7 +32,7 @@ class SignUpActivity : AppCompatActivity() {
 
         initViewPager(supportFragmentManager, lifecycle)
         initObserver(this)
-        initListener()
+        initListener(this)
 
         setSupportActionBar(binding.tbSignUp)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
@@ -49,6 +52,10 @@ class SignUpActivity : AppCompatActivity() {
             activity as LifecycleOwner,
             stateObserver(activity),
         )
+        viewModel.validation.observe(
+            activity as LifecycleOwner,
+            validationObserver(),
+        )
     }
 
     private fun stateObserver(activity: Activity) =
@@ -64,20 +71,77 @@ class SignUpActivity : AppCompatActivity() {
             }
         }
 
-    private fun initListener() {
+    private fun validationObserver() =
+        Observer<String> {
+            when (it) {
+                NAME_VALIDATED -> {
+                    setBtnBottomAsNext()
+                }
+                EMAIL_VALIDATED -> {
+                    setBtnBottomAsRequestEmailCode()
+                }
+                EMAIL_CODE_REQUESTED -> {
+                    setBtnBottomAsAuthenticateEmail()
+                }
+                EMAIL_AUTHENTICATED -> {
+                    binding.vpgSignUp.currentItem += 1
+                }
+                PASSWORD_VALIDATED, PASSWORD_CHECK_VALIDATED -> {
+                    setBtnBottomAsSignUp()
+                }
+                SIGN_UP_COMPLETED -> {
+                    finish()
+                }
+            }
+        }
+
+    private fun setBtnBottomAsNext() {
+        binding.btnNext.setOnClickListener {
+            binding.vpgSignUp.currentItem += 1
+        }
+    }
+
+    private fun setBtnBottomAsRequestEmailCode() {
+        binding.btnNext.setOnClickListener {
+            viewModel.requestEmailCode()
+            binding.vpgSignUp.currentItem += 1
+        }
+    }
+
+    private fun setBtnBottomAsAuthenticateEmail() {
+        binding.btnNext.setOnClickListener {
+            viewModel.authenticateEmail()
+        }
+    }
+
+    private fun setBtnBottomAsSignUp() {
+        binding.btnNext.setOnClickListener {
+            viewModel.signUp()
+        }
+    }
+
+    private fun initListener(activity: Activity) {
+        setVpgSignUpListener(activity)
         setBtnFinishListener()
-        setBtnNextListener()
+    }
+
+    private fun setVpgSignUpListener(activity: Activity) {
+        binding.vpgSignUp.registerOnPageChangeCallback(
+            object : ViewPager2.OnPageChangeCallback() {
+                override fun onPageSelected(position: Int) {
+                    super.onPageSelected(position)
+                    binding.btnNext.setOnClickListener {}
+                    if (position == 3) {
+                        binding.btnNext.text = ContextCompat.getString(activity, R.string.btn_sign_up)
+                    }
+                }
+            },
+        )
     }
 
     private fun setBtnFinishListener() {
         binding.btnFinish.setOnClickListener {
             finish()
-        }
-    }
-
-    private fun setBtnNextListener() {
-        binding.btnNext.setOnClickListener {
-            binding.vpgSignUp.currentItem += 1
         }
     }
 
@@ -111,5 +175,15 @@ class SignUpActivity : AppCompatActivity() {
         } else {
             return super.onKeyDown(keyCode, event)
         }
+    }
+
+    companion object {
+        const val NAME_VALIDATED = "1"
+        const val EMAIL_VALIDATED = "2"
+        const val EMAIL_CODE_REQUESTED = "3"
+        const val EMAIL_AUTHENTICATED = "4"
+        const val PASSWORD_VALIDATED = "5"
+        const val PASSWORD_CHECK_VALIDATED = "6"
+        const val SIGN_UP_COMPLETED = "7"
     }
 }

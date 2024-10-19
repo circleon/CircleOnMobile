@@ -16,7 +16,9 @@ interface SignUpViewModel {
 
     fun requestEmailCode()
 
-    fun authenticateEmail(code: String)
+    fun setEmailCode(code: String)
+
+    fun authenticateEmail()
 
     fun setPassword(password: String)
 
