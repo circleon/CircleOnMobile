@@ -1,11 +1,13 @@
 package com.developeek.circleon.data.repositoryimpl
 
+import com.developeek.circleon.data.entity.login.LoginEntity
 import com.developeek.circleon.data.repository.LoginRepository
 import com.developeek.circleon.data.source.Result
 import com.developeek.circleon.data.source.remote.retrofit.service.LoginService
 import com.developeek.circleon.domain.vo.Email
 import com.developeek.circleon.domain.vo.Name
 import com.developeek.circleon.domain.vo.Password
+import java.io.IOException
 
 class LoginRepositoryImpl(
     private val service: LoginService,
@@ -14,9 +16,12 @@ class LoginRepositoryImpl(
         email: String,
         password: String,
     ): Result<Boolean> {
-        // TODO: service.login(email, password)
-
-        return Result.success(true)
+        try {
+            service.login(LoginEntity(email, password))
+            return Result.success(true)
+        } catch (e: IOException) {
+            return Result.error(e)
+        }
     }
 
     override suspend fun signUp(

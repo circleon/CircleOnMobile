@@ -2,7 +2,7 @@ package com.developeek.circleon.data.source.remote.retrofit
 
 enum class StatusCode(
     private val responseCode: Int,
-    private val detailCode: String,
+    private val errorCode: String,
     private val message: String,
 ) {
     SUCCESS(200, "0", "성공"),
@@ -27,7 +27,7 @@ enum class StatusCode(
     fun isSame(
         responseCode: Int,
         detailCode: String,
-    ) = this.responseCode == responseCode && this.detailCode == detailCode
+    ) = this.responseCode == responseCode && this.errorCode == detailCode
 
     fun code() = this.responseCode
 

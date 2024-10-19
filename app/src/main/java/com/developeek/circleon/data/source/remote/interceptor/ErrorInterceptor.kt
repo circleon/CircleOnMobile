@@ -42,7 +42,7 @@ class ErrorInterceptor
                 val responseString = responseBody.string()
                 val jsonObject = JSONTokener(responseString).nextValue() as JSONObject
 
-                val detailCode = parseDetailCode(jsonObject)
+                val detailCode = parseErrorCode(jsonObject)
                 val statusCode = findStatusCode(responseCode, detailCode)
 
                 errorLog(statusCode)
@@ -55,9 +55,9 @@ class ErrorInterceptor
             }
         }
 
-        private fun parseDetailCode(data: JSONObject): String {
+        private fun parseErrorCode(data: JSONObject): String {
             try {
-                return data.getString(PARAM_NAME_DETAIL_CODE)
+                return data.getString(PARAM_NAME_ERROR_CODE)
             } catch (e: JSONException) {
                 throw IOException(ServiceExceptionMessage.UNDEFINED_DETAIL_CODE)
             }
@@ -65,10 +65,10 @@ class ErrorInterceptor
 
         private fun findStatusCode(
             responseCode: Int,
-            detailCode: String,
+            errorCode: String,
         ): StatusCode {
             try {
-                return StatusCode.entries.single { it.isSame(responseCode, detailCode) }
+                return StatusCode.entries.single { it.isSame(responseCode, errorCode) }
             } catch (e: NoSuchElementException) {
                 throw IOException(ServiceExceptionMessage.UNDEFINED_STATUS_CODE)
             }
@@ -114,8 +114,7 @@ class ErrorInterceptor
         }
 
         companion object {
-            // TODO: param name 확정되면 수정 필요
-            private const val PARAM_NAME_DETAIL_CODE = "detailCode"
+            private const val PARAM_NAME_ERROR_CODE = "errorCode"
             private const val PARAM_NAME_CONTENT_TYPE = "content-type"
         }
     }
