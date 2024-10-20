@@ -11,5 +11,5 @@ abstract class InputValidationResult<T> {
 class Valid<T>(val data: T) : InputValidationResult<T>()
 
 class Invalid<T>(private val error: Exception) : InputValidationResult<T>() {
-    fun message() = error.message
+    fun message() = error.message ?: error.toString()
 }

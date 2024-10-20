@@ -3,6 +3,7 @@ package com.developeek.circleon.domain.utils.validator
 import com.developeek.circleon.domain.vo.Email
 import com.developeek.circleon.domain.vo.Name
 import com.developeek.circleon.domain.vo.Password
+import java.io.IOException
 
 object Validator {
     fun checkName(data: String): InputValidationResult<Name> {
@@ -18,6 +19,14 @@ object Validator {
             InputValidationResult.valid(Email(data))
         } catch (e: IllegalArgumentException) {
             InputValidationResult.invalid(e)
+        }
+    }
+
+    fun checkEmailAsId(data: String): InputValidationResult<Email> {
+        return try {
+            InputValidationResult.valid(Email(data))
+        } catch (e: IllegalArgumentException) {
+            InputValidationResult.invalid(IOException(ValidatorExceptionMessage.MESSAGE_WRONG_FORMAT_ID))
         }
     }
 
