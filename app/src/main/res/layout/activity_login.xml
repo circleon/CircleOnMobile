@@ -24,6 +24,7 @@
         android:background="@drawable/bg_rounded_grey_rectangle"
         android:paddingHorizontal="@dimen/margin_padding_large"
         android:paddingVertical="@dimen/margin_padding_default"
+        android:inputType="textEmailAddress"
         android:hint="@string/hint_email"
         android:textColorHint="@color/grey_5"
         android:textSize="@dimen/text_size_default"/>
@@ -36,6 +37,7 @@
         android:background="@drawable/bg_rounded_grey_rectangle"
         android:paddingHorizontal="@dimen/margin_padding_large"
         android:paddingVertical="@dimen/margin_padding_default"
+        android:inputType="textPassword"
         android:hint="@string/hint_password"
         android:textColorHint="@color/grey_5"
         android:textSize="@dimen/text_size_default"/>

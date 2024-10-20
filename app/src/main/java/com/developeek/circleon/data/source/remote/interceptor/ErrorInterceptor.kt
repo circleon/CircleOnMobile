@@ -42,8 +42,7 @@ class ErrorInterceptor
                 val responseString = responseBody.string()
                 val jsonObject = JSONTokener(responseString).nextValue() as JSONObject
 
-                val detailCode = parseErrorCode(jsonObject)
-                val statusCode = findStatusCode(responseCode, detailCode)
+                val statusCode = findStatusCode(responseCode, jsonObject)
 
                 errorLog(statusCode)
                 throwException(statusCode, request)
@@ -55,22 +54,32 @@ class ErrorInterceptor
             }
         }
 
-        private fun parseErrorCode(data: JSONObject): String {
-            try {
-                return data.getString(PARAM_NAME_ERROR_CODE)
-            } catch (e: JSONException) {
-                throw IOException(ServiceExceptionMessage.UNDEFINED_DETAIL_CODE)
-            }
-        }
-
         private fun findStatusCode(
             responseCode: Int,
-            errorCode: String,
+            data: JSONObject,
         ): StatusCode {
+            if (responseCode == StatusCode.SUCCESS.code()) {
+                return StatusCode.SUCCESS
+            }
+            if (responseCode == StatusCode.NO_CONTENTS.code()) {
+                return StatusCode.NO_CONTENTS
+            }
+
+            val errorCode = parseErrorCode(data)
+
             try {
                 return StatusCode.entries.single { it.isSame(responseCode, errorCode) }
             } catch (e: NoSuchElementException) {
                 throw IOException(ServiceExceptionMessage.UNDEFINED_STATUS_CODE)
+            }
+        }
+
+        private fun parseErrorCode(data: JSONObject): String {
+            try {
+                Log.d("error", data.getString(PARAM_NAME_ERROR_CODE))
+                return data.getString(PARAM_NAME_ERROR_CODE)
+            } catch (e: JSONException) {
+                throw IOException(ServiceExceptionMessage.UNDEFINED_ERROR_CODE)
             }
         }
 

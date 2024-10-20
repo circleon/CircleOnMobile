@@ -10,7 +10,7 @@ data class Name(
         require(isNotEmpty()) { String.format(ValidatorExceptionMessage.MESSAGE_INPUT_VALIDATION_NO_DATA, NAME) }
     }
 
-    private fun get() = data
+    fun get() = data
 
     private fun isNotEmpty() = data.isNotEmpty()
 
