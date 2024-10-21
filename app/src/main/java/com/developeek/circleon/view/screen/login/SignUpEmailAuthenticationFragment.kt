@@ -9,6 +9,8 @@ import android.view.inputmethod.InputMethodManager
 import androidx.core.widget.doOnTextChanged
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.LifecycleOwner
+import androidx.lifecycle.Observer
 import com.developeek.circleon.databinding.FragmentSignUpEmailAuthenticationBinding
 import com.developeek.circleon.view.viewmodelimpl.SignUpViewModelImpl
 
@@ -23,10 +25,25 @@ class SignUpEmailAuthenticationFragment : Fragment() {
     ): View {
         binding = FragmentSignUpEmailAuthenticationBinding.inflate(layoutInflater)
 
+        initObserver(requireActivity())
         initListener()
 
         return binding.root
     }
+
+    private fun initObserver(activity: Activity) {
+        viewModel.emailAuthenticationTimer.observe(
+            activity as LifecycleOwner,
+            emailAuthenticationTimerObserver(),
+        )
+    }
+
+    private fun emailAuthenticationTimerObserver() =
+        Observer<Long> {
+            val minute = it / MINUTE
+            val second = (it % MINUTE) / SECOND
+            binding.timerEmailAuthenticationCode.text = String.format(TIME_FORMAT, minute, second)
+        }
 
     private fun initListener() {
         setEdtEmailCodeListener()
@@ -61,5 +78,11 @@ class SignUpEmailAuthenticationFragment : Fragment() {
             val imm = activity.getSystemService(InputMethodManager::class.java)
             imm.showSoftInput(view, InputMethodManager.SHOW_IMPLICIT)
         }
+    }
+
+    companion object {
+        private const val TIME_FORMAT = "%02d:%02d"
+        private const val MINUTE = 60000L
+        private const val SECOND = 1000L
     }
 }
