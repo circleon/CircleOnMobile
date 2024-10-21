@@ -37,7 +37,7 @@ class SignUpViewModelImpl
 
         override val emailAuthenticationTimer: LiveData<Long>
             get() = timer
-        private val timer = MutableLiveData<Long>()
+        private val timer = MutableLiveData(TIMER_INIT)
 
         private var name: Name? = null
         private var email: Email? = null

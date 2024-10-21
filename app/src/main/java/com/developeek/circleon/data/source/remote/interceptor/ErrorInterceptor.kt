@@ -50,7 +50,7 @@ class ErrorInterceptor
                 val newResponseBody = ResponseBody.create(MediaType.get(contentType!!), responseString)
                 return response.newBuilder().body(newResponseBody).build()
             } else {
-                throw IOException(ServiceExceptionMessage.NO_RESPONSE_BODY)
+                throw IOException(ServiceExceptionMessage.MESSAGE_NO_RESPONSE_BODY)
             }
         }
 
@@ -58,10 +58,10 @@ class ErrorInterceptor
             responseCode: Int,
             data: JSONObject,
         ): StatusCode {
-            if (responseCode == StatusCode.SUCCESS.code()) {
+            if (responseCode == StatusCode.SUCCESS.responseCode()) {
                 return StatusCode.SUCCESS
             }
-            if (responseCode == StatusCode.NO_CONTENTS.code()) {
+            if (responseCode == StatusCode.NO_CONTENTS.responseCode()) {
                 return StatusCode.NO_CONTENTS
             }
 
@@ -70,16 +70,15 @@ class ErrorInterceptor
             try {
                 return StatusCode.entries.single { it.isSame(responseCode, errorCode) }
             } catch (e: NoSuchElementException) {
-                throw IOException(ServiceExceptionMessage.UNDEFINED_STATUS_CODE)
+                throw IOException(String.format(ServiceExceptionMessage.MESSAGE_FAIL_REQUEST, errorCode))
             }
         }
 
         private fun parseErrorCode(data: JSONObject): String {
             try {
-                Log.d("error", data.getString(PARAM_NAME_ERROR_CODE))
                 return data.getString(PARAM_NAME_ERROR_CODE)
             } catch (e: JSONException) {
-                throw IOException(ServiceExceptionMessage.UNDEFINED_ERROR_CODE)
+                throw IOException(ServiceExceptionMessage.MESSAGE_WRONG_RESPONSE_FORMAT)
             }
         }
 
@@ -114,7 +113,9 @@ class ErrorInterceptor
                 StatusCode.WRONG_INPUT_DATA_FORMAT,
                 StatusCode.SERVER_ERROR,
                 -> {
-                    throw IOException(String.format(ServiceExceptionMessage.MESSAGE_FAIL_REQUEST, statusCode.code()))
+                    throw IOException(
+                        String.format(ServiceExceptionMessage.MESSAGE_FAIL_REQUEST, statusCode.errorCode()),
+                    )
                 }
                 else -> {
                     throw IOException(statusCode.message())

@@ -58,7 +58,7 @@
                 android:layout_height="wrap_content"
                 android:textColor="@color/grey_7"
                 android:textSize="@dimen/text_size_default"
-                tools:text="05:00"/>
+                tools:text="00:00"/>
 
         </androidx.appcompat.widget.LinearLayoutCompat>
 
