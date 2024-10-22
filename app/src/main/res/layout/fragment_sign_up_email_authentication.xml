@@ -49,6 +49,7 @@
                 android:inputType="text"
                 android:hint="@string/hint_email_authentication_code"
                 android:textColorHint="@color/grey_5"
+                android:textColor="@color/grey_7"
                 android:textSize="@dimen/text_size_default"
                 android:backgroundTint="@drawable/selector_edit_text"/>
 

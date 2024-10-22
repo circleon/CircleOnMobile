@@ -27,6 +27,7 @@
         android:inputType="textEmailAddress"
         android:hint="@string/hint_email"
         android:textColorHint="@color/grey_5"
+        android:textColor="@color/grey_7"
         android:textSize="@dimen/text_size_default"/>
 
     <androidx.appcompat.widget.AppCompatEditText
@@ -40,6 +41,7 @@
         android:inputType="textPassword"
         android:hint="@string/hint_password"
         android:textColorHint="@color/grey_5"
+        android:textColor="@color/grey_7"
         android:textSize="@dimen/text_size_default"/>
 
     <androidx.appcompat.widget.AppCompatTextView
