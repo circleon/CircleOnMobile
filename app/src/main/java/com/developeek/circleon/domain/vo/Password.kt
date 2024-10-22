@@ -11,7 +11,11 @@ data class Password(
         require(isPasswordFormat()) { String.format(ValidatorExceptionMessage.MESSAGE_WRONG_FORMAT) }
     }
 
-    private fun get() = data
+    fun get() = data
+
+    fun check(password: String) {
+        require(data == password) { String.format(ValidatorExceptionMessage.MESSAGE_WRONG_PASSWORD_CHECK) }
+    }
 
     private fun isNotEmpty() = data.isNotEmpty()
 
@@ -19,10 +23,6 @@ data class Password(
         val pattern = Regex("^(?=.*[a-zA-Z])(?=.*\\d)(?=.*[@\$!%*#?&])[A-Za-z\\d@\$!%*#?&]{8,12}\$")
 
         return pattern.matches(data)
-    }
-
-    fun check(password: String) {
-        require(data == password) { String.format(ValidatorExceptionMessage.MESSAGE_WRONG_PASSWORD_CHECK) }
     }
 
     companion object {

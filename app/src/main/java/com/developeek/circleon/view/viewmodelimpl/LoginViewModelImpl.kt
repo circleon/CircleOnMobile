@@ -9,6 +9,8 @@ import com.developeek.circleon.data.source.Error
 import com.developeek.circleon.data.source.Success
 import com.developeek.circleon.domain.state.UiState
 import com.developeek.circleon.domain.utils.Const
+import com.developeek.circleon.domain.utils.validator.Invalid
+import com.developeek.circleon.domain.utils.validator.Validator
 import com.developeek.circleon.view.viewmodel.LoginViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
@@ -48,13 +50,20 @@ class LoginViewModelImpl
             email: String,
             password: String,
         ) {
-            val result = repository.login(email, password)
+            val validation = Validator.checkEmailAsId(email)
 
-            if (result is Success) {
-                uiState.postValue(UiState.Success)
-            } else {
-                error = (result as Error).message()
+            if (validation is Invalid) {
+                error = validation.message()
                 uiState.postValue(UiState.Error)
+            } else {
+                val result = repository.login(email, password)
+
+                if (result is Success) {
+                    uiState.postValue(UiState.Success)
+                } else {
+                    error = (result as Error).message()
+                    uiState.postValue(UiState.Error)
+                }
             }
         }
     }

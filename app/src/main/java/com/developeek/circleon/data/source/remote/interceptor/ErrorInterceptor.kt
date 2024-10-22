@@ -42,8 +42,7 @@ class ErrorInterceptor
                 val responseString = responseBody.string()
                 val jsonObject = JSONTokener(responseString).nextValue() as JSONObject
 
-                val detailCode = parseDetailCode(jsonObject)
-                val statusCode = findStatusCode(responseCode, detailCode)
+                val statusCode = findStatusCode(responseCode, jsonObject)
 
                 errorLog(statusCode)
                 throwException(statusCode, request)
@@ -51,26 +50,35 @@ class ErrorInterceptor
                 val newResponseBody = ResponseBody.create(MediaType.get(contentType!!), responseString)
                 return response.newBuilder().body(newResponseBody).build()
             } else {
-                throw IOException(ServiceExceptionMessage.NO_RESPONSE_BODY)
-            }
-        }
-
-        private fun parseDetailCode(data: JSONObject): String {
-            try {
-                return data.getString(PARAM_NAME_DETAIL_CODE)
-            } catch (e: JSONException) {
-                throw IOException(ServiceExceptionMessage.UNDEFINED_DETAIL_CODE)
+                throw IOException(ServiceExceptionMessage.MESSAGE_NO_RESPONSE_BODY)
             }
         }
 
         private fun findStatusCode(
             responseCode: Int,
-            detailCode: String,
+            data: JSONObject,
         ): StatusCode {
+            if (responseCode == StatusCode.SUCCESS.responseCode()) {
+                return StatusCode.SUCCESS
+            }
+            if (responseCode == StatusCode.NO_CONTENTS.responseCode()) {
+                return StatusCode.NO_CONTENTS
+            }
+
+            val errorCode = parseErrorCode(data)
+
             try {
-                return StatusCode.entries.single { it.isSame(responseCode, detailCode) }
+                return StatusCode.entries.single { it.isSame(responseCode, errorCode) }
             } catch (e: NoSuchElementException) {
-                throw IOException(ServiceExceptionMessage.UNDEFINED_STATUS_CODE)
+                throw IOException(String.format(ServiceExceptionMessage.MESSAGE_FAIL_REQUEST, errorCode))
+            }
+        }
+
+        private fun parseErrorCode(data: JSONObject): String {
+            try {
+                return data.getString(PARAM_NAME_ERROR_CODE)
+            } catch (e: JSONException) {
+                throw IOException(ServiceExceptionMessage.MESSAGE_WRONG_RESPONSE_FORMAT)
             }
         }
 
@@ -105,7 +113,9 @@ class ErrorInterceptor
                 StatusCode.WRONG_INPUT_DATA_FORMAT,
                 StatusCode.SERVER_ERROR,
                 -> {
-                    throw IOException(String.format(ServiceExceptionMessage.MESSAGE_FAIL_REQUEST, statusCode.code()))
+                    throw IOException(
+                        String.format(ServiceExceptionMessage.MESSAGE_FAIL_REQUEST, statusCode.errorCode()),
+                    )
                 }
                 else -> {
                     throw IOException(statusCode.message())
@@ -114,8 +124,7 @@ class ErrorInterceptor
         }
 
         companion object {
-            // TODO: param name 확정되면 수정 필요
-            private const val PARAM_NAME_DETAIL_CODE = "detailCode"
+            private const val PARAM_NAME_ERROR_CODE = "errorCode"
             private const val PARAM_NAME_CONTENT_TYPE = "content-type"
         }
     }

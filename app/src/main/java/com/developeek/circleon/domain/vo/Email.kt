@@ -11,7 +11,7 @@ data class Email(
         require(isEmailFormat()) { String.format(ValidatorExceptionMessage.MESSAGE_WRONG_FORMAT) }
     }
 
-    private fun get() = data
+    fun get() = data
 
     private fun isNotEmpty() = data.isNotEmpty()
 

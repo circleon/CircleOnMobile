@@ -35,6 +35,10 @@ class SignUpViewModelImpl
             get() = validationMessage
         private val validationMessage = MutableLiveData<String>()
 
+        override val emailAuthenticationTimer: LiveData<Long>
+            get() = timer
+        private val timer = MutableLiveData(TIMER_INIT)
+
         private var name: Name? = null
         private var email: Email? = null
         private var emailCode: String? = null
@@ -43,6 +47,7 @@ class SignUpViewModelImpl
         private var emailAuthenticated: Boolean = false
 
         private var authenticationCodeJob: Job? = null
+        private var authenticationTimerJob: Job? = null
         private var authenticationJob: Job? = null
         private var signUpJob: Job? = null
 
@@ -121,11 +126,32 @@ class SignUpViewModelImpl
             val result = repository.requestEmailAuthenticationCode(email)
 
             if (result is Success) {
+                startEmailAuthenticationTimer()
                 validationMessage.postValue(EMAIL_CODE_REQUESTED)
             } else {
                 error = (result as Error).message()
                 uiState.postValue(UiState.Error)
             }
+        }
+
+        private fun startEmailAuthenticationTimer() {
+            authenticationTimerJob?.cancel()
+
+            authenticationTimerJob =
+                viewModelScope.launch {
+                    withContext(Dispatchers.IO) {
+                        timer.postValue(TIMER_INIT)
+                        var time = 0L
+                        var old = System.currentTimeMillis()
+                        while (time < TIMER_INIT) {
+                            if (System.currentTimeMillis() - old == TIMER_INTERVAL) {
+                                time += TIMER_INTERVAL
+                                timer.postValue(TIMER_INIT - time)
+                                old = System.currentTimeMillis()
+                            }
+                        }
+                    }
+                }
         }
 
         override fun setEmailCode(code: String) {
@@ -183,12 +209,15 @@ class SignUpViewModelImpl
         }
 
         companion object {
-            const val NAME_VALIDATED = "1"
-            const val EMAIL_VALIDATED = "2"
-            const val EMAIL_CODE_REQUESTED = "3"
-            const val EMAIL_AUTHENTICATED = "4"
-            const val PASSWORD_VALIDATED = "5"
-            const val PASSWORD_CHECK_VALIDATED = "6"
-            const val SIGN_UP_COMPLETED = "7"
+            private const val NAME_VALIDATED = "1"
+            private const val EMAIL_VALIDATED = "2"
+            private const val EMAIL_CODE_REQUESTED = "3"
+            private const val EMAIL_AUTHENTICATED = "4"
+            private const val PASSWORD_VALIDATED = "5"
+            private const val PASSWORD_CHECK_VALIDATED = "6"
+            private const val SIGN_UP_COMPLETED = "7"
+
+            private const val TIMER_INIT = 300000L
+            private const val TIMER_INTERVAL = 1000L
         }
     }

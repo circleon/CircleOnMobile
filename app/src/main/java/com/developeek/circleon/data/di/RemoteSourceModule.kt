@@ -1,5 +1,6 @@
 package com.developeek.circleon.data.di
 
+import com.developeek.circleon.BuildConfig
 import com.developeek.circleon.data.source.remote.interceptor.ErrorInterceptor
 import com.developeek.circleon.data.source.remote.interceptor.TokenAuthenticator
 import com.developeek.circleon.data.source.remote.retrofit.service.LoginService
@@ -47,7 +48,7 @@ object RemoteSourceModule {
         clientBuilder: OkHttpClient.Builder,
     ): LoginService {
         return Retrofit.Builder()
-            .baseUrl("https://api/") // TODO: use BuildConfig url
+            .baseUrl(BuildConfig.SERVICE_API_URL)
             .addConverterFactory(converter)
             .client(clientBuilder.build())
             .build()

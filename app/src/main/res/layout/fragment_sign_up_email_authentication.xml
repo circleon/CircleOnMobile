@@ -46,19 +46,19 @@
                 android:padding="@dimen/margin_padding_large"
                 android:maxLines="1"
                 android:maxLength="30"
-                android:inputType="number"
+                android:inputType="text"
                 android:hint="@string/hint_email_authentication_code"
                 android:textColorHint="@color/grey_5"
                 android:textSize="@dimen/text_size_default"
                 android:backgroundTint="@drawable/selector_edit_text"/>
 
             <androidx.appcompat.widget.AppCompatTextView
-                android:id="@+id/timerAuthenticationCode"
+                android:id="@+id/timerEmailAuthenticationCode"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textColor="@color/grey_7"
                 android:textSize="@dimen/text_size_default"
-                tools:text="05:00"/>
+                tools:text="00:00"/>
 
         </androidx.appcompat.widget.LinearLayoutCompat>
 

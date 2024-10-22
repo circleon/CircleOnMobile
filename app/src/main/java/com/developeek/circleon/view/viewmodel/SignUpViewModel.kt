@@ -6,6 +6,7 @@ import com.developeek.circleon.domain.state.UiState
 interface SignUpViewModel {
     val state: LiveData<UiState>
     val validation: LiveData<String>
+    val emailAuthenticationTimer: LiveData<Long>
     var error: String
 
     fun signUp()
