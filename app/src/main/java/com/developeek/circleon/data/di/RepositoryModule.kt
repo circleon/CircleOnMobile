@@ -2,6 +2,7 @@ package com.developeek.circleon.data.di
 
 import com.developeek.circleon.data.repository.LoginRepository
 import com.developeek.circleon.data.repositoryimpl.LoginRepositoryImpl
+import com.developeek.circleon.data.source.remote.interceptor.TokenManager
 import com.developeek.circleon.data.source.remote.retrofit.service.LoginService
 import dagger.Module
 import dagger.Provides
@@ -14,7 +15,10 @@ import javax.inject.Singleton
 object RepositoryModule {
     @Provides
     @Singleton
-    fun provideLoginRepository(service: LoginService): LoginRepository {
-        return LoginRepositoryImpl(service)
+    fun provideLoginRepository(
+        service: LoginService,
+        tokenManager: TokenManager,
+    ): LoginRepository {
+        return LoginRepositoryImpl(service, tokenManager)
     }
 }

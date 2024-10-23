@@ -139,7 +139,7 @@ class SignUpViewModelImpl
 
             authenticationTimerJob =
                 viewModelScope.launch {
-                    withContext(Dispatchers.IO) {
+                    withContext(Dispatchers.Default) {
                         timer.postValue(TIMER_INIT)
                         var time = 0L
                         var old = System.currentTimeMillis()
