@@ -2,10 +2,19 @@
 <resources>
     <style name="title">
         <item name="android:textSize">@dimen/text_size_large</item>
-        <item name="android:textStyle">bold</item>
+        <item name="android:textColor">@color/grey_9</item>
+        <item name="android:textFontWeight">600</item>
     </style>
     <style name="content_title">
         <item name="android:textSize">@dimen/text_size_extremely_large</item>
-        <item name="android:textStyle">bold</item>
+        <item name="android:textColor">@color/grey_9</item>
+        <item name="android:textFontWeight">600</item>
+    </style>
+    <style name="bottom_nav_title">
+        <item name="android:textSize">10sp</item>
+    </style>
+    <style name="small_bold_text">
+        <item name="android:textSize">@dimen/text_size_small</item>
+        <item name="android:textFontWeight">600</item>
     </style>
 </resources>

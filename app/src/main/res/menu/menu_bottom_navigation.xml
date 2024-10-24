@@ -19,5 +19,5 @@
     <item
         android:id="@+id/navMyPage"
         android:icon="@drawable/ic_my_page"
-        android:title="@string/tab_name_my_page"/>
+        android:title="@string/tab_name_my_page" />
 </menu>
