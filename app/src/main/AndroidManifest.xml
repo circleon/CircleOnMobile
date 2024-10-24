@@ -23,7 +23,7 @@
             android:name=".view.screen.login.LoginActivity"
             android:exported="false" />
         <activity
-            android:name=".view.screen.home.HomeActivity"
+            android:name=".view.screen.HomeActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

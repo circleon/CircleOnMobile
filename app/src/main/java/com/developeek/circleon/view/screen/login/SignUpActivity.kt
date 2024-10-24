@@ -81,6 +81,7 @@ class SignUpActivity : AppCompatActivity() {
                 }
                 EMAIL_CODE_REQUESTED -> {
                     binding.btnNext.isClickable = true
+                    binding.vpgSignUp.currentItem += 1
                     setBtnBottomAsAuthenticateEmail()
                 }
                 EMAIL_AUTHENTICATED -> {
@@ -111,7 +112,6 @@ class SignUpActivity : AppCompatActivity() {
     private fun setBtnBottomAsRequestEmailCode() {
         binding.btnNext.setOnClickListener {
             viewModel.requestEmailCode()
-            binding.vpgSignUp.currentItem += 1
         }
     }
 
