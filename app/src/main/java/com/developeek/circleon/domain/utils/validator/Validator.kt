@@ -39,14 +39,13 @@ object Validator {
     }
 
     fun checkPasswordMatch(
-        password: Password?,
+        password: String,
         data: String,
     ): InputValidationResult<Boolean> {
         return try {
-            if (password == null) {
+            if (password != data) {
                 throw IllegalArgumentException(String.format(ValidatorExceptionMessage.MESSAGE_WRONG_PASSWORD_CHECK))
             }
-            password.check(data)
             InputValidationResult.valid(true)
         } catch (e: IllegalArgumentException) {
             InputValidationResult.invalid(e)

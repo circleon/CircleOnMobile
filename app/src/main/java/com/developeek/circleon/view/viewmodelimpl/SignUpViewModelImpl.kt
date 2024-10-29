@@ -196,7 +196,10 @@ class SignUpViewModelImpl
             }
         }
 
-        override fun setPasswordCheck(passwordCheck: String) {
+        override fun checkPassword(
+            password: String,
+            passwordCheck: String,
+        ) {
             val result = Validator.checkPasswordMatch(password, passwordCheck)
 
             if (result is Valid) {

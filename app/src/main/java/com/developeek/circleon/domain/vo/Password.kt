@@ -13,14 +13,10 @@ data class Password(
 
     fun get() = data
 
-    fun check(password: String) {
-        require(data == password) { String.format(ValidatorExceptionMessage.MESSAGE_WRONG_PASSWORD_CHECK) }
-    }
-
     private fun isNotEmpty() = data.isNotEmpty()
 
     private fun isPasswordFormat(): Boolean {
-        val pattern = Regex("^(?=.*[a-zA-Z])(?=.*\\d)(?=.*[@\$!%*#?&])[A-Za-z\\d@\$!%*#?&]{8,12}\$")
+        val pattern = Regex("^(?=.*[a-zA-Z])(?=.*\\d)(?=.*[~!@#\$%^&*()_+`\\-={}|\\[\\];':\",.\\/?])(?=.{8,12}\$).*\$")
 
         return pattern.matches(data)
     }

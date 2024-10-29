@@ -69,7 +69,7 @@ class SignUpPasswordFragment : Fragment() {
 
     private fun setEdtPasswordCheckListener() {
         binding.edtPasswordCheck.doOnTextChanged { text, _, _, _ ->
-            viewModel.setPasswordCheck(text.toString())
+            viewModel.checkPassword(binding.edtPassword.text.toString(), text.toString())
         }
     }
 

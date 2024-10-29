@@ -1,5 +1,6 @@
 package com.developeek.circleon.domain.vo
 
+import android.util.Patterns
 import com.developeek.circleon.domain.utils.validator.ValidatorExceptionMessage
 import java.io.Serializable
 
@@ -15,11 +16,7 @@ data class Email(
 
     private fun isNotEmpty() = data.isNotEmpty()
 
-    private fun isEmailFormat(): Boolean {
-        val pattern = Regex("^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,6}$")
-
-        return pattern.matches(data)
-    }
+    private fun isEmailFormat() = Patterns.EMAIL_ADDRESS.matcher(data).matches()
 
     companion object {
         private const val EMAIL = "이메일"
