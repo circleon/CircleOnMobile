@@ -34,7 +34,7 @@ class LoginViewModelImpl
             email: String,
             password: String,
         ) {
-            if (!::loginJob.isInitialized || loginJob.isCompleted && isEmailFormat(email)) {
+            if ((!::loginJob.isInitialized || loginJob.isCompleted) && isEmailFormat(email)) {
                 loginJob =
                     viewModelScope.launch {
                         val result = repository.login(email, password)

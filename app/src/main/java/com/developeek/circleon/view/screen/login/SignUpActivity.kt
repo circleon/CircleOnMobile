@@ -81,7 +81,7 @@ class SignUpActivity : AppCompatActivity() {
                 }
                 EMAIL_CODE_REQUESTED -> {
                     binding.btnNext.isClickable = true
-                    binding.vpgSignUp.currentItem += 1
+                    if (binding.vpgSignUp.currentItem == 1) binding.vpgSignUp.currentItem += 1
                     setBtnBottomAsAuthenticateEmail()
                 }
                 EMAIL_AUTHENTICATED -> {

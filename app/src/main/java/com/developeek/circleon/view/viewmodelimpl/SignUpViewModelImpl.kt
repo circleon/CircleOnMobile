@@ -19,6 +19,7 @@ import com.developeek.circleon.view.viewmodel.SignUpViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
@@ -55,7 +56,7 @@ class SignUpViewModelImpl
             Const.EMPTY_TEXT
 
         override fun signUp() {
-            if (!::signUpJob.isInitialized || signUpJob.isCompleted && signUpCondition()) {
+            if ((!::signUpJob.isInitialized || signUpJob.isCompleted) && signUpCondition()) {
                 signUpJob =
                     viewModelScope.launch {
                         val result = repository.signUp(email!!, name!!, password!!)
@@ -100,7 +101,7 @@ class SignUpViewModelImpl
         }
 
         override fun requestEmailCode() {
-            if (!::requestEmailCodeJob.isInitialized || requestEmailCodeJob.isCompleted && email != null) {
+            if ((!::requestEmailCodeJob.isInitialized || requestEmailCodeJob.isCompleted) && email != null) {
                 requestEmailCodeJob =
                     viewModelScope.launch {
                         val result = repository.requestEmailAuthenticationCode(email!!)
@@ -124,13 +125,11 @@ class SignUpViewModelImpl
                     withContext(Dispatchers.Default) {
                         timer.postValue(TIMER_INIT)
                         var time = 0L
-                        var old = System.currentTimeMillis()
+
                         while (time < TIMER_INIT) {
-                            if (System.currentTimeMillis() - old == TIMER_INTERVAL) {
-                                time += TIMER_INTERVAL
-                                timer.postValue(TIMER_INIT - time)
-                                old = System.currentTimeMillis()
-                            }
+                            delay(TIMER_INTERVAL)
+                            time += TIMER_INTERVAL
+                            timer.postValue(TIMER_INIT - time)
                         }
                     }
                 }
@@ -141,7 +140,7 @@ class SignUpViewModelImpl
         }
 
         override fun authenticateEmail() {
-            if (!::emailAuthenticationJob.isInitialized || emailAuthenticationJob.isCompleted &&
+            if ((!::emailAuthenticationJob.isInitialized || emailAuthenticationJob.isCompleted) &&
                 email != null && emailCode != null
             ) {
                 emailAuthenticationJob =
@@ -150,6 +149,7 @@ class SignUpViewModelImpl
 
                         if (result is Success) {
                             emailAuthenticated = true
+                            emailCodeExpirationTimerJob.cancel()
                             validationMessage.postValue(EMAIL_AUTHENTICATED)
                         } else {
                             emailAuthenticated = false

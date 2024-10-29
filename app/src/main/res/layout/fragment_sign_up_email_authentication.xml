@@ -90,7 +90,6 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="@dimen/margin_padding_extremely_small"
             android:text="@string/btn_resend_authentication_code"
-            android:textStyle="bold"
             android:textColor="@color/purple_5"
             android:textSize="@dimen/text_size_small" />
 
