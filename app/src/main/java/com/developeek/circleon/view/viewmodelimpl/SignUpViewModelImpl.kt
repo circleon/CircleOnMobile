@@ -46,43 +46,33 @@ class SignUpViewModelImpl
         private var passwordMatched: Boolean = false
         private var emailAuthenticated: Boolean = false
 
-        private var authenticationCodeJob: Job? = null
-        private var authenticationTimerJob: Job? = null
-        private var authenticationJob: Job? = null
-        private var signUpJob: Job? = null
+        private lateinit var requestEmailCodeJob: Job
+        private lateinit var emailCodeExpirationTimerJob: Job
+        private lateinit var emailAuthenticationJob: Job
+        private lateinit var signUpJob: Job
 
         override var error =
             Const.EMPTY_TEXT
 
         override fun signUp() {
-            signUpJob?.cancel()
+            if (!::signUpJob.isInitialized || signUpJob.isCompleted && signUpCondition()) {
+                signUpJob =
+                    viewModelScope.launch {
+                        val result = repository.signUp(email!!, name!!, password!!)
 
-            signUpJob =
-                viewModelScope.launch {
-                    withContext(Dispatchers.IO) {
-                        if (name != null && email != null && password != null &&
-                            emailAuthenticated && passwordMatched
-                        ) {
-                            requestSignUp(name!!, email!!, password!!)
+                        if (result is Success) {
+                            validationMessage.postValue(SIGN_UP_COMPLETED)
+                        } else {
+                            error = (result as Error).message()
+                            uiState.postValue(UiState.Error)
                         }
                     }
-                }
-        }
-
-        private suspend fun requestSignUp(
-            name: Name,
-            email: Email,
-            password: Password,
-        ) {
-            val result = repository.signUp(email, name, password)
-
-            if (result is Success) {
-                validationMessage.postValue(SIGN_UP_COMPLETED)
-            } else {
-                error = (result as Error).message()
-                uiState.postValue(UiState.Error)
             }
         }
+
+        private fun signUpCondition() =
+            name != null && email != null && password != null &&
+                emailAuthenticated && passwordMatched
 
         override fun setName(name: String) {
             val result = Validator.checkName(name)
@@ -110,34 +100,26 @@ class SignUpViewModelImpl
         }
 
         override fun requestEmailCode() {
-            authenticationCodeJob?.cancel()
+            if (!::requestEmailCodeJob.isInitialized || requestEmailCodeJob.isCompleted && email != null) {
+                requestEmailCodeJob =
+                    viewModelScope.launch {
+                        val result = repository.requestEmailAuthenticationCode(email!!)
 
-            authenticationCodeJob =
-                viewModelScope.launch {
-                    withContext(Dispatchers.IO) {
-                        email?.let {
-                            requestEmailAuthenticationCode(it)
+                        if (result is Success) {
+                            startEmailAuthenticationTimer()
+                            validationMessage.postValue(EMAIL_CODE_REQUESTED)
+                        } else {
+                            error = (result as Error).message()
+                            uiState.postValue(UiState.Error)
                         }
                     }
-                }
-        }
-
-        private suspend fun requestEmailAuthenticationCode(email: Email) {
-            val result = repository.requestEmailAuthenticationCode(email)
-
-            if (result is Success) {
-                startEmailAuthenticationTimer()
-                validationMessage.postValue(EMAIL_CODE_REQUESTED)
-            } else {
-                error = (result as Error).message()
-                uiState.postValue(UiState.Error)
             }
         }
 
         private fun startEmailAuthenticationTimer() {
-            authenticationTimerJob?.cancel()
+            if (::emailCodeExpirationTimerJob.isInitialized) emailCodeExpirationTimerJob.cancel()
 
-            authenticationTimerJob =
+            emailCodeExpirationTimerJob =
                 viewModelScope.launch {
                     withContext(Dispatchers.Default) {
                         timer.postValue(TIMER_INIT)
@@ -159,28 +141,22 @@ class SignUpViewModelImpl
         }
 
         override fun authenticateEmail() {
-            authenticationJob?.cancel()
+            if (!::emailAuthenticationJob.isInitialized || emailAuthenticationJob.isCompleted &&
+                email != null && emailCode != null
+            ) {
+                emailAuthenticationJob =
+                    viewModelScope.launch {
+                        val result = repository.authenticateEmail(email!!, emailCode!!)
 
-            authenticationJob =
-                viewModelScope.launch {
-                    withContext(Dispatchers.IO) {
-                        emailCode?.let {
-                            emailAuthenticate(it)
+                        if (result is Success) {
+                            emailAuthenticated = true
+                            validationMessage.postValue(EMAIL_AUTHENTICATED)
+                        } else {
+                            emailAuthenticated = false
+                            error = (result as Error).message()
+                            uiState.postValue(UiState.Error)
                         }
                     }
-                }
-        }
-
-        private suspend fun emailAuthenticate(code: String) {
-            val result = repository.authenticateEmail(email!!, code)
-
-            if (result is Success) {
-                emailAuthenticated = true
-                validationMessage.postValue(EMAIL_AUTHENTICATED)
-            } else {
-                emailAuthenticated = false
-                error = (result as Error).message()
-                uiState.postValue(UiState.Error)
             }
         }
 

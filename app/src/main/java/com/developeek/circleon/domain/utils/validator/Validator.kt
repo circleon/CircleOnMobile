@@ -6,6 +6,8 @@ import com.developeek.circleon.domain.vo.Password
 import java.io.IOException
 
 object Validator {
+    // 텍스트 유효성 검증은 즉각적인 피드백이 요구되기 때문에 UI 스레드에서 진행
+
     fun checkName(data: String): InputValidationResult<Name> {
         return try {
             InputValidationResult.valid(Name(data))

@@ -8,6 +8,7 @@ import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
+import kotlinx.coroutines.Dispatchers
 import javax.inject.Singleton
 
 @InstallIn(SingletonComponent::class)
@@ -19,6 +20,6 @@ object RepositoryModule {
         service: LoginService,
         tokenManager: TokenManager,
     ): LoginRepository {
-        return LoginRepositoryImpl(service, tokenManager)
+        return LoginRepositoryImpl(service, tokenManager, Dispatchers.IO)
     }
 }
