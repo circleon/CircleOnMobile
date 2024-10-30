@@ -46,11 +46,61 @@
 
     </androidx.appcompat.widget.Toolbar>
 
+    <androidx.appcompat.widget.AppCompatTextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginVertical="@dimen/margin_padding_default"
+        tools:text="대학교명"
+        android:textAppearance="@style/content_title"/>
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/rvCircleCategory"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingVertical="@dimen/margin_padding_default"/>
+
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1">
 
+        <androidx.appcompat.widget.LinearLayoutCompat
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/txtContentTitleNewCircle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:paddingVertical="@dimen/margin_padding_default"
+                android:textAppearance="@style/content_title"
+                android:text="@string/home_content_title_new_circle"/>
+
+            <androidx.appcompat.widget.LinearLayoutCompat
+                android:id="@+id/llNewCircle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="@dimen/margin_padding_small"
+                android:orientation="vertical">
+
+            </androidx.appcompat.widget.LinearLayoutCompat>
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/txtContentTitleCircle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:paddingVertical="@dimen/margin_padding_default"
+                android:textAppearance="@style/content_title"
+                android:text="@string/home_content_title_circle"/>
+
+            <androidx.appcompat.widget.LinearLayoutCompat
+                android:id="@+id/llCircle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"/>
+
+        </androidx.appcompat.widget.LinearLayoutCompat>
 
     </ScrollView>
 

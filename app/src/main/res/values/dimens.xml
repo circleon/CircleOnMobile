@@ -7,7 +7,10 @@
     <dimen name="margin_padding_extremely_large">20dp</dimen>
 
     <dimen name="round_default">8dp</dimen>
+    <dimen name="round_chip">10dp</dimen>
+    <dimen name="round_tag">16dp</dimen>
 
+    <dimen name="text_size_extremely_small">10sp</dimen>
     <dimen name="text_size_small">12sp</dimen>
     <dimen name="text_size_default">14sp</dimen>
     <dimen name="text_size_large">16sp</dimen>

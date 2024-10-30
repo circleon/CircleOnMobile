@@ -30,6 +30,7 @@ class HomeActivity : AppCompatActivity() {
 
         // TODO: access 토큰 갱신 결과에 따라 로그인 화면 분기하도록 수정
         val intent = Intent(this, LoginActivity::class.java)
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)
         startActivity(intent)
 
         initBottomNav()
