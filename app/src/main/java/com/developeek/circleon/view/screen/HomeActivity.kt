@@ -1,6 +1,5 @@
 package com.developeek.circleon.view.screen
 
-import android.content.Intent
 import android.os.Bundle
 import android.view.KeyEvent
 import android.widget.Toast
@@ -12,7 +11,6 @@ import com.developeek.circleon.view.screen.calendar.CalendarFragment
 import com.developeek.circleon.view.screen.circle.CircleFragment
 import com.developeek.circleon.view.screen.directmessage.DirectMessageFragment
 import com.developeek.circleon.view.screen.home.HomeFragment
-import com.developeek.circleon.view.screen.login.LoginActivity
 import com.developeek.circleon.view.screen.mypage.MyPageFragment
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -29,9 +27,9 @@ class HomeActivity : AppCompatActivity() {
         setContentView(binding.root)
 
         // TODO: access 토큰 갱신 결과에 따라 로그인 화면 분기하도록 수정
-        val intent = Intent(this, LoginActivity::class.java)
-        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)
-        startActivity(intent)
+//        val intent = Intent(this, LoginActivity::class.java)
+//        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)
+//        startActivity(intent)
 
         initBottomNav()
         initFinishWaitingToast()

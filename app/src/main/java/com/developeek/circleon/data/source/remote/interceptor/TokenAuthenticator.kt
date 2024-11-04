@@ -26,7 +26,7 @@ class TokenAuthenticator
                 val request = tokenRequester.get()
 
                 if (request != null) {
-                    if (request == tokenRequester.first()) {
+                    if (request === tokenRequester.first()) {
                         tokenManager.setAccessToken(requestAccessToken(refreshToken))
                     }
 

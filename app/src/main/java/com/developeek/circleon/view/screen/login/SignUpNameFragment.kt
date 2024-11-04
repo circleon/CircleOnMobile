@@ -16,11 +16,12 @@ import androidx.lifecycle.Observer
 import com.developeek.circleon.R
 import com.developeek.circleon.databinding.FragmentSignUpNameBinding
 import com.developeek.circleon.domain.utils.Const
+import com.developeek.circleon.view.viewmodel.SignUpViewModel
 import com.developeek.circleon.view.viewmodelimpl.SignUpViewModelImpl
 
 class SignUpNameFragment : Fragment() {
     private lateinit var binding: FragmentSignUpNameBinding
-    private val viewModel: SignUpViewModelImpl by activityViewModels()
+    private val viewModel: SignUpViewModel by activityViewModels<SignUpViewModelImpl>()
 
     override fun onCreateView(
         inflater: LayoutInflater,

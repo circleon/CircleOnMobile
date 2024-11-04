@@ -16,6 +16,7 @@ import com.developeek.circleon.R
 import com.developeek.circleon.databinding.ActivitySignUpBinding
 import com.developeek.circleon.domain.state.UiState
 import com.developeek.circleon.view.adapter.SignUpFragmentAdapter
+import com.developeek.circleon.view.viewmodel.SignUpViewModel
 import com.developeek.circleon.view.viewmodelimpl.SignUpViewModelImpl
 import com.developeek.circleon.view.widget.CustomAlertDialog
 import dagger.hilt.android.AndroidEntryPoint
@@ -23,7 +24,7 @@ import dagger.hilt.android.AndroidEntryPoint
 @AndroidEntryPoint
 class SignUpActivity : AppCompatActivity() {
     private lateinit var binding: ActivitySignUpBinding
-    private val viewModel: SignUpViewModelImpl by viewModels()
+    private val viewModel: SignUpViewModel by viewModels<SignUpViewModelImpl>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

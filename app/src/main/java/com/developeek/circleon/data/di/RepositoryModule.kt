@@ -1,6 +1,8 @@
 package com.developeek.circleon.data.di
 
+import com.developeek.circleon.data.repository.CircleRepository
 import com.developeek.circleon.data.repository.LoginRepository
+import com.developeek.circleon.data.repositoryimpl.CircleRepositoryImpl
 import com.developeek.circleon.data.repositoryimpl.LoginRepositoryImpl
 import com.developeek.circleon.data.source.remote.interceptor.TokenManager
 import com.developeek.circleon.data.source.remote.retrofit.service.LoginService
@@ -21,5 +23,11 @@ object RepositoryModule {
         tokenManager: TokenManager,
     ): LoginRepository {
         return LoginRepositoryImpl(service, tokenManager, Dispatchers.IO)
+    }
+
+    @Provides
+    @Singleton
+    fun provideCircleRepository(): CircleRepository {
+        return CircleRepositoryImpl()
     }
 }

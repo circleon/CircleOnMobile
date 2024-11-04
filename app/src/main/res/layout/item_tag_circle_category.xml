@@ -5,7 +5,8 @@
     android:id="@+id/clItemCircleCategory"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
-    android:layout_marginEnd="@dimen/margin_padding_small">
+    android:layout_marginEnd="@dimen/margin_padding_small"
+    android:clickable="true">
 
     <androidx.appcompat.widget.AppCompatTextView
         android:id="@+id/txtCircleCategory"
@@ -13,13 +14,12 @@
         android:layout_height="wrap_content"
         android:paddingHorizontal="@dimen/margin_padding_small"
         android:paddingVertical="@dimen/margin_padding_small"
-        android:textColor="@drawable/selector_button_text"
         android:textSize="@dimen/text_size_default"
         tools:text="Category"
-        android:background="@drawable/bg_tag"
+        android:background="@drawable/bg_active_tag"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent"/>
+        app:layout_constraintBottom_toBottomOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
