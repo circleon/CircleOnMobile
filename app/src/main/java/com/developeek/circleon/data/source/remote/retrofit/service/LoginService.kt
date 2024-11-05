@@ -19,11 +19,6 @@ interface LoginService {
         @Body data: SignUpEntity,
     )
 
-    @POST("auth/duplication")
-    suspend fun checkEmailDuplication(
-        @Body data: EmailEntity,
-    )
-
     @POST("auth/verification")
     suspend fun requestEmailAuthenticationCode(
         @Body data: EmailEntity,

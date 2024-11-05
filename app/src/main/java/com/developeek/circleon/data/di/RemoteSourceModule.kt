@@ -4,6 +4,7 @@ import com.developeek.circleon.BuildConfig
 import com.developeek.circleon.data.source.remote.interceptor.ErrorInterceptor
 import com.developeek.circleon.data.source.remote.interceptor.TokenAuthenticator
 import com.developeek.circleon.data.source.remote.retrofit.service.LoginService
+import com.developeek.circleon.data.source.remote.retrofit.service.TokenService
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -39,6 +40,16 @@ object RemoteSourceModule {
             .connectTimeout(TIMEOUT_LIMIT, TimeUnit.SECONDS)
             .readTimeout(TIMEOUT_LIMIT, TimeUnit.SECONDS)
             .writeTimeout(TIMEOUT_LIMIT, TimeUnit.SECONDS)
+    }
+
+    @Provides
+    @Singleton
+    fun provideTokenService(converter: GsonConverterFactory): TokenService {
+        return Retrofit.Builder()
+            .baseUrl(BuildConfig.SERVICE_API_URL)
+            .addConverterFactory(converter)
+            .build()
+            .create(TokenService::class.java)
     }
 
     @Provides

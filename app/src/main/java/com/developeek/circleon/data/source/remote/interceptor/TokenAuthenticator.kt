@@ -1,6 +1,7 @@
 package com.developeek.circleon.data.source.remote.interceptor
 
-import kotlinx.coroutines.delay
+import com.developeek.circleon.data.entity.login.RefreshTokenEntity
+import com.developeek.circleon.data.source.remote.retrofit.service.TokenService
 import kotlinx.coroutines.runBlocking
 import okhttp3.Authenticator
 import okhttp3.Request
@@ -15,6 +16,7 @@ class TokenAuthenticator
     constructor(
         private val tokenManager: TokenManager,
         private val tokenRequester: TokenRequester,
+        private val service: TokenService,
     ) : Authenticator {
         override fun authenticate(
             route: Route?,
@@ -22,30 +24,24 @@ class TokenAuthenticator
         ): Request? {
             val refreshToken = tokenManager.getRefreshToken() ?: return null
 
-            return runBlocking {
-                val request = tokenRequester.get()
-
-                if (request != null) {
-                    if (request === tokenRequester.first()) {
-                        tokenManager.setAccessToken(requestAccessToken(refreshToken))
-                    }
-
+            val request = tokenRequester.get()
+            if (request === tokenRequester.first()) {
+                return runBlocking {
+                    tokenManager.setAccessToken(requestAccessToken(refreshToken))
                     if (tokenManager.getAccessToken() == null) {
                         null
                     } else {
                         newRequest(tokenManager.getAccessToken()!!, response.request())
                     }
-                } else {
-                    null
                 }
+            } else {
+                return newRequest(tokenManager.getAccessToken()!!, response.request())
             }
         }
 
         private suspend fun requestAccessToken(refreshToken: String): String {
-            // TODO: request access token api
-            delay(100)
-
-            return ""
+            val response = service.refreshAccessToken(RefreshTokenEntity(refreshToken))
+            return response.accessToken
         }
 
         private fun newRequest(
