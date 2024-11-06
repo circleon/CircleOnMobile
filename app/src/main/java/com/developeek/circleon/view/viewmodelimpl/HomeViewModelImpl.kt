@@ -3,11 +3,17 @@ package com.developeek.circleon.view.viewmodelimpl
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.developeek.circleon.data.repository.CircleRepository
+import com.developeek.circleon.data.source.Error
+import com.developeek.circleon.data.source.Success
 import com.developeek.circleon.domain.enums.Category
+import com.developeek.circleon.domain.model.CircleModels
 import com.developeek.circleon.domain.state.UiState
 import com.developeek.circleon.view.viewmodel.HomeViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
@@ -23,9 +29,28 @@ class HomeViewModelImpl
             get() = categoryFilter
         private val categoryFilter = MutableLiveData(Category.ALL)
 
-        override fun setFilter(category: Category) {
+        override val circles: CircleModels = CircleModels.emptyInstance()
+
+        private var circleLoadingJob: Job? = null
+
+        override fun setFilterAndLoad(category: Category) {
+            circleLoadingJob?.cancel()
             categoryFilter.postValue(category)
 
-            // TODO: repository.loadCircleByCategory
+            circleLoadingJob =
+                viewModelScope.launch {
+                    val result = repository.getCircles(0, 10, category)
+
+                    if (result is Success) {
+                        circles.append(result.data)
+                        uiState.postValue(UiState.Success)
+                    } else {
+                        if ((result as Error).isRefreshExpired()) {
+                            uiState.postValue(UiState.RefreshExpiration)
+                        } else {
+                            uiState.postValue(UiState.Error)
+                        }
+                    }
+                }
         }
     }

@@ -1,6 +1,7 @@
 package com.developeek.circleon.view.screen.home
 
 import android.app.Activity
+import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -12,7 +13,9 @@ import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.developeek.circleon.databinding.FragmentHomeBinding
 import com.developeek.circleon.domain.enums.Category
+import com.developeek.circleon.domain.state.UiState
 import com.developeek.circleon.view.adapter.CircleCategoryAdapter
+import com.developeek.circleon.view.screen.login.LoginActivity
 import com.developeek.circleon.view.viewmodel.HomeViewModel
 import com.developeek.circleon.view.viewmodelimpl.HomeViewModelImpl
 import dagger.hilt.android.AndroidEntryPoint
@@ -38,14 +41,47 @@ class HomeFragment : Fragment() {
     ) {
         super.onViewCreated(view, savedInstanceState)
 
+        initView(requireActivity())
         initObserver(requireActivity())
     }
 
+    private fun initView(activity: Activity) {
+        binding.rvCircleCategory.adapter = CircleCategoryAdapter(viewModel, activity)
+        binding.rvCircleCategory.layoutManager = LinearLayoutManager(activity)
+    }
+
     private fun initObserver(activity: Activity) {
+        viewModel.state.observe(
+            activity as LifecycleOwner,
+            stateObserver(activity),
+        )
         viewModel.selectedCategory.observe(
             activity as LifecycleOwner,
             selectedCategoryObserver(activity),
         )
+    }
+
+    private fun stateObserver(activity: Activity) =
+        Observer<UiState> {
+            when (it) {
+                UiState.Success -> {
+                    loadCircles()
+                }
+                UiState.RefreshExpiration -> {
+                    sendUserToLoginScreen(activity)
+                }
+                else -> {}
+            }
+        }
+
+    private fun loadCircles() {
+        // rvCircle 어댑터 작성 및 diffutil 적용
+    }
+
+    private fun sendUserToLoginScreen(activity: Activity) {
+        val intent = Intent(activity, LoginActivity::class.java)
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)
+        startActivity(intent)
     }
 
     private fun selectedCategoryObserver(activity: Activity) =

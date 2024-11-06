@@ -48,7 +48,7 @@ class TokenAuthenticator
             token: String,
             request: Request,
         ) = request.newBuilder()
-            .header(AUTHORIZATION, token)
+            .header(AUTHORIZATION, "Bearer $token")
             .build()
 
         companion object {

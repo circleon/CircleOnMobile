@@ -48,7 +48,7 @@ class CircleCategoryAdapter(
 
         private fun setItemClickListener(category: Category) {
             binding.clItemCircleCategory.setOnClickListener {
-                viewModel.setFilter(category)
+                viewModel.setFilterAndLoad(category)
             }
         }
     }

@@ -5,6 +5,7 @@ import com.developeek.circleon.data.repository.LoginRepository
 import com.developeek.circleon.data.repositoryimpl.CircleRepositoryImpl
 import com.developeek.circleon.data.repositoryimpl.LoginRepositoryImpl
 import com.developeek.circleon.data.source.remote.interceptor.TokenManager
+import com.developeek.circleon.data.source.remote.retrofit.service.CircleService
 import com.developeek.circleon.data.source.remote.retrofit.service.LoginService
 import dagger.Module
 import dagger.Provides
@@ -27,7 +28,7 @@ object RepositoryModule {
 
     @Provides
     @Singleton
-    fun provideCircleRepository(): CircleRepository {
-        return CircleRepositoryImpl()
+    fun provideCircleRepository(service: CircleService): CircleRepository {
+        return CircleRepositoryImpl(service, Dispatchers.IO)
     }
 }
