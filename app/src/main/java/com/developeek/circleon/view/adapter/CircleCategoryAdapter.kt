@@ -8,10 +8,12 @@ import androidx.recyclerview.widget.RecyclerView
 import com.developeek.circleon.R
 import com.developeek.circleon.databinding.ItemTagCircleCategoryBinding
 import com.developeek.circleon.domain.enums.Category
+import com.developeek.circleon.view.listener.ItemClickListener
 import com.developeek.circleon.view.viewmodel.HomeViewModel
 
 class CircleCategoryAdapter(
     private val viewModel: HomeViewModel,
+    private val itemClickListener: ItemClickListener,
     private val context: Context,
 ) : RecyclerView.Adapter<CircleCategoryAdapter.CircleCategoryAdapterViewHolder>() {
     inner class CircleCategoryAdapterViewHolder(
@@ -22,7 +24,7 @@ class CircleCategoryAdapter(
 
             loadCategory(category)
             setItemColor(category, context)
-            setItemClickListener(category)
+            setItemClickListener(position)
         }
 
         private fun loadCategory(category: Category) {
@@ -46,9 +48,9 @@ class CircleCategoryAdapter(
             }
         }
 
-        private fun setItemClickListener(category: Category) {
+        private fun setItemClickListener(position: Int) {
             binding.clItemCircleCategory.setOnClickListener {
-                viewModel.setFilterAndLoad(category)
+                itemClickListener.onItemClicked(position)
             }
         }
     }

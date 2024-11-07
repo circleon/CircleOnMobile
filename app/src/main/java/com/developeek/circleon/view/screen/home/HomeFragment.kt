@@ -15,6 +15,7 @@ import com.developeek.circleon.domain.enums.Category
 import com.developeek.circleon.domain.state.UiState
 import com.developeek.circleon.view.adapter.CircleAdapter
 import com.developeek.circleon.view.adapter.CircleCategoryAdapter
+import com.developeek.circleon.view.listener.ItemClickListener
 import com.developeek.circleon.view.screen.login.LoginActivity
 import com.developeek.circleon.view.viewmodel.HomeViewModel
 import com.developeek.circleon.view.viewmodelimpl.HomeViewModelImpl
@@ -45,8 +46,6 @@ class HomeFragment : Fragment() {
     }
 
     private fun initView(activity: Activity) {
-        binding.rvCircleCategory.adapter = CircleCategoryAdapter(viewModel, activity)
-        binding.rvCircleCategory.layoutManager = LinearLayoutManager(activity, LinearLayoutManager.HORIZONTAL, false)
         binding.rvCircle.adapter = CircleAdapter(viewModel)
         binding.rvCircle.layoutManager = LinearLayoutManager(activity)
         binding.rvCircle.itemAnimator = null
@@ -78,7 +77,7 @@ class HomeFragment : Fragment() {
 
     private fun loadCircles() {
         binding.rvCircle.adapter?.let {
-            (it as CircleAdapter).update()
+            (it as CircleAdapter).update { binding.rvCircle.scrollToPosition(0) }
         }
     }
 
@@ -94,6 +93,15 @@ class HomeFragment : Fragment() {
             binding.rvCircleCategory.adapter =
                 CircleCategoryAdapter(
                     viewModel,
+                    object : ItemClickListener {
+                        override fun onItemClicked(position: Int) {
+                            if (viewModel.selectedCategory.value!!.isSame(viewModel.category[position])) {
+                                binding.rvCircle.smoothScrollToPosition(0)
+                            } else {
+                                viewModel.setFilterAndLoad(viewModel.category[position])
+                            }
+                        }
+                    },
                     activity,
                 )
             binding.rvCircleCategory.layoutManager =

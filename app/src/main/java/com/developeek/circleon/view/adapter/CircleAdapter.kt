@@ -40,11 +40,11 @@ class CircleAdapter(
         }
 
         private fun loadCircle(position: Int) {
-            binding.txtCircleName.text = viewModel.circles.get(position).name
-            binding.txtCircleCategory.text = viewModel.circles.get(position).category.categoryName()
+            binding.txtCircleName.text = diffUtil.currentList[position].name
+            binding.txtCircleCategory.text = diffUtil.currentList[position].category.categoryName()
             binding.txtCirclePeopleCount.text =
                 String.format(
-                    MEMBER_COUNT_UNIT, viewModel.circles.get(position).member,
+                    MEMBER_COUNT_UNIT, diffUtil.currentList[position].member,
                 )
         }
     }
@@ -72,8 +72,8 @@ class CircleAdapter(
         holder.bind(position)
     }
 
-    fun update() {
-        diffUtil.submitList(viewModel.circles.get())
+    fun update(commitCallback: Runnable) {
+        diffUtil.submitList(viewModel.circles.get(), commitCallback)
     }
 
     companion object {
