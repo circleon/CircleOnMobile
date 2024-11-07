@@ -39,14 +39,10 @@ object RemoteSourceModule {
     @LoginClient
     @Provides
     @Singleton
-    fun provideLoginClient(
-        errorInterceptor: ErrorInterceptor,
-        tokenAuthenticator: TokenAuthenticator,
-    ): OkHttpClient.Builder {
+    fun provideLoginClient(errorInterceptor: ErrorInterceptor): Builder {
         return OkHttpClient().newBuilder()
             .addInterceptor(HttpLoggingInterceptor().setLevel(HttpLoggingInterceptor.Level.BODY))
             .addInterceptor(errorInterceptor)
-            .authenticator(tokenAuthenticator)
             .connectTimeout(TIMEOUT_LIMIT, TimeUnit.SECONDS)
             .readTimeout(TIMEOUT_LIMIT, TimeUnit.SECONDS)
             .writeTimeout(TIMEOUT_LIMIT, TimeUnit.SECONDS)
@@ -59,7 +55,7 @@ object RemoteSourceModule {
         errorInterceptor: ErrorInterceptor,
         headerInterceptor: HeaderInterceptor,
         tokenAuthenticator: TokenAuthenticator,
-    ): OkHttpClient.Builder {
+    ): Builder {
         return OkHttpClient().newBuilder()
             .addInterceptor(HttpLoggingInterceptor().setLevel(HttpLoggingInterceptor.Level.BODY))
             .addInterceptor(headerInterceptor)
@@ -84,7 +80,7 @@ object RemoteSourceModule {
     @Singleton
     fun provideLoginService(
         converter: GsonConverterFactory,
-        @LoginClient clientBuilder: OkHttpClient.Builder,
+        @LoginClient clientBuilder: Builder,
     ): LoginService {
         return Retrofit.Builder()
             .baseUrl(BuildConfig.SERVICE_API_URL)

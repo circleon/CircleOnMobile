@@ -41,6 +41,7 @@ class CircleAdapter(
         }
 
         private fun loadCircle(position: Int) {
+            binding.txtCircleName.text = viewModel.circles.get(position).name
             binding.txtCircleCategory.text = viewModel.circles.get(position).category.categoryName()
             binding.txtCirclePeopleCount.text =
                 String.format(

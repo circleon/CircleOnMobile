@@ -13,14 +13,16 @@ data class CircleResponse(
 
 data class CircleEntity(
     @SerializedName("circleId") val id: Int,
-    val profileImgUrl: String,
-    val thumbnailUrl: String,
+    @SerializedName("circleName") val name: String,
+    val profileImgUrl: String?,
+    val thumbnailUrl: String?,
     val category: String,
     val memberCount: Int,
 ) {
     fun toCircleModel() =
         CircleModel(
             id,
+            name,
             profileImgUrl,
             thumbnailUrl,
             category(category),

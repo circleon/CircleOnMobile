@@ -8,12 +8,12 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.developeek.circleon.databinding.FragmentHomeBinding
 import com.developeek.circleon.domain.enums.Category
 import com.developeek.circleon.domain.state.UiState
+import com.developeek.circleon.view.adapter.CircleAdapter
 import com.developeek.circleon.view.adapter.CircleCategoryAdapter
 import com.developeek.circleon.view.screen.login.LoginActivity
 import com.developeek.circleon.view.viewmodel.HomeViewModel
@@ -40,23 +40,25 @@ class HomeFragment : Fragment() {
         savedInstanceState: Bundle?,
     ) {
         super.onViewCreated(view, savedInstanceState)
-
         initView(requireActivity())
         initObserver(requireActivity())
     }
 
     private fun initView(activity: Activity) {
+        viewModel.setFilterAndLoad(Category.ALL)
         binding.rvCircleCategory.adapter = CircleCategoryAdapter(viewModel, activity)
-        binding.rvCircleCategory.layoutManager = LinearLayoutManager(activity)
+        binding.rvCircleCategory.layoutManager = LinearLayoutManager(activity, LinearLayoutManager.HORIZONTAL, false)
+        binding.rvCircle.adapter = CircleAdapter(viewModel)
+        binding.rvCircle.layoutManager = LinearLayoutManager(activity)
     }
 
     private fun initObserver(activity: Activity) {
         viewModel.state.observe(
-            activity as LifecycleOwner,
+            viewLifecycleOwner,
             stateObserver(activity),
         )
         viewModel.selectedCategory.observe(
-            activity as LifecycleOwner,
+            viewLifecycleOwner,
             selectedCategoryObserver(activity),
         )
     }
@@ -75,7 +77,9 @@ class HomeFragment : Fragment() {
         }
 
     private fun loadCircles() {
-        // rvCircle 어댑터 작성 및 diffutil 적용
+        binding.rvCircle.adapter?.let {
+            (it as CircleAdapter).update(viewModel.circles)
+        }
     }
 
     private fun sendUserToLoginScreen(activity: Activity) {
@@ -93,9 +97,7 @@ class HomeFragment : Fragment() {
                     activity,
                 )
             binding.rvCircleCategory.layoutManager =
-                LinearLayoutManager(activity).also {
-                    it.orientation = LinearLayoutManager.HORIZONTAL
-                }
+                LinearLayoutManager(activity, LinearLayoutManager.HORIZONTAL, false)
             binding.rvCircleCategory.layoutManager?.onRestoreInstanceState(scrollState)
         }
 }

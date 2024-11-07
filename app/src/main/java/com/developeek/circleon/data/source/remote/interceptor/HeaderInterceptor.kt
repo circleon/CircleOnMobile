@@ -26,6 +26,6 @@ class HeaderInterceptor
         }
 
         companion object {
-            private const val AUTHORIZATION = "authorization"
+            private const val AUTHORIZATION = "Authorization"
         }
     }

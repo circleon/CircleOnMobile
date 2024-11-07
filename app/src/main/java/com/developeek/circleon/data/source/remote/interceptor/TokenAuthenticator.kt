@@ -1,12 +1,16 @@
 package com.developeek.circleon.data.source.remote.interceptor
 
 import com.developeek.circleon.data.entity.login.RefreshTokenEntity
+import com.developeek.circleon.data.exception.ServiceException
+import com.developeek.circleon.data.source.remote.retrofit.StatusCode
 import com.developeek.circleon.data.source.remote.retrofit.service.TokenService
 import kotlinx.coroutines.runBlocking
 import okhttp3.Authenticator
 import okhttp3.Request
 import okhttp3.Response
 import okhttp3.Route
+import org.json.JSONObject
+import org.json.JSONTokener
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -22,20 +26,24 @@ class TokenAuthenticator
             route: Route?,
             response: Response,
         ): Request? {
-            val refreshToken = tokenManager.getRefreshToken() ?: return null
+            val refreshToken = tokenManager.getRefreshToken() ?: throw ServiceException.RefreshTokenExpiredException("")
+            val responseString = response.body()!!.string()
+            val jsonObject = JSONTokener(responseString).nextValue() as JSONObject
+            if (jsonObject.getString(PARAM_NAME_ERROR_CODE) == StatusCode.FAIL_REFRESH_TOKEN_VALIDATION.errorCode()) {
+                throw ServiceException.RefreshTokenExpiredException("")
+            }
 
-            val request = tokenRequester.get()
-            if (request === tokenRequester.first()) {
-                return runBlocking {
+            return runBlocking {
+                try {
                     tokenManager.setAccessToken(requestAccessToken(refreshToken))
-                    if (tokenManager.getAccessToken() == null) {
-                        null
-                    } else {
-                        newRequest(tokenManager.getAccessToken()!!, response.request())
-                    }
+                } catch (e: Exception) {
+                    throw ServiceException.RefreshTokenExpiredException("")
                 }
-            } else {
-                return newRequest(tokenManager.getAccessToken()!!, response.request())
+                if (tokenManager.getAccessToken() == null) {
+                    null
+                } else {
+                    newRequest(tokenManager.getAccessToken()!!, response.request())
+                }
             }
         }
 
@@ -52,6 +60,7 @@ class TokenAuthenticator
             .build()
 
         companion object {
-            private const val AUTHORIZATION = "authorization"
+            private const val AUTHORIZATION = "Authorization"
+            private const val PARAM_NAME_ERROR_CODE = "errorCode"
         }
     }

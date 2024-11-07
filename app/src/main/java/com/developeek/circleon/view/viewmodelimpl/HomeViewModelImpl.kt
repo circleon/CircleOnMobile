@@ -27,7 +27,7 @@ class HomeViewModelImpl
         override val category: List<Category> = Category.entries
         override val selectedCategory: LiveData<Category>
             get() = categoryFilter
-        private val categoryFilter = MutableLiveData(Category.ALL)
+        private val categoryFilter = MutableLiveData<Category>()
 
         override val circles: CircleModels = CircleModels.emptyInstance()
 
@@ -39,7 +39,7 @@ class HomeViewModelImpl
 
             circleLoadingJob =
                 viewModelScope.launch {
-                    val result = repository.getCircles(0, 10, category)
+                    val result = repository.getCircles(0, SIZE_BY_PAGE, category)
 
                     if (result is Success) {
                         circles.append(result.data)
@@ -52,5 +52,9 @@ class HomeViewModelImpl
                         }
                     }
                 }
+        }
+
+        companion object {
+            private const val SIZE_BY_PAGE = 10
         }
     }

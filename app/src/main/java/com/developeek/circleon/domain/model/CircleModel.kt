@@ -6,8 +6,9 @@ import java.util.Stack
 
 data class CircleModel(
     val id: Int,
-    val profileImgUrl: String,
-    val thumbnailUrl: String,
+    val name: String,
+    val profileImgUrl: String?,
+    val thumbnailUrl: String?,
     val category: Category,
     val member: Int,
 )

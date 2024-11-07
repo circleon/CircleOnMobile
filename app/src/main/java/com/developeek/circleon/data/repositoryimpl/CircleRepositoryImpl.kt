@@ -17,15 +17,15 @@ class CircleRepositoryImpl(
     override suspend fun getCircles(
         page: Int,
         size: Int,
-        category: Category?,
+        category: Category,
     ): Result<CircleModels> {
         return try {
             withContext(dispatcher) {
                 val response =
-                    if (category == null) {
-                        service.getAllCircles(page, size, "createdAt,desc")
+                    if (category == Category.ALL) {
+                        service.getAllCircles(page, size, SORT_LATEST)
                     } else {
-                        service.getCircles(page, size, "createdAt,desc", category.codeName())
+                        service.getCircles(page, size, SORT_LATEST, category.codeName())
                     }
                 Result.success(CircleModels(response.content.map { it.toCircleModel() }))
             }
@@ -34,5 +34,9 @@ class CircleRepositoryImpl(
         } catch (e: IOException) {
             Result.error(e)
         }
+    }
+
+    companion object {
+        private const val SORT_LATEST = "createdAt,desc"
     }
 }

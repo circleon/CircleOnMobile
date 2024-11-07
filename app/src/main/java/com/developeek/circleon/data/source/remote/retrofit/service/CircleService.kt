@@ -5,7 +5,7 @@ import retrofit2.http.GET
 import retrofit2.http.Query
 
 interface CircleService {
-    @GET("api/circles")
+    @GET("circles")
     suspend fun getCircles(
         @Query("page") page: Int,
         @Query("size") size: Int,
@@ -13,7 +13,7 @@ interface CircleService {
         @Query("categoryType") category: String,
     ): CircleResponse
 
-    @GET("api/circles")
+    @GET("circles")
     suspend fun getAllCircles(
         @Query("page") page: Int,
         @Query("size") size: Int,

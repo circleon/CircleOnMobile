@@ -5,7 +5,7 @@
     android:id="@+id/clItemCircle"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:padding="@dimen/margin_padding_default"
+    android:padding="@dimen/margin_padding_large"
     android:layout_marginBottom="@dimen/margin_padding_small"
     android:background="@drawable/bg_card"
     android:clickable="true">
@@ -31,7 +31,7 @@
                 android:id="@+id/txtCircleName"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                tools:text="동아리 이름"
+                android:text="동아리 이름"
                 android:textAppearance="@style/content_title"
                 android:textSize="@dimen/text_size_default"/>
 
@@ -54,7 +54,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/margin_padding_small"
-            tools:text="동아리 소개"
+            android:text="동아리 소개입니다"
             android:textSize="@dimen/text_size_small"
             android:maxLines="2"
             android:ellipsize="end"/>
@@ -85,8 +85,12 @@
 
     <androidx.appcompat.widget.AppCompatImageView
         android:id="@+id/imgCircleThumbnail"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="64dp"
+        android:layout_height="64dp"
+        android:padding="@dimen/margin_padding_default"
+        android:background="@drawable/bg_image"
+        android:src="@drawable/logo_main"
+        android:clipToOutline="true"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent"/>
 

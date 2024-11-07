@@ -8,6 +8,6 @@ interface CircleRepository {
     suspend fun getCircles(
         page: Int,
         size: Int,
-        category: Category?,
+        category: Category,
     ): Result<CircleModels>
 }
