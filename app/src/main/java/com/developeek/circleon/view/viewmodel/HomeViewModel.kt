@@ -12,4 +12,6 @@ interface HomeViewModel {
     val circles: CircleModels
 
     fun setFilterAndLoad(category: Category)
+
+    fun restore()
 }

@@ -22,14 +22,16 @@ class HomeViewModelImpl
     constructor(private val repository: CircleRepository) : HomeViewModel, ViewModel() {
         override val state: LiveData<UiState>
             get() = uiState
-        private val uiState = MutableLiveData<UiState>()
+        private val uiState = MutableLiveData<UiState>(UiState.Loading)
 
         override val category: List<Category> = Category.entries
         override val selectedCategory: LiveData<Category>
             get() = categoryFilter
         private val categoryFilter = MutableLiveData<Category>()
 
-        override val circles: CircleModels = CircleModels.emptyInstance()
+        override val circles: CircleModels
+            get() = circleModels
+        private var circleModels = CircleModels.emptyInstance()
 
         private var circleLoadingJob: Job? = null
 
@@ -42,7 +44,7 @@ class HomeViewModelImpl
                     val result = repository.getCircles(0, SIZE_BY_PAGE, category)
 
                     if (result is Success) {
-                        circles.append(result.data)
+                        circleModels = result.data
                         uiState.postValue(UiState.Success)
                     } else {
                         if ((result as Error).isRefreshExpired()) {
@@ -52,6 +54,17 @@ class HomeViewModelImpl
                         }
                     }
                 }
+        }
+
+        override fun restore() {
+            if (categoryFilter.value == null) {
+                setFilterAndLoad(Category.ALL)
+            } else {
+                categoryFilter.postValue(categoryFilter.value)
+            }
+            uiState.value?.let {
+                uiState.postValue(it)
+            }
         }
 
         companion object {

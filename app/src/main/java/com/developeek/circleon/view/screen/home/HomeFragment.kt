@@ -7,7 +7,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.viewModels
+import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.developeek.circleon.databinding.FragmentHomeBinding
@@ -23,7 +23,7 @@ import dagger.hilt.android.AndroidEntryPoint
 @AndroidEntryPoint
 class HomeFragment : Fragment() {
     private lateinit var binding: FragmentHomeBinding
-    private val viewModel: HomeViewModel by viewModels<HomeViewModelImpl>()
+    private val viewModel: HomeViewModel by activityViewModels<HomeViewModelImpl>()
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -45,11 +45,11 @@ class HomeFragment : Fragment() {
     }
 
     private fun initView(activity: Activity) {
-        viewModel.setFilterAndLoad(Category.ALL)
         binding.rvCircleCategory.adapter = CircleCategoryAdapter(viewModel, activity)
         binding.rvCircleCategory.layoutManager = LinearLayoutManager(activity, LinearLayoutManager.HORIZONTAL, false)
         binding.rvCircle.adapter = CircleAdapter(viewModel)
         binding.rvCircle.layoutManager = LinearLayoutManager(activity)
+        binding.rvCircle.itemAnimator = null
     }
 
     private fun initObserver(activity: Activity) {
@@ -78,7 +78,7 @@ class HomeFragment : Fragment() {
 
     private fun loadCircles() {
         binding.rvCircle.adapter?.let {
-            (it as CircleAdapter).update(viewModel.circles)
+            (it as CircleAdapter).update()
         }
     }
 
@@ -100,4 +100,9 @@ class HomeFragment : Fragment() {
                 LinearLayoutManager(activity, LinearLayoutManager.HORIZONTAL, false)
             binding.rvCircleCategory.layoutManager?.onRestoreInstanceState(scrollState)
         }
+
+    override fun onStart() {
+        super.onStart()
+        viewModel.restore()
+    }
 }

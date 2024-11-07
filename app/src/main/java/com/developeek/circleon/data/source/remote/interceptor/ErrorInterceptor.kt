@@ -6,7 +6,6 @@ import com.developeek.circleon.data.exception.ServiceExceptionMessage
 import com.developeek.circleon.data.source.remote.retrofit.StatusCode
 import okhttp3.Interceptor
 import okhttp3.MediaType
-import okhttp3.Request
 import okhttp3.Response
 import okhttp3.ResponseBody
 import org.json.JSONException
@@ -17,23 +16,17 @@ import javax.inject.Inject
 
 class ErrorInterceptor
     @Inject
-    constructor(
-        private val tokenManager: TokenManager,
-        private val tokenRequester: TokenRequester,
-    ) : Interceptor {
+    constructor() : Interceptor {
         override fun intercept(chain: Interceptor.Chain): Response {
             val request = chain.request()
             val response = chain.proceed(request)
 
-            val newResponse = parseResponse(response, request)
+            val newResponse = parseResponse(response)
 
             return newResponse
         }
 
-        private fun parseResponse(
-            response: Response,
-            request: Request,
-        ): Response {
+        private fun parseResponse(response: Response): Response {
             val responseCode = response.code()
             val responseBody = response.body()
             val contentType = response.header(PARAM_NAME_CONTENT_TYPE)
@@ -45,7 +38,7 @@ class ErrorInterceptor
                 val statusCode = findStatusCode(responseCode, jsonObject)
 
                 errorLog(statusCode)
-                throwException(statusCode, request)
+                throwException(statusCode)
 
                 val newResponseBody = ResponseBody.create(MediaType.get(contentType!!), responseString)
                 return response.newBuilder().body(newResponseBody).build()
@@ -91,22 +84,11 @@ class ErrorInterceptor
             }
         }
 
-        private fun throwException(
-            statusCode: StatusCode,
-            request: Request,
-        ) {
+        private fun throwException(statusCode: StatusCode) {
             when (statusCode) {
                 StatusCode.SUCCESS -> {}
                 StatusCode.NO_CONTENTS -> {
                     throw ServiceException.NoResultException(statusCode.message())
-                }
-                StatusCode.FAIL_ACCESS_TOKEN_VALIDATION -> {
-                    tokenManager.getRefreshToken()
-                        ?: throw ServiceException.RefreshTokenExpiredException(statusCode.message())
-                    tokenRequester.add(request)
-                }
-                StatusCode.FAIL_REFRESH_TOKEN_VALIDATION -> {
-                    throw ServiceException.RefreshTokenExpiredException(statusCode.message())
                 }
                 // 서버 혹은 통신 문제인 경우
                 StatusCode.WRONG_REQUEST_FORMAT,

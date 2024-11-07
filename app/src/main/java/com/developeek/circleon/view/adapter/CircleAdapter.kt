@@ -7,7 +7,6 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.developeek.circleon.databinding.ItemCardCircleBinding
 import com.developeek.circleon.domain.model.CircleModel
-import com.developeek.circleon.domain.model.CircleModels
 import com.developeek.circleon.view.viewmodel.HomeViewModel
 
 class CircleAdapter(
@@ -73,8 +72,8 @@ class CircleAdapter(
         holder.bind(position)
     }
 
-    fun update(circlesModels: CircleModels) {
-        diffUtil.submitList(circlesModels.get())
+    fun update() {
+        diffUtil.submitList(viewModel.circles.get())
     }
 
     companion object {

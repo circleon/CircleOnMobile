@@ -19,7 +19,6 @@ class TokenAuthenticator
     @Inject
     constructor(
         private val tokenManager: TokenManager,
-        private val tokenRequester: TokenRequester,
         private val service: TokenService,
     ) : Authenticator {
         override fun authenticate(
