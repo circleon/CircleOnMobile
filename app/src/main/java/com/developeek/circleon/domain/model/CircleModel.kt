@@ -28,10 +28,13 @@ data class CircleModels(private val data: List<CircleModel>) {
 
     fun size() = models.size
 
-    fun append(models: CircleModels) {
-        for (c in models.get()) {
-            this.models.push(c)
-        }
+    fun add(models: CircleModels): CircleModels {
+        val tmp = Stack<CircleModel>()
+
+        tmp.addAll(this.models)
+        tmp.addAll(models.get())
+
+        return CircleModels(tmp)
     }
 
     companion object {

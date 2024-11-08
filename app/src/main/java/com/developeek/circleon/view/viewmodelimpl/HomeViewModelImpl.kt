@@ -10,6 +10,7 @@ import com.developeek.circleon.data.source.Success
 import com.developeek.circleon.domain.enums.Category
 import com.developeek.circleon.domain.model.CircleModels
 import com.developeek.circleon.domain.state.UiState
+import com.developeek.circleon.domain.utils.Const
 import com.developeek.circleon.view.viewmodel.HomeViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
@@ -32,16 +33,24 @@ class HomeViewModelImpl
         override val circles: CircleModels
             get() = circleModels
         private var circleModels = CircleModels.emptyInstance()
+        private var currentPage = DEFAULT_PAGE
+        override val scrollOver: LiveData<Boolean>
+            get() = scrollOverCompleted
+        private var scrollOverCompleted = MutableLiveData<Boolean>()
 
         private var circleLoadingJob: Job? = null
+        private var scrollOverLoadingJob: Job? = null
+
+        private var error = Const.EMPTY_TEXT
 
         override fun setFilterAndLoad(category: Category) {
             circleLoadingJob?.cancel()
+            scrollOverLoadingJob?.cancel()
             categoryFilter.postValue(category)
 
             circleLoadingJob =
                 viewModelScope.launch {
-                    val result = repository.getCircles(0, SIZE_BY_PAGE, category)
+                    val result = repository.getCircles(DEFAULT_PAGE, SIZE_BY_PAGE, category)
 
                     if (result is Success) {
                         circleModels = result.data
@@ -50,6 +59,29 @@ class HomeViewModelImpl
                         if ((result as Error).isRefreshExpired()) {
                             uiState.postValue(UiState.RefreshExpiration)
                         } else {
+                            error = result.message()
+                            uiState.postValue(UiState.Error)
+                        }
+                    }
+                }
+        }
+
+        override fun scrollOver() {
+            scrollOverLoadingJob?.cancel()
+
+            scrollOverLoadingJob =
+                viewModelScope.launch {
+                    val result = repository.getCircles(currentPage + 1, SIZE_BY_PAGE, categoryFilter.value!!)
+
+                    if (result is Success) {
+                        circleModels = circleModels.add(result.data)
+                        currentPage++
+                        scrollOverCompleted.postValue(true)
+                    } else {
+                        if ((result as Error).isRefreshExpired()) {
+                            uiState.postValue(UiState.RefreshExpiration)
+                        } else {
+                            error = result.message()
                             uiState.postValue(UiState.Error)
                         }
                     }
@@ -69,5 +101,6 @@ class HomeViewModelImpl
 
         companion object {
             private const val SIZE_BY_PAGE = 10
+            private const val DEFAULT_PAGE = 0
         }
     }

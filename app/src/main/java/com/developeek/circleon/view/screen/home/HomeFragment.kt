@@ -10,6 +10,7 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.developeek.circleon.databinding.FragmentHomeBinding
 import com.developeek.circleon.domain.enums.Category
 import com.developeek.circleon.domain.state.UiState
@@ -46,12 +47,14 @@ class HomeFragment : Fragment() {
         savedInstanceState: Bundle?,
     ) {
         super.onViewCreated(view, savedInstanceState)
+
         initView(requireActivity())
         initObserver(requireActivity())
+        initListener()
     }
 
     private fun initView(activity: Activity) {
-        binding.rvCircle.adapter = CircleAdapter(viewModel, activity, glideProvider)
+        binding.rvCircle.adapter = CircleAdapter(activity, glideProvider)
         binding.rvCircle.layoutManager = LinearLayoutManager(activity)
         binding.rvCircle.itemAnimator = null
     }
@@ -64,6 +67,10 @@ class HomeFragment : Fragment() {
         viewModel.selectedCategory.observe(
             viewLifecycleOwner,
             selectedCategoryObserver(activity),
+        )
+        viewModel.scrollOver.observe(
+            viewLifecycleOwner,
+            scrollOverObserver(),
         )
     }
 
@@ -82,7 +89,7 @@ class HomeFragment : Fragment() {
 
     private fun loadCircles() {
         binding.rvCircle.adapter?.let {
-            (it as CircleAdapter).update { binding.rvCircle.scrollToPosition(0) }
+            (it as CircleAdapter).update(viewModel.circles) { binding.rvCircle.scrollToPosition(0) }
         }
     }
 
@@ -113,6 +120,46 @@ class HomeFragment : Fragment() {
                 LinearLayoutManager(activity, LinearLayoutManager.HORIZONTAL, false)
             binding.rvCircleCategory.layoutManager?.onRestoreInstanceState(scrollState)
         }
+
+    private fun scrollOverObserver() =
+        Observer<Boolean> { completed ->
+            if (completed) {
+                binding.rvCircle.adapter?.let {
+                    (it as CircleAdapter).update(viewModel.circles) {}
+                }
+            }
+        }
+
+    private fun initListener() {
+        setRvCircleListener()
+    }
+
+    private fun setRvCircleListener() {
+        binding.rvCircle.addOnScrollListener(
+            object : RecyclerView.OnScrollListener() {
+                override fun onScrolled(
+                    recyclerView: RecyclerView,
+                    dx: Int,
+                    dy: Int,
+                ) {
+                    super.onScrolled(recyclerView, dx, dy)
+
+                    if (dy >= 0) {
+                        val layoutManager = recyclerView.layoutManager as? LinearLayoutManager
+                        layoutManager?.let {
+                            val visibleItemCount = layoutManager.childCount
+                            val totalItemCount = layoutManager.itemCount
+                            val lastVisibleItemPosition = layoutManager.findLastVisibleItemPosition()
+
+                            if (visibleItemCount + lastVisibleItemPosition >= totalItemCount) {
+                                viewModel.scrollOver()
+                            }
+                        }
+                    }
+                }
+            },
+        )
+    }
 
     override fun onStart() {
         super.onStart()

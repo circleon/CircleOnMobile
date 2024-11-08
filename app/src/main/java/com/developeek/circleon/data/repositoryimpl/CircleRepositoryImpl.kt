@@ -37,6 +37,6 @@ class CircleRepositoryImpl(
     }
 
     companion object {
-        private const val SORT_LATEST = "createdAt"
+        private const val SORT_LATEST = "createdAt,desc"
     }
 }

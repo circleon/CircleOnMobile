@@ -10,8 +10,11 @@ interface HomeViewModel {
     val category: List<Category>
     val selectedCategory: LiveData<Category>
     val circles: CircleModels
+    val scrollOver: LiveData<Boolean>
 
     fun setFilterAndLoad(category: Category)
+
+    fun scrollOver()
 
     fun restore()
 }

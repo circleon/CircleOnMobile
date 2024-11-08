@@ -9,11 +9,10 @@ import androidx.recyclerview.widget.RecyclerView
 import com.developeek.circleon.R
 import com.developeek.circleon.databinding.ItemCardCircleBinding
 import com.developeek.circleon.domain.model.CircleModel
+import com.developeek.circleon.domain.model.CircleModels
 import com.developeek.circleon.domain.utils.glide.GlideProvider
-import com.developeek.circleon.view.viewmodel.HomeViewModel
 
 class CircleAdapter(
-    private val viewModel: HomeViewModel,
     private val parent: Context,
     private val glideProvider: GlideProvider,
 ) : RecyclerView.Adapter<CircleAdapter.CircleAdapterViewHolder>() {
@@ -80,8 +79,11 @@ class CircleAdapter(
         holder.bind(position)
     }
 
-    fun update(commitCallback: Runnable) {
-        diffUtil.submitList(viewModel.circles.get(), commitCallback)
+    fun update(
+        circleModels: CircleModels,
+        commitCallback: Runnable,
+    ) {
+        diffUtil.submitList(circleModels.get(), commitCallback)
     }
 
     companion object {
