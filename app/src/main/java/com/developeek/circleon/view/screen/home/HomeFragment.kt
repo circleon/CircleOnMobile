@@ -13,6 +13,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.developeek.circleon.databinding.FragmentHomeBinding
 import com.developeek.circleon.domain.enums.Category
 import com.developeek.circleon.domain.state.UiState
+import com.developeek.circleon.domain.utils.glide.GlideProvider
 import com.developeek.circleon.view.adapter.CircleAdapter
 import com.developeek.circleon.view.adapter.CircleCategoryAdapter
 import com.developeek.circleon.view.listener.ItemClickListener
@@ -20,11 +21,15 @@ import com.developeek.circleon.view.screen.login.LoginActivity
 import com.developeek.circleon.view.viewmodel.HomeViewModel
 import com.developeek.circleon.view.viewmodelimpl.HomeViewModelImpl
 import dagger.hilt.android.AndroidEntryPoint
+import javax.inject.Inject
 
 @AndroidEntryPoint
 class HomeFragment : Fragment() {
     private lateinit var binding: FragmentHomeBinding
     private val viewModel: HomeViewModel by activityViewModels<HomeViewModelImpl>()
+
+    @Inject
+    lateinit var glideProvider: GlideProvider
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -46,7 +51,7 @@ class HomeFragment : Fragment() {
     }
 
     private fun initView(activity: Activity) {
-        binding.rvCircle.adapter = CircleAdapter(viewModel)
+        binding.rvCircle.adapter = CircleAdapter(viewModel, activity, glideProvider)
         binding.rvCircle.layoutManager = LinearLayoutManager(activity)
         binding.rvCircle.itemAnimator = null
     }

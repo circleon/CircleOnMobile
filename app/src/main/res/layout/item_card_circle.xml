@@ -89,7 +89,6 @@
         android:layout_height="64dp"
         android:padding="@dimen/margin_padding_default"
         android:background="@drawable/bg_image"
-        android:src="@drawable/logo_main"
         android:clipToOutline="true"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent"/>

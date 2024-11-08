@@ -1,5 +1,6 @@
 package com.developeek.circleon.data.entity.home
 
+import com.developeek.circleon.BuildConfig
 import com.developeek.circleon.domain.enums.Category
 import com.developeek.circleon.domain.model.CircleModel
 import com.google.gson.annotations.SerializedName
@@ -23,8 +24,8 @@ data class CircleEntity(
         CircleModel(
             id,
             name,
-            profileImgUrl,
-            thumbnailUrl,
+            imageUrl(profileImgUrl),
+            imageUrl(thumbnailUrl),
             category(category),
             memberCount,
         )
@@ -33,5 +34,11 @@ data class CircleEntity(
         val category = Category.findOrNull(codeName)
 
         return category ?: Category.ETC
+    }
+
+    private fun imageUrl(url: String?): String? {
+        url ?: return null
+
+        return BuildConfig.SERVICE_API_URL + "circles/images/" + url
     }
 }

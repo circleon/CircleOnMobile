@@ -1,16 +1,21 @@
 package com.developeek.circleon.view.adapter
 
+import android.content.Context
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.AsyncListDiffer
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
+import com.developeek.circleon.R
 import com.developeek.circleon.databinding.ItemCardCircleBinding
 import com.developeek.circleon.domain.model.CircleModel
+import com.developeek.circleon.domain.utils.glide.GlideProvider
 import com.developeek.circleon.view.viewmodel.HomeViewModel
 
 class CircleAdapter(
     private val viewModel: HomeViewModel,
+    private val parent: Context,
+    private val glideProvider: GlideProvider,
 ) : RecyclerView.Adapter<CircleAdapter.CircleAdapterViewHolder>() {
     private val diffUtil =
         AsyncListDiffer(
@@ -46,6 +51,9 @@ class CircleAdapter(
                 String.format(
                     MEMBER_COUNT_UNIT, diffUtil.currentList[position].member,
                 )
+            diffUtil.currentList[position].thumbnailUrl?.let {
+                glideProvider.callImage(it, parent, binding.imgCircleThumbnail)
+            } ?: binding.imgCircleThumbnail.setImageResource(R.drawable.logo_main)
         }
     }
 

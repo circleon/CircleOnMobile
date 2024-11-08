@@ -17,6 +17,7 @@ gson = "2.10.1"
 retrofit = "2.9.0"
 viewmodel = "2.8.6"
 fragment = "1.8.4"
+glide = "4.16.0"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -35,7 +36,7 @@ squareup-retrofit2 = { group = "com.squareup.retrofit2", name = "retrofit", vers
 squareup-retrofit2-converter = { group = "com.squareup.retrofit2", name = "converter-gson", version.ref = "retrofit" }
 androidx-lifecycle-viewmodel = { group = "androidx.lifecycle", name = "lifecycle-viewmodel-ktx", version.ref = "viewmodel" }
 androidx-fragment = { group = "androidx.fragment", name = "fragment-ktx", version.ref = "fragment" }
-
+bumptech-glide = { group = "com.github.bumptech.glide", name = "glide", version.ref = "glide" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
