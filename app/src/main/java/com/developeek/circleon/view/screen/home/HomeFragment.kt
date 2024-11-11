@@ -21,6 +21,7 @@ import com.developeek.circleon.view.listener.ItemClickListener
 import com.developeek.circleon.view.screen.login.LoginActivity
 import com.developeek.circleon.view.viewmodel.HomeViewModel
 import com.developeek.circleon.view.viewmodelimpl.HomeViewModelImpl
+import com.developeek.circleon.view.widget.ErrorToast
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
@@ -50,7 +51,6 @@ class HomeFragment : Fragment() {
 
         initView(requireActivity())
         initObserver(requireActivity())
-        initListener()
     }
 
     private fun initView(activity: Activity) {
@@ -77,13 +77,23 @@ class HomeFragment : Fragment() {
     private fun stateObserver(activity: Activity) =
         Observer<UiState> {
             when (it) {
+                UiState.Loading -> {
+                    // TODO: toggleLoadingScreen
+                }
                 UiState.Success -> {
+                    // TODO: toggleCircleListScreen
                     loadCircles()
+                    setRvCircleListener()
+                }
+                UiState.Error -> {
+                    // TODO: toggleErrorScreen
+                    if (ErrorToast.previousFinished()) {
+                        ErrorToast(activity, viewModel.error).show()
+                    }
                 }
                 UiState.RefreshExpiration -> {
                     sendUserToLoginScreen(activity)
                 }
-                else -> {}
             }
         }
 
@@ -108,7 +118,7 @@ class HomeFragment : Fragment() {
                     object : ItemClickListener {
                         override fun onItemClicked(position: Int) {
                             if (viewModel.selectedCategory.value!!.isSame(viewModel.category[position])) {
-                                binding.rvCircle.smoothScrollToPosition(0)
+                                binding.rvCircle.scrollToPosition(0)
                             } else {
                                 viewModel.setFilterAndLoad(viewModel.category[position])
                             }
@@ -126,17 +136,16 @@ class HomeFragment : Fragment() {
             if (completed) {
                 binding.rvCircle.adapter?.let {
                     (it as CircleAdapter).update(viewModel.circles) {}
+                    setRvCircleListener()
                 }
             }
         }
 
-    private fun initListener() {
-        setRvCircleListener()
-    }
-
     private fun setRvCircleListener() {
         binding.rvCircle.addOnScrollListener(
             object : RecyclerView.OnScrollListener() {
+                var completed = false
+
                 override fun onScrolled(
                     recyclerView: RecyclerView,
                     dx: Int,
@@ -144,17 +153,14 @@ class HomeFragment : Fragment() {
                 ) {
                     super.onScrolled(recyclerView, dx, dy)
 
-                    if (dy >= 0) {
-                        val layoutManager = recyclerView.layoutManager as? LinearLayoutManager
-                        layoutManager?.let {
-                            val visibleItemCount = layoutManager.childCount
-                            val totalItemCount = layoutManager.itemCount
-                            val lastVisibleItemPosition = layoutManager.findLastVisibleItemPosition()
+                    val manager = recyclerView.layoutManager as LinearLayoutManager
+                    val visibleItemCount = manager.childCount
+                    val totalItemCount = manager.itemCount
+                    val firstItem = manager.findFirstVisibleItemPosition()
 
-                            if (visibleItemCount + lastVisibleItemPosition >= totalItemCount) {
-                                viewModel.scrollOver()
-                            }
-                        }
+                    if (!completed && visibleItemCount + firstItem >= totalItemCount) {
+                        viewModel.scrollOver()
+                        completed = true
                     }
                 }
             },

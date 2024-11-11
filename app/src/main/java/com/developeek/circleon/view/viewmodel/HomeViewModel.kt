@@ -11,6 +11,7 @@ interface HomeViewModel {
     val selectedCategory: LiveData<Category>
     val circles: CircleModels
     val scrollOver: LiveData<Boolean>
+    var error: String
 
     fun setFilterAndLoad(category: Category)
 

@@ -41,16 +41,16 @@ class HomeViewModelImpl
         private var circleLoadingJob: Job? = null
         private var scrollOverLoadingJob: Job? = null
 
-        private var error = Const.EMPTY_TEXT
+        override var error = Const.EMPTY_TEXT
 
         override fun setFilterAndLoad(category: Category) {
             circleLoadingJob?.cancel()
-            scrollOverLoadingJob?.cancel()
             categoryFilter.postValue(category)
+            currentPage = DEFAULT_PAGE
 
             circleLoadingJob =
                 viewModelScope.launch {
-                    val result = repository.getCircles(DEFAULT_PAGE, SIZE_BY_PAGE, category)
+                    val result = repository.getCircles(currentPage, SIZE_BY_PAGE, category)
 
                     if (result is Success) {
                         circleModels = result.data
