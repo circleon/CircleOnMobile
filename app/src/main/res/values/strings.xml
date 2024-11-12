@@ -36,9 +36,13 @@
     <string name="tab_name_circle">동아리</string>
     <string name="tab_name_direct_message">채팅</string>
     <string name="tab_name_my_page">MY</string>
-    
+
     <!--Home-->
     <string name="home_content_title_new_circle">새로 개설된 동아리를 소개합니다!</string>
     <string name="home_content_title_circle">이런 동아리는 어떠신가요?</string>
+        <!--Search Circle-->
+        <string name="message_no_result">검색 결과가 존재하지 않습니다</string>
+        <string name="hint_search_circle">동아리 검색</string>
+        <string name="btn_cancel">취소</string>
 
 </resources>

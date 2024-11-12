@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/llItemCircleSearchResult"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:paddingVertical="@dimen/margin_padding_small"
+    android:paddingHorizontal="@dimen/margin_padding_large"
+    android:orientation="vertical"
+    android:background="@color/grey_1">
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/txtCircleName"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        tools:text="동아리 이름"
+        android:textColor="@color/grey_9"
+        android:textAppearance="@style/default_bold_text"/>
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/txtCircleCategory"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/margin_padding_extremely_small"
+        tools:text="카테고리"
+        android:textColor="@color/purple_5"
+        android:textAppearance="@style/small_bold_text"/>
+
+</LinearLayout>
