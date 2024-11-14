@@ -1,6 +1,7 @@
 package com.developeek.circleon.domain.model
 
 import com.developeek.circleon.domain.enums.Category
+import java.io.Serializable
 import java.util.EmptyStackException
 import java.util.Stack
 
@@ -11,7 +12,7 @@ data class CircleModel(
     val thumbnailUrl: String?,
     val category: Category,
     val member: Int,
-)
+) : Serializable
 
 data class CircleModels(private val data: List<CircleModel>) {
     private val models = Stack<CircleModel>()

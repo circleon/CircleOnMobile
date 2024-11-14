@@ -13,16 +13,29 @@ import javax.inject.Qualifier
 @Qualifier
 annotation class TokenSharedPreferences
 
+annotation class UserSharedPreferences
+
 @InstallIn(SingletonComponent::class)
 @Module
 object LocalDatabaseModule {
     @TokenSharedPreferences
     @Provides
-    fun provideSharedPreferences(
+    fun provideTokenSharedPreferences(
         @ApplicationContext appContext: Context,
     ): SharedPreferences {
         return appContext.getSharedPreferences(
             BuildConfig.TOKEN_PREFERENCE_KEY,
+            Context.MODE_PRIVATE,
+        )
+    }
+
+    @UserSharedPreferences
+    @Provides
+    fun provideUserSharedPreferences(
+        @ApplicationContext appContext: Context,
+    ): SharedPreferences {
+        return appContext.getSharedPreferences(
+            BuildConfig.USER_PREFERENCE_KEY,
             Context.MODE_PRIVATE,
         )
     }

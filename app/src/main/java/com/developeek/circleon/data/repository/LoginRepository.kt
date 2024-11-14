@@ -1,26 +1,27 @@
 package com.developeek.circleon.data.repository
 
 import com.developeek.circleon.data.source.Result
-import com.developeek.circleon.domain.vo.Email
-import com.developeek.circleon.domain.vo.Name
+import com.developeek.circleon.domain.model.UserModel
 import com.developeek.circleon.domain.vo.Password
+import com.developeek.circleon.domain.vo.UserEmail
+import com.developeek.circleon.domain.vo.UserName
 
 interface LoginRepository {
     suspend fun login(
         email: String,
         password: String,
-    ): Result<Boolean>
+    ): Result<UserModel>
 
     suspend fun signUp(
-        email: Email,
-        userName: Name,
+        email: UserEmail,
+        userName: UserName,
         password: Password,
     ): Result<Boolean>
 
-    suspend fun requestEmailAuthenticationCode(email: Email): Result<Boolean>
+    suspend fun requestEmailAuthenticationCode(email: UserEmail): Result<Boolean>
 
     suspend fun authenticateEmail(
-        email: Email,
+        email: UserEmail,
         code: String,
     ): Result<Boolean>
 }

@@ -80,10 +80,10 @@ class CircleAdapter(
     }
 
     fun update(
-        circleModels: CircleModels,
+        models: CircleModels,
         commitCallback: Runnable,
     ) {
-        diffUtil.submitList(circleModels.get(), commitCallback)
+        diffUtil.submitList(models.get(), commitCallback)
     }
 
     companion object {

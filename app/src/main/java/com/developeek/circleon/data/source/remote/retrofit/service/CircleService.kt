@@ -1,6 +1,7 @@
 package com.developeek.circleon.data.source.remote.retrofit.service
 
-import com.developeek.circleon.data.entity.home.CircleResponse
+import com.developeek.circleon.data.entity.home.CircleSummaries
+import com.developeek.circleon.data.entity.home.Circles
 import retrofit2.http.GET
 import retrofit2.http.Query
 
@@ -11,12 +12,15 @@ interface CircleService {
         @Query("size") size: Int,
         @Query("sort") sort: String,
         @Query("categoryType") category: String,
-    ): CircleResponse
+    ): Circles
 
     @GET("circles")
     suspend fun getAllCircles(
         @Query("page") page: Int,
         @Query("size") size: Int,
         @Query("sort") sort: String,
-    ): CircleResponse
+    ): Circles
+
+    @GET("circles/summary")
+    suspend fun getCircleSummaries(): CircleSummaries
 }

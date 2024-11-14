@@ -6,6 +6,7 @@ import com.developeek.circleon.data.source.Result
 import com.developeek.circleon.data.source.remote.retrofit.service.CircleService
 import com.developeek.circleon.domain.enums.Category
 import com.developeek.circleon.domain.model.CircleModels
+import com.developeek.circleon.domain.model.CircleSummaryModels
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
 import java.io.IOException
@@ -31,6 +32,19 @@ class CircleRepositoryImpl(
             }
         } catch (e: ServiceException.NoResultException) {
             Result.success(CircleModels.emptyInstance())
+        } catch (e: IOException) {
+            Result.error(e)
+        }
+    }
+
+    override suspend fun getCircleSummaries(): Result<CircleSummaryModels> {
+        return try {
+            withContext(dispatcher) {
+                val response = service.getCircleSummaries()
+                Result.success(CircleSummaryModels(response.content.map { it.toCircleSummaryModel() }))
+            }
+        } catch (e: ServiceException.NoResultException) {
+            Result.success(CircleSummaryModels.emptyInstance())
         } catch (e: IOException) {
             Result.error(e)
         }

@@ -7,6 +7,7 @@ import androidx.lifecycle.viewModelScope
 import com.developeek.circleon.data.repository.LoginRepository
 import com.developeek.circleon.data.source.Error
 import com.developeek.circleon.data.source.Success
+import com.developeek.circleon.domain.model.UserModel
 import com.developeek.circleon.domain.state.UiState
 import com.developeek.circleon.domain.utils.Const
 import com.developeek.circleon.domain.utils.validator.Invalid
@@ -25,6 +26,8 @@ class LoginViewModelImpl
             get() = uiState
         private val uiState = MutableLiveData<UiState>()
 
+        override lateinit var user: UserModel
+
         private lateinit var loginJob: Job
 
         override var error =
@@ -40,6 +43,7 @@ class LoginViewModelImpl
                         val result = repository.login(email, password)
 
                         if (result is Success) {
+                            user = result.data
                             uiState.postValue(UiState.Success)
                         } else {
                             error = (result as Error).message()

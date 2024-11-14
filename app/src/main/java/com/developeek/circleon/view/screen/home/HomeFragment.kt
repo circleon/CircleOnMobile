@@ -51,6 +51,7 @@ class HomeFragment : Fragment() {
 
         initView(requireActivity())
         initObserver(requireActivity())
+        initListener(requireActivity())
     }
 
     private fun initView(activity: Activity) {
@@ -165,6 +166,22 @@ class HomeFragment : Fragment() {
                 }
             },
         )
+    }
+
+    private fun initListener(activity: Activity) {
+        setBtnSearchCircleListener(activity)
+    }
+
+    private fun setBtnSearchCircleListener(activity: Activity) {
+        binding.btnSearch.setOnClickListener {
+            sendUserToSearchCircleScreen(activity)
+        }
+    }
+
+    private fun sendUserToSearchCircleScreen(activity: Activity) {
+        val intent = Intent(activity, SearchCircleActivity::class.java)
+
+        startActivity(intent)
     }
 
     override fun onStart() {

@@ -1,7 +1,8 @@
 package com.developeek.circleon.data.source.remote.interceptor
 
-import com.developeek.circleon.data.entity.login.RefreshTokenEntity
+import com.developeek.circleon.data.entity.login.RefreshToken
 import com.developeek.circleon.data.exception.ServiceException
+import com.developeek.circleon.data.source.manager.TokenManager
 import com.developeek.circleon.data.source.remote.retrofit.StatusCode
 import com.developeek.circleon.data.source.remote.retrofit.service.TokenService
 import kotlinx.coroutines.runBlocking
@@ -47,7 +48,7 @@ class TokenAuthenticator
         }
 
         private suspend fun requestAccessToken(refreshToken: String): String {
-            val response = service.refreshAccessToken(RefreshTokenEntity(refreshToken))
+            val response = service.refreshAccessToken(RefreshToken(refreshToken))
             return response.accessToken
         }
 

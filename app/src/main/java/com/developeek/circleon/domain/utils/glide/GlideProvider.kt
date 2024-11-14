@@ -6,7 +6,7 @@ import com.bumptech.glide.Glide
 import com.bumptech.glide.load.model.GlideUrl
 import com.bumptech.glide.load.model.LazyHeaders
 import com.developeek.circleon.R
-import com.developeek.circleon.data.source.remote.interceptor.TokenManager
+import com.developeek.circleon.data.source.manager.TokenManager
 import javax.inject.Inject
 
 class GlideProvider

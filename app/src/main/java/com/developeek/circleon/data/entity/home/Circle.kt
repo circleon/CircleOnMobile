@@ -5,14 +5,14 @@ import com.developeek.circleon.domain.enums.Category
 import com.developeek.circleon.domain.model.CircleModel
 import com.google.gson.annotations.SerializedName
 
-data class CircleResponse(
-    val content: List<CircleEntity>,
+data class Circles(
+    val content: List<Circle>,
     val currentPageNumber: Int,
     val totalElementCount: Int,
     val totalPageCount: Int,
 )
 
-data class CircleEntity(
+data class Circle(
     @SerializedName("circleId") val id: Int,
     @SerializedName("circleName") val name: String,
     val profileImgUrl: String?,
@@ -39,6 +39,10 @@ data class CircleEntity(
     private fun imageUrl(url: String?): String? {
         url ?: return null
 
-        return BuildConfig.SERVICE_API_URL + "circles/images/" + url
+        return BuildConfig.SERVICE_API_URL + IMAGE_PATH + url
+    }
+
+    companion object {
+        private const val IMAGE_PATH = "circles/images/"
     }
 }

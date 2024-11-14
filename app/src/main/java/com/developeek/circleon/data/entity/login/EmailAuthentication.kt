@@ -1,6 +1,6 @@
 package com.developeek.circleon.data.entity.login
 
-data class LoginEntity(
+data class EmailAuthentication(
     val email: String,
-    val password: String,
+    val code: String,
 )

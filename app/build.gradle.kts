@@ -20,6 +20,7 @@ android {
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         buildConfigField("String", "TOKEN_PREFERENCE_KEY", getLocalValue("token.preference.key"))
+        buildConfigField("String", "USER_PREFERENCE_KEY", getLocalValue("user.preference.key"))
         buildConfigField("String", "SERVICE_API_URL", getLocalValue("service.api.url"))
     }
 

@@ -12,9 +12,9 @@ import com.developeek.circleon.domain.utils.Const
 import com.developeek.circleon.domain.utils.validator.Invalid
 import com.developeek.circleon.domain.utils.validator.Valid
 import com.developeek.circleon.domain.utils.validator.Validator
-import com.developeek.circleon.domain.vo.Email
-import com.developeek.circleon.domain.vo.Name
 import com.developeek.circleon.domain.vo.Password
+import com.developeek.circleon.domain.vo.UserEmail
+import com.developeek.circleon.domain.vo.UserName
 import com.developeek.circleon.view.viewmodel.SignUpViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
@@ -40,8 +40,8 @@ class SignUpViewModelImpl
             get() = timer
         private val timer = MutableLiveData(TIMER_INIT)
 
-        private var name: Name? = null
-        private var email: Email? = null
+        private var name: UserName? = null
+        private var email: UserEmail? = null
         private var emailCode: String? = null
         private var password: Password? = null
         private var passwordMatched: Boolean = false

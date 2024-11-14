@@ -1,7 +1,7 @@
 package com.developeek.circleon.domain.enums
 
 enum class Category(
-    private val codeName: String,
+    private val code: String,
     private val categoryName: String,
 ) {
     ALL("ALL", "전체"),
@@ -16,13 +16,13 @@ enum class Category(
     LANGUAGE("LANGUAGE", "어학"),
     ETC("ETC", "기타"), ;
 
-    fun isSame(category: Category) = this.codeName == category.codeName
+    fun isSame(category: Category) = this.code == category.code
 
-    fun codeName() = codeName
+    fun codeName() = code
 
     fun categoryName() = categoryName
 
     companion object {
-        fun findOrNull(codeName: String) = Category.entries.find { it.codeName == codeName }
+        fun findOrNull(code: String) = Category.entries.find { it.code == code }
     }
 }

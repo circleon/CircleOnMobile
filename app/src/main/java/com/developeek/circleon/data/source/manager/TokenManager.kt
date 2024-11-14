@@ -1,4 +1,4 @@
-package com.developeek.circleon.data.source.remote.interceptor
+package com.developeek.circleon.data.source.manager
 
 import android.content.SharedPreferences
 import com.developeek.circleon.data.di.TokenSharedPreferences

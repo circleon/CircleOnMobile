@@ -4,7 +4,7 @@ import android.util.Patterns
 import com.developeek.circleon.domain.utils.validator.ValidatorExceptionMessage
 import java.io.Serializable
 
-data class Email(
+data class UserEmail(
     private val data: String,
 ) : Serializable {
     init {

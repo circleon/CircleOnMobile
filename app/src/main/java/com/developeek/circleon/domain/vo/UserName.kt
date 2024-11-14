@@ -3,7 +3,7 @@ package com.developeek.circleon.domain.vo
 import com.developeek.circleon.domain.utils.validator.ValidatorExceptionMessage
 import java.io.Serializable
 
-data class Name(
+data class UserName(
     private val data: String,
 ) : Serializable {
     init {
