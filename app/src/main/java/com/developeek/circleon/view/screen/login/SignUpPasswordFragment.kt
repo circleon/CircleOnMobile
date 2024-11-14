@@ -1,6 +1,7 @@
 package com.developeek.circleon.view.screen.login
 
 import android.app.Activity
+import android.content.res.ColorStateList
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -15,11 +16,12 @@ import androidx.lifecycle.Observer
 import com.developeek.circleon.R
 import com.developeek.circleon.databinding.FragmentSignUpPasswordBinding
 import com.developeek.circleon.domain.utils.Const
+import com.developeek.circleon.view.viewmodel.SignUpViewModel
 import com.developeek.circleon.view.viewmodelimpl.SignUpViewModelImpl
 
 class SignUpPasswordFragment : Fragment() {
     private lateinit var binding: FragmentSignUpPasswordBinding
-    private val viewModel: SignUpViewModelImpl by activityViewModels()
+    private val viewModel: SignUpViewModel by activityViewModels<SignUpViewModelImpl>()
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -45,16 +47,67 @@ class SignUpPasswordFragment : Fragment() {
         Observer<String> {
             if (binding.edtPassword.hasFocus()) {
                 if (it == PASSWORD_VALIDATED) {
-                    binding.txtPasswordValidation.setTextColor(ContextCompat.getColor(activity, R.color.grey_5))
+                    whenPasswordValidated(activity)
                 } else {
-                    binding.txtPasswordValidation.setTextColor(ContextCompat.getColor(activity, R.color.error))
+                    whenPasswordNotValidated(activity)
                 }
             }
             if (binding.edtPasswordCheck.hasFocus()) {
                 binding.txtPasswordCheckValidation.text = it
-                if (it == PASSWORD_CHECK_VALIDATED) binding.txtPasswordCheckValidation.text = Const.EMPTY_TEXT
+                if (it == PASSWORD_CHECK_VALIDATED) {
+                    whenPasswordCheckValidated(activity)
+                } else {
+                    whenPasswordCheckNotValidated(activity)
+                }
             }
         }
+
+    private fun whenPasswordValidated(activity: Activity) {
+        binding.txtPasswordValidation.setTextColor(ContextCompat.getColor(activity, R.color.grey_5))
+        binding.edtPassword.backgroundTintList =
+            ColorStateList(
+                arrayOf(intArrayOf(android.R.attr.state_focused), intArrayOf()),
+                intArrayOf(
+                    ContextCompat.getColor(activity, R.color.purple_5),
+                    ContextCompat.getColor(activity, R.color.grey_3),
+                ),
+            )
+    }
+
+    private fun whenPasswordNotValidated(activity: Activity) {
+        binding.txtPasswordValidation.setTextColor(ContextCompat.getColor(activity, R.color.error))
+        binding.edtPassword.backgroundTintList =
+            ColorStateList(
+                arrayOf(intArrayOf(android.R.attr.state_focused), intArrayOf()),
+                intArrayOf(
+                    ContextCompat.getColor(activity, R.color.error),
+                    ContextCompat.getColor(activity, R.color.grey_3),
+                ),
+            )
+    }
+
+    private fun whenPasswordCheckValidated(activity: Activity) {
+        binding.txtPasswordCheckValidation.text = Const.EMPTY_TEXT
+        binding.edtPasswordCheck.backgroundTintList =
+            ColorStateList(
+                arrayOf(intArrayOf(android.R.attr.state_focused), intArrayOf()),
+                intArrayOf(
+                    ContextCompat.getColor(activity, R.color.purple_5),
+                    ContextCompat.getColor(activity, R.color.grey_3),
+                ),
+            )
+    }
+
+    private fun whenPasswordCheckNotValidated(activity: Activity) {
+        binding.edtPasswordCheck.backgroundTintList =
+            ColorStateList(
+                arrayOf(intArrayOf(android.R.attr.state_focused), intArrayOf()),
+                intArrayOf(
+                    ContextCompat.getColor(activity, R.color.error),
+                    ContextCompat.getColor(activity, R.color.grey_3),
+                ),
+            )
+    }
 
     private fun initListener() {
         setEdtPasswordListener()
@@ -69,7 +122,7 @@ class SignUpPasswordFragment : Fragment() {
 
     private fun setEdtPasswordCheckListener() {
         binding.edtPasswordCheck.doOnTextChanged { text, _, _, _ ->
-            viewModel.setPasswordCheck(text.toString())
+            viewModel.checkPassword(binding.edtPassword.text.toString(), text.toString())
         }
     }
 

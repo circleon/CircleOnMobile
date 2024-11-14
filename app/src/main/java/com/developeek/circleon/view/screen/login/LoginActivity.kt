@@ -9,7 +9,8 @@ import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.Observer
 import com.developeek.circleon.databinding.ActivityLoginBinding
 import com.developeek.circleon.domain.state.UiState
-import com.developeek.circleon.view.screen.home.HomeActivity
+import com.developeek.circleon.view.screen.HomeActivity
+import com.developeek.circleon.view.viewmodel.LoginViewModel
 import com.developeek.circleon.view.viewmodelimpl.LoginViewModelImpl
 import com.developeek.circleon.view.widget.CustomAlertDialog
 import dagger.hilt.android.AndroidEntryPoint
@@ -17,7 +18,7 @@ import dagger.hilt.android.AndroidEntryPoint
 @AndroidEntryPoint
 class LoginActivity : AppCompatActivity() {
     private lateinit var binding: ActivityLoginBinding
-    private val viewModel: LoginViewModelImpl by viewModels()
+    private val viewModel: LoginViewModel by viewModels<LoginViewModelImpl>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

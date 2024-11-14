@@ -12,13 +12,14 @@ import com.developeek.circleon.domain.utils.Const
 import com.developeek.circleon.domain.utils.validator.Invalid
 import com.developeek.circleon.domain.utils.validator.Valid
 import com.developeek.circleon.domain.utils.validator.Validator
-import com.developeek.circleon.domain.vo.Email
-import com.developeek.circleon.domain.vo.Name
 import com.developeek.circleon.domain.vo.Password
+import com.developeek.circleon.domain.vo.UserEmail
+import com.developeek.circleon.domain.vo.UserName
 import com.developeek.circleon.view.viewmodel.SignUpViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
@@ -39,50 +40,40 @@ class SignUpViewModelImpl
             get() = timer
         private val timer = MutableLiveData(TIMER_INIT)
 
-        private var name: Name? = null
-        private var email: Email? = null
+        private var name: UserName? = null
+        private var email: UserEmail? = null
         private var emailCode: String? = null
         private var password: Password? = null
         private var passwordMatched: Boolean = false
         private var emailAuthenticated: Boolean = false
 
-        private var authenticationCodeJob: Job? = null
-        private var authenticationTimerJob: Job? = null
-        private var authenticationJob: Job? = null
-        private var signUpJob: Job? = null
+        private lateinit var requestEmailCodeJob: Job
+        private lateinit var emailCodeExpirationTimerJob: Job
+        private lateinit var emailAuthenticationJob: Job
+        private lateinit var signUpJob: Job
 
         override var error =
             Const.EMPTY_TEXT
 
         override fun signUp() {
-            signUpJob?.cancel()
+            if ((!::signUpJob.isInitialized || signUpJob.isCompleted) && signUpCondition()) {
+                signUpJob =
+                    viewModelScope.launch {
+                        val result = repository.signUp(email!!, name!!, password!!)
 
-            signUpJob =
-                viewModelScope.launch {
-                    withContext(Dispatchers.IO) {
-                        if (name != null && email != null && password != null &&
-                            emailAuthenticated && passwordMatched
-                        ) {
-                            requestSignUp(name!!, email!!, password!!)
+                        if (result is Success) {
+                            validationMessage.postValue(SIGN_UP_COMPLETED)
+                        } else {
+                            error = (result as Error).message()
+                            uiState.postValue(UiState.Error)
                         }
                     }
-                }
-        }
-
-        private suspend fun requestSignUp(
-            name: Name,
-            email: Email,
-            password: Password,
-        ) {
-            val result = repository.signUp(email, name, password)
-
-            if (result is Success) {
-                validationMessage.postValue(SIGN_UP_COMPLETED)
-            } else {
-                error = (result as Error).message()
-                uiState.postValue(UiState.Error)
             }
         }
+
+        private fun signUpCondition() =
+            name != null && email != null && password != null &&
+                emailAuthenticated && passwordMatched
 
         override fun setName(name: String) {
             val result = Validator.checkName(name)
@@ -110,45 +101,35 @@ class SignUpViewModelImpl
         }
 
         override fun requestEmailCode() {
-            authenticationCodeJob?.cancel()
+            if ((!::requestEmailCodeJob.isInitialized || requestEmailCodeJob.isCompleted) && email != null) {
+                requestEmailCodeJob =
+                    viewModelScope.launch {
+                        val result = repository.requestEmailAuthenticationCode(email!!)
 
-            authenticationCodeJob =
-                viewModelScope.launch {
-                    withContext(Dispatchers.IO) {
-                        email?.let {
-                            requestEmailAuthenticationCode(it)
+                        if (result is Success) {
+                            startEmailAuthenticationTimer()
+                            validationMessage.postValue(EMAIL_CODE_REQUESTED)
+                        } else {
+                            error = (result as Error).message()
+                            uiState.postValue(UiState.Error)
                         }
                     }
-                }
-        }
-
-        private suspend fun requestEmailAuthenticationCode(email: Email) {
-            val result = repository.requestEmailAuthenticationCode(email)
-
-            if (result is Success) {
-                startEmailAuthenticationTimer()
-                validationMessage.postValue(EMAIL_CODE_REQUESTED)
-            } else {
-                error = (result as Error).message()
-                uiState.postValue(UiState.Error)
             }
         }
 
         private fun startEmailAuthenticationTimer() {
-            authenticationTimerJob?.cancel()
+            if (::emailCodeExpirationTimerJob.isInitialized) emailCodeExpirationTimerJob.cancel()
 
-            authenticationTimerJob =
+            emailCodeExpirationTimerJob =
                 viewModelScope.launch {
-                    withContext(Dispatchers.IO) {
+                    withContext(Dispatchers.Default) {
                         timer.postValue(TIMER_INIT)
                         var time = 0L
-                        var old = System.currentTimeMillis()
+
                         while (time < TIMER_INIT) {
-                            if (System.currentTimeMillis() - old == TIMER_INTERVAL) {
-                                time += TIMER_INTERVAL
-                                timer.postValue(TIMER_INIT - time)
-                                old = System.currentTimeMillis()
-                            }
+                            delay(TIMER_INTERVAL)
+                            time += TIMER_INTERVAL
+                            timer.postValue(TIMER_INIT - time)
                         }
                     }
                 }
@@ -159,28 +140,23 @@ class SignUpViewModelImpl
         }
 
         override fun authenticateEmail() {
-            authenticationJob?.cancel()
+            if ((!::emailAuthenticationJob.isInitialized || emailAuthenticationJob.isCompleted) &&
+                email != null && emailCode != null
+            ) {
+                emailAuthenticationJob =
+                    viewModelScope.launch {
+                        val result = repository.authenticateEmail(email!!, emailCode!!)
 
-            authenticationJob =
-                viewModelScope.launch {
-                    withContext(Dispatchers.IO) {
-                        emailCode?.let {
-                            emailAuthenticate(it)
+                        if (result is Success) {
+                            emailAuthenticated = true
+                            emailCodeExpirationTimerJob.cancel()
+                            validationMessage.postValue(EMAIL_AUTHENTICATED)
+                        } else {
+                            emailAuthenticated = false
+                            error = (result as Error).message()
+                            uiState.postValue(UiState.Error)
                         }
                     }
-                }
-        }
-
-        private suspend fun emailAuthenticate(code: String) {
-            val result = repository.authenticateEmail(email!!, code)
-
-            if (result is Success) {
-                emailAuthenticated = true
-                validationMessage.postValue(EMAIL_AUTHENTICATED)
-            } else {
-                emailAuthenticated = false
-                error = (result as Error).message()
-                uiState.postValue(UiState.Error)
             }
         }
 
@@ -196,7 +172,10 @@ class SignUpViewModelImpl
             }
         }
 
-        override fun setPasswordCheck(passwordCheck: String) {
+        override fun checkPassword(
+            password: String,
+            passwordCheck: String,
+        ) {
             val result = Validator.checkPasswordMatch(password, passwordCheck)
 
             if (result is Valid) {

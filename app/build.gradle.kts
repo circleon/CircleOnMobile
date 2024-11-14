@@ -13,13 +13,14 @@ android {
 
     defaultConfig {
         applicationId = "com.developeek.circleon"
-        minSdk = 29
+        minSdk = 30
         targetSdk = 34
         versionCode = 1
         versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         buildConfigField("String", "TOKEN_PREFERENCE_KEY", getLocalValue("token.preference.key"))
+        buildConfigField("String", "USER_PREFERENCE_KEY", getLocalValue("user.preference.key"))
         buildConfigField("String", "SERVICE_API_URL", getLocalValue("service.api.url"))
     }
 
@@ -65,6 +66,7 @@ dependencies {
     implementation(libs.squareup.retrofit2.converter)
     implementation(libs.androidx.lifecycle.viewmodel)
     implementation(libs.androidx.fragment)
+    implementation(libs.bumptech.glide)
     kapt(libs.google.dagger.hilt.android.compiler)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)

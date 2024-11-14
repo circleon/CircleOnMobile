@@ -23,5 +23,8 @@ interface SignUpViewModel {
 
     fun setPassword(password: String)
 
-    fun setPasswordCheck(passwordCheck: String)
+    fun checkPassword(
+        password: String,
+        passwordCheck: String,
+    )
 }

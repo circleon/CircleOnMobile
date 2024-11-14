@@ -12,11 +12,12 @@ import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.Observer
 import com.developeek.circleon.databinding.FragmentSignUpEmailAuthenticationBinding
+import com.developeek.circleon.view.viewmodel.SignUpViewModel
 import com.developeek.circleon.view.viewmodelimpl.SignUpViewModelImpl
 
 class SignUpEmailAuthenticationFragment : Fragment() {
     private lateinit var binding: FragmentSignUpEmailAuthenticationBinding
-    private val viewModel: SignUpViewModelImpl by activityViewModels()
+    private val viewModel: SignUpViewModel by activityViewModels<SignUpViewModelImpl>()
 
     override fun onCreateView(
         inflater: LayoutInflater,

@@ -51,7 +51,9 @@
             android:inputType="textEmailAddress"
             android:hint="@string/hint_name"
             android:textColorHint="@color/grey_5"
+            android:textColor="@color/grey_7"
             android:textSize="@dimen/text_size_default"
+            android:includeFontPadding="false"
             android:backgroundTint="@drawable/selector_edit_text"
             />
 

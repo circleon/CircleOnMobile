@@ -1,23 +1,27 @@
 package com.developeek.circleon.view.screen.login
 
 import android.app.Activity
+import android.content.res.ColorStateList
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.inputmethod.InputMethodManager
+import androidx.core.content.ContextCompat
 import androidx.core.widget.doOnTextChanged
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.Observer
+import com.developeek.circleon.R
 import com.developeek.circleon.databinding.FragmentSignUpNameBinding
 import com.developeek.circleon.domain.utils.Const
+import com.developeek.circleon.view.viewmodel.SignUpViewModel
 import com.developeek.circleon.view.viewmodelimpl.SignUpViewModelImpl
 
 class SignUpNameFragment : Fragment() {
     private lateinit var binding: FragmentSignUpNameBinding
-    private val viewModel: SignUpViewModelImpl by activityViewModels()
+    private val viewModel: SignUpViewModel by activityViewModels<SignUpViewModelImpl>()
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -35,17 +39,44 @@ class SignUpNameFragment : Fragment() {
     private fun initObserver(activity: Activity) {
         viewModel.validation.observe(
             activity as LifecycleOwner,
-            validationObserver(),
+            validationObserver(activity),
         )
     }
 
-    private fun validationObserver() =
+    private fun validationObserver(activity: Activity) =
         Observer<String> {
             if (binding.edtName.hasFocus()) {
                 binding.txtNameValidation.text = it
-                if (it == NAME_VALIDATED) binding.txtNameValidation.text = Const.EMPTY_TEXT
+                if (it == NAME_VALIDATED) {
+                    whenNameValidated(activity)
+                } else {
+                    whenNameNotValidated(activity)
+                }
             }
         }
+
+    private fun whenNameValidated(activity: Activity) {
+        binding.txtNameValidation.text = Const.EMPTY_TEXT
+        binding.edtName.backgroundTintList =
+            ColorStateList(
+                arrayOf(intArrayOf(android.R.attr.state_focused), intArrayOf()),
+                intArrayOf(
+                    ContextCompat.getColor(activity, R.color.purple_5),
+                    ContextCompat.getColor(activity, R.color.grey_3),
+                ),
+            )
+    }
+
+    private fun whenNameNotValidated(activity: Activity) {
+        binding.edtName.backgroundTintList =
+            ColorStateList(
+                arrayOf(intArrayOf(android.R.attr.state_focused), intArrayOf()),
+                intArrayOf(
+                    ContextCompat.getColor(activity, R.color.error),
+                    ContextCompat.getColor(activity, R.color.grey_3),
+                ),
+            )
+    }
 
     private fun initListener() {
         setEdtNameListener()
