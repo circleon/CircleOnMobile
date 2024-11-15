@@ -11,6 +11,7 @@ import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.developeek.circleon.data.source.manager.UserManager
 import com.developeek.circleon.databinding.FragmentHomeBinding
 import com.developeek.circleon.domain.enums.Category
 import com.developeek.circleon.domain.state.UiState
@@ -32,6 +33,9 @@ class HomeFragment : Fragment() {
 
     @Inject
     lateinit var glideProvider: GlideProvider
+
+    @Inject
+    lateinit var userManager: UserManager
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -58,6 +62,10 @@ class HomeFragment : Fragment() {
         binding.rvCircle.adapter = CircleAdapter(activity, glideProvider)
         binding.rvCircle.layoutManager = LinearLayoutManager(activity)
         binding.rvCircle.itemAnimator = null
+        userManager.getUser()?.let {
+            binding.txtUnivName.text = it.univ.univName()
+            binding.txtContentTitleCircle.text = String.format(CONTENT_TITLE_CIRCLE, it.name)
+        }
     }
 
     private fun initObserver(activity: Activity) {
@@ -187,5 +195,9 @@ class HomeFragment : Fragment() {
     override fun onStart() {
         super.onStart()
         viewModel.restore()
+    }
+
+    companion object {
+        private const val CONTENT_TITLE_CIRCLE = "%s님 이런 동아리는 어떠신가요?"
     }
 }

@@ -6,6 +6,8 @@ enum class University(
 ) {
     AJOU("AJOU", "아주대학교"), ;
 
+    fun univName() = univName
+
     companion object {
         fun findOrNull(code: String) = University.entries.find { it.code == code }
     }

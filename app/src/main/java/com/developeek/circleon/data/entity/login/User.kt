@@ -9,8 +9,6 @@ data class User(
     @SerializedName("userId") val id: Int,
     @SerializedName("username") val name: String,
     val univCode: String,
-    val accessToken: String,
-    val refreshToken: String,
 ) {
     fun toUserModel() =
         UserModel(

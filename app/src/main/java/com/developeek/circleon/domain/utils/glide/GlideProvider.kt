@@ -8,7 +8,9 @@ import com.bumptech.glide.load.model.LazyHeaders
 import com.developeek.circleon.R
 import com.developeek.circleon.data.source.manager.TokenManager
 import javax.inject.Inject
+import javax.inject.Singleton
 
+@Singleton
 class GlideProvider
     @Inject
     constructor(private val tokenManager: TokenManager) {
