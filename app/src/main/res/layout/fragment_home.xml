@@ -51,7 +51,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginVertical="@dimen/margin_padding_default"
-        android:text="대학교명"
+        android:text="대학교"
         android:textAppearance="@style/content_title"/>
 
     <androidx.recyclerview.widget.RecyclerView
@@ -66,6 +66,7 @@
         android:layout_height="wrap_content"
         android:paddingVertical="@dimen/margin_padding_default"
         android:textAppearance="@style/content_title"
+        android:textSize="16sp"
         android:text="@string/home_content_title_circle"/>
 
     <androidx.recyclerview.widget.RecyclerView

@@ -8,7 +8,8 @@
     android:padding="@dimen/margin_padding_large"
     android:layout_marginBottom="@dimen/margin_padding_small"
     android:background="@drawable/bg_card"
-    android:clickable="true">
+    android:clickable="true"
+    android:elevation="1dp">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="0dp"
