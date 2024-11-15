@@ -23,7 +23,7 @@ class HomeViewModelImpl
     constructor(private val repository: CircleRepository) : HomeViewModel, ViewModel() {
         override val state: LiveData<UiState>
             get() = uiState
-        private val uiState = MutableLiveData<UiState>(UiState.Loading)
+        private val uiState = MutableLiveData<UiState>()
 
         override val category: List<Category> = Category.entries
         override val selectedCategory: LiveData<Category>
@@ -46,6 +46,7 @@ class HomeViewModelImpl
         override fun setFilterAndLoad(category: Category) {
             circleLoadingJob?.cancel()
             categoryFilter.postValue(category)
+            uiState.postValue(UiState.Loading)
             currentPage = DEFAULT_PAGE
 
             circleLoadingJob =

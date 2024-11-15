@@ -87,10 +87,10 @@ class HomeFragment : Fragment() {
         Observer<UiState> {
             when (it) {
                 UiState.Loading -> {
-                    // TODO: toggleLoadingScreen
+                    toggleView(binding.pgbLoading)
                 }
                 UiState.Success -> {
-                    // TODO: toggleCircleListScreen
+                    toggleView(binding.rvCircle)
                     loadCircles()
                     setRvCircleListener()
                 }
@@ -196,6 +196,13 @@ class HomeFragment : Fragment() {
         super.onStart()
         viewModel.restore()
     }
+
+    private fun toggleView(view: View) {
+        binding.rvCircle.visibility = visibleWhenTrue(view == binding.rvCircle)
+        binding.pgbLoading.visibility = visibleWhenTrue(view == binding.pgbLoading)
+    }
+
+    private fun visibleWhenTrue(state: Boolean) = if (state) View.VISIBLE else View.GONE
 
     companion object {
         private const val CONTENT_TITLE_CIRCLE = "%s님 이런 동아리는 어떠신가요?"

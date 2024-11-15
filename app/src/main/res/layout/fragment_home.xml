@@ -69,9 +69,28 @@
         android:textSize="16sp"
         android:text="@string/home_content_title_circle"/>
 
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/rvCircle"
+    <FrameLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"/>
+        android:layout_height="0dp"
+        android:layout_weight="1">
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/rvCircle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:visibility="gone"/>
+
+        <com.google.android.material.progressindicator.CircularProgressIndicator
+            android:id="@+id/pgbLoading"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_gravity="center"
+            app:indicatorColor="@color/grey_5"
+            app:trackColor="@color/grey_3"
+            app:trackThickness="1dp"
+            android:indeterminate="true"
+            android:visibility="gone"/>
+
+    </FrameLayout>
 
 </androidx.appcompat.widget.LinearLayoutCompat>
