@@ -4,6 +4,7 @@ import androidx.lifecycle.LiveData
 import com.developeek.circleon.domain.enums.Category
 import com.developeek.circleon.domain.model.CircleModels
 import com.developeek.circleon.domain.state.UiState
+import com.developeek.circleon.view.listener.RecyclerViewOnScrollListenerImpl
 
 interface HomeViewModel {
     val state: LiveData<UiState>
@@ -11,6 +12,7 @@ interface HomeViewModel {
     val selectedCategory: LiveData<Category>
     val circles: CircleModels
     val scrollOver: LiveData<Boolean>
+    val scrollListener: RecyclerViewOnScrollListenerImpl
     var error: String
 
     fun setFilterAndLoad(category: Category)

@@ -11,6 +11,7 @@ import com.developeek.circleon.domain.enums.Category
 import com.developeek.circleon.domain.model.CircleModels
 import com.developeek.circleon.domain.state.UiState
 import com.developeek.circleon.domain.utils.Const
+import com.developeek.circleon.view.listener.RecyclerViewOnScrollListenerImpl
 import com.developeek.circleon.view.viewmodel.HomeViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
@@ -37,6 +38,7 @@ class HomeViewModelImpl
         override val scrollOver: LiveData<Boolean>
             get() = scrollOverCompleted
         private var scrollOverCompleted = MutableLiveData<Boolean>()
+        override val scrollListener = RecyclerViewOnScrollListenerImpl()
 
         private var circleLoadingJob: Job? = null
         private var scrollOverLoadingJob: Job? = null

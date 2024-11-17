@@ -6,11 +6,11 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
 import com.developeek.circleon.data.source.manager.UserManager
 import com.developeek.circleon.databinding.FragmentHomeBinding
 import com.developeek.circleon.domain.enums.Category
@@ -30,6 +30,7 @@ import javax.inject.Inject
 class HomeFragment : Fragment() {
     private lateinit var binding: FragmentHomeBinding
     private val viewModel: HomeViewModel by activityViewModels<HomeViewModelImpl>()
+    private var completed = false
 
     @Inject
     lateinit var glideProvider: GlideProvider
@@ -141,48 +142,40 @@ class HomeFragment : Fragment() {
         }
 
     private fun scrollOverObserver() =
-        Observer<Boolean> { completed ->
-            if (completed) {
+        Observer<Boolean> { it ->
+            if (it) {
+                viewModel.scrollListener.notifyScrollWorkCompleted()
+                binding.itemLoading.isVisible = false
                 binding.rvCircle.adapter?.let {
                     (it as CircleAdapter).update(viewModel.circles) {}
-                    setRvCircleListener()
                 }
+                binding.rvCircle.removeOnScrollListener(viewModel.scrollListener)
+                binding.rvCircle.addOnScrollListener(viewModel.scrollListener)
+                viewModel.scrollListener.initScrollWorkState()
             }
         }
 
-    private fun setRvCircleListener() {
-        binding.rvCircle.addOnScrollListener(
-            object : RecyclerView.OnScrollListener() {
-                var completed = false
-
-                override fun onScrolled(
-                    recyclerView: RecyclerView,
-                    dx: Int,
-                    dy: Int,
-                ) {
-                    super.onScrolled(recyclerView, dx, dy)
-
-                    val manager = recyclerView.layoutManager as LinearLayoutManager
-                    val visibleItemCount = manager.childCount
-                    val totalItemCount = manager.itemCount
-                    val firstItem = manager.findFirstVisibleItemPosition()
-
-                    if (!completed && visibleItemCount + firstItem >= totalItemCount) {
-                        viewModel.scrollOver()
-                        completed = true
-                    }
-                }
-            },
-        )
-    }
-
     private fun initListener(activity: Activity) {
         setBtnSearchCircleListener(activity)
+        setRvCircleListener()
     }
 
     private fun setBtnSearchCircleListener(activity: Activity) {
         binding.btnSearch.setOnClickListener {
             sendUserToSearchCircleScreen(activity)
+        }
+    }
+
+    private fun setRvCircleListener() {
+        binding.rvCircle.addOnScrollListener(viewModel.scrollListener)
+        viewModel.scrollListener.setScrollEndListener {
+            binding.itemLoading.isVisible = true
+            viewModel.scrollOver()
+        }
+        viewModel.scrollListener.setScrollUpListener {
+            if (binding.itemLoading.isVisible) {
+                binding.itemLoading.isVisible = false
+            }
         }
     }
 
