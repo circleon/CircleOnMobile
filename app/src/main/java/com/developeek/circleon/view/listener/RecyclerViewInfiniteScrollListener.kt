@@ -3,7 +3,7 @@ package com.developeek.circleon.view.listener
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 
-class RecyclerViewOnScrollListenerImpl : RecyclerView.OnScrollListener() {
+class RecyclerViewInfiniteScrollListener : RecyclerView.OnScrollListener() {
     private lateinit var whenScrollEnd: Runnable
     private lateinit var whenScrollUp: Runnable
     private var scrollWorkCompleted = false

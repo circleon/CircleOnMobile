@@ -48,7 +48,7 @@ class SearchViewModelImpl
 
                     if (result is Success) {
                         circleSummaryModels = result.data
-                        searchResult.postValue(circleSummaryModels.find(keyword))
+                        notifySearchResultByKeyword()
                         uiState.postValue(UiState.Success)
                     } else {
                         if ((result as Error).isRefreshExpired()) {
@@ -65,7 +65,7 @@ class SearchViewModelImpl
             this.keyword = keyword
 
             if (::circleSummaryModels.isInitialized) {
-                searchResult.postValue(circleSummaryModels.find(keyword))
+                notifySearchResultByKeyword()
             }
         }
 
@@ -73,5 +73,13 @@ class SearchViewModelImpl
             this.keyword = Const.EMPTY_TEXT
 
             searchResult.postValue(CircleSummaryModels.emptyInstance())
+        }
+
+        private fun notifySearchResultByKeyword() {
+            if (keyword == Const.EMPTY_TEXT) {
+                searchResult.postValue(CircleSummaryModels.emptyInstance())
+            } else {
+                searchResult.postValue(circleSummaryModels.find(keyword))
+            }
         }
     }

@@ -14,7 +14,9 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.developeek.circleon.databinding.ActivitySearchCircleBinding
 import com.developeek.circleon.domain.model.CircleSummaryModels
 import com.developeek.circleon.domain.state.UiState
+import com.developeek.circleon.domain.utils.Const
 import com.developeek.circleon.view.adapter.CircleSearchResultAdapter
+import com.developeek.circleon.view.listener.RecyclerViewHideSoftInputListener
 import com.developeek.circleon.view.screen.login.LoginActivity
 import com.developeek.circleon.view.viewmodel.SearchViewModel
 import com.developeek.circleon.view.viewmodelimpl.SearchViewModelImpl
@@ -92,6 +94,7 @@ class SearchCircleActivity : AppCompatActivity() {
 
     private fun initListener(activity: Activity) {
         setEdtSearchCircleListener()
+        setRvCircleListener(activity)
         setBtnClearListener(activity)
         setBtnCancelListener()
     }
@@ -102,9 +105,14 @@ class SearchCircleActivity : AppCompatActivity() {
         }
     }
 
+    private fun setRvCircleListener(activity: Activity) {
+        binding.rvCircle.addOnScrollListener(RecyclerViewHideSoftInputListener(activity))
+    }
+
     private fun setBtnClearListener(activity: Activity) {
         binding.btnClear.setOnClickListener {
             viewModel.clearKeyword()
+            binding.edtSearchCircle.setText(Const.EMPTY_TEXT)
             showSoftInput(binding.edtSearchCircle, activity)
         }
     }

@@ -30,7 +30,6 @@ import javax.inject.Inject
 class HomeFragment : Fragment() {
     private lateinit var binding: FragmentHomeBinding
     private val viewModel: HomeViewModel by activityViewModels<HomeViewModelImpl>()
-    private var completed = false
 
     @Inject
     lateinit var glideProvider: GlideProvider
@@ -93,7 +92,6 @@ class HomeFragment : Fragment() {
                 UiState.Success -> {
                     toggleView(binding.rvCircle)
                     loadCircles()
-                    setRvCircleListener()
                 }
                 UiState.Error -> {
                     // TODO: toggleErrorScreen
@@ -142,8 +140,8 @@ class HomeFragment : Fragment() {
         }
 
     private fun scrollOverObserver() =
-        Observer<Boolean> { it ->
-            if (it) {
+        Observer<Boolean> { completed ->
+            if (completed) {
                 viewModel.scrollListener.notifyScrollWorkCompleted()
                 binding.itemLoading.isVisible = false
                 binding.rvCircle.adapter?.let {
