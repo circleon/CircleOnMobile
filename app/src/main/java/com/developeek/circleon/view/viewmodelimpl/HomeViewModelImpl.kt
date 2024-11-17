@@ -59,10 +59,10 @@ class HomeViewModelImpl
                         circleModels = result.data
                         uiState.postValue(UiState.Success)
                     } else {
-                        if ((result as Error).isRefreshExpired()) {
+                        error = (result as Error).message()
+                        if (result.isRefreshExpired()) {
                             uiState.postValue(UiState.RefreshExpiration)
                         } else {
-                            error = result.message()
                             uiState.postValue(UiState.Error)
                         }
                     }

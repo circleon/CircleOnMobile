@@ -6,4 +6,5 @@ object ServiceExceptionMessage {
     const val MESSAGE_WRONG_RESPONSE_FORMAT = "응답 형식이 올바르지 않습니다"
     const val MESSAGE_FAIL_INTERNET_CONNECTION = "인터넷 연결에 실패하였습니다"
     const val MESSAGE_FAIL_REQUEST = "데이터 요청 실패 [ErrorCode : %s]"
+    const val MESSAGE_REFRESH_EXPIRED = "인증이 만료되었습니다. 다시 로그인해주세요"
 }

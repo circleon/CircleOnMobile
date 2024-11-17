@@ -44,7 +44,5 @@ class UserManager
             private const val USER_ID_KEY = "userId"
             private const val USER_NAME_KEY = "userName"
             private const val USER_UNIV_KEY = "userUniv"
-
-            private const val MESSAGE_NO_USER_INFO = "유저 정보가 존재하지 않습니다"
         }
     }

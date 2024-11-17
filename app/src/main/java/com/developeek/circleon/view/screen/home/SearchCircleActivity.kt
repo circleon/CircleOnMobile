@@ -61,15 +61,20 @@ class SearchCircleActivity : AppCompatActivity() {
                 UiState.Loading -> {
                     toggleView(binding.pgbLoading)
                 }
+                UiState.Success -> {
+                    viewModel.setKeywordAndFind(binding.edtSearchCircle.text.toString())
+                }
+                UiState.RefreshExpiration -> {
+                    sendUserToLoginScreen(activity)
+                    if (ErrorToast.previousFinished()) {
+                        ErrorToast(activity, viewModel.error).show()
+                    }
+                }
                 UiState.Error -> {
                     if (ErrorToast.previousFinished()) {
                         ErrorToast(activity, viewModel.error).show()
                     }
                 }
-                UiState.RefreshExpiration -> {
-                    sendUserToLoginScreen(activity)
-                }
-                else -> {}
             }
         }
 
@@ -85,9 +90,7 @@ class SearchCircleActivity : AppCompatActivity() {
                 true -> toggleView(binding.txtNoResult)
                 false -> {
                     toggleView(binding.rvCircle)
-                    (binding.rvCircle.adapter as CircleSearchResultAdapter).update(it) {
-                        binding.rvCircle.scrollToPosition(0)
-                    }
+                    (binding.rvCircle.adapter as CircleSearchResultAdapter).update(it) {}
                 }
             }
         }
@@ -101,7 +104,7 @@ class SearchCircleActivity : AppCompatActivity() {
 
     private fun setEdtSearchCircleListener() {
         binding.edtSearchCircle.doOnTextChanged { text, _, _, _ ->
-            viewModel.setKeyword(text.toString())
+            viewModel.setKeywordAndFind(text.toString())
         }
     }
 

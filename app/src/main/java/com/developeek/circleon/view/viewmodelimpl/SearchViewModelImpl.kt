@@ -48,24 +48,26 @@ class SearchViewModelImpl
 
                     if (result is Success) {
                         circleSummaryModels = result.data
-                        notifySearchResultByKeyword()
                         uiState.postValue(UiState.Success)
                     } else {
-                        if ((result as Error).isRefreshExpired()) {
+                        error = (result as Error).message()
+                        if (result.isRefreshExpired()) {
                             uiState.postValue(UiState.RefreshExpiration)
                         } else {
-                            error = result.message()
                             uiState.postValue(UiState.Error)
                         }
                     }
                 }
         }
 
-        override fun setKeyword(keyword: String) {
+        override fun setKeywordAndFind(keyword: String) {
             this.keyword = keyword
 
             if (::circleSummaryModels.isInitialized) {
                 notifySearchResultByKeyword()
+            }
+            if (uiState.value is UiState.Error) {
+                loadCircles()
             }
         }
 
