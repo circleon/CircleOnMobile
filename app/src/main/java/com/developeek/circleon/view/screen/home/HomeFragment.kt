@@ -169,11 +169,17 @@ class HomeFragment : Fragment() {
     private fun setRvCircleListener() {
         binding.rvCircle.addOnScrollListener(viewModel.scrollListener)
         (viewModel.scrollListener as RecyclerViewInfiniteScrollListener).setScrollEndListener {
-            binding.rvCircle.adapter?.let {
-                (it as CircleAdapter).update(viewModel.circles.add(CircleModel.emptyInstance())) {}
+            if (!viewModel.circles.isLastPage()) {
+                addScrollLoadingItemAndLoad()
             }
-            viewModel.scrollOver()
         }
+    }
+
+    private fun addScrollLoadingItemAndLoad() {
+        binding.rvCircle.adapter?.let {
+            (it as CircleAdapter).update(viewModel.circles.add(CircleModel.emptyInstance())) {}
+        }
+        viewModel.scrollOver()
     }
 
     private fun sendUserToSearchCircleScreen(activity: Activity) {

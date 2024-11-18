@@ -10,7 +10,15 @@ data class Circles(
     val currentPageNumber: Int,
     val totalElementCount: Int,
     val totalPageCount: Int,
-)
+) {
+    /**
+     * isLast
+     *
+     * 동아리 목록 무한 스크롤 Pagination 에서 사용
+     * when page 1 -> currentPage = 0, totalPage = 1
+     */
+    fun isLastPage() = currentPageNumber >= (totalPageCount - 1)
+}
 
 data class Circle(
     @SerializedName("circleId") val id: Int,

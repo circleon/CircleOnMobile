@@ -29,6 +29,7 @@ data class CircleModel(
 
 data class CircleModels(private val data: List<CircleModel>) {
     private val models = Stack<CircleModel>()
+    private var isLastPage = false
 
     init {
         for (c in data) {
@@ -59,6 +60,12 @@ data class CircleModels(private val data: List<CircleModel>) {
 
         return CircleModels(tmp)
     }
+
+    fun setAsLast() {
+        isLastPage = true
+    }
+
+    fun isLastPage() = isLastPage
 
     companion object {
         fun emptyInstance() = CircleModels(listOf())
