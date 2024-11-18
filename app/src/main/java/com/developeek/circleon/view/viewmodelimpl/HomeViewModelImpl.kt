@@ -10,7 +10,6 @@ import com.developeek.circleon.data.source.Success
 import com.developeek.circleon.domain.enums.Category
 import com.developeek.circleon.domain.model.CircleModels
 import com.developeek.circleon.domain.state.UiState
-import com.developeek.circleon.domain.utils.Const
 import com.developeek.circleon.view.listener.RecyclerViewInfiniteScrollListener
 import com.developeek.circleon.view.viewmodel.HomeViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -43,7 +42,7 @@ class HomeViewModelImpl
         private var circleLoadingJob: Job? = null
         private var scrollOverLoadingJob: Job? = null
 
-        override var error = Const.EMPTY_TEXT
+        override lateinit var error: String
 
         override fun setFilterAndLoad(category: Category) {
             circleLoadingJob?.cancel()

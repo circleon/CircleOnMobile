@@ -13,7 +13,7 @@ interface HomeViewModel {
     val circles: CircleModels
     val scrollOver: LiveData<Boolean>
     val scrollListener: RecyclerViewInfiniteScrollListener
-    var error: String
+    val error: String
 
     fun setFilterAndLoad(category: Category)
 

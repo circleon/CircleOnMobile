@@ -33,7 +33,7 @@ class SearchViewModelImpl
 
         private var loadCircleJob: Job? = null
 
-        override var error = Const.EMPTY_TEXT
+        override lateinit var error: String
 
         init {
             loadCircles()

@@ -8,7 +8,6 @@ import com.developeek.circleon.data.repository.LoginRepository
 import com.developeek.circleon.data.source.Error
 import com.developeek.circleon.data.source.Success
 import com.developeek.circleon.domain.state.UiState
-import com.developeek.circleon.domain.utils.Const
 import com.developeek.circleon.domain.utils.validator.Invalid
 import com.developeek.circleon.domain.utils.validator.Valid
 import com.developeek.circleon.domain.utils.validator.Validator
@@ -52,8 +51,7 @@ class SignUpViewModelImpl
         private lateinit var emailAuthenticationJob: Job
         private lateinit var signUpJob: Job
 
-        override var error =
-            Const.EMPTY_TEXT
+        override lateinit var error: String
 
         override fun signUp() {
             if ((!::signUpJob.isInitialized || signUpJob.isCompleted) && signUpCondition()) {

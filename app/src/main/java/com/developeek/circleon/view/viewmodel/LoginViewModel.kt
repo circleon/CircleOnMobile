@@ -5,7 +5,7 @@ import com.developeek.circleon.domain.state.UiState
 
 interface LoginViewModel {
     val state: LiveData<UiState>
-    var error: String
+    val error: String
 
     fun login(
         email: String,

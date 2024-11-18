@@ -7,7 +7,7 @@ interface SignUpViewModel {
     val state: LiveData<UiState>
     val validation: LiveData<String>
     val emailAuthenticationTimer: LiveData<Long>
-    var error: String
+    val error: String
 
     fun signUp()
 
