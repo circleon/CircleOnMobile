@@ -47,6 +47,7 @@ class CircleAdapter(
         private fun loadCircle(position: Int) {
             binding.txtCircleName.text = diffUtil.currentList[position].name
             binding.txtCircleCategory.text = diffUtil.currentList[position].category.categoryName()
+            binding.txtCircleComment.text = diffUtil.currentList[position].comment
             binding.txtCirclePeopleCount.text =
                 String.format(
                     MEMBER_COUNT_UNIT, diffUtil.currentList[position].member,

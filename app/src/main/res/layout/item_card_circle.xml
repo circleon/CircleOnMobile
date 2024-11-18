@@ -12,17 +12,20 @@
     android:elevation="1dp">
 
     <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/clCircleInfo"
         android:layout_width="0dp"
-        android:layout_height="0dp"
+        android:layout_height="wrap_content"
         android:orientation="vertical"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@id/imgCircleThumbnail"
         app:layout_constraintHorizontal_bias="0"
+        app:layout_constrainedWidth="true"
         >
 
         <androidx.appcompat.widget.LinearLayoutCompat
+            android:id="@+id/llCircleName"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:gravity="center_vertical"
@@ -36,7 +39,7 @@
                 android:layout_height="wrap_content"
                 android:text="동아리 이름"
                 android:textAppearance="@style/content_title"
-                android:textSize="@dimen/text_size_default"/>
+                android:textSize="@dimen/text_size_default" />
 
             <androidx.appcompat.widget.AppCompatTextView
                 android:id="@+id/txtCircleCategory"
@@ -52,7 +55,22 @@
 
         </androidx.appcompat.widget.LinearLayoutCompat>
 
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/txtCircleComment"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginVertical="@dimen/margin_padding_small"
+            android:textSize="@dimen/text_size_small"
+            android:textColor="@color/grey_9"
+            tools:text="동아리 소개 문구"
+            android:maxLines="2"
+            android:maxLength="35"
+            app:layout_constraintTop_toBottomOf="@id/llCircleName"
+            app:layout_constraintBottom_toTopOf="@id/llCircleMember"
+            app:layout_constraintStart_toStartOf="parent" />
+
         <androidx.appcompat.widget.LinearLayoutCompat
+            android:id="@+id/llCircleMember"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/margin_padding_small"
@@ -72,7 +90,8 @@
                 android:layout_height="wrap_content"
                 android:layout_marginStart="@dimen/margin_padding_extremely_small"
                 tools:text="0명"
-                android:textSize="@dimen/text_size_small"/>
+                android:textSize="@dimen/text_size_small"
+                android:textColor="@color/grey_9"/>
 
         </androidx.appcompat.widget.LinearLayoutCompat>
 
@@ -82,10 +101,12 @@
         android:id="@+id/imgCircleThumbnail"
         android:layout_width="64dp"
         android:layout_height="64dp"
+        android:layout_marginStart="60dp"
         android:padding="@dimen/margin_padding_default"
         android:background="@drawable/bg_image"
         android:clipToOutline="true"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent"/>
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toEndOf="@id/clCircleInfo"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

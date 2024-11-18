@@ -26,6 +26,7 @@ data class Circle(
     val profileImgUrl: String?,
     val thumbnailUrl: String?,
     val category: String,
+    @SerializedName("summary") val comment: String,
     val memberCount: Int,
 ) {
     fun toCircleModel() =
@@ -35,6 +36,7 @@ data class Circle(
             imageUrl(profileImgUrl),
             imageUrl(thumbnailUrl),
             category(category),
+            comment,
             memberCount,
         )
 

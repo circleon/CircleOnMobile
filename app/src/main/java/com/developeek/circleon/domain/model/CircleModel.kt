@@ -12,6 +12,7 @@ data class CircleModel(
     val profileImgUrl: String?,
     val thumbnailUrl: String?,
     val category: Category,
+    val comment: String,
     val member: Int,
 ) : Serializable {
     companion object {
@@ -22,6 +23,7 @@ data class CircleModel(
                 null,
                 null,
                 Category.ETC,
+                Const.EMPTY_TEXT,
                 0,
             )
     }
