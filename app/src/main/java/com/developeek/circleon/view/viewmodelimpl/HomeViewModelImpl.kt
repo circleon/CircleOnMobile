@@ -46,6 +46,7 @@ class HomeViewModelImpl
 
         override fun setFilterAndLoad(category: Category) {
             circleLoadingJob?.cancel()
+            scrollOverLoadingJob?.cancel()
             categoryFilter.postValue(category)
             uiState.postValue(UiState.Loading)
             currentPage = DEFAULT_PAGE
@@ -76,7 +77,7 @@ class HomeViewModelImpl
                     val result = repository.getCircles(currentPage + 1, SIZE_BY_PAGE, categoryFilter.value!!)
 
                     if (result is Success) {
-                        circleModels = circleModels.add(result.data)
+                        circleModels = circleModels.addAll(result.data)
                         currentPage++
                         scrollOverCompleted.postValue(true)
                     } else {

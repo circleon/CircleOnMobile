@@ -6,7 +6,6 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Observer
@@ -14,11 +13,13 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.developeek.circleon.data.source.manager.UserManager
 import com.developeek.circleon.databinding.FragmentHomeBinding
 import com.developeek.circleon.domain.enums.Category
+import com.developeek.circleon.domain.model.CircleModel
 import com.developeek.circleon.domain.state.UiState
 import com.developeek.circleon.domain.utils.glide.GlideProvider
 import com.developeek.circleon.view.adapter.CircleAdapter
 import com.developeek.circleon.view.adapter.CircleCategoryAdapter
 import com.developeek.circleon.view.listener.ItemClickListener
+import com.developeek.circleon.view.listener.RecyclerViewInfiniteScrollListener
 import com.developeek.circleon.view.screen.login.LoginActivity
 import com.developeek.circleon.view.viewmodel.HomeViewModel
 import com.developeek.circleon.view.viewmodelimpl.HomeViewModelImpl
@@ -30,6 +31,7 @@ import javax.inject.Inject
 class HomeFragment : Fragment() {
     private lateinit var binding: FragmentHomeBinding
     private val viewModel: HomeViewModel by activityViewModels<HomeViewModelImpl>()
+    private var scrollWorkCompleted = false
 
     @Inject
     lateinit var glideProvider: GlideProvider
@@ -145,14 +147,11 @@ class HomeFragment : Fragment() {
     private fun scrollOverObserver() =
         Observer<Boolean> { completed ->
             if (completed) {
-                viewModel.scrollListener.notifyScrollWorkCompleted()
-                binding.itemLoading.isVisible = false
+                binding.rvCircle.removeOnScrollListener(viewModel.scrollListener)
+                binding.rvCircle.addOnScrollListener(viewModel.scrollListener)
                 binding.rvCircle.adapter?.let {
                     (it as CircleAdapter).update(viewModel.circles) {}
                 }
-                binding.rvCircle.removeOnScrollListener(viewModel.scrollListener)
-                binding.rvCircle.addOnScrollListener(viewModel.scrollListener)
-                viewModel.scrollListener.initScrollWorkState()
             }
         }
 
@@ -169,14 +168,11 @@ class HomeFragment : Fragment() {
 
     private fun setRvCircleListener() {
         binding.rvCircle.addOnScrollListener(viewModel.scrollListener)
-        viewModel.scrollListener.setScrollEndListener {
-            binding.itemLoading.isVisible = true
-            viewModel.scrollOver()
-        }
-        viewModel.scrollListener.setScrollUpListener {
-            if (binding.itemLoading.isVisible) {
-                binding.itemLoading.isVisible = false
+        (viewModel.scrollListener as RecyclerViewInfiniteScrollListener).setScrollEndListener {
+            binding.rvCircle.adapter?.let {
+                (it as CircleAdapter).update(viewModel.circles.add(CircleModel.emptyInstance())) {}
             }
+            viewModel.scrollOver()
         }
     }
 

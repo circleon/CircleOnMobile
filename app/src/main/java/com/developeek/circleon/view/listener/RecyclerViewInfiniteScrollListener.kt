@@ -5,8 +5,6 @@ import androidx.recyclerview.widget.RecyclerView
 
 class RecyclerViewInfiniteScrollListener : RecyclerView.OnScrollListener() {
     private lateinit var whenScrollEnd: Runnable
-    private lateinit var whenScrollUp: Runnable
-    private var scrollWorkCompleted = false
 
     override fun onScrolled(
         recyclerView: RecyclerView,
@@ -21,28 +19,11 @@ class RecyclerViewInfiniteScrollListener : RecyclerView.OnScrollListener() {
         val firstItem = manager.findFirstVisibleItemPosition()
 
         if (visibleItemCount + firstItem >= totalItemCount) {
-            if (!scrollWorkCompleted) {
-                whenScrollEnd.run()
-            }
-        }
-        if (dy < 0) {
-            whenScrollUp.run()
+            whenScrollEnd.run()
         }
     }
 
     fun setScrollEndListener(whenScrollEnd: Runnable) {
         this.whenScrollEnd = whenScrollEnd
-    }
-
-    fun setScrollUpListener(whenScrollUp: Runnable) {
-        this.whenScrollUp = whenScrollUp
-    }
-
-    fun notifyScrollWorkCompleted() {
-        this.scrollWorkCompleted = true
-    }
-
-    fun initScrollWorkState() {
-        this.scrollWorkCompleted = false
     }
 }
