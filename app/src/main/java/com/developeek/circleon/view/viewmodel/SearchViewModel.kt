@@ -9,6 +9,8 @@ interface SearchViewModel {
     val circles: LiveData<CircleSummaryModels>
     val error: String
 
+    fun loadCircles()
+
     fun setKeywordAndFind(keyword: String)
 
     fun clearKeyword()

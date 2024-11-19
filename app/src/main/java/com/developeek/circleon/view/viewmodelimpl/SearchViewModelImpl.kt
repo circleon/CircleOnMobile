@@ -39,7 +39,7 @@ class SearchViewModelImpl
             loadCircles()
         }
 
-        private fun loadCircles() {
+        override fun loadCircles() {
             loadCircleJob?.cancel()
 
             loadCircleJob =

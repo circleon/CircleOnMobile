@@ -31,7 +31,6 @@ import javax.inject.Inject
 class HomeFragment : Fragment() {
     private lateinit var binding: FragmentHomeBinding
     private val viewModel: HomeViewModel by activityViewModels<HomeViewModelImpl>()
-    private var scrollWorkCompleted = false
 
     @Inject
     lateinit var glideProvider: GlideProvider
@@ -102,7 +101,7 @@ class HomeFragment : Fragment() {
                     }
                 }
                 UiState.Error -> {
-                    // TODO: toggleErrorScreen
+                    toggleView(binding.llServiceError)
                     if (ErrorToast.previousFinished()) {
                         ErrorToast(activity, viewModel.error).show()
                     }
@@ -157,12 +156,19 @@ class HomeFragment : Fragment() {
 
     private fun initListener(activity: Activity) {
         setBtnSearchCircleListener(activity)
+        setBtnRetryListener()
         setRvCircleListener()
     }
 
     private fun setBtnSearchCircleListener(activity: Activity) {
         binding.btnSearch.setOnClickListener {
             sendUserToSearchCircleScreen(activity)
+        }
+    }
+
+    private fun setBtnRetryListener() {
+        binding.btnRetry.setOnClickListener {
+            viewModel.restore()
         }
     }
 
@@ -196,6 +202,7 @@ class HomeFragment : Fragment() {
     private fun toggleView(view: View) {
         binding.rvCircle.visibility = visibleWhenTrue(view == binding.rvCircle)
         binding.pgbLoading.visibility = visibleWhenTrue(view == binding.pgbLoading)
+        binding.llServiceError.visibility = visibleWhenTrue(view == binding.llServiceError)
     }
 
     private fun visibleWhenTrue(state: Boolean) = if (state) View.VISIBLE else View.GONE

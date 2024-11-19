@@ -104,7 +104,11 @@ class HomeViewModelImpl
             if (uiState.value == UiState.Success) {
                 categoryFilter.postValue(categoryFilter.value)
             } else {
-                setFilterAndLoad(Category.ALL)
+                if (categoryFilter.value == null) {
+                    setFilterAndLoad(Category.ALL)
+                } else {
+                    setFilterAndLoad(categoryFilter.value!!)
+                }
             }
         }
 

@@ -101,7 +101,7 @@
         android:id="@+id/imgCircleThumbnail"
         android:layout_width="64dp"
         android:layout_height="64dp"
-        android:layout_marginStart="60dp"
+        android:layout_marginStart="40dp"
         android:padding="@dimen/margin_padding_default"
         android:background="@drawable/bg_image"
         android:clipToOutline="true"

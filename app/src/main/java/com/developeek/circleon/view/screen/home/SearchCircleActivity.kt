@@ -71,6 +71,7 @@ class SearchCircleActivity : AppCompatActivity() {
                     }
                 }
                 UiState.Error -> {
+                    toggleView(binding.llServiceError)
                     if (ErrorToast.previousFinished()) {
                         ErrorToast(activity, viewModel.error).show()
                     }
@@ -100,6 +101,7 @@ class SearchCircleActivity : AppCompatActivity() {
         setRvCircleListener(activity)
         setBtnClearListener(activity)
         setBtnCancelListener()
+        setBtnRetryListener()
     }
 
     private fun setEdtSearchCircleListener() {
@@ -136,10 +138,17 @@ class SearchCircleActivity : AppCompatActivity() {
         }
     }
 
+    private fun setBtnRetryListener() {
+        binding.btnRetry.setOnClickListener {
+            viewModel.loadCircles()
+        }
+    }
+
     private fun toggleView(view: View) {
         binding.rvCircle.visibility = visibleWhenTrue(view == binding.rvCircle)
         binding.pgbLoading.visibility = visibleWhenTrue(view == binding.pgbLoading)
         binding.txtNoResult.visibility = visibleWhenTrue(view == binding.txtNoResult)
+        binding.llServiceError.visibility = visibleWhenTrue(view == binding.llServiceError)
     }
 
     private fun visibleWhenTrue(state: Boolean) = if (state) View.VISIBLE else View.GONE

@@ -36,6 +36,7 @@
     <string name="tab_name_circle">동아리</string>
     <string name="tab_name_direct_message">채팅</string>
     <string name="tab_name_my_page">MY</string>
+    <string name="message_service_error">앗! 다시 시도해볼까요?</string>
 
     <!--Home-->
     <string name="home_content_title_new_circle">새로 개설된 동아리를 소개합니다!</string>

@@ -91,6 +91,31 @@
             android:indeterminate="true"
             android:visibility="gone"/>
 
+        <androidx.appcompat.widget.LinearLayoutCompat
+            android:id="@+id/llServiceError"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="center"
+            android:orientation="vertical"
+            android:visibility="gone">
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/message_service_error"
+                android:textAppearance="@style/large_bold_text"
+                android:textColor="@color/grey_5"/>
+
+            <androidx.appcompat.widget.AppCompatImageView
+                android:id="@+id/btnRetry"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/margin_padding_small"
+                android:src="@drawable/ic_retry"
+                android:clickable="true"/>
+
+        </androidx.appcompat.widget.LinearLayoutCompat>
+
     </FrameLayout>
 
 </androidx.appcompat.widget.LinearLayoutCompat>

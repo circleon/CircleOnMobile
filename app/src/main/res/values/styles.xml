@@ -21,4 +21,8 @@
         <item name="android:textSize">@dimen/text_size_default</item>
         <item name="android:textFontWeight">600</item>
     </style>
+    <style name="large_bold_text">
+        <item name="android:textSize">@dimen/text_size_large</item>
+        <item name="android:textFontWeight">600</item>
+    </style>
 </resources>

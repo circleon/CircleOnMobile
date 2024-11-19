@@ -21,6 +21,9 @@ class Error<T>(private val error: Exception) : Result<T>() {
             is UnknownHostException -> {
                 ServiceExceptionMessage.MESSAGE_FAIL_INTERNET_CONNECTION
             }
+            is SocketTimeoutException -> {
+                ServiceExceptionMessage.MESSAGE_SOCKET_TIMEOUT_EXCEPTION
+            }
             is ServiceException.RefreshTokenExpiredException -> {
                 ServiceExceptionMessage.MESSAGE_REFRESH_EXPIRED
             }
@@ -28,8 +31,6 @@ class Error<T>(private val error: Exception) : Result<T>() {
                 error.message ?: error.toString()
             }
         }
-
-    fun isTimeOut() = error is SocketTimeoutException
 
     fun isRefreshExpired() = error is ServiceException.RefreshTokenExpiredException
 }
