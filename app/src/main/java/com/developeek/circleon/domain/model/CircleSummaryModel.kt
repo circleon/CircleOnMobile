@@ -29,7 +29,7 @@ data class CircleSummaryModels(private val data: List<CircleSummaryModel>) {
 
     fun find(keyword: String) =
         CircleSummaryModels(
-            models.filter { it.name.contains(keyword) }
+            models.filter { it.name.lowercase().contains(keyword.lowercase()) }
                 .sortedWith(
                     compareBy<CircleSummaryModel> { it.name.compareTo(keyword).absoluteValue }
                         .thenBy { it.name }

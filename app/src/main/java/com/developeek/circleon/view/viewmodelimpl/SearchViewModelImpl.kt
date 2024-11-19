@@ -33,13 +33,13 @@ class SearchViewModelImpl
 
         private var loadCircleJob: Job? = null
 
-        override var error = Const.EMPTY_TEXT
+        override lateinit var error: String
 
         init {
             loadCircles()
         }
 
-        private fun loadCircles() {
+        override fun loadCircles() {
             loadCircleJob?.cancel()
 
             loadCircleJob =
@@ -48,24 +48,26 @@ class SearchViewModelImpl
 
                     if (result is Success) {
                         circleSummaryModels = result.data
-                        searchResult.postValue(circleSummaryModels.find(keyword))
                         uiState.postValue(UiState.Success)
                     } else {
-                        if ((result as Error).isRefreshExpired()) {
+                        error = (result as Error).message()
+                        if (result.isRefreshExpired()) {
                             uiState.postValue(UiState.RefreshExpiration)
                         } else {
-                            error = result.message()
                             uiState.postValue(UiState.Error)
                         }
                     }
                 }
         }
 
-        override fun setKeyword(keyword: String) {
+        override fun setKeywordAndFind(keyword: String) {
             this.keyword = keyword
 
             if (::circleSummaryModels.isInitialized) {
-                searchResult.postValue(circleSummaryModels.find(keyword))
+                notifySearchResultByKeyword()
+            }
+            if (uiState.value is UiState.Error) {
+                loadCircles()
             }
         }
 
@@ -73,5 +75,13 @@ class SearchViewModelImpl
             this.keyword = Const.EMPTY_TEXT
 
             searchResult.postValue(CircleSummaryModels.emptyInstance())
+        }
+
+        private fun notifySearchResultByKeyword() {
+            if (keyword == Const.EMPTY_TEXT) {
+                searchResult.postValue(CircleSummaryModels.emptyInstance())
+            } else {
+                searchResult.postValue(circleSummaryModels.find(keyword))
+            }
         }
     }

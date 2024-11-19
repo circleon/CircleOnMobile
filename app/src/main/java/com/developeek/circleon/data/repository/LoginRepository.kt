@@ -1,7 +1,6 @@
 package com.developeek.circleon.data.repository
 
 import com.developeek.circleon.data.source.Result
-import com.developeek.circleon.domain.model.UserModel
 import com.developeek.circleon.domain.vo.Password
 import com.developeek.circleon.domain.vo.UserEmail
 import com.developeek.circleon.domain.vo.UserName
@@ -10,7 +9,7 @@ interface LoginRepository {
     suspend fun login(
         email: String,
         password: String,
-    ): Result<UserModel>
+    ): Result<Boolean>
 
     suspend fun signUp(
         email: UserEmail,

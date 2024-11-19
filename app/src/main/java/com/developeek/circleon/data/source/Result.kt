@@ -17,13 +17,20 @@ class Success<T>(val data: T) : Result<T>()
 
 class Error<T>(private val error: Exception) : Result<T>() {
     fun message() =
-        if (error is UnknownHostException) {
-            ServiceExceptionMessage.MESSAGE_FAIL_INTERNET_CONNECTION
-        } else {
-            error.message ?: error.toString()
+        when (error) {
+            is UnknownHostException -> {
+                ServiceExceptionMessage.MESSAGE_FAIL_INTERNET_CONNECTION
+            }
+            is SocketTimeoutException -> {
+                ServiceExceptionMessage.MESSAGE_SOCKET_TIMEOUT_EXCEPTION
+            }
+            is ServiceException.RefreshTokenExpiredException -> {
+                ServiceExceptionMessage.MESSAGE_REFRESH_EXPIRED
+            }
+            else -> {
+                error.message ?: error.toString()
+            }
         }
-
-    fun isTimeOut() = error is SocketTimeoutException
 
     fun isRefreshExpired() = error is ServiceException.RefreshTokenExpiredException
 }

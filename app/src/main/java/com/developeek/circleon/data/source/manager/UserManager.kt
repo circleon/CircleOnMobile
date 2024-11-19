@@ -2,6 +2,8 @@ package com.developeek.circleon.data.source.manager
 
 import android.content.SharedPreferences
 import com.developeek.circleon.data.di.UserSharedPreferences
+import com.developeek.circleon.data.entity.login.User
+import com.developeek.circleon.domain.model.UserModel
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -11,11 +13,31 @@ class UserManager
     constructor(
         @UserSharedPreferences private val preferences: SharedPreferences,
     ) {
-        fun getUser() {
-            // TODO: 정보 없을 때 RefreshException throw
-            preferences.getInt(USER_ID_KEY, 0)
-            preferences.getString(USER_NAME_KEY, "")
-            preferences.getString(USER_UNIV_KEY, "")
+        private var user: UserModel? = null
+
+        fun getUser(): UserModel? {
+            val id = preferences.getInt(USER_ID_KEY, 0)
+            val name = preferences.getString(USER_NAME_KEY, null)
+            val univCode = preferences.getString(USER_UNIV_KEY, null)
+
+            if (name != null && univCode != null) {
+                user = User(id, name, univCode).toUserModel()
+            }
+
+            return user
+        }
+
+        fun setUser(
+            id: Int,
+            name: String,
+            univCode: String,
+        ) {
+            val editor = preferences.edit()
+
+            editor.putInt(USER_ID_KEY, id)
+            editor.putString(USER_NAME_KEY, name)
+            editor.putString(USER_UNIV_KEY, univCode)
+            editor.apply()
         }
 
         companion object {

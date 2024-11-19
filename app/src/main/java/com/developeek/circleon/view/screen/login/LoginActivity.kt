@@ -51,6 +51,7 @@ class LoginActivity : AppCompatActivity() {
 
     private fun sendUserToHomeScreen(activity: Activity) {
         val intent = Intent(activity, HomeActivity::class.java)
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)
 
         startActivity(intent)
     }

@@ -28,7 +28,13 @@ class CircleRepositoryImpl(
                     } else {
                         service.getCircles(page, size, SORT_LATEST, category.codeName())
                     }
-                Result.success(CircleModels(response.content.map { it.toCircleModel() }))
+                Result.success(
+                    CircleModels(response.content.map { it.toCircleModel() }).also {
+                        if (response.isLastPage()) {
+                            it.setAsLast()
+                        }
+                    },
+                )
             }
         } catch (e: ServiceException.NoResultException) {
             Result.success(CircleModels.emptyInstance())

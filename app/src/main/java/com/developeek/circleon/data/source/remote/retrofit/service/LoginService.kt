@@ -3,8 +3,8 @@ package com.developeek.circleon.data.source.remote.retrofit.service
 import com.developeek.circleon.data.entity.login.Email
 import com.developeek.circleon.data.entity.login.EmailAuthentication
 import com.developeek.circleon.data.entity.login.Login
+import com.developeek.circleon.data.entity.login.LoginResult
 import com.developeek.circleon.data.entity.login.SignUp
-import com.developeek.circleon.data.entity.login.User
 import retrofit2.http.Body
 import retrofit2.http.POST
 
@@ -12,7 +12,7 @@ interface LoginService {
     @POST("auth/login")
     suspend fun login(
         @Body data: Login,
-    ): User
+    ): LoginResult
 
     @POST("auth/signup")
     suspend fun signUp(

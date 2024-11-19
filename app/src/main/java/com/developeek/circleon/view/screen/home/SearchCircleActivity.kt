@@ -14,7 +14,9 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.developeek.circleon.databinding.ActivitySearchCircleBinding
 import com.developeek.circleon.domain.model.CircleSummaryModels
 import com.developeek.circleon.domain.state.UiState
+import com.developeek.circleon.domain.utils.Const
 import com.developeek.circleon.view.adapter.CircleSearchResultAdapter
+import com.developeek.circleon.view.listener.RecyclerViewHideSoftInputListener
 import com.developeek.circleon.view.screen.login.LoginActivity
 import com.developeek.circleon.view.viewmodel.SearchViewModel
 import com.developeek.circleon.view.viewmodelimpl.SearchViewModelImpl
@@ -40,6 +42,7 @@ class SearchCircleActivity : AppCompatActivity() {
         binding.rvCircle.adapter = CircleSearchResultAdapter()
         binding.rvCircle.layoutManager = LinearLayoutManager(activity)
         binding.rvCircle.itemAnimator = null
+        showSoftInput(binding.edtSearchCircle, activity)
     }
 
     private fun initObserver(activity: Activity) {
@@ -59,15 +62,21 @@ class SearchCircleActivity : AppCompatActivity() {
                 UiState.Loading -> {
                     toggleView(binding.pgbLoading)
                 }
-                UiState.Error -> {
+                UiState.Success -> {
+                    viewModel.setKeywordAndFind(binding.edtSearchCircle.text.toString())
+                }
+                UiState.RefreshExpiration -> {
+                    sendUserToLoginScreen(activity)
                     if (ErrorToast.previousFinished()) {
                         ErrorToast(activity, viewModel.error).show()
                     }
                 }
-                UiState.RefreshExpiration -> {
-                    sendUserToLoginScreen(activity)
+                UiState.Error -> {
+                    toggleView(binding.llServiceError)
+                    if (ErrorToast.previousFinished()) {
+                        ErrorToast(activity, viewModel.error).show()
+                    }
                 }
-                else -> {}
             }
         }
 
@@ -83,28 +92,33 @@ class SearchCircleActivity : AppCompatActivity() {
                 true -> toggleView(binding.txtNoResult)
                 false -> {
                     toggleView(binding.rvCircle)
-                    (binding.rvCircle.adapter as CircleSearchResultAdapter).update(it) {
-                        binding.rvCircle.scrollToPosition(0)
-                    }
+                    (binding.rvCircle.adapter as CircleSearchResultAdapter).update(it) {}
                 }
             }
         }
 
     private fun initListener(activity: Activity) {
         setEdtSearchCircleListener()
+        setRvCircleListener(activity)
         setBtnClearListener(activity)
         setBtnCancelListener()
+        setBtnRetryListener()
     }
 
     private fun setEdtSearchCircleListener() {
         binding.edtSearchCircle.doOnTextChanged { text, _, _, _ ->
-            viewModel.setKeyword(text.toString())
+            viewModel.setKeywordAndFind(text.toString())
         }
+    }
+
+    private fun setRvCircleListener(activity: Activity) {
+        binding.rvCircle.addOnScrollListener(RecyclerViewHideSoftInputListener(activity))
     }
 
     private fun setBtnClearListener(activity: Activity) {
         binding.btnClear.setOnClickListener {
             viewModel.clearKeyword()
+            binding.edtSearchCircle.setText(Const.EMPTY_TEXT)
             showSoftInput(binding.edtSearchCircle, activity)
         }
     }
@@ -125,10 +139,17 @@ class SearchCircleActivity : AppCompatActivity() {
         }
     }
 
+    private fun setBtnRetryListener() {
+        binding.btnRetry.setOnClickListener {
+            viewModel.loadCircles()
+        }
+    }
+
     private fun toggleView(view: View) {
         binding.rvCircle.visibility = visibleWhenTrue(view == binding.rvCircle)
         binding.pgbLoading.visibility = visibleWhenTrue(view == binding.pgbLoading)
         binding.txtNoResult.visibility = visibleWhenTrue(view == binding.txtNoResult)
+        binding.llServiceError.visibility = visibleWhenTrue(view == binding.llServiceError)
     }
 
     private fun visibleWhenTrue(state: Boolean) = if (state) View.VISIBLE else View.GONE

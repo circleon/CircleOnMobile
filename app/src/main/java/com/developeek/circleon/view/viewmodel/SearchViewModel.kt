@@ -7,9 +7,11 @@ import com.developeek.circleon.domain.state.UiState
 interface SearchViewModel {
     val state: LiveData<UiState>
     val circles: LiveData<CircleSummaryModels>
-    var error: String
+    val error: String
 
-    fun setKeyword(keyword: String)
+    fun loadCircles()
+
+    fun setKeywordAndFind(keyword: String)
 
     fun clearKeyword()
 }

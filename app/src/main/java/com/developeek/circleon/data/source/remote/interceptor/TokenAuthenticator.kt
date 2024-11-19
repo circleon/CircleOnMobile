@@ -26,18 +26,18 @@ class TokenAuthenticator
             route: Route?,
             response: Response,
         ): Request? {
-            val refreshToken = tokenManager.getRefreshToken() ?: throw ServiceException.RefreshTokenExpiredException("")
+            val refreshToken = tokenManager.getRefreshToken() ?: throw ServiceException.RefreshTokenExpiredException()
             val responseString = response.body()!!.string()
             val jsonObject = JSONTokener(responseString).nextValue() as JSONObject
             if (jsonObject.getString(PARAM_NAME_ERROR_CODE) == StatusCode.FAIL_REFRESH_TOKEN_VALIDATION.errorCode()) {
-                throw ServiceException.RefreshTokenExpiredException("")
+                throw ServiceException.RefreshTokenExpiredException()
             }
 
             return runBlocking {
                 try {
                     tokenManager.setAccessToken(requestAccessToken(refreshToken))
                 } catch (e: Exception) {
-                    throw ServiceException.RefreshTokenExpiredException("")
+                    throw ServiceException.RefreshTokenExpiredException()
                 }
                 if (tokenManager.getAccessToken() == null) {
                     null

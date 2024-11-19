@@ -10,7 +10,7 @@ import com.developeek.circleon.data.source.Success
 import com.developeek.circleon.domain.enums.Category
 import com.developeek.circleon.domain.model.CircleModels
 import com.developeek.circleon.domain.state.UiState
-import com.developeek.circleon.domain.utils.Const
+import com.developeek.circleon.view.listener.RecyclerViewInfiniteScrollListener
 import com.developeek.circleon.view.viewmodel.HomeViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
@@ -23,7 +23,7 @@ class HomeViewModelImpl
     constructor(private val repository: CircleRepository) : HomeViewModel, ViewModel() {
         override val state: LiveData<UiState>
             get() = uiState
-        private val uiState = MutableLiveData<UiState>(UiState.Loading)
+        private val uiState = MutableLiveData<UiState>()
 
         override val category: List<Category> = Category.entries
         override val selectedCategory: LiveData<Category>
@@ -37,16 +37,15 @@ class HomeViewModelImpl
         override val scrollOver: LiveData<Boolean>
             get() = scrollOverCompleted
         private var scrollOverCompleted = MutableLiveData<Boolean>()
+        override val scrollListener = RecyclerViewInfiniteScrollListener()
 
         private var circleLoadingJob: Job? = null
         private var scrollOverLoadingJob: Job? = null
 
-        override var error = Const.EMPTY_TEXT
+        override lateinit var error: String
 
         override fun setFilterAndLoad(category: Category) {
-            circleLoadingJob?.cancel()
-            categoryFilter.postValue(category)
-            currentPage = DEFAULT_PAGE
+            initCategoryFiltering(category)
 
             circleLoadingJob =
                 viewModelScope.launch {
@@ -56,14 +55,22 @@ class HomeViewModelImpl
                         circleModels = result.data
                         uiState.postValue(UiState.Success)
                     } else {
-                        if ((result as Error).isRefreshExpired()) {
+                        error = (result as Error).message()
+                        if (result.isRefreshExpired()) {
                             uiState.postValue(UiState.RefreshExpiration)
                         } else {
-                            error = result.message()
                             uiState.postValue(UiState.Error)
                         }
                     }
                 }
+        }
+
+        private fun initCategoryFiltering(category: Category) {
+            circleLoadingJob?.cancel()
+            scrollOverLoadingJob?.cancel()
+            categoryFilter.postValue(category)
+            uiState.postValue(UiState.Loading)
+            currentPage = DEFAULT_PAGE
         }
 
         override fun scrollOver() {
@@ -74,7 +81,12 @@ class HomeViewModelImpl
                     val result = repository.getCircles(currentPage + 1, SIZE_BY_PAGE, categoryFilter.value!!)
 
                     if (result is Success) {
-                        circleModels = circleModels.add(result.data)
+                        circleModels =
+                            circleModels.addAll(result.data).also {
+                                if (result.data.isLastPage()) {
+                                    it.setAsLast()
+                                }
+                            }
                         currentPage++
                         scrollOverCompleted.postValue(true)
                     } else {
@@ -89,13 +101,14 @@ class HomeViewModelImpl
         }
 
         override fun restore() {
-            if (categoryFilter.value == null) {
-                setFilterAndLoad(Category.ALL)
-            } else {
+            if (uiState.value == UiState.Success) {
                 categoryFilter.postValue(categoryFilter.value)
-            }
-            uiState.value?.let {
-                uiState.postValue(it)
+            } else {
+                if (categoryFilter.value == null) {
+                    setFilterAndLoad(Category.ALL)
+                } else {
+                    setFilterAndLoad(categoryFilter.value!!)
+                }
             }
         }
 
