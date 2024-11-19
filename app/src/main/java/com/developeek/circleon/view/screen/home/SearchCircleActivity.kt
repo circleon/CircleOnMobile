@@ -42,6 +42,7 @@ class SearchCircleActivity : AppCompatActivity() {
         binding.rvCircle.adapter = CircleSearchResultAdapter()
         binding.rvCircle.layoutManager = LinearLayoutManager(activity)
         binding.rvCircle.itemAnimator = null
+        showSoftInput(binding.edtSearchCircle, activity)
     }
 
     private fun initObserver(activity: Activity) {
