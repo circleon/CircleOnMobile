@@ -9,12 +9,15 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Observer
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.developeek.circleon.R
 import com.developeek.circleon.data.source.manager.UserManager
 import com.developeek.circleon.databinding.FragmentHomeBinding
 import com.developeek.circleon.domain.enums.Category
 import com.developeek.circleon.domain.model.CircleModel
 import com.developeek.circleon.domain.state.UiState
+import com.developeek.circleon.domain.utils.Utils.navigateWithoutAnimation
 import com.developeek.circleon.domain.utils.glide.GlideProvider
 import com.developeek.circleon.view.adapter.CircleAdapter
 import com.developeek.circleon.view.adapter.CircleCategoryAdapter
@@ -56,7 +59,7 @@ class HomeFragment : Fragment() {
 
         initView(requireActivity())
         initObserver(requireActivity())
-        initListener(requireActivity())
+        initListener()
     }
 
     private fun initView(activity: Activity) {
@@ -167,15 +170,15 @@ class HomeFragment : Fragment() {
             }
         }
 
-    private fun initListener(activity: Activity) {
-        setBtnSearchCircleListener(activity)
+    private fun initListener() {
+        setBtnSearchCircleListener()
         setBtnRetryListener()
         setRvCircleListener()
     }
 
-    private fun setBtnSearchCircleListener(activity: Activity) {
+    private fun setBtnSearchCircleListener() {
         binding.btnSearch.setOnClickListener {
-            sendUserToSearchCircleScreen(activity)
+            sendUserToSearchCircleScreen()
         }
     }
 
@@ -201,10 +204,8 @@ class HomeFragment : Fragment() {
         viewModel.scrollOver()
     }
 
-    private fun sendUserToSearchCircleScreen(activity: Activity) {
-        val intent = Intent(activity, SearchCircleActivity::class.java)
-
-        startActivity(intent)
+    private fun sendUserToSearchCircleScreen() {
+        findNavController().navigateWithoutAnimation(R.id.searchCircleFragment, null)
     }
 
     override fun onStart() {

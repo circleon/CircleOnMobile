@@ -5,11 +5,11 @@ import android.view.KeyEvent
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.navigation.NavController
-import androidx.navigation.NavOptions
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.NavigationUI
 import com.developeek.circleon.R
 import com.developeek.circleon.databinding.ActivityHomeBinding
+import com.developeek.circleon.domain.utils.Utils.navigateWithoutAnimation
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -48,22 +48,6 @@ class HomeActivity : AppCompatActivity() {
             navController.navigateWithoutAnimation(it.itemId, null)
             true
         }
-    }
-
-    fun NavController.navigateWithoutAnimation(
-        destinationId: Int,
-        args: Bundle?,
-    ) {
-        val navOption =
-            NavOptions
-                .Builder()
-                .setExitAnim(0)
-                .setEnterAnim(0)
-                .setPopExitAnim(0)
-                .setPopEnterAnim(0)
-                .build()
-
-        navigate(destinationId, args, navOption)
     }
 
     private fun initFinishWaitingToast() {

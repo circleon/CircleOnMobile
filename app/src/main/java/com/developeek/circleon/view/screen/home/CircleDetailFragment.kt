@@ -1,4 +1,4 @@
-package com.developeek.circleon
+package com.developeek.circleon.view.screen.home
 
 import android.os.Bundle
 import android.view.LayoutInflater
