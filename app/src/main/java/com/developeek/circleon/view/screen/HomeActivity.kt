@@ -4,22 +4,20 @@ import android.os.Bundle
 import android.view.KeyEvent
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import androidx.fragment.app.Fragment
+import androidx.navigation.NavController
+import androidx.navigation.fragment.NavHostFragment
+import androidx.navigation.ui.NavigationUI
 import com.developeek.circleon.R
 import com.developeek.circleon.databinding.ActivityHomeBinding
-import com.developeek.circleon.view.screen.calendar.CalendarFragment
-import com.developeek.circleon.view.screen.circle.CircleFragment
-import com.developeek.circleon.view.screen.directmessage.DirectMessageFragment
-import com.developeek.circleon.view.screen.home.HomeFragment
-import com.developeek.circleon.view.screen.mypage.MyPageFragment
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
 class HomeActivity : AppCompatActivity() {
     private lateinit var binding: ActivityHomeBinding
+    private lateinit var navController: NavController
+    private lateinit var finishWaitingToast: Toast
     private var backClicked = false
     private var onMainFragment = true
-    private lateinit var finishWaitingToast: Toast
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -31,34 +29,16 @@ class HomeActivity : AppCompatActivity() {
     }
 
     private fun initBottomNav() {
-        add(HomeFragment())
-        supportFragmentManager.addFragmentOnAttachListener { _, fragment ->
-            onMainFragment = fragment is HomeFragment
-        }
-
-        binding.btmNav.setOnItemSelectedListener {
-            when (it.itemId) {
-                R.id.navHome -> replaceTo(HomeFragment())
-                R.id.navCalendar -> replaceTo(CalendarFragment())
-                R.id.navCircle -> replaceTo(CircleFragment())
-                R.id.navDirectMessage -> replaceTo(DirectMessageFragment())
-                R.id.navMyPage -> replaceTo(MyPageFragment())
-            }
-
-            return@setOnItemSelectedListener true
-        }
+        val navHostFragment = supportFragmentManager.findFragmentById(R.id.containerHome) as NavHostFragment
+        navController = navHostFragment.navController
+        NavigationUI.setupWithNavController(binding.btmNav, navController)
+        setDestinationChangedListener()
     }
 
-    private fun add(fragment: Fragment) {
-        val transaction = supportFragmentManager.beginTransaction()
-        transaction.add(binding.flHome.id, fragment)
-        transaction.commit()
-    }
-
-    private fun replaceTo(fragment: Fragment) {
-        val transaction = supportFragmentManager.beginTransaction()
-        transaction.replace(binding.flHome.id, fragment)
-        transaction.commit()
+    private fun setDestinationChangedListener() {
+        navController.addOnDestinationChangedListener { _, destination, _ ->
+            onMainFragment = destination.id == R.id.homeFragment
+        }
     }
 
     private fun initFinishWaitingToast() {
@@ -85,11 +65,7 @@ class HomeActivity : AppCompatActivity() {
         event: KeyEvent?,
     ): Boolean {
         if (keyCode == KeyEvent.KEYCODE_BACK) {
-            if (!onMainFragment) {
-                replaceTo(HomeFragment())
-                binding.btmNav.selectedItemId = R.id.navHome
-                return true
-            } else {
+            if (onMainFragment) {
                 if (backClicked) {
                     finish()
                 } else {

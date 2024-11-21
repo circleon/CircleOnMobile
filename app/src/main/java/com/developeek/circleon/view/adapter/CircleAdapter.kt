@@ -1,6 +1,6 @@
 package com.developeek.circleon.view.adapter
 
-import android.content.Context
+import android.app.Activity
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.AsyncListDiffer
@@ -12,10 +12,12 @@ import com.developeek.circleon.databinding.ItemLoadingBinding
 import com.developeek.circleon.domain.model.CircleModel
 import com.developeek.circleon.domain.model.CircleModels
 import com.developeek.circleon.domain.utils.glide.GlideProvider
+import com.developeek.circleon.view.listener.ItemClickListener
 
 class CircleAdapter(
-    private val parent: Context,
+    private val activity: Activity,
     private val glideProvider: GlideProvider,
+    private val itemClickListener: ItemClickListener<CircleModel>,
 ) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
     private val diffUtil =
         AsyncListDiffer(
@@ -42,6 +44,7 @@ class CircleAdapter(
     ) : RecyclerView.ViewHolder(binding.root) {
         fun bind(position: Int) {
             loadCircle(position)
+            setItemClickListener(position)
         }
 
         private fun loadCircle(position: Int) {
@@ -53,8 +56,14 @@ class CircleAdapter(
                     MEMBER_COUNT_UNIT, diffUtil.currentList[position].member,
                 )
             diffUtil.currentList[position].thumbnailUrl?.let {
-                glideProvider.callImage(it, parent, binding.imgCircleThumbnail)
+                glideProvider.callImage(it, activity, binding.imgCircleThumbnail)
             } ?: binding.imgCircleThumbnail.setImageResource(R.drawable.logo_main)
+        }
+
+        private fun setItemClickListener(position: Int) {
+            binding.clItemCircle.setOnClickListener {
+                itemClickListener.onItemClicked(diffUtil.currentList[position])
+            }
         }
     }
 

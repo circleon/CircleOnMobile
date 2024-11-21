@@ -60,13 +60,26 @@ class HomeFragment : Fragment() {
     }
 
     private fun initView(activity: Activity) {
-        binding.rvCircle.adapter = CircleAdapter(activity, glideProvider)
+        binding.rvCircle.adapter =
+            CircleAdapter(
+                activity,
+                glideProvider,
+                object : ItemClickListener<CircleModel> {
+                    override fun onItemClicked(item: CircleModel) {
+                        sendUserToCircleDetailScreen(item)
+                    }
+                },
+            )
         binding.rvCircle.layoutManager = LinearLayoutManager(activity)
         binding.rvCircle.itemAnimator = null
         userManager.getUser()?.let {
             binding.txtUnivName.text = it.univ.univName()
             binding.txtContentTitleCircle.text = String.format(CONTENT_TITLE_CIRCLE, it.name)
         }
+    }
+
+    private fun sendUserToCircleDetailScreen(item: CircleModel) {
+        // TODO: navController 활용
     }
 
     private fun initObserver(activity: Activity) {
@@ -127,12 +140,12 @@ class HomeFragment : Fragment() {
             binding.rvCircleCategory.adapter =
                 CircleCategoryAdapter(
                     viewModel,
-                    object : ItemClickListener {
-                        override fun onItemClicked(position: Int) {
-                            if (viewModel.selectedCategory.value!!.isSame(viewModel.category[position])) {
+                    object : ItemClickListener<Category> {
+                        override fun onItemClicked(item: Category) {
+                            if (viewModel.selectedCategory.value!!.isSame(item)) {
                                 binding.rvCircle.scrollToPosition(0)
                             } else {
-                                viewModel.setFilterAndLoad(viewModel.category[position])
+                                viewModel.setFilterAndLoad(item)
                             }
                         }
                     },

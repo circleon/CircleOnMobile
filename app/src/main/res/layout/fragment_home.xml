@@ -64,7 +64,7 @@
         android:id="@+id/txtContentTitleCircle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:paddingVertical="@dimen/margin_padding_default"
+        android:paddingVertical="@dimen/margin_padding_small"
         android:textAppearance="@style/content_title"
         android:textSize="16sp"
         android:text="@string/home_content_title_circle"/>

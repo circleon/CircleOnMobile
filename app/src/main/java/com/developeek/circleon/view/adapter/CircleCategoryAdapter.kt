@@ -13,7 +13,7 @@ import com.developeek.circleon.view.viewmodel.HomeViewModel
 
 class CircleCategoryAdapter(
     private val viewModel: HomeViewModel,
-    private val itemClickListener: ItemClickListener,
+    private val itemClickListener: ItemClickListener<Category>,
     private val context: Context,
 ) : RecyclerView.Adapter<CircleCategoryAdapter.CircleCategoryAdapterViewHolder>() {
     inner class CircleCategoryAdapterViewHolder(
@@ -50,7 +50,7 @@ class CircleCategoryAdapter(
 
         private fun setItemClickListener(position: Int) {
             binding.clItemCircleCategory.setOnClickListener {
-                itemClickListener.onItemClicked(position)
+                itemClickListener.onItemClicked(viewModel.category[position])
             }
         }
     }
