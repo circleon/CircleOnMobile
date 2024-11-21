@@ -5,6 +5,7 @@ import android.view.KeyEvent
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.navigation.NavController
+import androidx.navigation.NavOptions
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.NavigationUI
 import com.developeek.circleon.R
@@ -33,12 +34,36 @@ class HomeActivity : AppCompatActivity() {
         navController = navHostFragment.navController
         NavigationUI.setupWithNavController(binding.btmNav, navController)
         setDestinationChangedListener()
+        setBottomNavItemSelectedListener()
     }
 
     private fun setDestinationChangedListener() {
         navController.addOnDestinationChangedListener { _, destination, _ ->
             onMainFragment = destination.id == R.id.homeFragment
         }
+    }
+
+    private fun setBottomNavItemSelectedListener() {
+        binding.btmNav.setOnItemSelectedListener {
+            navController.navigateWithoutAnimation(it.itemId, null)
+            true
+        }
+    }
+
+    fun NavController.navigateWithoutAnimation(
+        destinationId: Int,
+        args: Bundle?,
+    ) {
+        val navOption =
+            NavOptions
+                .Builder()
+                .setExitAnim(0)
+                .setEnterAnim(0)
+                .setPopExitAnim(0)
+                .setPopEnterAnim(0)
+                .build()
+
+        navigate(destinationId, args, navOption)
     }
 
     private fun initFinishWaitingToast() {
