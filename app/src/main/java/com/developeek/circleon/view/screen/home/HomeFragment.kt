@@ -6,6 +6,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Observer
@@ -17,6 +18,7 @@ import com.developeek.circleon.databinding.FragmentHomeBinding
 import com.developeek.circleon.domain.enums.Category
 import com.developeek.circleon.domain.model.CircleModel
 import com.developeek.circleon.domain.state.UiState
+import com.developeek.circleon.domain.utils.Const
 import com.developeek.circleon.domain.utils.glide.GlideProvider
 import com.developeek.circleon.view.adapter.CircleAdapter
 import com.developeek.circleon.view.adapter.CircleCategoryAdapter
@@ -68,7 +70,11 @@ class HomeFragment : Fragment() {
                 glideProvider,
                 object : ItemClickListener<CircleModel> {
                     override fun onItemClicked(item: CircleModel) {
-                        sendUserToCircleDetailScreen(item)
+                        findNavController()
+                            .navigate(
+                                R.id.action_homeFragment_to_circleDetailFragment,
+                                bundleOf(Pair(Const.TAG_CIRCLE_ID, item.id)),
+                            )
                     }
                 },
             )
@@ -78,10 +84,6 @@ class HomeFragment : Fragment() {
             binding.txtUnivName.text = it.univ.univName()
             binding.txtContentTitleCircle.text = String.format(CONTENT_TITLE_CIRCLE, it.name)
         }
-    }
-
-    private fun sendUserToCircleDetailScreen(item: CircleModel) {
-        findNavController().navigate(R.id.action_homeFragment_to_circleDetailFragment)
     }
 
     private fun initObserver(activity: Activity) {

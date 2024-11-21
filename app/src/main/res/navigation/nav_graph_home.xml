@@ -22,11 +22,13 @@
         android:name="com.developeek.circleon.view.screen.home.SearchCircleFragment"
         android:label="fragment_search_circle"
         tools:layout="@layout/fragment_search_circle" >
+        <action
+            android:id="@+id/action_searchCircleFragment_to_circleDetailFragment"
+            app:destination="@id/circleDetailFragment" />
     </fragment>
     <fragment
         android:id="@+id/circleDetailFragment"
         android:name="com.developeek.circleon.view.screen.home.CircleDetailFragment"
         android:label="fragment_circle_detail"
-        tools:layout="@layout/fragment_circle_detail" >
-    </fragment>
+        tools:layout="@layout/fragment_circle_detail"/>
 </navigation>

@@ -8,6 +8,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.inputmethod.InputMethodManager
 import androidx.activity.viewModels
+import androidx.core.os.bundleOf
 import androidx.core.widget.doOnTextChanged
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
@@ -15,11 +16,14 @@ import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.Observer
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.developeek.circleon.R
 import com.developeek.circleon.databinding.FragmentSearchCircleBinding
+import com.developeek.circleon.domain.model.CircleSummaryModel
 import com.developeek.circleon.domain.model.CircleSummaryModels
 import com.developeek.circleon.domain.state.UiState
 import com.developeek.circleon.domain.utils.Const
 import com.developeek.circleon.view.adapter.CircleSearchResultAdapter
+import com.developeek.circleon.view.listener.ItemClickListener
 import com.developeek.circleon.view.listener.RecyclerViewHideSoftInputListener
 import com.developeek.circleon.view.screen.login.LoginActivity
 import com.developeek.circleon.view.viewmodel.SearchViewModel
@@ -54,7 +58,18 @@ class SearchCircleFragment : Fragment() {
     }
 
     private fun initView(activity: Activity) {
-        binding.rvCircle.adapter = CircleSearchResultAdapter()
+        binding.rvCircle.adapter =
+            CircleSearchResultAdapter(
+                object : ItemClickListener<CircleSummaryModel> {
+                    override fun onItemClicked(item: CircleSummaryModel) {
+                        findNavController()
+                            .navigate(
+                                R.id.action_searchCircleFragment_to_circleDetailFragment,
+                                bundleOf(Pair(Const.TAG_CIRCLE_ID, item.id)),
+                            )
+                    }
+                },
+            )
         binding.rvCircle.layoutManager = LinearLayoutManager(activity)
         binding.rvCircle.itemAnimator = null
         showSoftInput(binding.edtSearchCircle, activity)

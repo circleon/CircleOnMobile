@@ -8,8 +8,9 @@ import androidx.recyclerview.widget.RecyclerView
 import com.developeek.circleon.databinding.ItemCircleSearchResultBinding
 import com.developeek.circleon.domain.model.CircleSummaryModel
 import com.developeek.circleon.domain.model.CircleSummaryModels
+import com.developeek.circleon.view.listener.ItemClickListener
 
-class CircleSearchResultAdapter :
+class CircleSearchResultAdapter(private val itemClickListener: ItemClickListener<CircleSummaryModel>) :
     RecyclerView.Adapter<CircleSearchResultAdapter.CircleSearchResultAdapterViewHolder>() {
     private val diffUtil =
         AsyncListDiffer(
@@ -36,11 +37,18 @@ class CircleSearchResultAdapter :
     ) : RecyclerView.ViewHolder(binding.root) {
         fun bind(position: Int) {
             loadCircleSummary(position)
+            setItemClickListener(position)
         }
 
         private fun loadCircleSummary(position: Int) {
             binding.txtCircleName.text = diffUtil.currentList[position].name
             binding.txtCircleCategory.text = diffUtil.currentList[position].category.categoryName()
+        }
+
+        private fun setItemClickListener(position: Int) {
+            binding.llItemCircleSearchResult.setOnClickListener {
+                itemClickListener.onItemClicked(diffUtil.currentList[position])
+            }
         }
     }
 
