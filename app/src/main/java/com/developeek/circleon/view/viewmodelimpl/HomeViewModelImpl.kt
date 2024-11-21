@@ -44,6 +44,10 @@ class HomeViewModelImpl
 
         override lateinit var error: String
 
+        init {
+            setFilterAndLoad(Category.ALL)
+        }
+
         override fun setFilterAndLoad(category: Category) {
             initCategoryFiltering(category)
 

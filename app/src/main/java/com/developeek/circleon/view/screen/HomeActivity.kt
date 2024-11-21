@@ -9,7 +9,6 @@ import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.NavigationUI
 import com.developeek.circleon.R
 import com.developeek.circleon.databinding.ActivityHomeBinding
-import com.developeek.circleon.domain.utils.Utils.navigateWithoutAnimation
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -34,19 +33,11 @@ class HomeActivity : AppCompatActivity() {
         navController = navHostFragment.navController
         NavigationUI.setupWithNavController(binding.btmNav, navController)
         setDestinationChangedListener()
-        setBottomNavItemSelectedListener()
     }
 
     private fun setDestinationChangedListener() {
         navController.addOnDestinationChangedListener { _, destination, _ ->
             onMainFragment = destination.id == R.id.homeFragment
-        }
-    }
-
-    private fun setBottomNavItemSelectedListener() {
-        binding.btmNav.setOnItemSelectedListener {
-            navController.navigateWithoutAnimation(it.itemId, null)
-            true
         }
     }
 

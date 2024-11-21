@@ -17,7 +17,6 @@ import com.developeek.circleon.databinding.FragmentHomeBinding
 import com.developeek.circleon.domain.enums.Category
 import com.developeek.circleon.domain.model.CircleModel
 import com.developeek.circleon.domain.state.UiState
-import com.developeek.circleon.domain.utils.Utils.navigateWithoutAnimation
 import com.developeek.circleon.domain.utils.glide.GlideProvider
 import com.developeek.circleon.view.adapter.CircleAdapter
 import com.developeek.circleon.view.adapter.CircleCategoryAdapter
@@ -82,7 +81,7 @@ class HomeFragment : Fragment() {
     }
 
     private fun sendUserToCircleDetailScreen(item: CircleModel) {
-        // TODO: navController 활용
+        findNavController().navigate(R.id.action_homeFragment_to_circleDetailFragment)
     }
 
     private fun initObserver(activity: Activity) {
@@ -205,12 +204,7 @@ class HomeFragment : Fragment() {
     }
 
     private fun sendUserToSearchCircleScreen() {
-        findNavController().navigateWithoutAnimation(R.id.searchCircleFragment, null)
-    }
-
-    override fun onStart() {
-        super.onStart()
-        viewModel.restore()
+        findNavController().navigate(R.id.action_homeFragment_to_searchCircleFragment)
     }
 
     private fun toggleView(view: View) {
