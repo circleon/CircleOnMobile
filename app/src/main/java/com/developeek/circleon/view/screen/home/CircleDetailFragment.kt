@@ -6,6 +6,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import com.developeek.circleon.databinding.FragmentCircleDetailBinding
+import com.developeek.circleon.domain.utils.Const
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -20,5 +21,16 @@ class CircleDetailFragment : Fragment() {
         binding = FragmentCircleDetailBinding.inflate(layoutInflater)
 
         return binding.root
+    }
+
+    override fun onViewCreated(
+        view: View,
+        savedInstanceState: Bundle?,
+    ) {
+        super.onViewCreated(view, savedInstanceState)
+
+        arguments?.let {
+            binding.txtCircleId.text = String.format("circleId: %s", it.getInt(Const.TAG_CIRCLE_ID).toString())
+        }
     }
 }

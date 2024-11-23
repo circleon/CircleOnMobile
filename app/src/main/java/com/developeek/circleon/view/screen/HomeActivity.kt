@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.view.KeyEvent
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.view.isVisible
 import androidx.navigation.NavController
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.NavigationUI
@@ -38,6 +39,11 @@ class HomeActivity : AppCompatActivity() {
     private fun setDestinationChangedListener() {
         navController.addOnDestinationChangedListener { _, destination, _ ->
             onMainFragment = destination.id == R.id.homeFragment
+            if (destination.id == R.id.searchCircleFragment) {
+                binding.btmNav.isVisible = false
+            } else if (!binding.btmNav.isVisible) {
+                binding.btmNav.isVisible = true
+            }
         }
     }
 
