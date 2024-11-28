@@ -8,6 +8,7 @@ import android.view.ViewGroup
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
+import androidx.navigation.fragment.findNavController
 import com.developeek.circleon.R
 import com.developeek.circleon.databinding.FragmentCircleDetailBinding
 import com.google.android.material.tabs.TabLayout
@@ -57,7 +58,14 @@ class CircleDetailFragment : Fragment() {
     }
 
     private fun initListener() {
+        setBtnBackListener()
         setTlCircleDetailListener()
+    }
+
+    private fun setBtnBackListener() {
+        binding.btnBack.setOnClickListener {
+            findNavController().navigateUp()
+        }
     }
 
     private fun setTlCircleDetailListener() {

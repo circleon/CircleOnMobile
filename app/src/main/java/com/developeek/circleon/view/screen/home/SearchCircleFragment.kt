@@ -14,6 +14,7 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.Observer
+import androidx.navigation.NavOptions
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.developeek.circleon.R
@@ -62,10 +63,21 @@ class SearchCircleFragment : Fragment() {
             CircleSearchResultAdapter(
                 object : ItemClickListener<CircleSummaryModel> {
                     override fun onItemClicked(item: CircleSummaryModel) {
+                        val navOption =
+                            NavOptions
+                                .Builder()
+                                .setPopUpTo(
+                                    R.id.searchCircleFragment,
+                                    true,
+                                    false,
+                                )
+                                .build()
+
                         findNavController()
                             .navigate(
                                 R.id.action_searchCircleFragment_to_circleDetailFragment,
                                 bundleOf(Pair(Const.TAG_CIRCLE_ID, item.id)),
+                                navOption,
                             )
                     }
                 },
