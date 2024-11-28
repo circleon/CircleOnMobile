@@ -13,7 +13,6 @@
         android:name="androidx.navigation.fragment.NavHostFragment"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:paddingHorizontal="@dimen/margin_padding_large"
         app:navGraph="@navigation/nav_graph"
         app:defaultNavHost="true"
         app:layout_constraintBottom_toTopOf="@+id/btmNav"

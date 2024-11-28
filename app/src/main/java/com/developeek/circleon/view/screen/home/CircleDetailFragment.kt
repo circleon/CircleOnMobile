@@ -1,17 +1,22 @@
 package com.developeek.circleon.view.screen.home
 
+import android.app.Activity
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.FragmentManager
+import com.developeek.circleon.R
 import com.developeek.circleon.databinding.FragmentCircleDetailBinding
-import com.developeek.circleon.domain.utils.Const
+import com.google.android.material.tabs.TabLayout
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
 class CircleDetailFragment : Fragment() {
     private lateinit var binding: FragmentCircleDetailBinding
+    private lateinit var fragmentManager: FragmentManager
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -19,6 +24,7 @@ class CircleDetailFragment : Fragment() {
         savedInstanceState: Bundle?,
     ): View {
         binding = FragmentCircleDetailBinding.inflate(layoutInflater)
+        fragmentManager = requireActivity().supportFragmentManager
 
         return binding.root
     }
@@ -29,8 +35,69 @@ class CircleDetailFragment : Fragment() {
     ) {
         super.onViewCreated(view, savedInstanceState)
 
-        arguments?.let {
-            binding.txtCircleId.text = String.format("circleId: %s", it.getInt(Const.TAG_CIRCLE_ID).toString())
-        }
+        initView(requireActivity())
+        initListener()
+//        arguments?.let {
+//            binding.txtCircleId.text = String.format("circleId: %s", it.getInt(Const.TAG_CIRCLE_ID).toString())
+//        }
+    }
+
+    private fun initView(activity: Activity) {
+        initToolbar(activity)
+        initBottomNav()
+    }
+
+    private fun initToolbar(activity: Activity) {
+        val color = ContextCompat.getColor(activity, R.color.grey_1)
+        binding.ctbCircleDetail.setContentScrimColor(color)
+    }
+
+    private fun initBottomNav() {
+        add(CircleDetailIntroductionFragment())
+    }
+
+    private fun initListener() {
+        setTlCircleDetailListener()
+    }
+
+    private fun setTlCircleDetailListener() {
+        binding.tlCircleDetail.addOnTabSelectedListener(
+            object : TabLayout.OnTabSelectedListener {
+                override fun onTabSelected(tab: TabLayout.Tab?) {
+                    when (tab?.position) {
+                        0 -> {
+                            replaceTo(CircleDetailIntroductionFragment())
+                        }
+                        1 -> {
+                            replaceTo(CircleDetailAnnouncementFragment())
+                        }
+                        2 -> {
+                            replaceTo(CircleDetailPostFragment())
+                        }
+                        3 -> {
+                            replaceTo(CircleDetailActivityPhotoFragment())
+                        }
+                    }
+                }
+
+                override fun onTabUnselected(p0: TabLayout.Tab?) {
+                }
+
+                override fun onTabReselected(p0: TabLayout.Tab?) {
+                }
+            },
+        )
+    }
+
+    private fun add(fragment: Fragment) {
+        val transaction = fragmentManager.beginTransaction()
+        transaction.add(binding.flCircleDetail.id, fragment)
+        transaction.commit()
+    }
+
+    private fun replaceTo(fragment: Fragment) {
+        val transaction = fragmentManager.beginTransaction()
+        transaction.replace(binding.flCircleDetail.id, fragment)
+        transaction.commit()
     }
 }

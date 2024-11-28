@@ -45,5 +45,10 @@
     <string name="message_no_result">검색 결과가 존재하지 않습니다</string>
     <string name="hint_search_circle">동아리 검색</string>
     <string name="btn_cancel">취소</string>
+    <!--CircleDetail-->
+    <string name="tab_name_introduction">소개글</string>
+    <string name="tab_name_announcement">공지사항</string>
+    <string name="tab_name_post">게시글</string>
+    <string name="tab_name_activity_photo">활동사진</string>
 
 </resources>

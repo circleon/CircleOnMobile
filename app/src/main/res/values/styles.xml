@@ -13,6 +13,14 @@
     <style name="bottom_nav_title">
         <item name="android:textSize">10sp</item>
     </style>
+    <style name="small_text">
+        <item name="android:textSize">@dimen/text_size_small</item>
+        <item name="android:textStyle">normal</item>
+    </style>
+    <style name="small_bold_style_text">
+        <item name="android:textSize">@dimen/text_size_small</item>
+        <item name="android:textStyle">bold</item>
+    </style>
     <style name="small_bold_text">
         <item name="android:textSize">@dimen/text_size_small</item>
         <item name="android:textFontWeight">600</item>

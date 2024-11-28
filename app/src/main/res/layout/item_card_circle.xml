@@ -103,7 +103,7 @@
         android:layout_height="64dp"
         android:layout_marginStart="40dp"
         android:padding="@dimen/margin_padding_default"
-        android:background="@drawable/bg_image"
+        android:background="@drawable/bg_image_rounded_rectangle"
         android:clipToOutline="true"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent"
