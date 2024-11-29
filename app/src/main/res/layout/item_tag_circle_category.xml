@@ -17,7 +17,7 @@
         android:gravity="center"
         android:textSize="@dimen/text_size_default"
         tools:text="Category"
-        android:background="@drawable/bg_active_tag"
+        android:background="@drawable/bg_button"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"

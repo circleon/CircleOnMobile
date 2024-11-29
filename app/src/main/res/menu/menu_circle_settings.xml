@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <item
+        android:id="@+id/modify_circle"
+        android:title="@string/menu_circle_settings_modify"/>
+    <item
+        android:id="@+id/manage_circle"
+        android:title="@string/menu_circle_settings_manage"/>
+    <item
+        android:id="@+id/resign_circle"
+        android:title="@string/menu_circle_settings_resign" />
+</menu>

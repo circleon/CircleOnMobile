@@ -38,7 +38,7 @@ class CircleCategoryAdapter(
             viewModel.selectedCategory.value?.let {
                 if (it.isSame(category)) {
                     binding.txtCircleCategory.background =
-                        ContextCompat.getDrawable(context, R.drawable.bg_active_tag)
+                        ContextCompat.getDrawable(context, R.drawable.bg_button)
                     binding.txtCircleCategory.setTextColor(ContextCompat.getColor(context, R.color.white))
                 } else {
                     binding.txtCircleCategory.background =

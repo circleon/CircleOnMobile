@@ -6,6 +6,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:paddingTop="@dimen/margin_padding_default"
+    android:paddingHorizontal="@dimen/margin_padding_large"
     android:background="@color/grey_1"
     tools:context=".view.screen.home.SearchCricleFragment">
 

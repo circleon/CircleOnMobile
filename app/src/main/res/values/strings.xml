@@ -46,6 +46,10 @@
     <string name="hint_search_circle">동아리 검색</string>
     <string name="btn_cancel">취소</string>
     <!--CircleDetail-->
+    <string name="btn_sign_up_circle">가입신청</string>
+    <string name="menu_circle_settings_modify">수정하기</string>
+    <string name="menu_circle_settings_manage">관리하기</string>
+    <string name="menu_circle_settings_resign">탈퇴하기</string>
     <string name="tab_name_introduction">소개글</string>
     <string name="tab_name_announcement">공지사항</string>
     <string name="tab_name_post">게시글</string>

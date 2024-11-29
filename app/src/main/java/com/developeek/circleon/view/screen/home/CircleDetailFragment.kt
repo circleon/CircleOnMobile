@@ -51,6 +51,7 @@ class CircleDetailFragment : Fragment() {
     private fun initToolbar(activity: Activity) {
         val color = ContextCompat.getColor(activity, R.color.grey_1)
         binding.ctbCircleDetail.setContentScrimColor(color)
+        binding.tbCircleDetail.inflateMenu(R.menu.menu_circle_settings)
     }
 
     private fun initBottomNav() {
