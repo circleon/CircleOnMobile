@@ -52,7 +52,7 @@
         android:paddingHorizontal="@dimen/margin_padding_large"
         android:paddingVertical="10dp"
         android:gravity="center"
-        android:text="@string/text_login"
+        android:text="@string/btn_login"
         android:textSize="@dimen/text_size_default"
         android:textColor="@color/white"
         android:background="@drawable/bg_rounded_purple_rectangle" />
@@ -68,7 +68,7 @@
             android:id="@+id/btnSearchIdPassword"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/text_find_id_password"
+            android:text="@string/btn_find_id_password"
             android:textSize="@dimen/text_size_small"
             android:textColor="@color/grey_6"/>
 
@@ -82,7 +82,7 @@
             android:id="@+id/btnSignUp"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/text_sign_up"
+            android:text="@string/btn_go_sign_up_page"
             android:textAppearance="@style/small_bold_text"
             android:textColor="@color/grey_7" />
 

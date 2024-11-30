@@ -18,7 +18,8 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             app:layout_scrollFlags="scroll|exitUntilCollapsed"
-            android:background="@color/grey_1">
+            app:contentScrim="@color/white"
+            android:background="@color/white">
 
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:layout_width="match_parent"
@@ -121,6 +122,14 @@
                     android:src="@drawable/ic_back"
                     android:background="@null"/>
 
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/txtTbCircleName"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textAppearance="@style/large_bold_text"
+                    android:textColor="@color/grey_9"
+                    android:text="동아리 이름"/>
+
             </androidx.appcompat.widget.Toolbar>
 
         </com.google.android.material.appbar.CollapsingToolbarLayout>
@@ -129,7 +138,7 @@
             android:id="@+id/tlCircleDetail"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="@color/grey_1"
+            android:background="@color/white"
             app:tabIndicatorColor="@color/purple_5"
             app:tabMode="fixed"
             app:tabRippleColor="@null"

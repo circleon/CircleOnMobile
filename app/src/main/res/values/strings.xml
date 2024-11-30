@@ -4,9 +4,9 @@
     <!--Login-->
     <string name="hint_email">학교 이메일</string>
     <string name="hint_password">비밀번호</string>
-    <string name="text_login">로그인</string>
-    <string name="text_find_id_password">아이디/비밀번호 찾기</string>
-    <string name="text_sign_up">회원가입</string>
+    <string name="btn_login">로그인</string>
+    <string name="btn_find_id_password">아이디/비밀번호 찾기</string>
+    <string name="btn_go_sign_up_page">회원가입</string>
 
     <!--Sign Up-->
     <string name="btn_next">다음 단계로</string>
@@ -41,11 +41,13 @@
     <!--Home-->
     <string name="home_content_title_new_circle">새로 개설된 동아리를 소개합니다!</string>
     <string name="home_content_title_circle">이런 동아리는 어떠신가요?</string>
+    
     <!--Search Circle-->
     <string name="message_no_result">검색 결과가 존재하지 않습니다</string>
     <string name="hint_search_circle">동아리 검색</string>
     <string name="btn_cancel">취소</string>
-    <!--CircleDetail-->
+    
+    <!--Circle Detail-->
     <string name="btn_sign_up_circle">가입신청</string>
     <string name="menu_circle_settings_modify">수정하기</string>
     <string name="menu_circle_settings_manage">관리하기</string>
@@ -54,5 +56,8 @@
     <string name="tab_name_announcement">공지사항</string>
     <string name="tab_name_post">게시글</string>
     <string name="tab_name_activity_photo">활동사진</string>
+    
+    <!--Circle Detail Introduction-->
+    <string name="text_recruitment_date">모집기간</string>
 
 </resources>

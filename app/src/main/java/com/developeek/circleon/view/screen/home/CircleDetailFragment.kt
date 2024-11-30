@@ -1,11 +1,9 @@
 package com.developeek.circleon.view.screen.home
 
-import android.app.Activity
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.navigation.fragment.findNavController
@@ -36,21 +34,19 @@ class CircleDetailFragment : Fragment() {
     ) {
         super.onViewCreated(view, savedInstanceState)
 
-        initView(requireActivity())
+        initView()
         initListener()
 //        arguments?.let {
 //            binding.txtCircleId.text = String.format("circleId: %s", it.getInt(Const.TAG_CIRCLE_ID).toString())
 //        }
     }
 
-    private fun initView(activity: Activity) {
-        initToolbar(activity)
+    private fun initView() {
+        initToolbar()
         initBottomNav()
     }
 
-    private fun initToolbar(activity: Activity) {
-        val color = ContextCompat.getColor(activity, R.color.grey_1)
-        binding.ctbCircleDetail.setContentScrimColor(color)
+    private fun initToolbar() {
         binding.tbCircleDetail.inflateMenu(R.menu.menu_circle_settings)
     }
 
