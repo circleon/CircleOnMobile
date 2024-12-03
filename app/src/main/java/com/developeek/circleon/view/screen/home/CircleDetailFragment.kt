@@ -74,7 +74,7 @@ class CircleDetailFragment : Fragment() {
                             replaceTo(CircleDetailIntroductionFragment())
                         }
                         1 -> {
-                            replaceTo(CircleDetailAnnouncementFragment())
+                            replaceTo(CircleDetailNoticeFragment())
                         }
                         2 -> {
                             replaceTo(CircleDetailPostFragment())
