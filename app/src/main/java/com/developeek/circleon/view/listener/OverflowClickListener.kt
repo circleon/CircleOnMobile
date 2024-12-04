@@ -6,16 +6,13 @@ import android.widget.Toast
 import androidx.appcompat.widget.PopupMenu
 import com.developeek.circleon.R
 
-class OverflowClickListener : View.OnClickListener {
+class OverflowClickListener(
+    private val mContext: Context,
+) : View.OnClickListener {
     private var id: Int = 0
-    private lateinit var mContext: Context
 
-    fun onOverflowSelectedListener(
-        id: Int,
-        context: Context,
-    ) {
+    fun onBind(id: Int) {
         this.id = id
-        mContext = context
     }
 
     // TODO: 아마 나중에 menuitem 클릭 리스너를 외부에서 받아야될듯? 뷰모델 관련 작업때문에
