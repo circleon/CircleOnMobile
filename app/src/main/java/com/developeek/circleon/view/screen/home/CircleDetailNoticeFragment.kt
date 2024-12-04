@@ -28,7 +28,7 @@ class CircleDetailNoticeFragment : Fragment() {
     ) {
         super.onViewCreated(view, savedInstanceState)
 
-        binding.rvCircleNotice.adapter = CircleNoticeAdapter()
+        binding.rvCircleNotice.adapter = CircleNoticeAdapter(requireActivity())
         binding.rvCircleNotice.layoutManager = LinearLayoutManager(requireActivity())
     }
 }

@@ -121,7 +121,6 @@
                 android:id="@+id/tbCircleDetail"
                 android:layout_width="match_parent"
                 android:layout_height="56dp"
-                app:popupTheme="@style/pop_up_menu"
                 app:layout_collapseMode="pin">
 
                 <androidx.appcompat.widget.AppCompatImageView
