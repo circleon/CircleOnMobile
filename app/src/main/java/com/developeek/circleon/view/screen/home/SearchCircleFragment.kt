@@ -24,7 +24,7 @@ import com.developeek.circleon.domain.model.CircleSummaryModels
 import com.developeek.circleon.domain.state.UiState
 import com.developeek.circleon.domain.utils.Const
 import com.developeek.circleon.view.adapter.CircleSearchResultAdapter
-import com.developeek.circleon.view.listener.ItemClickListener
+import com.developeek.circleon.view.listener.ItemListenerInitializer
 import com.developeek.circleon.view.listener.RecyclerViewHideSoftInputListener
 import com.developeek.circleon.view.screen.login.LoginActivity
 import com.developeek.circleon.view.viewmodel.SearchViewModel
@@ -61,8 +61,8 @@ class SearchCircleFragment : Fragment() {
     private fun initView(activity: Activity) {
         binding.rvCircle.adapter =
             CircleSearchResultAdapter(
-                object : ItemClickListener<CircleSummaryModel> {
-                    override fun onItemClicked(item: CircleSummaryModel) {
+                object : ItemListenerInitializer<CircleSummaryModel> {
+                    override fun initialize(item: CircleSummaryModel) {
                         val navOption =
                             NavOptions
                                 .Builder()

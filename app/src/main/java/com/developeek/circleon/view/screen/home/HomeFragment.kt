@@ -22,7 +22,7 @@ import com.developeek.circleon.domain.utils.Const
 import com.developeek.circleon.domain.utils.glide.GlideProvider
 import com.developeek.circleon.view.adapter.CircleAdapter
 import com.developeek.circleon.view.adapter.CircleCategoryAdapter
-import com.developeek.circleon.view.listener.ItemClickListener
+import com.developeek.circleon.view.listener.ItemListenerInitializer
 import com.developeek.circleon.view.listener.RecyclerViewInfiniteScrollListener
 import com.developeek.circleon.view.screen.login.LoginActivity
 import com.developeek.circleon.view.viewmodel.HomeViewModel
@@ -68,8 +68,8 @@ class HomeFragment : Fragment() {
             CircleAdapter(
                 activity,
                 glideProvider,
-                object : ItemClickListener<CircleModel> {
-                    override fun onItemClicked(item: CircleModel) {
+                object : ItemListenerInitializer<CircleModel> {
+                    override fun initialize(item: CircleModel) {
                         findNavController()
                             .navigate(
                                 R.id.action_homeFragment_to_circleDetailFragment,
@@ -144,8 +144,8 @@ class HomeFragment : Fragment() {
             binding.rvCircleCategory.adapter =
                 CircleCategoryAdapter(
                     viewModel,
-                    object : ItemClickListener<Category> {
-                        override fun onItemClicked(item: Category) {
+                    object : ItemListenerInitializer<Category> {
+                        override fun initialize(item: Category) {
                             if (viewModel.selectedCategory.value!!.isSame(item)) {
                                 binding.rvCircle.scrollToPosition(0)
                             } else {

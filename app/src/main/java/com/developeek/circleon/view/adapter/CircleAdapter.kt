@@ -2,6 +2,7 @@ package com.developeek.circleon.view.adapter
 
 import android.app.Activity
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.AsyncListDiffer
 import androidx.recyclerview.widget.DiffUtil
@@ -13,11 +14,12 @@ import com.developeek.circleon.domain.model.CircleModel
 import com.developeek.circleon.domain.model.CircleModels
 import com.developeek.circleon.domain.utils.glide.GlideProvider
 import com.developeek.circleon.view.listener.ItemClickListener
+import com.developeek.circleon.view.listener.ItemListenerInitializer
 
 class CircleAdapter(
     private val activity: Activity,
     private val glideProvider: GlideProvider,
-    private val itemClickListener: ItemClickListener<CircleModel>,
+    private val itemListenerInitializer: ItemListenerInitializer<CircleModel>,
 ) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
     private val diffUtil =
         AsyncListDiffer(
@@ -41,10 +43,11 @@ class CircleAdapter(
 
     inner class CircleAdapterItemViewHolder(
         private val binding: ItemCardCircleBinding,
+        private val itemClickListener: ItemClickListener<CircleModel>,
     ) : RecyclerView.ViewHolder(binding.root) {
         fun bind(position: Int) {
             loadCircle(position)
-            setItemClickListener(position)
+            notifyListenerItemChanged(position)
         }
 
         private fun loadCircle(position: Int) {
@@ -60,10 +63,8 @@ class CircleAdapter(
             } ?: binding.imgCircleThumbnail.setImageResource(R.drawable.logo_main)
         }
 
-        private fun setItemClickListener(position: Int) {
-            binding.clItemCircle.setOnClickListener {
-                itemClickListener.onItemClicked(diffUtil.currentList[position])
-            }
+        private fun notifyListenerItemChanged(position: Int) {
+            itemClickListener.item = diffUtil.currentList[position]
         }
     }
 
@@ -92,7 +93,16 @@ class CircleAdapter(
                 false,
             )
 
-        return CircleAdapterItemViewHolder(binding)
+        val itemClickListener =
+            object : ItemClickListener<CircleModel> {
+                override lateinit var item: CircleModel
+
+                override fun onClick(p0: View?) {
+                    itemListenerInitializer.initialize(item)
+                }
+            }
+        binding.clItemCircle.setOnClickListener(itemClickListener)
+        return CircleAdapterItemViewHolder(binding, itemClickListener)
     }
 
     override fun getItemCount() = diffUtil.currentList.size
