@@ -5,6 +5,7 @@ import com.developeek.circleon.data.repository.CircleRepository
 import com.developeek.circleon.data.source.Result
 import com.developeek.circleon.data.source.remote.retrofit.service.CircleService
 import com.developeek.circleon.domain.enums.Category
+import com.developeek.circleon.domain.model.CircleDetailModel
 import com.developeek.circleon.domain.model.CircleModels
 import com.developeek.circleon.domain.model.CircleSummaryModels
 import kotlinx.coroutines.CoroutineDispatcher
@@ -51,6 +52,17 @@ class CircleRepositoryImpl(
             }
         } catch (e: ServiceException.NoResultException) {
             Result.success(CircleSummaryModels.emptyInstance())
+        } catch (e: IOException) {
+            Result.error(e)
+        }
+    }
+
+    override suspend fun getCircleDetail(circleId: Int): Result<CircleDetailModel> {
+        return try {
+            withContext(dispatcher) {
+                val response = service.getCircleDetail(circleId)
+                Result.success(response.toCircleDetailModel())
+            }
         } catch (e: IOException) {
             Result.error(e)
         }

@@ -12,7 +12,6 @@ import androidx.core.os.bundleOf
 import androidx.core.widget.doOnTextChanged
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.Observer
 import androidx.navigation.NavOptions
 import androidx.navigation.fragment.findNavController
@@ -76,7 +75,10 @@ class SearchCircleFragment : Fragment() {
                         findNavController()
                             .navigate(
                                 R.id.action_searchCircleFragment_to_circleDetailFragment,
-                                bundleOf(Pair(Const.TAG_CIRCLE_ID, item.id)),
+                                bundleOf(
+                                    Pair(Const.TAG_CIRCLE_ID, item.id),
+                                    Pair(Const.TAG_CIRCLE_NAME, item.name),
+                                ),
                                 navOption,
                             )
                     }
@@ -89,11 +91,11 @@ class SearchCircleFragment : Fragment() {
 
     private fun initObserver(activity: Activity) {
         viewModel.state.observe(
-            activity as LifecycleOwner,
+            viewLifecycleOwner,
             stateObserver(activity),
         )
         viewModel.circles.observe(
-            activity as LifecycleOwner,
+            viewLifecycleOwner,
             circlesObserver(),
         )
     }

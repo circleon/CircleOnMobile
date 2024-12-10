@@ -1,14 +1,22 @@
 package com.developeek.circleon.view.screen.home
 
+import android.app.Activity
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
+import androidx.fragment.app.viewModels
+import androidx.lifecycle.Observer
 import androidx.navigation.fragment.findNavController
 import com.developeek.circleon.R
 import com.developeek.circleon.databinding.FragmentCircleDetailBinding
+import com.developeek.circleon.domain.state.UiState
+import com.developeek.circleon.domain.utils.Const
+import com.developeek.circleon.view.viewmodel.CircleDetailViewModel
+import com.developeek.circleon.view.viewmodelimpl.CircleDetailViewModelImpl
+import com.developeek.circleon.view.widget.ErrorToast
 import com.google.android.material.tabs.TabLayout
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -16,6 +24,9 @@ import dagger.hilt.android.AndroidEntryPoint
 class CircleDetailFragment : Fragment() {
     private lateinit var binding: FragmentCircleDetailBinding
     private lateinit var fragmentManager: FragmentManager
+    private val viewModel: CircleDetailViewModel by viewModels<CircleDetailViewModelImpl>()
+    private var circleId: Int = 0
+    private lateinit var circleName: String
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -24,6 +35,12 @@ class CircleDetailFragment : Fragment() {
     ): View {
         binding = FragmentCircleDetailBinding.inflate(layoutInflater)
         fragmentManager = requireActivity().supportFragmentManager
+        arguments?.let {
+            circleId = it.getInt(Const.TAG_CIRCLE_ID)
+            circleName = it.getString(Const.TAG_CIRCLE_NAME) ?: Const.EMPTY_TEXT
+        }
+
+        viewModel.load(circleId)
 
         return binding.root
     }
@@ -35,24 +52,55 @@ class CircleDetailFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         initView()
+        initObserver(requireActivity())
         initListener()
-//        arguments?.let {
-//            binding.txtCircleId.text = String.format("circleId: %s", it.getInt(Const.TAG_CIRCLE_ID).toString())
-//        }
     }
 
     private fun initView() {
         initToolbar()
-        initBottomNav()
+        initTabLayout()
     }
 
     private fun initToolbar() {
+        binding.txtTbCircleName.text = circleName
         binding.tbCircleDetail.inflateMenu(R.menu.menu_circle_settings)
     }
 
-    private fun initBottomNav() {
+    private fun initTabLayout() {
         add(CircleDetailIntroductionFragment())
     }
+
+    private fun initObserver(activity: Activity) {
+        viewModel.state.observe(
+            viewLifecycleOwner,
+            stateObserver(activity),
+        )
+    }
+
+    private fun stateObserver(activity: Activity) =
+        Observer<UiState> {
+            when (it) {
+                UiState.Loading -> {
+                    toggleView(binding.pgbLoading)
+                }
+                UiState.Success -> {
+                    toggleView(binding.rvCircle)
+                    loadCircles()
+                }
+                UiState.RefreshExpiration -> {
+                    sendUserToLoginScreen(activity)
+                    if (ErrorToast.previousFinished()) {
+                        ErrorToast(activity, viewModel.error).show()
+                    }
+                }
+                UiState.Error -> {
+                    toggleView(binding.llServiceError)
+                    if (ErrorToast.previousFinished()) {
+                        ErrorToast(activity, viewModel.error).show()
+                    }
+                }
+            }
+        }
 
     private fun initListener() {
         setBtnBackListener()
@@ -105,4 +153,12 @@ class CircleDetailFragment : Fragment() {
         transaction.replace(binding.flCircleDetail.id, fragment)
         transaction.commit()
     }
+
+    private fun toggleView(view: View) {
+        binding.rvCircle.visibility = visibleWhenTrue(view == binding.rvCircle)
+        binding.pgbLoading.visibility = visibleWhenTrue(view == binding.pgbLoading)
+        binding.llServiceError.visibility = visibleWhenTrue(view == binding.llServiceError)
+    }
+
+    private fun visibleWhenTrue(state: Boolean) = if (state) View.VISIBLE else View.GONE
 }

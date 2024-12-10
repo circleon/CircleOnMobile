@@ -34,14 +34,9 @@ class GlideProvider
                     )
             }
 
-            if (glideUrl == null) {
+            glideUrl?.let {
                 Glide.with(parent)
-                    .load(url)
-                    .placeholder(R.drawable.logo_main)
-                    .into(view)
-            } else {
-                Glide.with(parent)
-                    .load(glideUrl)
+                    .load(it)
                     .error(R.drawable.logo_main)
                     .into(view)
             }

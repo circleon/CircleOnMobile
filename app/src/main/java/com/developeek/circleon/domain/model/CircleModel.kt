@@ -13,7 +13,7 @@ data class CircleModel(
     val thumbnailUrl: String?,
     val category: Category,
     val comment: String,
-    val member: Int,
+    val memberCount: Int,
 ) : Serializable {
     companion object {
         fun emptyInstance() =

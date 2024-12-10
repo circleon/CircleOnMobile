@@ -33,11 +33,14 @@
         <item name="android:textSize">@dimen/text_size_large</item>
         <item name="android:textFontWeight">600</item>
     </style>
+    <style name="pop_up_text" parent="TextAppearance.AppCompat.Widget.PopupMenu.Small">
+        <item name="android:textSize">@dimen/text_size_small</item>
+        <item name="android:textColor">@color/grey_9</item>
+    </style>
     <style name="pop_up_menu" parent="Widget.AppCompat.PopupMenu">
         <item name="android:popupBackground">@drawable/bg_overflow_menu</item>
         <item name="overlapAnchor">false</item>
-        <item name="android:textColor">@color/grey_9</item>
-        <item name="android:textSize">14sp</item>
+        <item name="android:textAppearance">@style/pop_up_text</item>
         <item name="android:layout_width">48dp</item>
     </style>
 </resources>

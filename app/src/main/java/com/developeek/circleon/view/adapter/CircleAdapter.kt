@@ -7,7 +7,6 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.AsyncListDiffer
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
-import com.developeek.circleon.R
 import com.developeek.circleon.databinding.ItemCardCircleBinding
 import com.developeek.circleon.databinding.ItemLoadingBinding
 import com.developeek.circleon.domain.model.CircleModel
@@ -56,11 +55,11 @@ class CircleAdapter(
             binding.txtCircleComment.text = diffUtil.currentList[position].comment
             binding.txtCirclePeopleCount.text =
                 String.format(
-                    MEMBER_COUNT_UNIT, diffUtil.currentList[position].member,
+                    MEMBER_COUNT_UNIT, diffUtil.currentList[position].memberCount,
                 )
             diffUtil.currentList[position].thumbnailUrl?.let {
                 glideProvider.callImage(it, activity, binding.imgCircleThumbnail)
-            } ?: binding.imgCircleThumbnail.setImageResource(R.drawable.logo_main)
+            }
         }
 
         private fun notifyListenerItemChanged(position: Int) {

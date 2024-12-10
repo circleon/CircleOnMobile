@@ -73,7 +73,10 @@ class HomeFragment : Fragment() {
                         findNavController()
                             .navigate(
                                 R.id.action_homeFragment_to_circleDetailFragment,
-                                bundleOf(Pair(Const.TAG_CIRCLE_ID, item.id)),
+                                bundleOf(
+                                    Pair(Const.TAG_CIRCLE_ID, item.id),
+                                    Pair(Const.TAG_CIRCLE_NAME, item.name),
+                                ),
                             )
                     }
                 },
