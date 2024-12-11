@@ -19,6 +19,7 @@ enum class StatusCode(
     NO_AUTHORIZATION(403, "004", "해당 권한이 없습니다"),
     FAIL_LOGIN_NO_MATCH_USER_EMAIL(404, "023", "아이디를 확인해주세요"),
     FAIL_LOGIN_NO_MATCH_USER_PASSWORD(404, "024", "비밀번호를 확인해주세요"),
+    NOT_SIGNED_CIRCLE(404, "042", "가입하지 않은 동아리입니다"),
     FAIL_EMAIL_VALIDATION(409, "021", "중복 이메일이 존재합니다"),
     FAIL_CIRCLE_RESIGN_UNREGISTERED(409, "041", "동아리 탈퇴 실패 - 미가입"),
     OVER_REQUEST_LIMIT(429, "026", "너무 많은 인증 시도가 발생했습니다"),
