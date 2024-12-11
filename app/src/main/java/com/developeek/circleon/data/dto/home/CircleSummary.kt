@@ -1,4 +1,4 @@
-package com.developeek.circleon.data.entity.home
+package com.developeek.circleon.data.dto.home
 
 import com.developeek.circleon.domain.enums.Category
 import com.developeek.circleon.domain.model.CircleSummaryModel

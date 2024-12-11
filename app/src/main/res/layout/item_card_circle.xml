@@ -85,7 +85,7 @@
                 android:src="@drawable/ic_circle_people"/>
 
             <TextView
-                android:id="@+id/txtCirclePeopleCount"
+                android:id="@+id/txtCircleMemberCount"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="@dimen/margin_padding_extremely_small"

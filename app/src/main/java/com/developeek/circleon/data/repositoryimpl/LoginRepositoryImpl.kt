@@ -1,8 +1,8 @@
 package com.developeek.circleon.data.repositoryimpl
 
-import com.developeek.circleon.data.entity.login.EmailAuthentication
-import com.developeek.circleon.data.entity.login.Login
-import com.developeek.circleon.data.entity.login.SignUp
+import com.developeek.circleon.data.dto.login.EmailAuthentication
+import com.developeek.circleon.data.dto.login.Login
+import com.developeek.circleon.data.dto.login.SignUp
 import com.developeek.circleon.data.repository.LoginRepository
 import com.developeek.circleon.data.source.Result
 import com.developeek.circleon.data.source.manager.TokenManager
@@ -60,7 +60,7 @@ class LoginRepositoryImpl(
     override suspend fun requestEmailAuthenticationCode(email: UserEmail): Result<Boolean> {
         return try {
             withContext(dispatcher) {
-                service.requestEmailAuthenticationCode(com.developeek.circleon.data.entity.login.Email(email.get()))
+                service.requestEmailAuthenticationCode(com.developeek.circleon.data.dto.login.Email(email.get()))
                 Result.success(true)
             }
         } catch (e: IOException) {

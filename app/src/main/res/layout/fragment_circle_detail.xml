@@ -74,7 +74,7 @@
                                 android:textColor="@color/grey_9"
                                 android:lineSpacingExtra="2sp"
                                 android:translationY="-0.91sp"
-                                android:text="카테고리"/>
+                                tools:text="카테고리"/>
 
                             <androidx.appcompat.widget.AppCompatTextView
                                 android:layout_width="wrap_content"
@@ -87,14 +87,14 @@
                                 android:text="·"/>
 
                             <androidx.appcompat.widget.AppCompatTextView
-                                android:id="@+id/txtCirclePeopleCount"
+                                android:id="@+id/txtCircleMemberCount"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:textSize="@dimen/text_size_small"
                                 android:textColor="@color/grey_9"
                                 android:lineSpacingExtra="2sp"
                                 android:translationY="-0.91sp"
-                                android:text="멤버 0명"/>
+                                tools:text="멤버 0명"/>
 
                         </LinearLayout>
 
@@ -182,10 +182,55 @@
     </com.google.android.material.appbar.AppBarLayout>
 
     <FrameLayout
-        android:id="@+id/flCircleDetail"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         app:layout_behavior="@string/appbar_scrolling_view_behavior">
+
+        <FrameLayout
+            android:id="@+id/flCircleDetail"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:visibility="gone">
+        </FrameLayout>
+
+        <com.google.android.material.progressindicator.CircularProgressIndicator
+            android:id="@+id/pgbLoading"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:paddingBottom="182dp"
+            android:layout_gravity="center"
+            app:indicatorColor="@color/grey_5"
+            app:trackColor="@color/grey_3"
+            app:trackThickness="1dp"
+            android:indeterminate="true"
+            android:visibility="gone"/>
+
+        <androidx.appcompat.widget.LinearLayoutCompat
+            android:id="@+id/llServiceError"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:paddingBottom="182dp"
+            android:gravity="center"
+            android:orientation="vertical"
+            android:visibility="gone">
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/message_service_error"
+                android:textAppearance="@style/large_bold_text"
+                android:textColor="@color/grey_5"/>
+
+            <androidx.appcompat.widget.AppCompatImageView
+                android:id="@+id/btnRetry"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/margin_padding_small"
+                android:src="@drawable/ic_retry"
+                android:clickable="true"/>
+
+        </androidx.appcompat.widget.LinearLayoutCompat>
+
     </FrameLayout>
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

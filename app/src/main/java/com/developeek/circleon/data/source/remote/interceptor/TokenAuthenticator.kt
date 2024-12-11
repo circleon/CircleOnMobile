@@ -1,6 +1,6 @@
 package com.developeek.circleon.data.source.remote.interceptor
 
-import com.developeek.circleon.data.entity.login.RefreshToken
+import com.developeek.circleon.data.dto.login.RefreshToken
 import com.developeek.circleon.data.exception.ServiceException
 import com.developeek.circleon.data.source.manager.TokenManager
 import com.developeek.circleon.data.source.remote.retrofit.StatusCode

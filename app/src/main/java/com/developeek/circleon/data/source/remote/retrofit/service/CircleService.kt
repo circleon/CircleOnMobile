@@ -1,8 +1,8 @@
 package com.developeek.circleon.data.source.remote.retrofit.service
 
-import com.developeek.circleon.data.entity.home.CircleDetail
-import com.developeek.circleon.data.entity.home.CircleSummaries
-import com.developeek.circleon.data.entity.home.Circles
+import com.developeek.circleon.data.dto.home.CircleDetail
+import com.developeek.circleon.data.dto.home.CircleSummaries
+import com.developeek.circleon.data.dto.home.Circles
 import retrofit2.http.GET
 import retrofit2.http.Path
 import retrofit2.http.Query
@@ -26,7 +26,7 @@ interface CircleService {
     @GET("circles/summary")
     suspend fun getCircleSummaries(): CircleSummaries
 
-    @GET("circle/{id}")
+    @GET("circles/{id}")
     suspend fun getCircleDetail(
         @Path("id") circleId: Int,
     ): CircleDetail

@@ -1,13 +1,20 @@
-package com.developeek.circleon.data.entity.home
+package com.developeek.circleon.data.dto.home
 
 import com.developeek.circleon.BuildConfig
+import com.developeek.circleon.domain.enums.Category
 import com.developeek.circleon.domain.enums.Role
 import com.developeek.circleon.domain.model.CircleDetailModel
 import com.google.gson.annotations.SerializedName
 import java.time.LocalTime
 
 data class CircleDetail(
-    val circle: Circle,
+    @SerializedName("circleId") val id: Int,
+    @SerializedName("circleName") val name: String,
+    val profileImgUrl: String?,
+    val thumbnailUrl: String?,
+    val category: String,
+    @SerializedName("summary") val comment: String,
+    val memberCount: Int,
     val introImgUrl: String?,
     val introduction: String,
     val recruitmentStartDate: LocalTime,
@@ -17,7 +24,13 @@ data class CircleDetail(
 ) {
     fun toCircleDetailModel() =
         CircleDetailModel(
-            circle.toCircleModel(),
+            id,
+            name,
+            imageUrl(profileImgUrl),
+            imageUrl(thumbnailUrl),
+            category(category),
+            comment,
+            memberCount,
             imageUrl(introImgUrl),
             introduction,
             recruitmentStartDate,
@@ -25,6 +38,12 @@ data class CircleDetail(
             memberRole(memberRole),
             memberId(memberId),
         )
+
+    private fun category(codeName: String): Category {
+        val category = Category.findOrNull(codeName)
+
+        return category ?: Category.ETC
+    }
 
     private fun imageUrl(url: String?): String? {
         url ?: return null

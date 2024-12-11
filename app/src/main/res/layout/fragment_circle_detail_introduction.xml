@@ -46,7 +46,7 @@
         <androidx.appcompat.widget.AppCompatImageView
             android:id="@+id/imgCircleIntroduction"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="140dp"
             android:layout_marginTop="@dimen/margin_padding_small"
             android:background="@color/white"
             android:src="@drawable/logo_main"/>

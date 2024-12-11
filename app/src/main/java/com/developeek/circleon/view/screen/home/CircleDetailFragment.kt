@@ -1,6 +1,7 @@
 package com.developeek.circleon.view.screen.home
 
 import android.app.Activity
+import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -14,6 +15,7 @@ import com.developeek.circleon.R
 import com.developeek.circleon.databinding.FragmentCircleDetailBinding
 import com.developeek.circleon.domain.state.UiState
 import com.developeek.circleon.domain.utils.Const
+import com.developeek.circleon.view.screen.login.LoginActivity
 import com.developeek.circleon.view.viewmodel.CircleDetailViewModel
 import com.developeek.circleon.view.viewmodelimpl.CircleDetailViewModelImpl
 import com.developeek.circleon.view.widget.ErrorToast
@@ -57,17 +59,9 @@ class CircleDetailFragment : Fragment() {
     }
 
     private fun initView() {
-        initToolbar()
-        initTabLayout()
-    }
-
-    private fun initToolbar() {
         binding.txtTbCircleName.text = circleName
+        binding.txtCircleName.text = circleName
         binding.tbCircleDetail.inflateMenu(R.menu.menu_circle_settings)
-    }
-
-    private fun initTabLayout() {
-        add(CircleDetailIntroductionFragment())
     }
 
     private fun initObserver(activity: Activity) {
@@ -84,8 +78,9 @@ class CircleDetailFragment : Fragment() {
                     toggleView(binding.pgbLoading)
                 }
                 UiState.Success -> {
-                    toggleView(binding.rvCircle)
-                    loadCircles()
+                    toggleView(binding.flCircleDetail)
+                    add(CircleDetailIntroductionFragment(viewModel.circleDetail))
+                    loadCircleDetail()
                 }
                 UiState.RefreshExpiration -> {
                     sendUserToLoginScreen(activity)
@@ -102,9 +97,21 @@ class CircleDetailFragment : Fragment() {
             }
         }
 
+    private fun loadCircleDetail() {
+        binding.txtCircleCategory.text = viewModel.circleDetail.category.categoryName()
+        binding.txtCircleMemberCount.text = String.format(MEMBER_COUNT_UNIT, viewModel.circleDetail.memberCount)
+    }
+
+    private fun sendUserToLoginScreen(activity: Activity) {
+        val intent = Intent(activity, LoginActivity::class.java)
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)
+        startActivity(intent)
+    }
+
     private fun initListener() {
         setBtnBackListener()
         setTlCircleDetailListener()
+        setBtnRetryListener()
     }
 
     private fun setBtnBackListener() {
@@ -119,7 +126,7 @@ class CircleDetailFragment : Fragment() {
                 override fun onTabSelected(tab: TabLayout.Tab?) {
                     when (tab?.position) {
                         0 -> {
-                            replaceTo(CircleDetailIntroductionFragment())
+                            replaceTo(CircleDetailIntroductionFragment(viewModel.circleDetail))
                         }
                         1 -> {
                             replaceTo(CircleDetailNoticeFragment())
@@ -142,6 +149,12 @@ class CircleDetailFragment : Fragment() {
         )
     }
 
+    private fun setBtnRetryListener() {
+        binding.btnRetry.setOnClickListener {
+            viewModel.load(circleId)
+        }
+    }
+
     private fun add(fragment: Fragment) {
         val transaction = fragmentManager.beginTransaction()
         transaction.add(binding.flCircleDetail.id, fragment)
@@ -155,10 +168,14 @@ class CircleDetailFragment : Fragment() {
     }
 
     private fun toggleView(view: View) {
-        binding.rvCircle.visibility = visibleWhenTrue(view == binding.rvCircle)
+        binding.flCircleDetail.visibility = visibleWhenTrue(view == binding.flCircleDetail)
         binding.pgbLoading.visibility = visibleWhenTrue(view == binding.pgbLoading)
         binding.llServiceError.visibility = visibleWhenTrue(view == binding.llServiceError)
     }
 
     private fun visibleWhenTrue(state: Boolean) = if (state) View.VISIBLE else View.GONE
+
+    companion object {
+        private const val MEMBER_COUNT_UNIT = "멤버 %d명"
+    }
 }
