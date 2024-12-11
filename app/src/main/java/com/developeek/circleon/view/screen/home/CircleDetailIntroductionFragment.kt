@@ -10,6 +10,9 @@ import com.developeek.circleon.databinding.FragmentCircleDetailIntroductionBindi
 import com.developeek.circleon.domain.model.CircleDetailModel
 import com.developeek.circleon.domain.utils.glide.GlideProvider
 import dagger.hilt.android.AndroidEntryPoint
+import java.time.format.DateTimeFormatter
+import java.time.format.TextStyle
+import java.util.Locale
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -47,5 +50,35 @@ class CircleDetailIntroductionFragment(
         } else {
             glideProvider.callImage(circleDetail.introImgUrl, requireActivity(), binding.imgCircleIntroduction)
         }
+        initRecruitmentDate()
+    }
+
+    private fun initRecruitmentDate() {
+        if (circleDetail.recruitmentStartDate == null || circleDetail.recruitmentEndDate == null) {
+            binding.txtRecruitmentDate.text = NO_RECRUITMENT_MESSAGE
+        } else {
+            val start = circleDetail.recruitmentStartDate.format(DateTimeFormatter.ofPattern(RECRUITMENT_DATE_FORMAT))
+            val startDayOfWeek =
+                String.format(
+                    DAY_OF_WEEK_UNIT,
+                    circleDetail.recruitmentStartDate.dayOfWeek
+                        .getDisplayName(TextStyle.SHORT, Locale.KOREAN),
+                )
+            val end = circleDetail.recruitmentEndDate.format(DateTimeFormatter.ofPattern(RECRUITMENT_DATE_FORMAT))
+            val endDayOfWeek =
+                String.format(
+                    DAY_OF_WEEK_UNIT,
+                    circleDetail.recruitmentEndDate.dayOfWeek
+                        .getDisplayName(TextStyle.SHORT, Locale.KOREAN),
+                )
+            binding.txtRecruitmentDate.text = start + startDayOfWeek + RECRUITMENT_DATE_DIVIDER + end + endDayOfWeek
+        }
+    }
+
+    companion object {
+        private const val NO_RECRUITMENT_MESSAGE = "예정 없음"
+        private const val RECRUITMENT_DATE_FORMAT = "yyyy-MM-dd"
+        private const val DAY_OF_WEEK_UNIT = "(%s)"
+        private const val RECRUITMENT_DATE_DIVIDER = " ~ "
     }
 }

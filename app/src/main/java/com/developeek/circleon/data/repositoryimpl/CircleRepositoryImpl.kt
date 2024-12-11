@@ -8,6 +8,7 @@ import com.developeek.circleon.domain.enums.Category
 import com.developeek.circleon.domain.model.CircleDetailModel
 import com.developeek.circleon.domain.model.CircleModels
 import com.developeek.circleon.domain.model.CircleSummaryModels
+import com.developeek.circleon.domain.model.PostModels
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
 import java.io.IOException
@@ -30,9 +31,9 @@ class CircleRepositoryImpl(
                         service.getCircles(page, size, SORT_LATEST, category.codeName())
                     }
                 Result.success(
-                    CircleModels(response.content.map { it.toCircleModel() }).also {
+                    CircleModels(response.content.map { it.toCircleModel() }).apply {
                         if (response.isLastPage()) {
-                            it.setAsLast()
+                            setAsLast()
                         }
                     },
                 )
@@ -68,7 +69,32 @@ class CircleRepositoryImpl(
         }
     }
 
+    override suspend fun getCircleNotices(
+        circleId: Int,
+        page: Int,
+        size: Int,
+    ): Result<PostModels> {
+        return try {
+            withContext(dispatcher) {
+                val response = service.getCirclePosts(circleId, page, size, TYPE_NOTICE)
+                Result.success(
+                    PostModels(response.content.map { it.toPostModel() }).apply {
+                        if (response.isLastPage()) {
+                            setAsLast()
+                        }
+                    },
+                )
+            }
+        } catch (e: ServiceException.NoResultException) {
+            Result.success(PostModels.emptyInstance())
+        } catch (e: IOException) {
+            Result.error(e)
+        }
+    }
+
     companion object {
         private const val SORT_LATEST = "createdAt,desc"
+        private const val TYPE_NOTICE = "NOTICE"
+        private const val TYPE_POST = "POST"
     }
 }

@@ -15,12 +15,14 @@ import com.developeek.circleon.R
 import com.developeek.circleon.databinding.FragmentCircleDetailBinding
 import com.developeek.circleon.domain.state.UiState
 import com.developeek.circleon.domain.utils.Const
+import com.developeek.circleon.domain.utils.glide.GlideProvider
 import com.developeek.circleon.view.screen.login.LoginActivity
 import com.developeek.circleon.view.viewmodel.CircleDetailViewModel
 import com.developeek.circleon.view.viewmodelimpl.CircleDetailViewModelImpl
 import com.developeek.circleon.view.widget.ErrorToast
 import com.google.android.material.tabs.TabLayout
 import dagger.hilt.android.AndroidEntryPoint
+import javax.inject.Inject
 
 @AndroidEntryPoint
 class CircleDetailFragment : Fragment() {
@@ -29,6 +31,9 @@ class CircleDetailFragment : Fragment() {
     private val viewModel: CircleDetailViewModel by viewModels<CircleDetailViewModelImpl>()
     private var circleId: Int = 0
     private lateinit var circleName: String
+
+    @Inject
+    lateinit var glideProvider: GlideProvider
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -42,8 +47,6 @@ class CircleDetailFragment : Fragment() {
             circleName = it.getString(Const.TAG_CIRCLE_NAME) ?: Const.EMPTY_TEXT
         }
 
-        viewModel.load(circleId)
-
         return binding.root
     }
 
@@ -53,6 +56,7 @@ class CircleDetailFragment : Fragment() {
     ) {
         super.onViewCreated(view, savedInstanceState)
 
+        viewModel.load(circleId)
         initView()
         initObserver(requireActivity())
         initListener()
@@ -79,8 +83,7 @@ class CircleDetailFragment : Fragment() {
                 }
                 UiState.Success -> {
                     toggleView(binding.flCircleDetail)
-                    add(CircleDetailIntroductionFragment(viewModel.circleDetail))
-                    loadCircleDetail()
+                    loadCircleDetail(activity)
                 }
                 UiState.RefreshExpiration -> {
                     sendUserToLoginScreen(activity)
@@ -97,7 +100,11 @@ class CircleDetailFragment : Fragment() {
             }
         }
 
-    private fun loadCircleDetail() {
+    private fun loadCircleDetail(activity: Activity) {
+        add(CircleDetailIntroductionFragment(viewModel.circleDetail))
+        viewModel.circleDetail.thumbnailUrl?.let {
+            glideProvider.callImage(it, activity, binding.imgCircleThumbnail)
+        }
         binding.txtCircleCategory.text = viewModel.circleDetail.category.categoryName()
         binding.txtCircleMemberCount.text = String.format(MEMBER_COUNT_UNIT, viewModel.circleDetail.memberCount)
     }

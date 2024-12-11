@@ -2,14 +2,47 @@ package com.developeek.circleon.view.adapter
 
 import android.app.Activity
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
+import androidx.core.view.isVisible
+import androidx.recyclerview.widget.AsyncListDiffer
+import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
+import com.developeek.circleon.R
 import com.developeek.circleon.databinding.ItemCirclePostBinding
+import com.developeek.circleon.databinding.ItemLoadingBinding
+import com.developeek.circleon.domain.model.PostModel
+import com.developeek.circleon.domain.model.PostModels
+import com.developeek.circleon.domain.utils.glide.GlideProvider
+import com.developeek.circleon.view.listener.ItemClickListener
+import com.developeek.circleon.view.listener.ItemListenerInitializer
 import com.developeek.circleon.view.listener.OverflowClickListener
 
 class CircleNoticeAdapter(
     private val activity: Activity,
+    private val glideProvider: GlideProvider,
+    private val itemListenerInitializer: ItemListenerInitializer<PostModel>,
 ) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
+    private val diffUtil =
+        AsyncListDiffer(
+            this,
+            object : DiffUtil.ItemCallback<PostModel>() {
+                override fun areItemsTheSame(
+                    oldItem: PostModel,
+                    newItem: PostModel,
+                ): Boolean {
+                    return oldItem.id == newItem.id
+                }
+
+                override fun areContentsTheSame(
+                    oldItem: PostModel,
+                    newItem: PostModel,
+                ): Boolean {
+                    return oldItem.id == newItem.id
+                }
+            },
+        )
+
     /**
      * CircleNoticeAdapterItemViewHolder
      *
@@ -22,35 +55,101 @@ class CircleNoticeAdapter(
     inner class CircleNoticeAdapterItemViewHolder(
         private val binding: ItemCirclePostBinding,
         private val overflowClickListener: OverflowClickListener,
+        private val itemClickListener: ItemClickListener<PostModel>,
     ) : RecyclerView.ViewHolder(binding.root) {
         fun onBind(position: Int) {
+            loadAuthor(position)
+            loadNotice(position)
             // TODO: post id 로 수정 필요
             overflowClickListener.onBind(0)
+            notifyListenerItemChanged(position)
+        }
+
+        private fun loadAuthor(position: Int) {
+            binding.txtAuthorName.text = diffUtil.currentList[position].author.name
+            diffUtil.currentList[position].author.profileUrl?.let {
+                glideProvider.callImage(it, activity, binding.imgAuthorProfile)
+            } ?: binding.imgAuthorProfile.setImageResource(R.drawable.ic_profile)
+        }
+
+        private fun loadNotice(position: Int) {
+            binding.txtNoticeContent.text = diffUtil.currentList[position].content
+            binding.txtCommentCount.text =
+                String.format(
+                    COMMENT_COUNT_UNIT,
+                    diffUtil.currentList[position].commentCount,
+                )
+            diffUtil.currentList[position].postImgUrl?.let {
+                binding.imgPost.isVisible = true
+                glideProvider.callImage(it, activity, binding.imgPost)
+            } ?: { binding.imgPost.isVisible = false }
+        }
+
+        private fun notifyListenerItemChanged(position: Int) {
+            itemClickListener.item = diffUtil.currentList[position]
         }
     }
+
+    inner class CircleNoticeAdapterLoadingViewHolder(
+        private val binding: ItemLoadingBinding,
+    ) : RecyclerView.ViewHolder(binding.root)
 
     override fun onCreateViewHolder(
         parent: ViewGroup,
         viewType: Int,
     ): RecyclerView.ViewHolder {
+        if (viewType == VIEW_TYPE_LOADING) {
+            val binding =
+                ItemLoadingBinding.inflate(
+                    LayoutInflater.from(parent.context),
+                    parent,
+                    false,
+                )
+
+            return CircleNoticeAdapterLoadingViewHolder(binding)
+        }
+
         val binding =
             ItemCirclePostBinding.inflate(
                 LayoutInflater.from(parent.context),
                 parent,
                 false,
             )
-
         val overflowClickListener = OverflowClickListener(activity)
         binding.btnNoticeOverflow.setOnClickListener(overflowClickListener)
-        return CircleNoticeAdapterItemViewHolder(binding, overflowClickListener)
+        val itemClickListener =
+            object : ItemClickListener<PostModel> {
+                override lateinit var item: PostModel
+
+                override fun onClick(p0: View?) {
+                    itemListenerInitializer.initialize(item)
+                }
+            }
+        return CircleNoticeAdapterItemViewHolder(binding, overflowClickListener, itemClickListener)
     }
 
-    override fun getItemCount() = 10
+    override fun getItemCount() = diffUtil.currentList.size
+
+    override fun getItemViewType(position: Int) =
+        if (diffUtil.currentList[position] == PostModel.emptyInstance()) VIEW_TYPE_LOADING else VIEW_TYPE_ITEM
 
     override fun onBindViewHolder(
         holder: RecyclerView.ViewHolder,
         position: Int,
     ) {
-        (holder as CircleNoticeAdapterItemViewHolder).onBind(position)
+        if (holder is CircleNoticeAdapterItemViewHolder) holder.onBind(position)
+    }
+
+    fun update(
+        models: PostModels,
+        commitCallback: Runnable,
+    ) {
+        diffUtil.submitList(models.get(), commitCallback)
+    }
+
+    companion object {
+        private const val COMMENT_COUNT_UNIT = "%d개"
+        private const val VIEW_TYPE_LOADING = 0
+        private const val VIEW_TYPE_ITEM = 1
     }
 }

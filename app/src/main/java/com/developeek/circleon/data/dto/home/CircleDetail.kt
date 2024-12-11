@@ -1,11 +1,12 @@
 package com.developeek.circleon.data.dto.home
 
-import com.developeek.circleon.BuildConfig
+import android.util.TimeFormatException
 import com.developeek.circleon.domain.enums.Category
 import com.developeek.circleon.domain.enums.Role
 import com.developeek.circleon.domain.model.CircleDetailModel
+import com.developeek.circleon.domain.utils.Utils.circleImageUrl
 import com.google.gson.annotations.SerializedName
-import java.time.LocalTime
+import java.time.LocalDateTime
 
 data class CircleDetail(
     @SerializedName("circleId") val id: Int,
@@ -17,8 +18,8 @@ data class CircleDetail(
     val memberCount: Int,
     val introImgUrl: String?,
     val introduction: String,
-    val recruitmentStartDate: LocalTime,
-    val recruitmentEndDate: LocalTime,
+    val recruitmentStartDate: String?,
+    val recruitmentEndDate: String?,
     @SerializedName("circleRole") val memberRole: String?,
     val memberId: Int?,
 ) {
@@ -26,15 +27,15 @@ data class CircleDetail(
         CircleDetailModel(
             id,
             name,
-            imageUrl(profileImgUrl),
-            imageUrl(thumbnailUrl),
+            circleImageUrl(profileImgUrl),
+            circleImageUrl(thumbnailUrl),
             category(category),
             comment,
             memberCount,
-            imageUrl(introImgUrl),
+            circleImageUrl(introImgUrl),
             introduction,
-            recruitmentStartDate,
-            recruitmentEndDate,
+            localDateTime(recruitmentStartDate),
+            localDateTime(recruitmentEndDate),
             memberRole(memberRole),
             memberId(memberId),
         )
@@ -45,10 +46,14 @@ data class CircleDetail(
         return category ?: Category.ETC
     }
 
-    private fun imageUrl(url: String?): String? {
-        url ?: return null
+    private fun localDateTime(dateTime: String?): LocalDateTime? {
+        dateTime ?: return null
 
-        return BuildConfig.SERVICE_API_URL + IMAGE_PATH + url
+        return try {
+            LocalDateTime.parse(dateTime)
+        } catch (e: TimeFormatException) {
+            null
+        }
     }
 
     private fun memberRole(codeName: String?): Role {
@@ -58,8 +63,4 @@ data class CircleDetail(
     }
 
     private fun memberId(id: Int?) = id ?: 0
-
-    companion object {
-        private const val IMAGE_PATH = "circles/images/"
-    }
 }

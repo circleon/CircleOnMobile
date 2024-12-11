@@ -25,7 +25,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/imgNoticePin"
         app:layout_constraintEnd_toStartOf="@id/btnNoticeOverflow"
-        app:layout_constraintBottom_toTopOf="@id/llLike"
+        app:layout_constraintBottom_toTopOf="@id/llComment"
         app:layout_constrainedWidth="true"
         app:layout_constrainedHeight="true"
         app:layout_constraintHorizontal_bias="0"
@@ -34,6 +34,7 @@
         <androidx.appcompat.widget.LinearLayoutCompat
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginBottom="@dimen/margin_padding_large"
             android:orientation="horizontal"
             android:gravity="center_vertical">
 
@@ -77,11 +78,17 @@
 
         </androidx.appcompat.widget.LinearLayoutCompat>
 
+        <androidx.appcompat.widget.AppCompatImageView
+            android:id="@+id/imgPost"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="@dimen/margin_padding_large"
+            android:background="@color/white"/>
+
         <androidx.appcompat.widget.AppCompatTextView
             android:id="@+id/txtNoticeContent"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/margin_padding_large"
             android:textSize="@dimen/text_size_default"
             android:textColor="@color/grey_9"
             android:lineSpacingExtra="2sp"
@@ -102,30 +109,13 @@
         app:layout_constraintTop_toTopOf="parent" />
 
     <androidx.appcompat.widget.LinearLayoutCompat
-        android:id="@+id/llLike"
+        android:id="@+id/llComment"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
         android:gravity="center"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintBottom_toBottomOf="parent">
-
-        <androidx.appcompat.widget.AppCompatImageView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:src="@drawable/ic_like"/>
-
-        <androidx.appcompat.widget.AppCompatTextView
-            android:id="@+id/txtLikeCount"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="2dp"
-            android:textSize="@dimen/text_size_small"
-            android:textColor="@color/grey_9"
-            android:lineSpacingExtra="2sp"
-            android:translationY="-0.91sp"
-            android:text="5개"
-            tools:text="0개"/>
 
         <androidx.appcompat.widget.AppCompatImageView
             android:layout_width="wrap_content"
@@ -142,7 +132,6 @@
             android:textColor="@color/grey_9"
             android:lineSpacingExtra="2sp"
             android:translationY="-0.91sp"
-            android:text="18개"
             tools:text="0개"/>
 
     </androidx.appcompat.widget.LinearLayoutCompat>
