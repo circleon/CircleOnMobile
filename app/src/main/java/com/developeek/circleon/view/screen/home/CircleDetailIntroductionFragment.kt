@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import com.developeek.circleon.databinding.FragmentCircleDetailIntroductionBinding
 import com.developeek.circleon.domain.model.CircleDetailModel
@@ -41,8 +42,10 @@ class CircleDetailIntroductionFragment(
 
     private fun initView() {
         binding.txtCircleIntroductionContent.text = circleDetail.introduction
-        circleDetail.introImgUrl?.let {
-            glideProvider.callImage(it, requireActivity(), binding.imgCircleIntroduction)
+        if (circleDetail.introImgUrl == null) {
+            binding.imgCircleIntroduction.isVisible = false
+        } else {
+            glideProvider.callImage(circleDetail.introImgUrl, requireActivity(), binding.imgCircleIntroduction)
         }
     }
 }

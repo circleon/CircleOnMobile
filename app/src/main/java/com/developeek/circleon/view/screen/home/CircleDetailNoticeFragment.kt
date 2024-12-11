@@ -8,8 +8,12 @@ import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.developeek.circleon.databinding.FragmentCircleDetailNoticeBinding
 import com.developeek.circleon.view.adapter.CircleNoticeAdapter
+import dagger.hilt.android.AndroidEntryPoint
 
-class CircleDetailNoticeFragment : Fragment() {
+@AndroidEntryPoint
+class CircleDetailNoticeFragment(
+    private val circleId: Int,
+) : Fragment() {
     private lateinit var binding: FragmentCircleDetailNoticeBinding
 
     override fun onCreateView(

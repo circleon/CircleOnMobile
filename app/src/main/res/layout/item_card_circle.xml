@@ -105,7 +105,6 @@
         android:padding="@dimen/margin_padding_default"
         android:background="@drawable/bg_image_rounded_rectangle"
         android:clipToOutline="true"
-        android:src="@drawable/logo_main"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toEndOf="@id/clCircleInfo"/>

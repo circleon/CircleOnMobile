@@ -129,7 +129,7 @@ class CircleDetailFragment : Fragment() {
                             replaceTo(CircleDetailIntroductionFragment(viewModel.circleDetail))
                         }
                         1 -> {
-                            replaceTo(CircleDetailNoticeFragment())
+                            replaceTo(CircleDetailNoticeFragment(viewModel.circleDetail.id))
                         }
                         2 -> {
                             replaceTo(CircleDetailPostFragment())
