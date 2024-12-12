@@ -114,13 +114,13 @@ class HomeFragment : Fragment() {
                     toggleView(binding.rvCircle)
                     loadCircles()
                 }
-                UiState.RefreshExpiration -> {
+                UiState.AuthenticationError -> {
                     sendUserToLoginScreen(activity)
                     if (ErrorToast.previousFinished()) {
                         ErrorToast(activity, viewModel.error).show()
                     }
                 }
-                UiState.Error -> {
+                UiState.ServiceError -> {
                     toggleView(binding.llServiceError)
                     if (ErrorToast.previousFinished()) {
                         ErrorToast(activity, viewModel.error).show()

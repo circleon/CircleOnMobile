@@ -51,10 +51,10 @@ class SearchViewModelImpl
                         uiState.postValue(UiState.Success)
                     } else {
                         error = (result as Error).message()
-                        if (result.isRefreshExpired()) {
-                            uiState.postValue(UiState.RefreshExpiration)
+                        if (result.isAuthenticationError()) {
+                            uiState.postValue(UiState.AuthenticationError)
                         } else {
-                            uiState.postValue(UiState.Error)
+                            uiState.postValue(UiState.ServiceError)
                         }
                     }
                 }
@@ -66,7 +66,7 @@ class SearchViewModelImpl
             if (::circleSummaryModels.isInitialized) {
                 notifySearchResultByKeyword()
             }
-            if (uiState.value is UiState.Error) {
+            if (uiState.value is UiState.ServiceError) {
                 loadCircles()
             }
         }

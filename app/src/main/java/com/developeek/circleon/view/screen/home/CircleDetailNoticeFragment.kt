@@ -76,13 +76,13 @@ class CircleDetailNoticeFragment(
                     toggleView(binding.rvCircleNotice)
                     loadCircleNotices(activity)
                 }
-                UiState.RefreshExpiration -> {
+                UiState.AuthenticationError -> {
                     sendUserToLoginScreen(activity)
                     if (ErrorToast.previousFinished()) {
                         ErrorToast(activity, viewModel.error).show()
                     }
                 }
-                UiState.Error -> {
+                UiState.ServiceError -> {
                     toggleView(binding.llServiceError)
                     if (ErrorToast.previousFinished()) {
                         ErrorToast(activity, viewModel.error).show()

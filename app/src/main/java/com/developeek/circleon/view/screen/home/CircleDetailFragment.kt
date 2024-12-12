@@ -85,13 +85,13 @@ class CircleDetailFragment : Fragment() {
                     toggleView(binding.flCircleDetail)
                     loadCircleDetail(activity)
                 }
-                UiState.RefreshExpiration -> {
+                UiState.AuthenticationError -> {
                     sendUserToLoginScreen(activity)
                     if (ErrorToast.previousFinished()) {
                         ErrorToast(activity, viewModel.error).show()
                     }
                 }
-                UiState.Error -> {
+                UiState.ServiceError -> {
                     toggleView(binding.llServiceError)
                     if (ErrorToast.previousFinished()) {
                         ErrorToast(activity, viewModel.error).show()

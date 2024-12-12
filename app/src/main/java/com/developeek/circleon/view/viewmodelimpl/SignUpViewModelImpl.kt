@@ -63,7 +63,7 @@ class SignUpViewModelImpl
                             validationMessage.postValue(SIGN_UP_COMPLETED)
                         } else {
                             error = (result as Error).message()
-                            uiState.postValue(UiState.Error)
+                            uiState.postValue(UiState.ServiceError)
                         }
                     }
             }
@@ -109,7 +109,7 @@ class SignUpViewModelImpl
                             validationMessage.postValue(EMAIL_CODE_REQUESTED)
                         } else {
                             error = (result as Error).message()
-                            uiState.postValue(UiState.Error)
+                            uiState.postValue(UiState.ServiceError)
                         }
                     }
             }
@@ -152,7 +152,7 @@ class SignUpViewModelImpl
                         } else {
                             emailAuthenticated = false
                             error = (result as Error).message()
-                            uiState.postValue(UiState.Error)
+                            uiState.postValue(UiState.ServiceError)
                         }
                     }
             }

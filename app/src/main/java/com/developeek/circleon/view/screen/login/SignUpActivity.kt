@@ -59,7 +59,7 @@ class SignUpActivity : AppCompatActivity() {
     private fun stateObserver(activity: Activity) =
         Observer<UiState> {
             when (it) {
-                UiState.Error -> {
+                UiState.ServiceError -> {
                     CustomAlertDialog(
                         activity,
                         viewModel.error,

@@ -40,7 +40,7 @@ class LoginActivity : AppCompatActivity() {
         Observer<UiState> {
             when (it) {
                 UiState.Success -> sendUserToHomeScreen(activity)
-                UiState.Error ->
+                UiState.ServiceError ->
                     CustomAlertDialog(
                         activity,
                         viewModel.error,

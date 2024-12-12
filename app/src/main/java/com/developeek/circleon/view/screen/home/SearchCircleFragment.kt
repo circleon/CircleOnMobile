@@ -7,7 +7,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.inputmethod.InputMethodManager
-import androidx.activity.viewModels
 import androidx.core.os.bundleOf
 import androidx.core.widget.doOnTextChanged
 import androidx.fragment.app.Fragment
@@ -109,13 +108,13 @@ class SearchCircleFragment : Fragment() {
                 UiState.Success -> {
                     viewModel.setKeywordAndFind(binding.edtSearchCircle.text.toString())
                 }
-                UiState.RefreshExpiration -> {
+                UiState.AuthenticationError -> {
                     sendUserToLoginScreen(activity)
                     if (ErrorToast.previousFinished()) {
                         ErrorToast(activity, viewModel.error).show()
                     }
                 }
-                UiState.Error -> {
+                UiState.ServiceError -> {
                     toggleView(binding.llServiceError)
                     if (ErrorToast.previousFinished()) {
                         ErrorToast(activity, viewModel.error).show()

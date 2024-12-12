@@ -41,7 +41,7 @@ class LoginViewModelImpl
                             uiState.postValue(UiState.Success)
                         } else {
                             error = (result as Error).message()
-                            uiState.postValue(UiState.Error)
+                            uiState.postValue(UiState.ServiceError)
                         }
                     }
             }
@@ -52,7 +52,7 @@ class LoginViewModelImpl
 
             return if (validation is Invalid) {
                 error = validation.message()
-                uiState.postValue(UiState.Error)
+                uiState.postValue(UiState.ServiceError)
                 false
             } else {
                 true

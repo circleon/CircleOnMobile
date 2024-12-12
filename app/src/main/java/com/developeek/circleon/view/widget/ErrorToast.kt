@@ -2,15 +2,21 @@ package com.developeek.circleon.view.widget
 
 import android.content.Context
 import android.widget.Toast
+import com.developeek.circleon.domain.utils.Const
 
-class ErrorToast(context: Context, message: CharSequence) : Toast(context) {
+class ErrorToast(
+    private val context: Context,
+    private val message: CharSequence,
+) : Toast(context) {
     init {
         super.setText(message)
     }
 
     override fun show() {
-        toastedTime = System.currentTimeMillis() / MILLIS_DIVIDER
-        super.show()
+        if (message != Const.EMPTY_TEXT) {
+            toastedTime = System.currentTimeMillis() / MILLIS_DIVIDER
+            super.show()
+        }
     }
 
     companion object {

@@ -48,10 +48,10 @@ class CircleDetailNoticeViewModelImpl
                         uiState.postValue(UiState.Success)
                     } else {
                         error = (result as Error).message()
-                        if (result.isRefreshExpired()) {
-                            uiState.postValue(UiState.RefreshExpiration)
+                        if (result.isAuthenticationError()) {
+                            uiState.postValue(UiState.AuthenticationError)
                         } else {
-                            uiState.postValue(UiState.Error)
+                            uiState.postValue(UiState.ServiceError)
                         }
                     }
                 }
@@ -81,11 +81,11 @@ class CircleDetailNoticeViewModelImpl
                         currentPage++
                         scrollOverCompleted.postValue(true)
                     } else {
-                        if ((result as Error).isRefreshExpired()) {
-                            uiState.postValue(UiState.RefreshExpiration)
+                        if ((result as Error).isAuthenticationError()) {
+                            uiState.postValue(UiState.AuthenticationError)
                         } else {
                             error = result.message()
-                            uiState.postValue(UiState.Error)
+                            uiState.postValue(UiState.ServiceError)
                         }
                     }
                 }
