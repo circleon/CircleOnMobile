@@ -1,19 +1,20 @@
 package com.developeek.circleon.data.dto.home
 
+import android.util.TimeFormatException
 import com.developeek.circleon.domain.model.AuthorModel
 import com.developeek.circleon.domain.model.PostModel
 import com.developeek.circleon.domain.utils.Utils.circleImageUrl
 import com.developeek.circleon.domain.utils.Utils.postImageUrl
 import com.google.gson.annotations.SerializedName
-import java.time.LocalTime
+import java.time.LocalDateTime
 
 data class Post(
     @SerializedName("postId") val id: Int,
     val isPinned: Boolean,
     val postImgUrl: String?,
     val content: String,
-    val createdAt: LocalTime,
-    val updatedAt: LocalTime,
+    val createdAt: String,
+    val updatedAt: String,
     val commentCount: Int,
     val author: Author,
 ) {
@@ -23,11 +24,18 @@ data class Post(
             isPinned,
             postImageUrl(postImgUrl),
             content,
-            createdAt,
-            updatedAt,
+            localDateTime(createdAt),
+            localDateTime(updatedAt),
             commentCount,
             author.toAuthorModel(),
         )
+
+    private fun localDateTime(dateTime: String) =
+        try {
+            LocalDateTime.parse(dateTime)
+        } catch (e: TimeFormatException) {
+            LocalDateTime.of(0, 0, 0, 0, 0)
+        }
 }
 
 data class Author(

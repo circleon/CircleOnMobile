@@ -1,7 +1,7 @@
 package com.developeek.circleon.domain.model
 
 import com.developeek.circleon.domain.utils.Const
-import java.time.LocalTime
+import java.time.LocalDateTime
 import java.util.EmptyStackException
 import java.util.Stack
 
@@ -10,8 +10,8 @@ data class PostModel(
     val isPinned: Boolean,
     val postImgUrl: String?,
     val content: String,
-    val createdAt: LocalTime,
-    val updatedAt: LocalTime,
+    val createdAt: LocalDateTime,
+    val updatedAt: LocalDateTime,
     val commentCount: Int,
     val author: AuthorModel,
 ) {
@@ -22,8 +22,8 @@ data class PostModel(
                 false,
                 null,
                 Const.EMPTY_TEXT,
-                LocalTime.of(0, 0),
-                LocalTime.of(0, 0),
+                LocalDateTime.of(1, 1, 1, 1, 1),
+                LocalDateTime.of(1, 1, 1, 1, 1),
                 0,
                 AuthorModel.emptyInstance(),
             )

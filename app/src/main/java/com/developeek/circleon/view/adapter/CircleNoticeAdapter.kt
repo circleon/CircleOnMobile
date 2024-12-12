@@ -17,6 +17,7 @@ import com.developeek.circleon.domain.utils.glide.GlideProvider
 import com.developeek.circleon.view.listener.ItemClickListener
 import com.developeek.circleon.view.listener.ItemListenerInitializer
 import com.developeek.circleon.view.listener.OverflowClickListener
+import java.time.format.DateTimeFormatter
 
 class CircleNoticeAdapter(
     private val activity: Activity,
@@ -67,6 +68,10 @@ class CircleNoticeAdapter(
 
         private fun loadAuthor(position: Int) {
             binding.txtAuthorName.text = diffUtil.currentList[position].author.name
+            binding.txtCreated.text =
+                diffUtil.currentList[position].createdAt.format(
+                    DateTimeFormatter.ofPattern(CREATED_DATE_FORMAT),
+                )
             diffUtil.currentList[position].author.profileUrl?.let {
                 glideProvider.callImage(it, activity, binding.imgAuthorProfile)
             } ?: binding.imgAuthorProfile.setImageResource(R.drawable.ic_profile)
@@ -79,10 +84,13 @@ class CircleNoticeAdapter(
                     COMMENT_COUNT_UNIT,
                     diffUtil.currentList[position].commentCount,
                 )
-            diffUtil.currentList[position].postImgUrl?.let {
+            val postImgUrl = diffUtil.currentList[position].postImgUrl
+            if (postImgUrl != null) {
                 binding.imgPost.isVisible = true
-                glideProvider.callImage(it, activity, binding.imgPost)
-            } ?: { binding.imgPost.isVisible = false }
+                glideProvider.callImage(postImgUrl, activity, binding.imgPost)
+            } else {
+                binding.imgPost.isVisible = false
+            }
         }
 
         private fun notifyListenerItemChanged(position: Int) {
@@ -149,6 +157,7 @@ class CircleNoticeAdapter(
 
     companion object {
         private const val COMMENT_COUNT_UNIT = "%d개"
+        private const val CREATED_DATE_FORMAT = "M월 d일 hh:mm"
         private const val VIEW_TYPE_LOADING = 0
         private const val VIEW_TYPE_ITEM = 1
     }
