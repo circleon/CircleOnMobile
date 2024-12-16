@@ -73,8 +73,12 @@ class CircleDetailNoticeFragment(
                     toggleView(binding.pgbLoading)
                 }
                 UiState.Success -> {
-                    toggleView(binding.rvCircleNotice)
-                    loadCircleNotices(activity)
+                    if (viewModel.notices.isEmpty()) {
+                        toggleView(binding.txtNoNotice)
+                    } else {
+                        toggleView(binding.rvCircleNotice)
+                        loadCircleNotices(activity)
+                    }
                 }
                 UiState.AuthenticationError -> {
                     sendUserToLoginScreen(activity)
@@ -155,6 +159,7 @@ class CircleDetailNoticeFragment(
     private fun toggleView(view: View) {
         binding.rvCircleNotice.visibility = visibleWhenTrue(view == binding.rvCircleNotice)
         binding.pgbLoading.visibility = visibleWhenTrue(view == binding.pgbLoading)
+        binding.txtNoNotice.visibility = visibleWhenTrue(view == binding.txtNoNotice)
         binding.llServiceError.visibility = visibleWhenTrue(view == binding.llServiceError)
     }
 

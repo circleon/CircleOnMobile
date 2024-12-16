@@ -18,7 +18,7 @@
         android:visibility="gone"/>
 
     <androidx.appcompat.widget.LinearLayoutCompat
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginBottom="@dimen/margin_padding_large"
         android:orientation="vertical"
@@ -82,7 +82,9 @@
             android:id="@+id/imgPost"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
             android:layout_marginBottom="@dimen/margin_padding_large"
+            android:adjustViewBounds="true"
             android:background="@color/white"/>
 
         <androidx.appcompat.widget.AppCompatTextView

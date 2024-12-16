@@ -61,6 +61,8 @@ data class PostModels(private val data: List<PostModel>) {
 
     fun size() = models.size
 
+    fun isEmpty() = models.isEmpty()
+
     fun add(model: PostModel): PostModels {
         val tmp = Stack<PostModel>()
 
