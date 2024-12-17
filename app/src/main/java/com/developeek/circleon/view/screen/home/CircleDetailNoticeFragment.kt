@@ -14,7 +14,7 @@ import com.developeek.circleon.databinding.FragmentCircleDetailNoticeBinding
 import com.developeek.circleon.domain.model.PostModel
 import com.developeek.circleon.domain.state.UiState
 import com.developeek.circleon.domain.utils.glide.GlideProvider
-import com.developeek.circleon.view.adapter.CircleNoticeAdapter
+import com.developeek.circleon.view.adapter.CirclePostAdapter
 import com.developeek.circleon.view.listener.ItemListenerInitializer
 import com.developeek.circleon.view.listener.RecyclerViewInfiniteScrollListener
 import com.developeek.circleon.view.screen.login.LoginActivity
@@ -97,7 +97,7 @@ class CircleDetailNoticeFragment(
 
     private fun loadCircleNotices(activity: Activity) {
         binding.rvCircleNotice.adapter =
-            CircleNoticeAdapter(
+            CirclePostAdapter(
                 activity,
                 glideProvider,
                 object : ItemListenerInitializer<PostModel> {
@@ -108,7 +108,7 @@ class CircleDetailNoticeFragment(
             )
         binding.rvCircleNotice.layoutManager = LinearLayoutManager(requireActivity())
         binding.rvCircleNotice.adapter?.let {
-            (it as CircleNoticeAdapter).update(viewModel.notices) { binding.rvCircleNotice.scrollToPosition(0) }
+            (it as CirclePostAdapter).update(viewModel.notices) { binding.rvCircleNotice.scrollToPosition(0) }
         }
     }
 
@@ -124,7 +124,7 @@ class CircleDetailNoticeFragment(
                 binding.rvCircleNotice.removeOnScrollListener(viewModel.scrollListener)
                 binding.rvCircleNotice.addOnScrollListener(viewModel.scrollListener)
                 binding.rvCircleNotice.adapter?.let {
-                    (it as CircleNoticeAdapter).update(viewModel.notices) {}
+                    (it as CirclePostAdapter).update(viewModel.notices) {}
                 }
             }
         }
@@ -145,7 +145,7 @@ class CircleDetailNoticeFragment(
 
     private fun addScrollLoadingItemAndLoad() {
         binding.rvCircleNotice.adapter?.let {
-            (it as CircleNoticeAdapter).update(viewModel.notices.add(PostModel.emptyInstance())) {}
+            (it as CirclePostAdapter).update(viewModel.notices.add(PostModel.emptyInstance())) {}
         }
         viewModel.scrollOver(circleId)
     }

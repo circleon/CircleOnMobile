@@ -19,7 +19,7 @@ import com.developeek.circleon.view.listener.ItemListenerInitializer
 import com.developeek.circleon.view.listener.OverflowClickListener
 import java.time.format.DateTimeFormatter
 
-class CircleNoticeAdapter(
+class CirclePostAdapter(
     private val activity: Activity,
     private val glideProvider: GlideProvider,
     private val itemListenerInitializer: ItemListenerInitializer<PostModel>,
@@ -45,7 +45,7 @@ class CircleNoticeAdapter(
         )
 
     /**
-     * CircleNoticeAdapterItemViewHolder
+     * CirclePostAdapterItemViewHolder
      *
      * 아이템 리스너의 경우 뷰홀더를 만들 때 설정을 하는 것이 올바르지만, 리스너에서 아이템 각각의 데이터를 필요로하는 경우
      * onCreateViewHolder 가 아닌 onBind 에서 리스너가 계속 재설정되는 비효율적 방식을 개선하기 위해
@@ -53,14 +53,14 @@ class CircleNoticeAdapter(
      * 1. 커스텀 리스너 객체를 뷰홀더에서 저장
      * 2. 커스텀 리스너는 아이템 id 값만 갱신하는 별도 기능을 통해 onBind 에서 아이템 내용이 바뀌었을 때 식별값만 갱신
      */
-    inner class CircleNoticeAdapterItemViewHolder(
+    inner class CirclePostAdapterItemViewHolder(
         private val binding: ItemCirclePostBinding,
         private val overflowClickListener: OverflowClickListener,
         private val itemClickListener: ItemClickListener<PostModel>,
     ) : RecyclerView.ViewHolder(binding.root) {
         fun onBind(position: Int) {
             loadAuthor(position)
-            loadNotice(position)
+            loadPost(position)
             // TODO: post id 로 수정 필요
             overflowClickListener.onBind(0)
             notifyListenerItemChanged(position)
@@ -74,10 +74,10 @@ class CircleNoticeAdapter(
                 )
             diffUtil.currentList[position].author.profileUrl?.let {
                 glideProvider.callImage(it, activity, binding.imgAuthorProfile)
-            } ?: binding.imgAuthorProfile.setImageResource(R.drawable.ic_profile)
+            } ?: binding.imgAuthorProfile.setImageResource(R.drawable.ic_author_placeholder)
         }
 
-        private fun loadNotice(position: Int) {
+        private fun loadPost(position: Int) {
             binding.txtNoticeContent.text = diffUtil.currentList[position].content
             binding.txtCommentCount.text =
                 String.format(
@@ -98,7 +98,7 @@ class CircleNoticeAdapter(
         }
     }
 
-    inner class CircleNoticeAdapterLoadingViewHolder(
+    inner class CirclePostAdapterLoadingViewHolder(
         private val binding: ItemLoadingBinding,
     ) : RecyclerView.ViewHolder(binding.root)
 
@@ -114,7 +114,7 @@ class CircleNoticeAdapter(
                     false,
                 )
 
-            return CircleNoticeAdapterLoadingViewHolder(binding)
+            return CirclePostAdapterLoadingViewHolder(binding)
         }
 
         val binding =
@@ -133,7 +133,7 @@ class CircleNoticeAdapter(
                     itemListenerInitializer.initialize(item)
                 }
             }
-        return CircleNoticeAdapterItemViewHolder(binding, overflowClickListener, itemClickListener)
+        return CirclePostAdapterItemViewHolder(binding, overflowClickListener, itemClickListener)
     }
 
     override fun getItemCount() = diffUtil.currentList.size
@@ -145,7 +145,7 @@ class CircleNoticeAdapter(
         holder: RecyclerView.ViewHolder,
         position: Int,
     ) {
-        if (holder is CircleNoticeAdapterItemViewHolder) holder.onBind(position)
+        if (holder is CirclePostAdapterItemViewHolder) holder.onBind(position)
     }
 
     fun update(
