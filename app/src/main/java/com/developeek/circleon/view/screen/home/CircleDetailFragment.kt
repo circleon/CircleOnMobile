@@ -22,18 +22,36 @@ import com.developeek.circleon.view.viewmodelimpl.CircleDetailViewModelImpl
 import com.developeek.circleon.view.widget.ErrorToast
 import com.google.android.material.tabs.TabLayout
 import dagger.hilt.android.AndroidEntryPoint
+import dagger.hilt.android.lifecycle.withCreationCallback
 import javax.inject.Inject
 
 @AndroidEntryPoint
 class CircleDetailFragment : Fragment() {
     private lateinit var binding: FragmentCircleDetailBinding
     private lateinit var fragmentManager: FragmentManager
-    private val viewModel: CircleDetailViewModel by viewModels<CircleDetailViewModelImpl>()
+    private val viewModel: CircleDetailViewModel by viewModels<CircleDetailViewModelImpl>(
+        extrasProducer = {
+            defaultViewModelCreationExtras
+                .withCreationCallback<CircleDetailViewModelImpl.CircleDetailViewModelFactory> {
+                    it.create(circleId)
+                }
+        },
+    )
     private var circleId: Int = 0
     private lateinit var circleName: String
 
     @Inject
     lateinit var glideProvider: GlideProvider
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+
+        // 런타임에서 뷰모델에 circleId 를 전달하기 위해 onCreate 에서 초기화
+        arguments?.let {
+            circleId = it.getInt(Const.TAG_CIRCLE_ID)
+            circleName = it.getString(Const.TAG_CIRCLE_NAME) ?: Const.EMPTY_TEXT
+        }
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -42,10 +60,6 @@ class CircleDetailFragment : Fragment() {
     ): View {
         binding = FragmentCircleDetailBinding.inflate(layoutInflater)
         fragmentManager = requireActivity().supportFragmentManager
-        arguments?.let {
-            circleId = it.getInt(Const.TAG_CIRCLE_ID)
-            circleName = it.getString(Const.TAG_CIRCLE_NAME) ?: Const.EMPTY_TEXT
-        }
 
         return binding.root
     }
@@ -56,7 +70,6 @@ class CircleDetailFragment : Fragment() {
     ) {
         super.onViewCreated(view, savedInstanceState)
 
-        viewModel.load(circleId)
         initView()
         initObserver(requireActivity())
         initListener()
@@ -101,12 +114,33 @@ class CircleDetailFragment : Fragment() {
         }
 
     private fun loadCircleDetail(activity: Activity) {
-        add(CircleDetailIntroductionFragment(viewModel.circleDetail))
+        restoreTabPosition()
         viewModel.circleDetail.thumbnailUrl?.let {
             glideProvider.callImage(it, activity, binding.imgCircleThumbnail)
         }
         binding.txtCircleCategory.text = viewModel.circleDetail.category.categoryName()
         binding.txtCircleMemberCount.text = String.format(MEMBER_COUNT_UNIT, viewModel.circleDetail.memberCount)
+    }
+
+    private fun restoreTabPosition() {
+        binding.tlCircleDetail.getTabAt(viewModel.currentTabPosition)?.select()
+        when (viewModel.currentTabPosition) {
+            0 -> {
+                add(CircleDetailIntroductionFragment(viewModel.circleDetail))
+            }
+            1 -> {
+                add(CircleDetailNoticeFragment(viewModel.circleDetail.id))
+            }
+            2 -> {
+                add(CircleDetailPostFragment())
+            }
+            3 -> {
+                add(CircleDetailActivityPhotoFragment())
+            }
+            else -> {
+                add(CircleDetailIntroductionFragment(viewModel.circleDetail))
+            }
+        }
     }
 
     private fun sendUserToLoginScreen(activity: Activity) {
@@ -131,7 +165,8 @@ class CircleDetailFragment : Fragment() {
         binding.tlCircleDetail.addOnTabSelectedListener(
             object : TabLayout.OnTabSelectedListener {
                 override fun onTabSelected(tab: TabLayout.Tab?) {
-                    when (tab?.position) {
+                    viewModel.setTabPosition(tab?.position!!)
+                    when (tab.position) {
                         0 -> {
                             replaceTo(CircleDetailIntroductionFragment(viewModel.circleDetail))
                         }
@@ -158,7 +193,7 @@ class CircleDetailFragment : Fragment() {
 
     private fun setBtnRetryListener() {
         binding.btnRetry.setOnClickListener {
-            viewModel.load(circleId)
+            viewModel.load()
         }
     }
 

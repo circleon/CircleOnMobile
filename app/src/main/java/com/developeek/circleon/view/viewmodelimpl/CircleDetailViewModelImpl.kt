@@ -10,15 +10,24 @@ import com.developeek.circleon.data.source.Success
 import com.developeek.circleon.domain.model.CircleDetailModel
 import com.developeek.circleon.domain.state.UiState
 import com.developeek.circleon.view.viewmodel.CircleDetailViewModel
+import dagger.assisted.Assisted
+import dagger.assisted.AssistedFactory
+import dagger.assisted.AssistedInject
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
-import javax.inject.Inject
 
-@HiltViewModel
+@HiltViewModel(assistedFactory = CircleDetailViewModelImpl.CircleDetailViewModelFactory::class)
 class CircleDetailViewModelImpl
-    @Inject
-    constructor(private val repository: CircleRepository) : CircleDetailViewModel, ViewModel() {
+    @AssistedInject
+    constructor(
+        @Assisted private val circleId: Int,
+        private val repository: CircleRepository,
+    ) : CircleDetailViewModel, ViewModel() {
+        @AssistedFactory interface CircleDetailViewModelFactory {
+            fun create(circleId: Int): CircleDetailViewModelImpl
+        }
+
         override val state: LiveData<UiState>
             get() = uiState
         private val uiState = MutableLiveData<UiState>()
@@ -26,9 +35,17 @@ class CircleDetailViewModelImpl
         override lateinit var circleDetail: CircleDetailModel
         private var circleDetailLoadingJob: Job? = null
 
+        override val currentTabPosition: Int
+            get() = tabPosition
+        private var tabPosition = 0
+
         override lateinit var error: String
 
-        override fun load(circleId: Int) {
+        init {
+            load()
+        }
+
+        override fun load() {
             circleDetailLoadingJob?.cancel()
             uiState.postValue(UiState.Loading)
 
@@ -48,5 +65,9 @@ class CircleDetailViewModelImpl
                         }
                     }
                 }
+        }
+
+        override fun setTabPosition(position: Int) {
+            tabPosition = position
         }
     }
