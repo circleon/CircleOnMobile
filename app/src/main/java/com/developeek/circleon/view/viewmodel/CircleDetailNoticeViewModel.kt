@@ -12,7 +12,7 @@ interface CircleDetailNoticeViewModel {
     val scrollListener: RecyclerView.OnScrollListener
     val error: String
 
-    fun load(circleId: Int)
+    fun load()
 
     fun scrollOver(circleId: Int)
 }

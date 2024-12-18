@@ -1,5 +1,6 @@
 package com.developeek.circleon.view.viewmodelimpl
 
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -11,15 +12,25 @@ import com.developeek.circleon.domain.model.PostModels
 import com.developeek.circleon.domain.state.UiState
 import com.developeek.circleon.view.listener.RecyclerViewInfiniteScrollListener
 import com.developeek.circleon.view.viewmodel.CircleDetailNoticeViewModel
+import dagger.assisted.Assisted
+import dagger.assisted.AssistedFactory
+import dagger.assisted.AssistedInject
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
-import javax.inject.Inject
 
-@HiltViewModel
+@HiltViewModel(assistedFactory = CircleDetailNoticeViewModelImpl.CircleDetailNoticeViewModelFactory::class)
 class CircleDetailNoticeViewModelImpl
-    @Inject
-    constructor(private val repository: CircleRepository) : CircleDetailNoticeViewModel, ViewModel() {
+    @AssistedInject
+    constructor(
+        @Assisted private val circleId: Int,
+        private val repository: CircleRepository,
+    ) : CircleDetailNoticeViewModel, ViewModel() {
+        @AssistedFactory
+        interface CircleDetailNoticeViewModelFactory {
+            fun create(circleId: Int): CircleDetailNoticeViewModelImpl
+        }
+
         override val state: LiveData<UiState>
             get() = uiState
         private val uiState = MutableLiveData<UiState>()
@@ -36,7 +47,12 @@ class CircleDetailNoticeViewModelImpl
 
         override lateinit var error: String
 
-        override fun load(circleId: Int) {
+        init {
+            load()
+            Log.d("viewModel", "init")
+        }
+
+        override fun load() {
             initNoticeLoading()
 
             noticeLoadingJob =

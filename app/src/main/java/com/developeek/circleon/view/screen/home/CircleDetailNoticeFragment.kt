@@ -22,6 +22,7 @@ import com.developeek.circleon.view.viewmodel.CircleDetailNoticeViewModel
 import com.developeek.circleon.view.viewmodelimpl.CircleDetailNoticeViewModelImpl
 import com.developeek.circleon.view.widget.ErrorToast
 import dagger.hilt.android.AndroidEntryPoint
+import dagger.hilt.android.lifecycle.withCreationCallback
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -29,7 +30,14 @@ class CircleDetailNoticeFragment(
     private val circleId: Int,
 ) : Fragment() {
     private lateinit var binding: FragmentCircleDetailNoticeBinding
-    private val viewModel: CircleDetailNoticeViewModel by viewModels<CircleDetailNoticeViewModelImpl>()
+    private val viewModel: CircleDetailNoticeViewModel by viewModels<CircleDetailNoticeViewModelImpl>(
+        extrasProducer = {
+            defaultViewModelCreationExtras
+                .withCreationCallback<CircleDetailNoticeViewModelImpl.CircleDetailNoticeViewModelFactory> {
+                    it.create(circleId)
+                }
+        },
+    )
 
     @Inject
     lateinit var glideProvider: GlideProvider
@@ -50,7 +58,6 @@ class CircleDetailNoticeFragment(
     ) {
         super.onViewCreated(view, savedInstanceState)
 
-        viewModel.load(circleId)
         initObserver(requireActivity())
         initListener()
     }
@@ -152,7 +159,7 @@ class CircleDetailNoticeFragment(
 
     private fun setBtnRetryListener() {
         binding.btnRetry.setOnClickListener {
-            viewModel.load(circleId)
+            viewModel.load()
         }
     }
 

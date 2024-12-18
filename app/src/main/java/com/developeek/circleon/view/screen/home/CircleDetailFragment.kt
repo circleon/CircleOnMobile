@@ -114,33 +114,12 @@ class CircleDetailFragment : Fragment() {
         }
 
     private fun loadCircleDetail(activity: Activity) {
-        restoreTabPosition()
+        binding.tlCircleDetail.getTabAt(viewModel.currentTabPosition)?.select() // 탭 복원
         viewModel.circleDetail.thumbnailUrl?.let {
             glideProvider.callImage(it, activity, binding.imgCircleThumbnail)
         }
         binding.txtCircleCategory.text = viewModel.circleDetail.category.categoryName()
         binding.txtCircleMemberCount.text = String.format(MEMBER_COUNT_UNIT, viewModel.circleDetail.memberCount)
-    }
-
-    private fun restoreTabPosition() {
-        binding.tlCircleDetail.getTabAt(viewModel.currentTabPosition)?.select()
-        when (viewModel.currentTabPosition) {
-            0 -> {
-                add(CircleDetailIntroductionFragment(viewModel.circleDetail))
-            }
-            1 -> {
-                add(CircleDetailNoticeFragment(viewModel.circleDetail.id))
-            }
-            2 -> {
-                add(CircleDetailPostFragment())
-            }
-            3 -> {
-                add(CircleDetailActivityPhotoFragment())
-            }
-            else -> {
-                add(CircleDetailIntroductionFragment(viewModel.circleDetail))
-            }
-        }
     }
 
     private fun sendUserToLoginScreen(activity: Activity) {
@@ -166,29 +145,34 @@ class CircleDetailFragment : Fragment() {
             object : TabLayout.OnTabSelectedListener {
                 override fun onTabSelected(tab: TabLayout.Tab?) {
                     viewModel.setTabPosition(tab?.position!!)
-                    when (tab.position) {
-                        0 -> {
-                            replaceTo(CircleDetailIntroductionFragment(viewModel.circleDetail))
-                        }
-                        1 -> {
-                            replaceTo(CircleDetailNoticeFragment(viewModel.circleDetail.id))
-                        }
-                        2 -> {
-                            replaceTo(CircleDetailPostFragment())
-                        }
-                        3 -> {
-                            replaceTo(CircleDetailActivityPhotoFragment())
-                        }
-                    }
+                    replaceByTabPosition()
                 }
 
                 override fun onTabUnselected(p0: TabLayout.Tab?) {
                 }
 
                 override fun onTabReselected(p0: TabLayout.Tab?) {
+                    replaceByTabPosition()
                 }
             },
         )
+    }
+
+    private fun replaceByTabPosition() {
+        when (viewModel.currentTabPosition) {
+            0 -> {
+                replaceTo(CircleDetailIntroductionFragment(viewModel.circleDetail))
+            }
+            1 -> {
+                replaceTo(CircleDetailNoticeFragment(viewModel.circleDetail.id))
+            }
+            2 -> {
+                replaceTo(CircleDetailPostFragment())
+            }
+            3 -> {
+                replaceTo(CircleDetailActivityPhotoFragment())
+            }
+        }
     }
 
     private fun setBtnRetryListener() {
@@ -205,8 +189,10 @@ class CircleDetailFragment : Fragment() {
 
     private fun replaceTo(fragment: Fragment) {
         val transaction = fragmentManager.beginTransaction()
-        transaction.replace(binding.flCircleDetail.id, fragment)
-        transaction.commit()
+        transaction
+            .add(binding.flCircleDetail, fragment, null)
+            .addToBackStack(null)
+            .commit()
     }
 
     private fun toggleView(view: View) {
