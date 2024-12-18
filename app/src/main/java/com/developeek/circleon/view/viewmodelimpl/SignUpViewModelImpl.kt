@@ -41,13 +41,12 @@ class SignUpViewModelImpl
 
         private var name: UserName? = null
         private var email: UserEmail? = null
+        private lateinit var requestEmailCodeJob: Job
         private var emailCode: String? = null
+        private lateinit var emailCodeExpirationTimerJob: Job
         private var password: Password? = null
         private var passwordMatched: Boolean = false
         private var emailAuthenticated: Boolean = false
-
-        private lateinit var requestEmailCodeJob: Job
-        private lateinit var emailCodeExpirationTimerJob: Job
         private lateinit var emailAuthenticationJob: Job
         private lateinit var signUpJob: Job
 

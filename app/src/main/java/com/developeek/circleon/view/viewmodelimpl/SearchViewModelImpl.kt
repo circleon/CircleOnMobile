@@ -28,10 +28,9 @@ class SearchViewModelImpl
             get() = searchResult
         private val searchResult = MutableLiveData<CircleSummaryModels>()
         private lateinit var circleSummaryModels: CircleSummaryModels
+        private var circleLoadingJob: Job? = null
 
         private var keyword = Const.EMPTY_TEXT
-
-        private var loadCircleJob: Job? = null
 
         override lateinit var error: String
 
@@ -40,9 +39,9 @@ class SearchViewModelImpl
         }
 
         override fun loadCircles() {
-            loadCircleJob?.cancel()
+            circleLoadingJob?.cancel()
 
-            loadCircleJob =
+            circleLoadingJob =
                 viewModelScope.launch {
                     val result = repository.getCircleSummaries()
 

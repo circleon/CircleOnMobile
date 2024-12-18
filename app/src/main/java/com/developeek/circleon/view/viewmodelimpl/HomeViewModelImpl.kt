@@ -33,14 +33,14 @@ class HomeViewModelImpl
         override val circles: CircleModels
             get() = circleModels
         private var circleModels = CircleModels.emptyInstance()
+        private var circleLoadingJob: Job? = null
         private var currentPage = DEFAULT_PAGE
+
         override val scrollOver: LiveData<Boolean>
             get() = scrollOverCompleted
         private var scrollOverCompleted = MutableLiveData<Boolean>()
-        override val scrollListener = RecyclerViewInfiniteScrollListener()
-
-        private var circleLoadingJob: Job? = null
         private var scrollOverLoadingJob: Job? = null
+        override val scrollListener = RecyclerViewInfiniteScrollListener()
 
         override lateinit var error: String
 

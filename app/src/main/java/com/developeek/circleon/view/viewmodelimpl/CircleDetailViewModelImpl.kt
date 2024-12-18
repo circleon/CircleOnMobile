@@ -24,7 +24,6 @@ class CircleDetailViewModelImpl
         private val uiState = MutableLiveData<UiState>()
 
         override lateinit var circleDetail: CircleDetailModel
-
         private var circleDetailLoadingJob: Job? = null
 
         override lateinit var error: String
