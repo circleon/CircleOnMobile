@@ -8,6 +8,7 @@ import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import com.developeek.circleon.databinding.FragmentCircleDetailIntroductionBinding
 import com.developeek.circleon.domain.model.CircleDetailModel
+import com.developeek.circleon.domain.utils.Const
 import com.developeek.circleon.domain.utils.glide.GlideProvider
 import dagger.hilt.android.AndroidEntryPoint
 import java.time.format.DateTimeFormatter
@@ -16,13 +17,20 @@ import java.util.Locale
 import javax.inject.Inject
 
 @AndroidEntryPoint
-class CircleDetailIntroductionFragment(
-    private val circleDetail: CircleDetailModel,
-) : Fragment() {
+class CircleDetailIntroductionFragment : Fragment() {
     private lateinit var binding: FragmentCircleDetailIntroductionBinding
+    private lateinit var circleDetail: CircleDetailModel
 
     @Inject
     lateinit var glideProvider: GlideProvider
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+
+        arguments?.let {
+            circleDetail = it.getSerializable(Const.TAG_CIRCLE_DETAIL) as CircleDetailModel
+        }
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -48,7 +56,7 @@ class CircleDetailIntroductionFragment(
         if (circleDetail.introImgUrl == null) {
             binding.imgCircleIntroduction.isVisible = false
         } else {
-            glideProvider.callImage(circleDetail.introImgUrl, requireActivity(), binding.imgCircleIntroduction)
+            glideProvider.callImage(circleDetail.introImgUrl!!, requireActivity(), binding.imgCircleIntroduction)
         }
         initRecruitmentDate()
     }
@@ -57,18 +65,18 @@ class CircleDetailIntroductionFragment(
         if (circleDetail.recruitmentStartDate == null || circleDetail.recruitmentEndDate == null) {
             binding.txtRecruitmentDate.text = NO_RECRUITMENT_MESSAGE
         } else {
-            val start = circleDetail.recruitmentStartDate.format(DateTimeFormatter.ofPattern(RECRUITMENT_DATE_FORMAT))
+            val start = circleDetail.recruitmentStartDate!!.format(DateTimeFormatter.ofPattern(RECRUITMENT_DATE_FORMAT))
             val startDayOfWeek =
                 String.format(
                     DAY_OF_WEEK_UNIT,
-                    circleDetail.recruitmentStartDate.dayOfWeek
+                    circleDetail.recruitmentStartDate!!.dayOfWeek
                         .getDisplayName(TextStyle.SHORT, Locale.KOREAN),
                 )
-            val end = circleDetail.recruitmentEndDate.format(DateTimeFormatter.ofPattern(RECRUITMENT_DATE_FORMAT))
+            val end = circleDetail.recruitmentEndDate!!.format(DateTimeFormatter.ofPattern(RECRUITMENT_DATE_FORMAT))
             val endDayOfWeek =
                 String.format(
                     DAY_OF_WEEK_UNIT,
-                    circleDetail.recruitmentEndDate.dayOfWeek
+                    circleDetail.recruitmentEndDate!!.dayOfWeek
                         .getDisplayName(TextStyle.SHORT, Locale.KOREAN),
                 )
             binding.txtRecruitmentDate.text = start + startDayOfWeek + RECRUITMENT_DATE_DIVIDER + end + endDayOfWeek

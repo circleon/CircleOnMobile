@@ -13,6 +13,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.developeek.circleon.databinding.FragmentCircleDetailNoticeBinding
 import com.developeek.circleon.domain.model.PostModel
 import com.developeek.circleon.domain.state.UiState
+import com.developeek.circleon.domain.utils.Const
 import com.developeek.circleon.domain.utils.glide.GlideProvider
 import com.developeek.circleon.view.adapter.CirclePostAdapter
 import com.developeek.circleon.view.listener.ItemListenerInitializer
@@ -26,11 +27,13 @@ import dagger.hilt.android.lifecycle.withCreationCallback
 import javax.inject.Inject
 
 @AndroidEntryPoint
-class CircleDetailNoticeFragment(
-    private val circleId: Int,
-) : Fragment() {
+class CircleDetailNoticeFragment : Fragment() {
     private lateinit var binding: FragmentCircleDetailNoticeBinding
+    private var circleId = 0
     private val viewModel: CircleDetailNoticeViewModel by viewModels<CircleDetailNoticeViewModelImpl>(
+        ownerProducer = {
+            requireParentFragment()
+        },
         extrasProducer = {
             defaultViewModelCreationExtras
                 .withCreationCallback<CircleDetailNoticeViewModelImpl.CircleDetailNoticeViewModelFactory> {
@@ -41,6 +44,14 @@ class CircleDetailNoticeFragment(
 
     @Inject
     lateinit var glideProvider: GlideProvider
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+
+        arguments?.let {
+            circleId = it.getInt(Const.TAG_CIRCLE_ID)
+        }
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater,

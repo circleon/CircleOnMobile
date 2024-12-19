@@ -59,7 +59,8 @@ class CircleDetailFragment : Fragment() {
         savedInstanceState: Bundle?,
     ): View {
         binding = FragmentCircleDetailBinding.inflate(layoutInflater)
-        fragmentManager = requireActivity().supportFragmentManager
+        // 하위 fragment 에서 circleDetailFragment 를 부모로 인식하기 위해 childFragmentManager 사용
+        fragmentManager = childFragmentManager
 
         return binding.root
     }
@@ -159,12 +160,22 @@ class CircleDetailFragment : Fragment() {
     }
 
     private fun replaceByTabPosition() {
+        val bundle: Bundle?
+
         when (viewModel.currentTabPosition) {
             0 -> {
-                replaceTo(CircleDetailIntroductionFragment(viewModel.circleDetail))
+                bundle =
+                    Bundle().apply {
+                        putSerializable(Const.TAG_CIRCLE_DETAIL, viewModel.circleDetail)
+                    }
+                replaceTo(CircleDetailIntroductionFragment(), bundle)
             }
             1 -> {
-                replaceTo(CircleDetailNoticeFragment(viewModel.circleDetail.id))
+                bundle =
+                    Bundle().apply {
+                        putInt(Const.TAG_CIRCLE_ID, viewModel.circleDetail.id)
+                    }
+                replaceTo(CircleDetailNoticeFragment(), bundle)
             }
             2 -> {
                 replaceTo(CircleDetailPostFragment())
@@ -175,24 +186,24 @@ class CircleDetailFragment : Fragment() {
         }
     }
 
+    private fun replaceTo(
+        fragment: Fragment,
+        bundle: Bundle? = null,
+    ) {
+        bundle?.let {
+            fragment.arguments = bundle
+        }
+
+        val transaction = fragmentManager.beginTransaction()
+        transaction
+            .replace(binding.flCircleDetail.id, fragment)
+            .commit()
+    }
+
     private fun setBtnRetryListener() {
         binding.btnRetry.setOnClickListener {
             viewModel.load()
         }
-    }
-
-    private fun add(fragment: Fragment) {
-        val transaction = fragmentManager.beginTransaction()
-        transaction.add(binding.flCircleDetail.id, fragment)
-        transaction.commit()
-    }
-
-    private fun replaceTo(fragment: Fragment) {
-        val transaction = fragmentManager.beginTransaction()
-        transaction
-            .add(binding.flCircleDetail, fragment, null)
-            .addToBackStack(null)
-            .commit()
     }
 
     private fun toggleView(view: View) {
