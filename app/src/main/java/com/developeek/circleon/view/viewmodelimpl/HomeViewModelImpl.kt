@@ -1,5 +1,6 @@
 package com.developeek.circleon.view.viewmodelimpl
 
+import android.os.Parcelable
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -41,6 +42,9 @@ class HomeViewModelImpl
         private var scrollOverCompleted = MutableLiveData<Boolean>()
         private var scrollOverLoadingJob: Job? = null
         override val scrollListener = RecyclerViewInfiniteScrollListener()
+        override val currentScrollState: Parcelable?
+            get() = scrollState
+        private var scrollState: Parcelable? = null
 
         override lateinit var error: String
 
@@ -102,6 +106,10 @@ class HomeViewModelImpl
                         }
                     }
                 }
+        }
+
+        override fun saveScrollState(scrollState: Parcelable?) {
+            this.scrollState = scrollState
         }
 
         override fun restore() {

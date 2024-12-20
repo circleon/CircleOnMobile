@@ -128,6 +128,7 @@ class CircleDetailNoticeFragment : Fragment() {
         binding.rvCircleNotice.adapter?.let {
             (it as CirclePostAdapter).update(viewModel.notices) { binding.rvCircleNotice.scrollToPosition(0) }
         }
+        binding.rvCircleNotice.layoutManager?.onRestoreInstanceState(viewModel.currentScrollState)
     }
 
     private fun sendUserToLoginScreen(activity: Activity) {
@@ -172,6 +173,12 @@ class CircleDetailNoticeFragment : Fragment() {
         binding.btnRetry.setOnClickListener {
             viewModel.load()
         }
+    }
+
+    override fun onStop() {
+        super.onStop()
+
+        viewModel.saveScrollState(binding.rvCircleNotice.layoutManager?.onSaveInstanceState())
     }
 
     private fun toggleView(view: View) {

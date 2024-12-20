@@ -212,6 +212,12 @@ class HomeFragment : Fragment() {
         findNavController().navigate(R.id.action_homeFragment_to_searchCircleFragment)
     }
 
+    override fun onStop() {
+        super.onStop()
+
+        viewModel.saveScrollState(binding.rvCircle.layoutManager?.onSaveInstanceState())
+    }
+
     private fun toggleView(view: View) {
         binding.rvCircle.visibility = visibleWhenTrue(view == binding.rvCircle)
         binding.pgbLoading.visibility = visibleWhenTrue(view == binding.pgbLoading)

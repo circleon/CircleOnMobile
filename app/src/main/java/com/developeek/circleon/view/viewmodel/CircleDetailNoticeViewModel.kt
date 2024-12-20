@@ -1,5 +1,6 @@
 package com.developeek.circleon.view.viewmodel
 
+import android.os.Parcelable
 import androidx.lifecycle.LiveData
 import androidx.recyclerview.widget.RecyclerView
 import com.developeek.circleon.domain.model.PostModels
@@ -10,9 +11,15 @@ interface CircleDetailNoticeViewModel {
     val notices: PostModels
     val scrollOver: LiveData<Boolean>
     val scrollListener: RecyclerView.OnScrollListener
+    val currentScrollState: Parcelable?
+    val currentTopOrNot: Boolean
     val error: String
 
     fun load()
 
     fun scrollOver(circleId: Int)
+
+    fun saveScrollState(scrollState: Parcelable?)
+
+    fun setTopOrNot(isTop: Boolean)
 }

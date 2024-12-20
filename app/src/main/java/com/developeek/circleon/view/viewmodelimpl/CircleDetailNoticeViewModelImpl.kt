@@ -1,6 +1,6 @@
 package com.developeek.circleon.view.viewmodelimpl
 
-import android.util.Log
+import android.os.Parcelable
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -44,12 +44,17 @@ class CircleDetailNoticeViewModelImpl
         private var scrollOverCompleted = MutableLiveData<Boolean>()
         private var scrollOverLoadingJob: Job? = null
         override val scrollListener = RecyclerViewInfiniteScrollListener()
+        override val currentScrollState: Parcelable?
+            get() = scrollState
+        private var scrollState: Parcelable? = null
+        override val currentTopOrNot: Boolean
+            get() = isTop
+        private var isTop = true
 
         override lateinit var error: String
 
         init {
             load()
-            Log.d("viewModel", "init")
         }
 
         override fun load() {
@@ -105,6 +110,14 @@ class CircleDetailNoticeViewModelImpl
                         }
                     }
                 }
+        }
+
+        override fun saveScrollState(scrollState: Parcelable?) {
+            this.scrollState = scrollState
+        }
+
+        override fun setTopOrNot(isTop: Boolean) {
+            this.isTop = isTop
         }
 
         companion object {
