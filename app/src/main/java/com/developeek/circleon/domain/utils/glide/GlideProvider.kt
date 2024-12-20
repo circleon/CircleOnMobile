@@ -3,9 +3,9 @@ package com.developeek.circleon.domain.utils.glide
 import android.content.Context
 import android.widget.ImageView
 import com.bumptech.glide.Glide
+import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.bumptech.glide.load.model.GlideUrl
 import com.bumptech.glide.load.model.LazyHeaders
-import com.developeek.circleon.R
 import com.developeek.circleon.data.source.manager.TokenManager
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -37,7 +37,7 @@ class GlideProvider
             glideUrl?.let {
                 Glide.with(parent)
                     .load(it)
-                    .error(R.drawable.logo_main)
+                    .diskCacheStrategy(DiskCacheStrategy.ALL)
                     .into(view)
             }
         }
