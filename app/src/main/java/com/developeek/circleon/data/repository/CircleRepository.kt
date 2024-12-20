@@ -18,6 +18,12 @@ interface CircleRepository {
 
     suspend fun getCircleDetail(circleId: Int): Result<CircleDetailModel>
 
+    suspend fun getCirclePosts(
+        circleId: Int,
+        page: Int,
+        size: Int,
+    ): Result<PostModels>
+
     suspend fun getCircleNotices(
         circleId: Int,
         page: Int,

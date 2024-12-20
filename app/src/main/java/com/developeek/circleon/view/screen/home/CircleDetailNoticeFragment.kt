@@ -19,7 +19,7 @@ import com.developeek.circleon.view.adapter.CirclePostAdapter
 import com.developeek.circleon.view.listener.ItemListenerInitializer
 import com.developeek.circleon.view.listener.RecyclerViewInfiniteScrollListener
 import com.developeek.circleon.view.screen.login.LoginActivity
-import com.developeek.circleon.view.viewmodel.CircleDetailNoticeViewModel
+import com.developeek.circleon.view.viewmodel.CircleDetailPostViewModel
 import com.developeek.circleon.view.viewmodelimpl.CircleDetailNoticeViewModelImpl
 import com.developeek.circleon.view.widget.ErrorToast
 import dagger.hilt.android.AndroidEntryPoint
@@ -30,7 +30,7 @@ import javax.inject.Inject
 class CircleDetailNoticeFragment : Fragment() {
     private lateinit var binding: FragmentCircleDetailNoticeBinding
     private var circleId = 0
-    private val viewModel: CircleDetailNoticeViewModel by viewModels<CircleDetailNoticeViewModelImpl>(
+    private val viewModel: CircleDetailPostViewModel by viewModels<CircleDetailNoticeViewModelImpl>(
         ownerProducer = {
             requireParentFragment()
         },
@@ -91,7 +91,7 @@ class CircleDetailNoticeFragment : Fragment() {
                     toggleView(binding.pgbLoading)
                 }
                 UiState.Success -> {
-                    if (viewModel.notices.isEmpty()) {
+                    if (viewModel.posts.isEmpty()) {
                         toggleView(binding.txtNoNotice)
                     } else {
                         toggleView(binding.rvCircleNotice)
@@ -126,7 +126,7 @@ class CircleDetailNoticeFragment : Fragment() {
             )
         binding.rvCircleNotice.layoutManager = LinearLayoutManager(requireActivity())
         binding.rvCircleNotice.adapter?.let {
-            (it as CirclePostAdapter).update(viewModel.notices) { binding.rvCircleNotice.scrollToPosition(0) }
+            (it as CirclePostAdapter).update(viewModel.posts) { binding.rvCircleNotice.scrollToPosition(0) }
         }
         binding.rvCircleNotice.layoutManager?.onRestoreInstanceState(viewModel.currentScrollState)
     }
@@ -143,7 +143,7 @@ class CircleDetailNoticeFragment : Fragment() {
                 binding.rvCircleNotice.removeOnScrollListener(viewModel.scrollListener)
                 binding.rvCircleNotice.addOnScrollListener(viewModel.scrollListener)
                 binding.rvCircleNotice.adapter?.let {
-                    (it as CirclePostAdapter).update(viewModel.notices) {}
+                    (it as CirclePostAdapter).update(viewModel.posts) {}
                 }
             }
         }
@@ -156,7 +156,7 @@ class CircleDetailNoticeFragment : Fragment() {
     private fun setRvCircleNoticeListener() {
         binding.rvCircleNotice.addOnScrollListener(viewModel.scrollListener)
         (viewModel.scrollListener as RecyclerViewInfiniteScrollListener).setScrollEndListener {
-            if (!viewModel.notices.isLastPage()) {
+            if (!viewModel.posts.isLastPage()) {
                 addScrollLoadingItemAndLoad()
             }
         }
@@ -164,7 +164,7 @@ class CircleDetailNoticeFragment : Fragment() {
 
     private fun addScrollLoadingItemAndLoad() {
         binding.rvCircleNotice.adapter?.let {
-            (it as CirclePostAdapter).update(viewModel.notices.add(PostModel.emptyInstance())) {}
+            (it as CirclePostAdapter).update(viewModel.posts.add(PostModel.emptyInstance())) {}
         }
         viewModel.scrollOver(circleId)
     }

@@ -19,16 +19,16 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 
-@HiltViewModel(assistedFactory = CircleDetailNoticeViewModelImpl.CircleDetailNoticeViewModelFactory::class)
-class CircleDetailNoticeViewModelImpl
+@HiltViewModel(assistedFactory = CircleDetailPostViewModelImpl.CircleDetailPostViewModelFactory::class)
+class CircleDetailPostViewModelImpl
     @AssistedInject
     constructor(
         @Assisted private val circleId: Int,
         private val repository: CircleRepository,
     ) : CircleDetailPostViewModel, ViewModel() {
         @AssistedFactory
-        interface CircleDetailNoticeViewModelFactory {
-            fun create(circleId: Int): CircleDetailNoticeViewModelImpl
+        interface CircleDetailPostViewModelFactory {
+            fun create(circleId: Int): CircleDetailPostViewModelImpl
         }
 
         override val state: LiveData<UiState>
@@ -36,7 +36,7 @@ class CircleDetailNoticeViewModelImpl
         private val uiState = MutableLiveData<UiState>()
 
         override lateinit var posts: PostModels
-        private var noticeLoadingJob: Job? = null
+        private var postLoadingJob: Job? = null
         private var currentPage = DEFAULT_PAGE
 
         override val scrollOver: LiveData<Boolean>
@@ -58,11 +58,11 @@ class CircleDetailNoticeViewModelImpl
         }
 
         override fun load() {
-            initNoticeLoading()
+            initPostLoading()
 
-            noticeLoadingJob =
+            postLoadingJob =
                 viewModelScope.launch {
-                    val result = repository.getCircleNotices(circleId, currentPage, SIZE_BY_PAGE)
+                    val result = repository.getCirclePosts(circleId, currentPage, SIZE_BY_PAGE)
 
                     if (result is Success) {
                         posts = result.data
@@ -78,8 +78,8 @@ class CircleDetailNoticeViewModelImpl
                 }
         }
 
-        private fun initNoticeLoading() {
-            noticeLoadingJob?.cancel()
+        private fun initPostLoading() {
+            postLoadingJob?.cancel()
             scrollOverLoadingJob?.cancel()
             uiState.postValue(UiState.Loading)
             currentPage = DEFAULT_PAGE
@@ -90,7 +90,7 @@ class CircleDetailNoticeViewModelImpl
 
             scrollOverLoadingJob =
                 viewModelScope.launch {
-                    val result = repository.getCircleNotices(circleId, currentPage + 1, SIZE_BY_PAGE)
+                    val result = repository.getCirclePosts(circleId, currentPage + 1, SIZE_BY_PAGE)
 
                     if (result is Success) {
                         posts =

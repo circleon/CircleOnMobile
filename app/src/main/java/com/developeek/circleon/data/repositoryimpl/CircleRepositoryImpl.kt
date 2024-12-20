@@ -69,6 +69,29 @@ class CircleRepositoryImpl(
         }
     }
 
+    override suspend fun getCirclePosts(
+        circleId: Int,
+        page: Int,
+        size: Int,
+    ): Result<PostModels> {
+        return try {
+            withContext(dispatcher) {
+                val response = service.getCirclePosts(circleId, page, size, TYPE_POST)
+                Result.success(
+                    PostModels(response.content.map { it.toPostModel() }).apply {
+                        if (response.isLastPage()) {
+                            setAsLast()
+                        }
+                    },
+                )
+            }
+        } catch (e: ServiceException.NoResultException) {
+            Result.success(PostModels.emptyInstance())
+        } catch (e: IOException) {
+            Result.error(e)
+        }
+    }
+
     override suspend fun getCircleNotices(
         circleId: Int,
         page: Int,
@@ -94,7 +117,7 @@ class CircleRepositoryImpl(
 
     companion object {
         private const val SORT_LATEST = "createdAt,desc"
-        private const val TYPE_NOTICE = "NOTICE"
         private const val TYPE_POST = "POST"
+        private const val TYPE_NOTICE = "NOTICE"
     }
 }

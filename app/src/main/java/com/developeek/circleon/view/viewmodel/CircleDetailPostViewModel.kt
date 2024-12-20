@@ -6,9 +6,9 @@ import androidx.recyclerview.widget.RecyclerView
 import com.developeek.circleon.domain.model.PostModels
 import com.developeek.circleon.domain.state.UiState
 
-interface CircleDetailNoticeViewModel {
+interface CircleDetailPostViewModel {
     val state: LiveData<UiState>
-    val notices: PostModels
+    val posts: PostModels
     val scrollOver: LiveData<Boolean>
     val scrollListener: RecyclerView.OnScrollListener
     val currentScrollState: Parcelable?

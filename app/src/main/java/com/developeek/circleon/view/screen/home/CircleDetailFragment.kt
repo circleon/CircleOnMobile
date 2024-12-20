@@ -11,6 +11,7 @@ import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import androidx.navigation.fragment.findNavController
+import androidx.recyclerview.widget.RecyclerView
 import com.developeek.circleon.R
 import com.developeek.circleon.databinding.FragmentCircleDetailBinding
 import com.developeek.circleon.domain.state.UiState
@@ -153,32 +154,27 @@ class CircleDetailFragment : Fragment() {
                 }
 
                 override fun onTabReselected(p0: TabLayout.Tab?) {
-                    replaceByTabPosition()
+                    refreshByTabPosition()
                 }
             },
         )
     }
 
     private fun replaceByTabPosition() {
-        val bundle: Bundle?
+        val bundle = Bundle()
 
         when (viewModel.currentTabPosition) {
             0 -> {
-                bundle =
-                    Bundle().apply {
-                        putSerializable(Const.TAG_CIRCLE_DETAIL, viewModel.circleDetail)
-                    }
+                bundle.putSerializable(Const.TAG_CIRCLE_DETAIL, viewModel.circleDetail)
                 replaceTo(CircleDetailIntroductionFragment(), bundle)
             }
             1 -> {
-                bundle =
-                    Bundle().apply {
-                        putInt(Const.TAG_CIRCLE_ID, viewModel.circleDetail.id)
-                    }
+                bundle.putInt(Const.TAG_CIRCLE_ID, viewModel.circleDetail.id)
                 replaceTo(CircleDetailNoticeFragment(), bundle)
             }
             2 -> {
-                replaceTo(CircleDetailPostFragment())
+                bundle.putInt(Const.TAG_CIRCLE_ID, viewModel.circleDetail.id)
+                replaceTo(CircleDetailPostFragment(), bundle)
             }
             3 -> {
                 replaceTo(CircleDetailActivityPhotoFragment())
@@ -198,6 +194,32 @@ class CircleDetailFragment : Fragment() {
         transaction
             .replace(binding.flCircleDetail.id, fragment)
             .commit()
+    }
+
+    private fun refreshByTabPosition() {
+        val fragment: Fragment
+        val bundle = Bundle()
+
+        when (viewModel.currentTabPosition) {
+            0 -> {
+                bundle.putSerializable(Const.TAG_CIRCLE_DETAIL, viewModel.circleDetail)
+                replaceTo(CircleDetailIntroductionFragment(), bundle)
+            }
+            1 -> {
+                fragment = childFragmentManager.findFragmentById(R.id.flCircleDetail) as CircleDetailNoticeFragment
+
+                if (fragment.isAdded) {
+                    fragment.view?.findViewById<RecyclerView>(R.id.rvCircleNotice)?.scrollToPosition(0)
+                }
+            }
+            2 -> {
+                fragment = childFragmentManager.findFragmentById(R.id.flCircleDetail) as CircleDetailPostFragment
+
+                if (fragment.isAdded) {
+                    fragment.view?.findViewById<RecyclerView>(R.id.rvCirclePost)?.scrollToPosition(0)
+                }
+            }
+        }
     }
 
     private fun setBtnRetryListener() {
