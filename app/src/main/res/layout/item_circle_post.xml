@@ -5,7 +5,7 @@
     android:layout_height="wrap_content"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_marginTop="@dimen/margin_padding_small"
-    android:padding="@dimen/margin_padding_large"
+    android:paddingVertical="@dimen/margin_padding_large"
     android:background="@color/white">
 
     <androidx.appcompat.widget.AppCompatImageView
@@ -13,18 +13,22 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:src="@drawable/ic_pin"
+        android:paddingStart="@dimen/margin_padding_large"
+        android:layout_marginBottom="@dimen/margin_padding_small"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toTopOf="@id/llContent"
         android:visibility="gone"/>
 
     <androidx.appcompat.widget.LinearLayoutCompat
+        android:id="@+id/llContent"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginBottom="@dimen/margin_padding_large"
         android:orientation="vertical"
         app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toBottomOf="@id/imgNoticePin"
-        app:layout_constraintEnd_toStartOf="@id/btnNoticeOverflow"
         app:layout_constraintBottom_toTopOf="@id/llComment"
         app:layout_constrainedWidth="true"
         app:layout_constrainedHeight="true"
@@ -34,6 +38,7 @@
         <androidx.appcompat.widget.LinearLayoutCompat
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:paddingStart="@dimen/margin_padding_large"
             android:layout_marginBottom="@dimen/margin_padding_large"
             android:orientation="horizontal"
             android:gravity="center_vertical">
@@ -44,7 +49,8 @@
                 android:layout_height="40dp"
                 android:background="@drawable/bg_image_circle"
                 android:scaleType="fitXY"
-                android:adjustViewBounds="true"/>
+                android:adjustViewBounds="true"
+                android:clipToOutline="true"/>
 
             <androidx.appcompat.widget.LinearLayoutCompat
                 android:layout_width="wrap_content"
@@ -92,6 +98,7 @@
             android:id="@+id/txtNoticeContent"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:paddingHorizontal="@dimen/margin_padding_large"
             android:textSize="@dimen/text_size_default"
             android:textColor="@color/grey_9"
             android:lineSpacingExtra="2sp"
@@ -106,6 +113,7 @@
         android:id="@+id/btnNoticeOverflow"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:paddingEnd="@dimen/margin_padding_large"
         android:src="@drawable/ic_overflow"
         android:clickable="true"
         app:layout_constraintEnd_toEndOf="parent"
@@ -115,6 +123,7 @@
         android:id="@+id/llComment"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:paddingEnd="@dimen/margin_padding_large"
         android:orientation="horizontal"
         android:gravity="center"
         app:layout_constraintEnd_toEndOf="parent"

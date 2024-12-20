@@ -43,7 +43,8 @@
                         android:layout_height="48dp"
                         android:background="@drawable/bg_image_rounded_rectangle"
                         android:src="@drawable/logo_main"
-                        android:clipToOutline="true"/>
+                        android:scaleType="fitXY"
+                        android:adjustViewBounds="true"/>
 
                     <androidx.appcompat.widget.LinearLayoutCompat
                         android:layout_width="wrap_content"
