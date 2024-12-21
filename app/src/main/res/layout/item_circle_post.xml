@@ -48,8 +48,6 @@
                 android:layout_width="40dp"
                 android:layout_height="40dp"
                 android:background="@drawable/bg_image_circle"
-                android:scaleType="fitXY"
-                android:adjustViewBounds="true"
                 android:clipToOutline="true"/>
 
             <androidx.appcompat.widget.LinearLayoutCompat
@@ -88,7 +86,6 @@
             android:id="@+id/imgPost"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_gravity="center_horizontal"
             android:layout_marginBottom="@dimen/margin_padding_large"
             android:adjustViewBounds="true"
             android:background="@color/white"

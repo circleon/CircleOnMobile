@@ -62,7 +62,7 @@ class CircleAdapter(
             // 싱글 라인인 경우에는 작동
             diffUtil.currentList[position].thumbnailUrl?.let {
                 glideProvider.callImage(it, activity, binding.imgCircleThumbnail)
-            } ?: binding.imgCircleThumbnail.setImageResource(R.drawable.logo_main)
+            } ?: binding.imgCircleThumbnail.setImageResource(R.drawable.ic_circle_thumbnail_placeholder)
         }
 
         private fun notifyListenerItemChanged(position: Int) {

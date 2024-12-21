@@ -8,8 +8,7 @@
     android:padding="@dimen/margin_padding_large"
     android:layout_marginBottom="@dimen/margin_padding_small"
     android:background="@drawable/bg_card"
-    android:clickable="true"
-    android:elevation="1dp">
+    android:clickable="true">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/clCircleInfo"
@@ -102,10 +101,9 @@
         android:layout_width="64dp"
         android:layout_height="64dp"
         android:layout_marginStart="40dp"
-        android:padding="@dimen/margin_padding_default"
         android:background="@drawable/bg_image_rounded_rectangle"
         android:scaleType="fitXY"
-        android:adjustViewBounds="true"
+        android:clipToOutline="true"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toEndOf="@id/clCircleInfo"/>

@@ -34,6 +34,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:orientation="horizontal"
+                    android:gravity="center_vertical"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintBottom_toBottomOf="parent">
 
@@ -41,10 +42,11 @@
                         android:id="@+id/imgCircleThumbnail"
                         android:layout_width="48dp"
                         android:layout_height="48dp"
-                        android:background="@drawable/bg_image_rounded_rectangle"
-                        android:src="@drawable/logo_main"
+                        android:background="@drawable/bg_image_circle"
+                        android:src="@drawable/ic_circle_thumbnail_placeholder"
                         android:scaleType="fitXY"
-                        android:adjustViewBounds="true"/>
+                        android:adjustViewBounds="true"
+                        android:clipToOutline="true"/>
 
                     <androidx.appcompat.widget.LinearLayoutCompat
                         android:layout_width="wrap_content"
