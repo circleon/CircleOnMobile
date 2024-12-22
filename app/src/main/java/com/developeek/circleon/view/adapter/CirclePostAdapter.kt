@@ -4,12 +4,12 @@ import android.app.Activity
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.core.view.isVisible
 import androidx.recyclerview.widget.AsyncListDiffer
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.developeek.circleon.R
 import com.developeek.circleon.databinding.ItemCirclePostBinding
+import com.developeek.circleon.databinding.ItemCirclePostWithImageBinding
 import com.developeek.circleon.databinding.ItemLoadingBinding
 import com.developeek.circleon.domain.model.PostModel
 import com.developeek.circleon.domain.model.PostModels
@@ -84,12 +84,52 @@ class CirclePostAdapter(
                     COMMENT_COUNT_UNIT,
                     diffUtil.currentList[position].commentCount,
                 )
+        }
+
+        private fun notifyListenerItemChanged(position: Int) {
+            itemClickListener.item = diffUtil.currentList[position]
+        }
+    }
+
+    /**
+     * CirclePostAdapterItemWithImageViewHolder
+     *
+     * 게시글 이미지 visibility 설정이 UX 에 영향을 끼치기 때문에 별도로 추가한 아이템
+     */
+    inner class CirclePostAdapterItemWithImageViewHolder(
+        private val binding: ItemCirclePostWithImageBinding,
+        private val overflowClickListener: OverflowClickListener,
+        private val itemClickListener: ItemClickListener<PostModel>,
+    ) : RecyclerView.ViewHolder(binding.root) {
+        fun onBind(position: Int) {
+            loadAuthor(position)
+            loadPost(position)
+            // TODO: post id 로 수정 필요
+            overflowClickListener.onBind(0)
+            notifyListenerItemChanged(position)
+        }
+
+        private fun loadAuthor(position: Int) {
+            binding.txtAuthorName.text = diffUtil.currentList[position].author.name
+            binding.txtCreated.text =
+                diffUtil.currentList[position].createdAt.format(
+                    DateTimeFormatter.ofPattern(CREATED_DATE_FORMAT),
+                )
+            diffUtil.currentList[position].author.profileUrl?.let {
+                glideProvider.callImage(it, activity, binding.imgAuthorProfile)
+            } ?: binding.imgAuthorProfile.setImageResource(R.drawable.ic_author_placeholder)
+        }
+
+        private fun loadPost(position: Int) {
+            binding.txtNoticeContent.text = diffUtil.currentList[position].content
+            binding.txtCommentCount.text =
+                String.format(
+                    COMMENT_COUNT_UNIT,
+                    diffUtil.currentList[position].commentCount,
+                )
             val postImgUrl = diffUtil.currentList[position].postImgUrl
-            if (postImgUrl != null) {
-                binding.imgPost.isVisible = true
-                glideProvider.callImage(postImgUrl, activity, binding.imgPost)
-            } else {
-                binding.imgPost.isVisible = false
+            postImgUrl?.let {
+                glideProvider.callImage(it, activity, binding.imgPost)
             }
         }
 
@@ -117,35 +157,62 @@ class CirclePostAdapter(
             return CirclePostAdapterLoadingViewHolder(binding)
         }
 
-        val binding =
-            ItemCirclePostBinding.inflate(
-                LayoutInflater.from(parent.context),
-                parent,
-                false,
-            )
-        val overflowClickListener = OverflowClickListener(activity)
-        binding.btnNoticeOverflow.setOnClickListener(overflowClickListener)
-        val itemClickListener =
-            object : ItemClickListener<PostModel> {
-                override lateinit var item: PostModel
+        if (viewType == VIEW_TYPE_ITEM) {
+            val binding =
+                ItemCirclePostBinding.inflate(
+                    LayoutInflater.from(parent.context),
+                    parent,
+                    false,
+                )
+            val overflowClickListener = OverflowClickListener(activity)
+            binding.btnNoticeOverflow.setOnClickListener(overflowClickListener)
+            val itemClickListener =
+                object : ItemClickListener<PostModel> {
+                    override lateinit var item: PostModel
 
-                override fun onClick(p0: View?) {
-                    itemListenerInitializer.initialize(item)
+                    override fun onClick(p0: View?) {
+                        itemListenerInitializer.initialize(item)
+                    }
                 }
-            }
-        return CirclePostAdapterItemViewHolder(binding, overflowClickListener, itemClickListener)
+            return CirclePostAdapterItemViewHolder(binding, overflowClickListener, itemClickListener)
+        } else {
+            val binding =
+                ItemCirclePostWithImageBinding.inflate(
+                    LayoutInflater.from(parent.context),
+                    parent,
+                    false,
+                )
+            val overflowClickListener = OverflowClickListener(activity)
+            binding.btnNoticeOverflow.setOnClickListener(overflowClickListener)
+            val itemClickListener =
+                object : ItemClickListener<PostModel> {
+                    override lateinit var item: PostModel
+
+                    override fun onClick(p0: View?) {
+                        itemListenerInitializer.initialize(item)
+                    }
+                }
+            return CirclePostAdapterItemWithImageViewHolder(binding, overflowClickListener, itemClickListener)
+        }
     }
 
     override fun getItemCount() = diffUtil.currentList.size
 
     override fun getItemViewType(position: Int) =
-        if (diffUtil.currentList[position] == PostModel.emptyInstance()) VIEW_TYPE_LOADING else VIEW_TYPE_ITEM
+        if (diffUtil.currentList[position] == PostModel.emptyInstance()) {
+            VIEW_TYPE_LOADING
+        } else if (diffUtil.currentList[position].postImgUrl == null) {
+            VIEW_TYPE_ITEM
+        } else {
+            VIEW_TYPE_ITEM_WITH_IMAGE
+        }
 
     override fun onBindViewHolder(
         holder: RecyclerView.ViewHolder,
         position: Int,
     ) {
         if (holder is CirclePostAdapterItemViewHolder) holder.onBind(position)
+        if (holder is CirclePostAdapterItemWithImageViewHolder) holder.onBind(position)
     }
 
     fun update(
@@ -160,5 +227,6 @@ class CirclePostAdapter(
         private const val CREATED_DATE_FORMAT = "M월 d일 hh:mm"
         private const val VIEW_TYPE_LOADING = 0
         private const val VIEW_TYPE_ITEM = 1
+        private const val VIEW_TYPE_ITEM_WITH_IMAGE = 2
     }
 }
