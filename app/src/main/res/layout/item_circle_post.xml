@@ -80,6 +80,15 @@
 
         </androidx.appcompat.widget.LinearLayoutCompat>
 
+        <androidx.appcompat.widget.AppCompatImageView
+            android:id="@+id/imgPost"
+            android:layout_width="match_parent"
+            android:layout_height="200dp"
+            android:layout_marginBottom="@dimen/margin_padding_large"
+            android:background="@color/white"
+            android:scaleType="fitXY"
+            android:visibility="gone"/>
+
         <androidx.appcompat.widget.AppCompatTextView
             android:id="@+id/txtNoticeContent"
             android:layout_width="wrap_content"
