@@ -58,6 +58,7 @@
     <string name="tab_name_notice">공지사항</string>
     <string name="tab_name_post">게시글</string>
     <string name="tab_name_activity_photo">활동사진</string>
+    <string name="message_not_member">동아리 멤버에게만\n공개된 게시글입니다.</string>
     
     <!--Circle Detail Introduction-->
     <string name="text_recruitment_date">모집기간</string>

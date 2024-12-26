@@ -29,7 +29,7 @@
             <androidx.appcompat.widget.AppCompatTextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="@dimen/margin_padding_extremely_small"
+                android:layout_marginStart="@dimen/margin_padding_x_small"
                 android:textAppearance="@style/small_bold_text"
                 android:textColor="@color/purple_5"
                 android:text="@string/text_recruitment_date"/>

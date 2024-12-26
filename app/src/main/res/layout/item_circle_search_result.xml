@@ -21,7 +21,7 @@
         android:id="@+id/txtCircleCategory"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/margin_padding_extremely_small"
+        android:layout_marginTop="@dimen/margin_padding_x_small"
         tools:text="카테고리"
         android:textColor="@color/purple_5"
         android:textAppearance="@style/small_bold_text"/>

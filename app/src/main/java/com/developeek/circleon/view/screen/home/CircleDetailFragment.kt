@@ -6,6 +6,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.viewModels
@@ -154,7 +155,7 @@ class CircleDetailFragment : Fragment() {
                 }
 
                 override fun onTabReselected(p0: TabLayout.Tab?) {
-                    refreshByTabPosition()
+                    resetScrollByTabPosition()
                 }
             },
         )
@@ -167,17 +168,29 @@ class CircleDetailFragment : Fragment() {
             0 -> {
                 bundle.putSerializable(Const.TAG_CIRCLE_DETAIL, viewModel.circleDetail)
                 replaceTo(CircleDetailIntroductionFragment(), bundle)
+
+                removeNotMemberViewIfVisible()
             }
             1 -> {
-                bundle.putInt(Const.TAG_CIRCLE_ID, viewModel.circleDetail.id)
-                replaceTo(CircleDetailNoticeFragment(), bundle)
+                if (viewModel.circleDetail.isMember()) {
+                    bundle.putInt(Const.TAG_CIRCLE_ID, viewModel.circleDetail.id)
+                    replaceTo(CircleDetailNoticeFragment(), bundle)
+                } else if (!binding.llNotMember.isVisible) {
+                    binding.llNotMember.isVisible = true
+                }
             }
             2 -> {
-                bundle.putInt(Const.TAG_CIRCLE_ID, viewModel.circleDetail.id)
-                replaceTo(CircleDetailPostFragment(), bundle)
+                if (viewModel.circleDetail.isMember()) {
+                    bundle.putInt(Const.TAG_CIRCLE_ID, viewModel.circleDetail.id)
+                    replaceTo(CircleDetailPostFragment(), bundle)
+                } else if (!binding.llNotMember.isVisible) {
+                    binding.llNotMember.isVisible = true
+                }
             }
             3 -> {
                 replaceTo(CircleDetailActivityPhotoFragment())
+
+                removeNotMemberViewIfVisible()
             }
         }
     }
@@ -196,7 +209,7 @@ class CircleDetailFragment : Fragment() {
             .commit()
     }
 
-    private fun refreshByTabPosition() {
+    private fun resetScrollByTabPosition() {
         val fragment: Fragment
         val bundle = Bundle()
 
@@ -232,6 +245,12 @@ class CircleDetailFragment : Fragment() {
         binding.flCircleDetail.visibility = visibleWhenTrue(view == binding.flCircleDetail)
         binding.pgbLoading.visibility = visibleWhenTrue(view == binding.pgbLoading)
         binding.llServiceError.visibility = visibleWhenTrue(view == binding.llServiceError)
+    }
+
+    private fun removeNotMemberViewIfVisible() {
+        if (binding.llNotMember.isVisible) {
+            binding.llNotMember.isVisible = false
+        }
     }
 
     private fun visibleWhenTrue(state: Boolean) = if (state) View.VISIBLE else View.GONE

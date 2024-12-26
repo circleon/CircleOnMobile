@@ -82,7 +82,7 @@
                             <androidx.appcompat.widget.AppCompatTextView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:layout_marginHorizontal="@dimen/margin_padding_extremely_small"
+                                android:layout_marginHorizontal="@dimen/margin_padding_x_small"
                                 android:textColor="@color/grey_5"
                                 android:textStyle="bold"
                                 android:lineSpacingExtra="2sp"
@@ -195,6 +195,34 @@
             android:layout_height="match_parent"
             android:visibility="gone">
         </FrameLayout>
+
+        <LinearLayout
+            android:id="@+id/llNotMember"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="center"
+            android:paddingBottom="182dp"
+            android:orientation="vertical"
+            android:background="@color/white"
+            android:visibility="gone">
+
+            <androidx.appcompat.widget.AppCompatImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/ic_lock"/>
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/margin_padding_small"
+                android:gravity="center"
+                android:text="@string/message_not_member"
+                android:textColor="@color/grey_9"
+                android:textSize="@dimen/text_size_default"
+                android:lineSpacingExtra="2sp"
+                android:translationY="-1.06sp"/>
+
+        </LinearLayout>
 
         <com.google.android.material.progressindicator.CircularProgressIndicator
             android:id="@+id/pgbLoading"
