@@ -23,5 +23,7 @@ interface HomeViewModel {
 
     fun saveScrollState(scrollState: Parcelable?)
 
+    fun removeScrollState()
+
     fun restore()
 }

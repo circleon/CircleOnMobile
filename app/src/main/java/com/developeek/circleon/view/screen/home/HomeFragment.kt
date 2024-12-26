@@ -131,7 +131,12 @@ class HomeFragment : Fragment() {
 
     private fun loadCircles() {
         binding.rvCircle.adapter?.let {
-            (it as CircleAdapter).update(viewModel.circles) { binding.rvCircle.scrollToPosition(0) }
+            (it as CircleAdapter).update(viewModel.circles) {
+                viewModel.currentScrollState?.let {
+                    binding.rvCircle.layoutManager?.onRestoreInstanceState(viewModel.currentScrollState)
+                    viewModel.removeScrollState()
+                } ?: binding.rvCircle.scrollToPosition(0)
+            }
         }
     }
 
@@ -167,7 +172,7 @@ class HomeFragment : Fragment() {
         Observer<Boolean> { completed ->
             if (completed) {
                 binding.rvCircle.removeOnScrollListener(viewModel.scrollListener)
-                binding.rvCircle.addOnScrollListener(viewModel.scrollListener)
+                binding.rvCircle.addOnScrollListener(viewModel.scrollListener) // 아이템 정보 업데이트
                 binding.rvCircle.adapter?.let {
                     (it as CircleAdapter).update(viewModel.circles) {}
                 }
@@ -212,8 +217,9 @@ class HomeFragment : Fragment() {
         findNavController().navigate(R.id.action_homeFragment_to_searchCircleFragment)
     }
 
-    override fun onStop() {
-        super.onStop()
+    // 화면이 잠깐 보여지지 않는 경우가 아니라, 무조건 bottom tab 전환인 경우에만 scroll state 를 저장
+    override fun onDestroyView() {
+        super.onDestroyView()
 
         viewModel.saveScrollState(binding.rvCircle.layoutManager?.onSaveInstanceState())
     }
