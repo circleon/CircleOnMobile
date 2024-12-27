@@ -39,6 +39,10 @@ class CircleDetailViewModelImpl
             get() = tabPosition
         private var tabPosition = 0
 
+        override val currentAppBarExpanded: Boolean
+            get() = appBarExpanded
+        private var appBarExpanded = true
+
         override lateinit var error: String
 
         init {
@@ -69,5 +73,9 @@ class CircleDetailViewModelImpl
 
         override fun setTabPosition(position: Int) {
             tabPosition = position
+        }
+
+        override fun setAppBarExpanded(expanded: Boolean) {
+            appBarExpanded = expanded
         }
     }

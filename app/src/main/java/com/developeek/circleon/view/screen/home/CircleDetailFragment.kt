@@ -82,6 +82,7 @@ class CircleDetailFragment : Fragment() {
         binding.txtTbCircleName.text = circleName
         binding.txtCircleName.text = circleName
         binding.tbCircleDetail.inflateMenu(R.menu.menu_circle_settings)
+        binding.abCircleDetail.setExpanded(viewModel.currentAppBarExpanded)
     }
 
     private fun initObserver(activity: Activity) {
@@ -133,6 +134,7 @@ class CircleDetailFragment : Fragment() {
 
     private fun initListener() {
         setBtnBackListener()
+        setAbCircleDetailListener()
         setTlCircleDetailListener()
         setBtnRetryListener()
     }
@@ -140,6 +142,16 @@ class CircleDetailFragment : Fragment() {
     private fun setBtnBackListener() {
         binding.btnBack.setOnClickListener {
             findNavController().navigateUp()
+        }
+    }
+
+    private fun setAbCircleDetailListener() {
+        binding.abCircleDetail.addOnOffsetChangedListener { _, offset ->
+            if (viewModel.currentAppBarExpanded && offset != 0) {
+                viewModel.setAppBarExpanded(false)
+            } else if (!viewModel.currentAppBarExpanded && offset == 0) {
+                viewModel.setAppBarExpanded(true)
+            }
         }
     }
 

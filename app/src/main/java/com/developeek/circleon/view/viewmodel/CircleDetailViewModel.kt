@@ -8,9 +8,12 @@ interface CircleDetailViewModel {
     val state: LiveData<UiState>
     val circleDetail: CircleDetailModel
     val currentTabPosition: Int
+    val currentAppBarExpanded: Boolean
     val error: String
 
     fun load()
 
     fun setTabPosition(position: Int)
+
+    fun setAppBarExpanded(expanded: Boolean)
 }
