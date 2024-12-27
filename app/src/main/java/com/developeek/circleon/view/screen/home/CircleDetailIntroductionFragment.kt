@@ -85,7 +85,7 @@ class CircleDetailIntroductionFragment : Fragment() {
 
     companion object {
         private const val NO_RECRUITMENT_MESSAGE = "예정 없음"
-        private const val RECRUITMENT_DATE_FORMAT = "yyyy-MM-dd"
+        private const val RECRUITMENT_DATE_FORMAT = "M월 d일"
         private const val DAY_OF_WEEK_UNIT = "(%s)"
         private const val RECRUITMENT_DATE_DIVIDER = " ~ "
     }
