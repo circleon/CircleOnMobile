@@ -5,4 +5,5 @@ object Const {
     const val TAG_CIRCLE_ID = "circle_id"
     const val TAG_CIRCLE_NAME = "circle_name"
     const val TAG_CIRCLE_DETAIL = "circle_detail"
+    const val TAG_CIRCLE_POST = "circle_post"
 }

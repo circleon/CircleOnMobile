@@ -11,7 +11,7 @@ import java.time.LocalDateTime
 data class Post(
     @SerializedName("postId") val id: Int,
     val isPinned: Boolean,
-    val postImgUrl: String?,
+    @SerializedName("postImgUrl") val imgUrl: String?,
     val content: String,
     val createdAt: String,
     val updatedAt: String,
@@ -22,7 +22,7 @@ data class Post(
         PostModel(
             id,
             isPinned,
-            postImageUrl(postImgUrl),
+            postImageUrl(imgUrl),
             content,
             localDateTime(createdAt),
             localDateTime(updatedAt),

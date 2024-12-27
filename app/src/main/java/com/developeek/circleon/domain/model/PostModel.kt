@@ -1,6 +1,7 @@
 package com.developeek.circleon.domain.model
 
 import com.developeek.circleon.domain.utils.Const
+import java.io.Serializable
 import java.time.LocalDateTime
 import java.util.EmptyStackException
 import java.util.Stack
@@ -8,13 +9,13 @@ import java.util.Stack
 data class PostModel(
     val id: Int,
     val isPinned: Boolean,
-    val postImgUrl: String?,
+    val imgUrl: String?,
     val content: String,
     val createdAt: LocalDateTime,
     val updatedAt: LocalDateTime,
     val commentCount: Int,
     val author: AuthorModel,
-) {
+) : Serializable {
     companion object {
         fun emptyInstance() =
             PostModel(
@@ -34,7 +35,7 @@ data class AuthorModel(
     val id: Int,
     val name: String,
     val profileUrl: String?,
-) {
+) : Serializable {
     companion object {
         fun emptyInstance() =
             AuthorModel(

@@ -61,6 +61,7 @@ class CirclePostAdapter(
         fun onBind(position: Int) {
             loadAuthor(position)
             loadPost(position)
+            setItemCickListener(position)
             // TODO: post id 로 수정 필요
             overflowClickListener.onBind(0)
             notifyListenerItemChanged(position)
@@ -78,14 +79,20 @@ class CirclePostAdapter(
         }
 
         private fun loadPost(position: Int) {
-            binding.txtNoticeContent.text = diffUtil.currentList[position].content
+            binding.txtPostContent.text = diffUtil.currentList[position].content
             binding.txtCommentCount.text =
                 String.format(
                     COMMENT_COUNT_UNIT,
                     diffUtil.currentList[position].commentCount,
                 )
-            diffUtil.currentList[position].postImgUrl?.let {
+            diffUtil.currentList[position].imgUrl?.let {
                 glideProvider.callImage(it, activity, binding.imgPost)
+            }
+        }
+
+        private fun setItemCickListener(position: Int) {
+            binding.clItemCirclePost.setOnClickListener {
+                itemListenerInitializer.initialize(diffUtil.currentList[position])
             }
         }
 
@@ -120,7 +127,7 @@ class CirclePostAdapter(
                 false,
             )
         val overflowClickListener = OverflowClickListener(activity)
-        binding.btnNoticeOverflow.setOnClickListener(overflowClickListener)
+        binding.btnPostOverflow.setOnClickListener(overflowClickListener)
         val itemClickListener =
             object : ItemClickListener<PostModel> {
                 override lateinit var item: PostModel
@@ -138,7 +145,7 @@ class CirclePostAdapter(
     override fun getItemViewType(position: Int) =
         if (diffUtil.currentList[position] == PostModel.emptyInstance()) {
             VIEW_TYPE_LOADING
-        } else if (diffUtil.currentList[position].postImgUrl == null) {
+        } else if (diffUtil.currentList[position].imgUrl == null) {
             VIEW_TYPE_ITEM
         } else {
             VIEW_TYPE_ITEM_WITH_IMAGE
