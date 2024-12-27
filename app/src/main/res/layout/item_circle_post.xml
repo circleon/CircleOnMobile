@@ -21,7 +21,7 @@
         app:layout_constraintBottom_toTopOf="@id/llContent"
         android:visibility="gone"/>
 
-    <androidx.appcompat.widget.LinearLayoutCompat
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/llContent"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -37,19 +37,23 @@
         app:layout_constraintVertical_bias="0">
 
         <androidx.appcompat.widget.LinearLayoutCompat
+            android:id="@+id/llAuthor"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:paddingStart="@dimen/margin_padding_large"
             android:layout_marginBottom="@dimen/margin_padding_large"
+            android:paddingStart="@dimen/margin_padding_large"
+            android:gravity="center_vertical"
             android:orientation="horizontal"
-            android:gravity="center_vertical">
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toTopOf="@id/imgPost">
 
             <androidx.appcompat.widget.AppCompatImageView
                 android:id="@+id/imgAuthorProfile"
                 android:layout_width="40dp"
                 android:layout_height="40dp"
                 android:background="@drawable/bg_image_circle"
-                android:clipToOutline="true"/>
+                android:clipToOutline="true" />
 
             <androidx.appcompat.widget.LinearLayoutCompat
                 android:layout_width="wrap_content"
@@ -61,21 +65,21 @@
                     android:id="@+id/txtAuthorName"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:lineSpacingExtra="2sp"
                     android:textAppearance="@style/default_bold_text"
                     android:textColor="@color/grey_9"
-                    android:lineSpacingExtra="2sp"
                     android:translationY="-1.06sp"
-                    tools:text="authorName"/>
+                    tools:text="authorName" />
 
                 <androidx.appcompat.widget.AppCompatTextView
                     android:id="@+id/txtCreated"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:textSize="@dimen/text_size_small"
-                    android:textColor="@color/grey_6"
                     android:lineSpacingExtra="2sp"
+                    android:textColor="@color/grey_6"
+                    android:textSize="@dimen/text_size_small"
                     android:translationY="-0.91sp"
-                    tools:text="created"/>
+                    tools:text="created" />
 
             </androidx.appcompat.widget.LinearLayoutCompat>
 
@@ -84,11 +88,16 @@
         <androidx.appcompat.widget.AppCompatImageView
             android:id="@+id/imgPost"
             android:layout_width="match_parent"
-            android:layout_height="200dp"
+            android:layout_height="0dp"
             android:layout_marginBottom="@dimen/margin_padding_large"
             android:background="@color/white"
-            android:scaleType="fitXY"
-            android:visibility="gone"/>
+            android:scaleType="centerCrop"
+            android:adjustViewBounds="true"
+            android:visibility="gone"
+            app:layout_constraintDimensionRatio="3:2"
+            app:layout_constraintTop_toBottomOf="@id/llAuthor"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintBottom_toTopOf="@id/txtPostContent"/>
 
         <androidx.appcompat.widget.AppCompatTextView
             android:id="@+id/txtPostContent"
@@ -101,19 +110,23 @@
             android:translationY="-1.06sp"
             android:maxLines="2"
             android:ellipsize="end"
-            tools:text="게시글 컨텐츠"/>
+            tools:text="게시글 컨텐츠"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/imgPost"
+            app:layout_constraintBottom_toBottomOf="parent"/>
 
-    </androidx.appcompat.widget.LinearLayoutCompat>
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
     <androidx.appcompat.widget.AppCompatImageView
         android:id="@+id/btnPostOverflow"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:paddingEnd="@dimen/margin_padding_large"
+        android:paddingHorizontal="@dimen/margin_padding_large"
         android:src="@drawable/ic_overflow"
         android:clickable="true"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent"
+        android:visibility="gone"/>
 
     <androidx.appcompat.widget.LinearLayoutCompat
         android:id="@+id/llComment"
