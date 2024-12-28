@@ -3,12 +3,16 @@ package com.developeek.circleon.data.source.remote.retrofit.service
 import com.developeek.circleon.data.dto.home.CircleDetail
 import com.developeek.circleon.data.dto.home.CircleSummaries
 import com.developeek.circleon.data.dto.home.Circles
+import com.developeek.circleon.data.dto.home.Pin
 import com.developeek.circleon.data.dto.home.Posts
+import retrofit2.http.Body
 import retrofit2.http.GET
+import retrofit2.http.PUT
 import retrofit2.http.Path
 import retrofit2.http.Query
 
 interface CircleService {
+    // GET
     @GET("circles")
     suspend fun getCircles(
         @Query("page") page: Int,
@@ -39,4 +43,12 @@ interface CircleService {
         @Query("size") size: Int,
         @Query("postType") postType: String,
     ): Posts
+
+    // PUT
+    @PUT("circles/{circleId}/posts/{postId}/pin")
+    suspend fun putPostPin(
+        @Path("circleId") circleId: Int,
+        @Path("postId") postId: Int,
+        @Body data: Pin,
+    )
 }

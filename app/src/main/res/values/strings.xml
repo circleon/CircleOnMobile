@@ -64,6 +64,7 @@
     <string name="text_recruitment_date">모집기간</string>
 
     <!-- Circle Detail Notice-->
+    <string name="menu_post_settings_pin">고정하기</string>
     <string name="menu_post_settings_modify">수정하기</string>
     <string name="menu_post_settings_delete">삭제하기</string>
 

@@ -13,6 +13,17 @@ interface ItemClickListener<T> : View.OnClickListener {
     var item: T
 }
 
+/**
+ * ItemListenerInitializer
+ *
+ * 아이템 클릭 리스너 구현부를 외부 클래스에서 입력받기 위한 리스너 중개 클래스
+ * initialize 에 리스너 구현부를 설정하고 ItemClickListener 의 onClick 에서 initialize 를 실행한다
+ */
 interface ItemListenerInitializer<T> {
     fun initialize(item: T)
+
+    fun initialize(
+        item: T,
+        view: View?,
+    )
 }

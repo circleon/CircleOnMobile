@@ -37,6 +37,7 @@ class CircleDetailNoticeViewModelImpl
 
         override lateinit var posts: PostModels
         private var noticeLoadingJob: Job? = null
+        private var pinNoticeJob: Job? = null
         private var currentPage = DEFAULT_PAGE
 
         override val scrollOver: LiveData<Boolean>
@@ -118,6 +119,35 @@ class CircleDetailNoticeViewModelImpl
 
         override fun setTopOrNot(isTop: Boolean) {
             this.isTop = isTop
+        }
+
+        override fun pin(postId: Int) {
+            togglePin(postId, true)
+        }
+
+        override fun removePin(postId: Int) {
+            togglePin(postId, false)
+        }
+
+        private fun togglePin(
+            postId: Int,
+            isPinned: Boolean,
+        ) {
+            pinNoticeJob?.cancel()
+
+            pinNoticeJob =
+                viewModelScope.launch {
+                    val result = repository.putPostPin(circleId, postId, isPinned)
+
+                    if (result is Error) {
+                        error = result.message()
+                        if (result.isAuthenticationError()) {
+                            uiState.postValue(UiState.AuthenticationError)
+                        } else {
+                            uiState.postValue(UiState.ServiceError)
+                        }
+                    }
+                }
         }
 
         companion object {

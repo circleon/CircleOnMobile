@@ -29,4 +29,10 @@ interface CircleRepository {
         page: Int,
         size: Int,
     ): Result<PostModels>
+
+    suspend fun putPostPin(
+        circleId: Int,
+        postId: Int,
+        isPinned: Boolean,
+    ): Result<Boolean>
 }

@@ -17,13 +17,13 @@ import com.developeek.circleon.domain.model.PostModels
 import com.developeek.circleon.domain.utils.glide.GlideProvider
 import com.developeek.circleon.view.listener.ItemClickListener
 import com.developeek.circleon.view.listener.ItemListenerInitializer
-import com.developeek.circleon.view.listener.OverflowClickListener
 import java.time.format.DateTimeFormatter
 
 class CirclePostAdapter(
     private val activity: Activity,
     private val glideProvider: GlideProvider,
     private val itemListenerInitializer: ItemListenerInitializer<PostModel>,
+    private val overflowListenerInitializer: ItemListenerInitializer<PostModel>,
     private val userId: Int? = null,
     private val role: Role = Role.NONE,
 ) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
@@ -58,7 +58,7 @@ class CirclePostAdapter(
      */
     inner class CirclePostAdapterItemViewHolder(
         private val binding: ItemCirclePostBinding,
-        private val overflowClickListener: OverflowClickListener,
+        private val overflowClickListener: ItemClickListener<PostModel>,
         private val itemClickListener: ItemClickListener<PostModel>,
     ) : RecyclerView.ViewHolder(binding.root) {
         fun onBind(position: Int) {
@@ -68,8 +68,6 @@ class CirclePostAdapter(
             loadPost(post)
             hideOverFlow(post)
             setItemClickListener(post)
-            // TODO: post id 로 수정 필요
-            overflowClickListener.onBind(0)
             notifyListenerItemChanged(post)
         }
 
@@ -94,6 +92,7 @@ class CirclePostAdapter(
             post.imgUrl?.let {
                 glideProvider.callImage(it, activity, binding.imgPost)
             }
+            binding.imgNoticePin.isVisible = post.isPinned
         }
 
         private fun hideOverFlow(post: PostModel) {
@@ -114,6 +113,7 @@ class CirclePostAdapter(
 
         private fun notifyListenerItemChanged(post: PostModel) {
             itemClickListener.item = post
+            overflowClickListener.item = post
         }
     }
 
@@ -142,7 +142,14 @@ class CirclePostAdapter(
                 parent,
                 false,
             )
-        val overflowClickListener = OverflowClickListener(activity)
+        val overflowClickListener =
+            object : ItemClickListener<PostModel> {
+                override lateinit var item: PostModel
+
+                override fun onClick(view: View?) {
+                    overflowListenerInitializer.initialize(item, view)
+                }
+            }
         binding.btnPostOverflow.setOnClickListener(overflowClickListener)
         val itemClickListener =
             object : ItemClickListener<PostModel> {

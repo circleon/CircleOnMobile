@@ -6,6 +6,8 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
+import androidx.appcompat.widget.PopupMenu
 import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
@@ -135,8 +137,36 @@ class CircleDetailPostFragment : Fragment() {
                                 ),
                             )
                     }
+
+                    override fun initialize(
+                        item: PostModel,
+                        view: View?,
+                    ) {}
                 },
-                userManager.getUser()?.id,
+                object : ItemListenerInitializer<PostModel> {
+                    override fun initialize(item: PostModel) {}
+
+                    override fun initialize(
+                        item: PostModel,
+                        view: View?,
+                    ) {
+                        val popupMenu = object : PopupMenu(activity, view!!) {}
+                        popupMenu.inflate(R.menu.menu_post_settings)
+                        popupMenu.setOnMenuItemClickListener {
+                            when (it.itemId) {
+                                R.id.modify_post -> {
+                                    Toast.makeText(activity, "수정하기", Toast.LENGTH_SHORT).show()
+                                }
+                                R.id.delete_post -> {
+                                    Toast.makeText(activity, "삭제하기", Toast.LENGTH_SHORT).show()
+                                }
+                            }
+                            true
+                        }
+                        popupMenu.show()
+                    }
+                },
+                userId = userManager.getUser()?.id,
             )
         binding.rvCirclePost.layoutManager = LinearLayoutManager(requireActivity())
         binding.rvCirclePost.adapter?.let {

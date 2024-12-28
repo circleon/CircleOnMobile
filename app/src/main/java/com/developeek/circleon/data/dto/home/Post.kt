@@ -62,3 +62,7 @@ data class Author(
             circleImageUrl(profileUrl),
         )
 }
+
+data class Pin(
+    val isPinned: Boolean,
+)

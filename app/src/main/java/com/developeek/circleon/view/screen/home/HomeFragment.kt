@@ -79,6 +79,11 @@ class HomeFragment : Fragment() {
                                 ),
                             )
                     }
+
+                    override fun initialize(
+                        item: CircleModel,
+                        view: View?,
+                    ) {}
                 },
             )
         binding.rvCircle.layoutManager = LinearLayoutManager(activity)
@@ -160,6 +165,11 @@ class HomeFragment : Fragment() {
                                 viewModel.setFilterAndLoad(item)
                             }
                         }
+
+                        override fun initialize(
+                            item: Category,
+                            view: View?,
+                        ) {}
                     },
                     activity,
                 )
@@ -233,6 +243,6 @@ class HomeFragment : Fragment() {
     private fun visibleWhenTrue(state: Boolean) = if (state) View.VISIBLE else View.GONE
 
     companion object {
-        private const val CONTENT_TITLE_CIRCLE = "%s님 이런 동아리는 어떠신가요?"
+        private const val CONTENT_TITLE_CIRCLE = "%s 님 이런 동아리는 어떠신가요?"
     }
 }

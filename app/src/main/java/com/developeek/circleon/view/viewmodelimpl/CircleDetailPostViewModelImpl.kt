@@ -120,6 +120,11 @@ class CircleDetailPostViewModelImpl
             this.isTop = isTop
         }
 
+        // 현재는 공지사항용 핀 고정 기능이고, 나중에 게시글 고정 기능 추가 시 사용
+        override fun pin(postId: Int) {}
+
+        override fun removePin(postId: Int) {}
+
         companion object {
             private const val SIZE_BY_PAGE = 10
             private const val DEFAULT_PAGE = 0

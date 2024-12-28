@@ -1,5 +1,6 @@
 package com.developeek.circleon.data.repositoryimpl
 
+import com.developeek.circleon.data.dto.home.Pin
 import com.developeek.circleon.data.exception.ServiceException
 import com.developeek.circleon.data.repository.CircleRepository
 import com.developeek.circleon.data.source.Result
@@ -110,6 +111,21 @@ class CircleRepositoryImpl(
             }
         } catch (e: ServiceException.NoResultException) {
             Result.success(PostModels.emptyInstance())
+        } catch (e: IOException) {
+            Result.error(e)
+        }
+    }
+
+    override suspend fun putPostPin(
+        circleId: Int,
+        postId: Int,
+        isPinned: Boolean,
+    ): Result<Boolean> {
+        return try {
+            withContext(dispatcher) {
+                service.putPostPin(circleId, postId, Pin(isPinned))
+                Result.success(true)
+            }
         } catch (e: IOException) {
             Result.error(e)
         }
