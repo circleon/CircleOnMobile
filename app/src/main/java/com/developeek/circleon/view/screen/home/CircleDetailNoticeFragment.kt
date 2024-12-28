@@ -13,7 +13,9 @@ import androidx.lifecycle.Observer
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.developeek.circleon.R
+import com.developeek.circleon.data.source.manager.UserManager
 import com.developeek.circleon.databinding.FragmentCircleDetailNoticeBinding
+import com.developeek.circleon.domain.enums.Role
 import com.developeek.circleon.domain.model.PostModel
 import com.developeek.circleon.domain.state.UiState
 import com.developeek.circleon.domain.utils.Const
@@ -33,6 +35,7 @@ import javax.inject.Inject
 class CircleDetailNoticeFragment : Fragment() {
     private lateinit var binding: FragmentCircleDetailNoticeBinding
     private var circleId = 0
+    private lateinit var role: Role
     private val viewModel: CircleDetailPostViewModel by viewModels<CircleDetailNoticeViewModelImpl>(
         ownerProducer = {
             requireParentFragment()
@@ -48,11 +51,15 @@ class CircleDetailNoticeFragment : Fragment() {
     @Inject
     lateinit var glideProvider: GlideProvider
 
+    @Inject
+    lateinit var userManager: UserManager
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         arguments?.let {
             circleId = it.getInt(Const.TAG_CIRCLE_ID)
+            role = it.getSerializable(Const.TAG_USER_ROLE) as Role
         }
     }
 
@@ -132,6 +139,7 @@ class CircleDetailNoticeFragment : Fragment() {
                             )
                     }
                 },
+                role = role,
             )
         binding.rvCircleNotice.layoutManager = LinearLayoutManager(requireActivity())
         binding.rvCircleNotice.adapter?.let {

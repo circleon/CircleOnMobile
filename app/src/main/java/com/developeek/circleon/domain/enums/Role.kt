@@ -10,13 +10,17 @@ enum class Role(
     MEMBER("MEMBER", "부원"),
     ;
 
-    fun isSame(role: Role) = this.code == role.code
+    fun isMember() = this.code != NONE.code
+
+    fun isExecutive() = this.code == EXECUTIVE.code || this.code == PRESIDENT.code
 
     fun codeName() = code
 
     fun roleName() = roleName
 
     companion object {
-        fun findOrNull(code: String?) = Role.entries.find { it.code == code }
+        private val default = NONE
+
+        fun findOrDefault(code: String?) = Role.entries.find { it.code == code } ?: default
     }
 }

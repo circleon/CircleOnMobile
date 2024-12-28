@@ -20,16 +20,10 @@ data class Circle(
             name,
             circleImageUrl(profileImgUrl),
             circleImageUrl(thumbnailUrl),
-            category(category),
+            Category.findOrDefault(category),
             comment,
             memberCount,
         )
-
-    private fun category(codeName: String): Category {
-        val category = Category.findOrNull(codeName)
-
-        return category ?: Category.ETC
-    }
 }
 
 data class Circles(

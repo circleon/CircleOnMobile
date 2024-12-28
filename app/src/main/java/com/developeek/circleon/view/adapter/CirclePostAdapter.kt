@@ -11,6 +11,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.developeek.circleon.R
 import com.developeek.circleon.databinding.ItemCirclePostBinding
 import com.developeek.circleon.databinding.ItemLoadingBinding
+import com.developeek.circleon.domain.enums.Role
 import com.developeek.circleon.domain.model.PostModel
 import com.developeek.circleon.domain.model.PostModels
 import com.developeek.circleon.domain.utils.glide.GlideProvider
@@ -23,6 +24,8 @@ class CirclePostAdapter(
     private val activity: Activity,
     private val glideProvider: GlideProvider,
     private val itemListenerInitializer: ItemListenerInitializer<PostModel>,
+    private val userId: Int? = null,
+    private val role: Role = Role.NONE,
 ) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
     private val diffUtil =
         AsyncListDiffer(
@@ -59,45 +62,58 @@ class CirclePostAdapter(
         private val itemClickListener: ItemClickListener<PostModel>,
     ) : RecyclerView.ViewHolder(binding.root) {
         fun onBind(position: Int) {
-            loadAuthor(position)
-            loadPost(position)
-            setItemCickListener(position)
+            val post = diffUtil.currentList[position]
+
+            loadAuthor(post)
+            loadPost(post)
+            hideOverFlow(post)
+            setItemClickListener(post)
             // TODO: post id 로 수정 필요
             overflowClickListener.onBind(0)
-            notifyListenerItemChanged(position)
+            notifyListenerItemChanged(post)
         }
 
-        private fun loadAuthor(position: Int) {
-            binding.txtAuthorName.text = diffUtil.currentList[position].author.name
-            binding.txtCreated.text =
-                diffUtil.currentList[position].createdAt.format(
-                    DateTimeFormatter.ofPattern(CREATED_DATE_FORMAT),
-                )
-            diffUtil.currentList[position].author.profileUrl?.let {
+        private fun loadAuthor(post: PostModel) {
+            binding.txtAuthorName.text = post.author.name
+            post.author.profileUrl?.let {
                 glideProvider.callImage(it, activity, binding.imgAuthorProfile)
             } ?: binding.imgAuthorProfile.setImageResource(R.drawable.ic_author_placeholder)
+            binding.txtCreated.text =
+                post.createdAt.format(
+                    DateTimeFormatter.ofPattern(CREATED_DATE_FORMAT),
+                )
         }
 
-        private fun loadPost(position: Int) {
-            binding.txtPostContent.text = diffUtil.currentList[position].content
+        private fun loadPost(post: PostModel) {
+            binding.txtPostContent.text = post.content
             binding.txtCommentCount.text =
                 String.format(
                     COMMENT_COUNT_UNIT,
-                    diffUtil.currentList[position].commentCount,
+                    post.commentCount,
                 )
-            diffUtil.currentList[position].imgUrl?.let {
+            post.imgUrl?.let {
                 glideProvider.callImage(it, activity, binding.imgPost)
             }
         }
 
-        private fun setItemCickListener(position: Int) {
-            binding.clItemCirclePost.setOnClickListener {
-                itemListenerInitializer.initialize(diffUtil.currentList[position])
+        private fun hideOverFlow(post: PostModel) {
+            if (post.type.isPost()) {
+                userId?.let {
+                    binding.btnPostOverflow.isVisible = it == post.author.id
+                }
+            } else if (post.type.isNotice() && role.isExecutive()) {
+                binding.btnPostOverflow.isVisible = true
             }
         }
 
-        private fun notifyListenerItemChanged(position: Int) {
-            itemClickListener.item = diffUtil.currentList[position]
+        private fun setItemClickListener(post: PostModel) {
+            binding.clItemCirclePost.setOnClickListener {
+                itemListenerInitializer.initialize(post)
+            }
+        }
+
+        private fun notifyListenerItemChanged(post: PostModel) {
+            itemClickListener.item = post
         }
     }
 

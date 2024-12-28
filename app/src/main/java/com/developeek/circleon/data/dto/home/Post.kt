@@ -1,6 +1,7 @@
 package com.developeek.circleon.data.dto.home
 
 import android.util.TimeFormatException
+import com.developeek.circleon.domain.enums.PostType
 import com.developeek.circleon.domain.model.AuthorModel
 import com.developeek.circleon.domain.model.PostModel
 import com.developeek.circleon.domain.utils.Utils.circleImageUrl
@@ -10,6 +11,7 @@ import java.time.LocalDateTime
 
 data class Post(
     @SerializedName("postId") val id: Int,
+    @SerializedName("postType") val type: String,
     val isPinned: Boolean,
     @SerializedName("postImgUrl") val imgUrl: String?,
     val content: String,
@@ -21,6 +23,7 @@ data class Post(
     fun toPostModel() =
         PostModel(
             id,
+            PostType.findOrDefault(type),
             isPinned,
             postImageUrl(imgUrl),
             content,

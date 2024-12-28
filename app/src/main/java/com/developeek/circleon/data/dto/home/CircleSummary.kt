@@ -13,14 +13,8 @@ data class CircleSummary(
         CircleSummaryModel(
             id,
             name,
-            category(category),
+            Category.findOrDefault(category),
         )
-
-    private fun category(codeName: String): Category {
-        val category = Category.findOrNull(codeName)
-
-        return category ?: Category.ETC
-    }
 }
 
 data class CircleSummaries(

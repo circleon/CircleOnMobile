@@ -8,6 +8,8 @@ import java.time.LocalDateTime
 data class CircleDetailModel(
     val id: Int,
     val name: String,
+    val role: Role,
+    val memberId: Int,
     val profileImgUrl: String?,
     val thumbnailUrl: String?,
     val category: Category,
@@ -17,8 +19,6 @@ data class CircleDetailModel(
     val introduction: String,
     val recruitmentStartDate: LocalDateTime?,
     val recruitmentEndDate: LocalDateTime?,
-    val memberRole: Role,
-    val memberId: Int,
 ) : Serializable {
-    fun isMember() = !memberRole.isSame(Role.NONE)
+    fun isMember() = role.isMember()
 }

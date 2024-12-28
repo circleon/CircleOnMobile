@@ -23,6 +23,8 @@ enum class Category(
     fun categoryName() = categoryName
 
     companion object {
-        fun findOrNull(code: String) = Category.entries.find { it.code == code }
+        private val default = ETC
+
+        fun findOrDefault(code: String) = Category.entries.find { it.code == code } ?: default
     }
 }

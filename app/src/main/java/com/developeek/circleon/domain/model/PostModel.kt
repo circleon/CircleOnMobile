@@ -1,5 +1,6 @@
 package com.developeek.circleon.domain.model
 
+import com.developeek.circleon.domain.enums.PostType
 import com.developeek.circleon.domain.utils.Const
 import java.io.Serializable
 import java.time.LocalDateTime
@@ -8,6 +9,7 @@ import java.util.Stack
 
 data class PostModel(
     val id: Int,
+    val type: PostType,
     val isPinned: Boolean,
     val imgUrl: String?,
     val content: String,
@@ -20,6 +22,7 @@ data class PostModel(
         fun emptyInstance() =
             PostModel(
                 0,
+                PostType.POST,
                 false,
                 null,
                 Const.EMPTY_TEXT,

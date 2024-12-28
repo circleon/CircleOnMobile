@@ -27,24 +27,18 @@ data class CircleDetail(
         CircleDetailModel(
             id,
             name,
+            Role.findOrDefault(memberRole),
+            memberId(memberId),
             circleImageUrl(profileImgUrl),
             circleImageUrl(thumbnailUrl),
-            category(category),
+            Category.findOrDefault(category),
             comment,
             memberCount,
             circleImageUrl(introImgUrl),
             introduction,
             localDateTime(recruitmentStartDate),
             localDateTime(recruitmentEndDate),
-            memberRole(memberRole),
-            memberId(memberId),
         )
-
-    private fun category(codeName: String): Category {
-        val category = Category.findOrNull(codeName)
-
-        return category ?: Category.ETC
-    }
 
     private fun localDateTime(dateTime: String?): LocalDateTime? {
         dateTime ?: return null
@@ -54,12 +48,6 @@ data class CircleDetail(
         } catch (e: TimeFormatException) {
             null
         }
-    }
-
-    private fun memberRole(codeName: String?): Role {
-        val role = Role.findOrNull(codeName)
-
-        return role ?: Role.NONE
     }
 
     private fun memberId(id: Int?) = id ?: 0

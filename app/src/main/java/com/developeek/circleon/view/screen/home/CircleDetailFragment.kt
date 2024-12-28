@@ -187,6 +187,7 @@ class CircleDetailFragment : Fragment() {
                 1 -> {
                     if (viewModel.circleDetail.isMember()) {
                         bundle.putInt(Const.TAG_CIRCLE_ID, viewModel.circleDetail.id)
+                        bundle.putSerializable(Const.TAG_USER_ROLE, viewModel.circleDetail.role)
                         replaceTo(CircleDetailNoticeFragment(), bundle)
                     } else if (!binding.llNotMember.isVisible) {
                         binding.llNotMember.isVisible = true

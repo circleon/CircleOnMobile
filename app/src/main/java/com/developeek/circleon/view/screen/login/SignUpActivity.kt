@@ -93,7 +93,7 @@ class SignUpActivity : AppCompatActivity() {
                     setBtnBottomAsSignUp()
                 }
                 SIGN_UP_COMPLETED -> {
-                    Toast.makeText(activity, "회원 가입 완료", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(activity, "회원 가입이 완료되었습니다", Toast.LENGTH_SHORT).show()
                     finish()
                 }
                 else -> {
