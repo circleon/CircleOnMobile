@@ -9,6 +9,15 @@ import com.developeek.circleon.domain.utils.Utils.postImageUrl
 import com.google.gson.annotations.SerializedName
 import java.time.LocalDateTime
 
+data class Posts(
+    val content: List<Post>,
+    val currentPageNumber: Int,
+    val totalElementCount: Int,
+    val totalPageCount: Int,
+) {
+    fun isLastPage() = currentPageNumber >= (totalPageCount - 1)
+}
+
 data class Post(
     @SerializedName("postId") val id: Int,
     @SerializedName("postType") val type: String,
@@ -52,13 +61,4 @@ data class Author(
             name,
             circleImageUrl(profileUrl),
         )
-}
-
-data class Posts(
-    val content: List<Post>,
-    val currentPageNumber: Int,
-    val totalElementCount: Int,
-    val totalPageCount: Int,
-) {
-    fun isLastPage() = currentPageNumber >= (totalPageCount - 1)
 }

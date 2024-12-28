@@ -7,48 +7,6 @@ import java.time.LocalDateTime
 import java.util.EmptyStackException
 import java.util.Stack
 
-data class PostModel(
-    val id: Int,
-    val type: PostType,
-    val isPinned: Boolean,
-    val imgUrl: String?,
-    val content: String,
-    val createdAt: LocalDateTime,
-    val updatedAt: LocalDateTime,
-    val commentCount: Int,
-    val author: AuthorModel,
-) : Serializable {
-    companion object {
-        fun emptyInstance() =
-            PostModel(
-                0,
-                PostType.POST,
-                false,
-                null,
-                Const.EMPTY_TEXT,
-                LocalDateTime.of(1, 1, 1, 1, 1),
-                LocalDateTime.of(1, 1, 1, 1, 1),
-                0,
-                AuthorModel.emptyInstance(),
-            )
-    }
-}
-
-data class AuthorModel(
-    val id: Int,
-    val name: String,
-    val profileUrl: String?,
-) : Serializable {
-    companion object {
-        fun emptyInstance() =
-            AuthorModel(
-                0,
-                Const.EMPTY_TEXT,
-                null,
-            )
-    }
-}
-
 data class PostModels(private val data: List<PostModel>) {
     private val models = Stack<PostModel>()
     private var isLastPage = false
@@ -93,5 +51,47 @@ data class PostModels(private val data: List<PostModel>) {
 
     companion object {
         fun emptyInstance() = PostModels(listOf())
+    }
+}
+
+data class PostModel(
+    val id: Int,
+    val type: PostType,
+    val isPinned: Boolean,
+    val imgUrl: String?,
+    val content: String,
+    val createdAt: LocalDateTime,
+    val updatedAt: LocalDateTime,
+    val commentCount: Int,
+    val author: AuthorModel,
+) : Serializable {
+    companion object {
+        fun emptyInstance() =
+            PostModel(
+                0,
+                PostType.POST,
+                false,
+                null,
+                Const.EMPTY_TEXT,
+                LocalDateTime.of(1, 1, 1, 1, 1),
+                LocalDateTime.of(1, 1, 1, 1, 1),
+                0,
+                AuthorModel.emptyInstance(),
+            )
+    }
+}
+
+data class AuthorModel(
+    val id: Int,
+    val name: String,
+    val profileUrl: String?,
+) : Serializable {
+    companion object {
+        fun emptyInstance() =
+            AuthorModel(
+                0,
+                Const.EMPTY_TEXT,
+                null,
+            )
     }
 }

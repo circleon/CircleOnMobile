@@ -6,29 +6,6 @@ import java.io.Serializable
 import java.util.EmptyStackException
 import java.util.Stack
 
-data class CircleModel(
-    val id: Int,
-    val name: String,
-    val profileImgUrl: String?,
-    val thumbnailUrl: String?,
-    val category: Category,
-    val comment: String,
-    val memberCount: Int,
-) : Serializable {
-    companion object {
-        fun emptyInstance() =
-            CircleModel(
-                0,
-                Const.EMPTY_TEXT,
-                null,
-                null,
-                Category.ETC,
-                Const.EMPTY_TEXT,
-                0,
-            )
-    }
-}
-
 data class CircleModels(private val data: List<CircleModel>) {
     private val models = Stack<CircleModel>()
     private var isLastPage = false
@@ -71,5 +48,28 @@ data class CircleModels(private val data: List<CircleModel>) {
 
     companion object {
         fun emptyInstance() = CircleModels(listOf())
+    }
+}
+
+data class CircleModel(
+    val id: Int,
+    val name: String,
+    val profileImgUrl: String?,
+    val thumbnailUrl: String?,
+    val category: Category,
+    val comment: String,
+    val memberCount: Int,
+) : Serializable {
+    companion object {
+        fun emptyInstance() =
+            CircleModel(
+                0,
+                Const.EMPTY_TEXT,
+                null,
+                null,
+                Category.ETC,
+                Const.EMPTY_TEXT,
+                0,
+            )
     }
 }

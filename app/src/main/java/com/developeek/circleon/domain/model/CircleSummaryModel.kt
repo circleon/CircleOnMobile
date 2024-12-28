@@ -6,12 +6,6 @@ import java.util.EmptyStackException
 import java.util.Stack
 import kotlin.math.absoluteValue
 
-data class CircleSummaryModel(
-    val id: Int,
-    val name: String,
-    val category: Category,
-) : Serializable
-
 data class CircleSummaryModels(private val data: List<CircleSummaryModel>) {
     private val models = Stack<CircleSummaryModel>()
 
@@ -41,3 +35,9 @@ data class CircleSummaryModels(private val data: List<CircleSummaryModel>) {
         fun emptyInstance() = CircleSummaryModels(listOf())
     }
 }
+
+data class CircleSummaryModel(
+    val id: Int,
+    val name: String,
+    val category: Category,
+) : Serializable

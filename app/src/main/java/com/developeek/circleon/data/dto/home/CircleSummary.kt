@@ -4,6 +4,10 @@ import com.developeek.circleon.domain.enums.Category
 import com.developeek.circleon.domain.model.CircleSummaryModel
 import com.google.gson.annotations.SerializedName
 
+data class CircleSummaries(
+    val content: List<CircleSummary>,
+)
+
 data class CircleSummary(
     @SerializedName("circleId") val id: Int,
     @SerializedName("circleName") val name: String,
@@ -16,7 +20,3 @@ data class CircleSummary(
             Category.findOrDefault(category),
         )
 }
-
-data class CircleSummaries(
-    val content: List<CircleSummary>,
-)
