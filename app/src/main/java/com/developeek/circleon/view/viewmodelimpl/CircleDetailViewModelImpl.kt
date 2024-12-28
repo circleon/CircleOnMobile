@@ -34,6 +34,9 @@ class CircleDetailViewModelImpl
 
         override lateinit var circleDetail: CircleDetailModel
         private var circleDetailLoadingJob: Job? = null
+        override val circleDetailInitialized: Boolean
+            get() = isCircleDetailInitialized
+        private var isCircleDetailInitialized = false
 
         override val currentTabPosition: Int
             get() = tabPosition
@@ -59,6 +62,7 @@ class CircleDetailViewModelImpl
 
                     if (result is Success) {
                         circleDetail = result.data
+                        if (!isCircleDetailInitialized) isCircleDetailInitialized = true
                         uiState.postValue(UiState.Success)
                     } else {
                         error = (result as Error).message()

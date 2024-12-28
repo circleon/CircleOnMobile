@@ -176,33 +176,35 @@ class CircleDetailFragment : Fragment() {
     private fun replaceByTabPosition() {
         val bundle = Bundle()
 
-        when (viewModel.currentTabPosition) {
-            0 -> {
-                bundle.putSerializable(Const.TAG_CIRCLE_DETAIL, viewModel.circleDetail)
-                replaceTo(CircleDetailIntroductionFragment(), bundle)
+        if (viewModel.circleDetailInitialized) {
+            when (viewModel.currentTabPosition) {
+                0 -> {
+                    bundle.putSerializable(Const.TAG_CIRCLE_DETAIL, viewModel.circleDetail)
+                    replaceTo(CircleDetailIntroductionFragment(), bundle)
 
-                removeNotMemberViewIfVisible()
-            }
-            1 -> {
-                if (viewModel.circleDetail.isMember()) {
-                    bundle.putInt(Const.TAG_CIRCLE_ID, viewModel.circleDetail.id)
-                    replaceTo(CircleDetailNoticeFragment(), bundle)
-                } else if (!binding.llNotMember.isVisible) {
-                    binding.llNotMember.isVisible = true
+                    removeNotMemberViewIfVisible()
                 }
-            }
-            2 -> {
-                if (viewModel.circleDetail.isMember()) {
-                    bundle.putInt(Const.TAG_CIRCLE_ID, viewModel.circleDetail.id)
-                    replaceTo(CircleDetailPostFragment(), bundle)
-                } else if (!binding.llNotMember.isVisible) {
-                    binding.llNotMember.isVisible = true
+                1 -> {
+                    if (viewModel.circleDetail.isMember()) {
+                        bundle.putInt(Const.TAG_CIRCLE_ID, viewModel.circleDetail.id)
+                        replaceTo(CircleDetailNoticeFragment(), bundle)
+                    } else if (!binding.llNotMember.isVisible) {
+                        binding.llNotMember.isVisible = true
+                    }
                 }
-            }
-            3 -> {
-                replaceTo(CircleDetailActivityPhotoFragment())
+                2 -> {
+                    if (viewModel.circleDetail.isMember()) {
+                        bundle.putInt(Const.TAG_CIRCLE_ID, viewModel.circleDetail.id)
+                        replaceTo(CircleDetailPostFragment(), bundle)
+                    } else if (!binding.llNotMember.isVisible) {
+                        binding.llNotMember.isVisible = true
+                    }
+                }
+                3 -> {
+                    replaceTo(CircleDetailActivityPhotoFragment())
 
-                removeNotMemberViewIfVisible()
+                    removeNotMemberViewIfVisible()
+                }
             }
         }
     }
@@ -225,23 +227,29 @@ class CircleDetailFragment : Fragment() {
         val fragment: Fragment
         val bundle = Bundle()
 
-        when (viewModel.currentTabPosition) {
-            0 -> {
-                bundle.putSerializable(Const.TAG_CIRCLE_DETAIL, viewModel.circleDetail)
-                replaceTo(CircleDetailIntroductionFragment(), bundle)
-            }
-            1 -> {
-                fragment = childFragmentManager.findFragmentById(R.id.flCircleDetail) as CircleDetailNoticeFragment
-
-                if (fragment.isAdded) {
-                    fragment.view?.findViewById<RecyclerView>(R.id.rvCircleNotice)?.scrollToPosition(0)
+        if (viewModel.circleDetailInitialized) {
+            when (viewModel.currentTabPosition) {
+                0 -> {
+                    bundle.putSerializable(Const.TAG_CIRCLE_DETAIL, viewModel.circleDetail)
+                    replaceTo(CircleDetailIntroductionFragment(), bundle)
                 }
-            }
-            2 -> {
-                fragment = childFragmentManager.findFragmentById(R.id.flCircleDetail) as CircleDetailPostFragment
+                1 -> {
+                    childFragmentManager.findFragmentById(R.id.flCircleDetail)?.let {
+                        fragment = it as CircleDetailNoticeFragment
 
-                if (fragment.isAdded) {
-                    fragment.view?.findViewById<RecyclerView>(R.id.rvCirclePost)?.scrollToPosition(0)
+                        if (fragment.isAdded) {
+                            fragment.view?.findViewById<RecyclerView>(R.id.rvCircleNotice)?.scrollToPosition(0)
+                        }
+                    }
+                }
+                2 -> {
+                    childFragmentManager.findFragmentById(R.id.flCircleDetail)?.let {
+                        fragment = it as CircleDetailPostFragment
+
+                        if (fragment.isAdded) {
+                            fragment.view?.findViewById<RecyclerView>(R.id.rvCirclePost)?.scrollToPosition(0)
+                        }
+                    }
                 }
             }
         }
