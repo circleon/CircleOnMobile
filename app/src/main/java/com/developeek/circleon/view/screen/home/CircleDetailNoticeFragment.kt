@@ -8,6 +8,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.appcompat.widget.PopupMenu
+import androidx.core.content.ContextCompat
 import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
@@ -21,6 +22,7 @@ import com.developeek.circleon.domain.enums.Role
 import com.developeek.circleon.domain.model.PostModel
 import com.developeek.circleon.domain.state.UiState
 import com.developeek.circleon.domain.utils.Const
+import com.developeek.circleon.domain.utils.Utils
 import com.developeek.circleon.domain.utils.glide.GlideProvider
 import com.developeek.circleon.view.adapter.CirclePostAdapter
 import com.developeek.circleon.view.listener.ItemListenerInitializer
@@ -144,6 +146,11 @@ class CircleDetailNoticeFragment : Fragment() {
         }
 
         popupMenu.setOnMenuItemClickListener(noticeOverflowMenuItemClickListener(item))
+        Utils.changeMenuItemTextColor(
+            popupMenu.menu.findItem(R.id.delete_post),
+            ContextCompat.getColor(activity, R.color.error),
+        )
+
         popupMenu.show()
     }
 

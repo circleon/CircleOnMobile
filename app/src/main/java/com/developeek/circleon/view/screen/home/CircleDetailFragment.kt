@@ -6,6 +6,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
@@ -17,6 +18,7 @@ import com.developeek.circleon.R
 import com.developeek.circleon.databinding.FragmentCircleDetailBinding
 import com.developeek.circleon.domain.state.UiState
 import com.developeek.circleon.domain.utils.Const
+import com.developeek.circleon.domain.utils.Utils
 import com.developeek.circleon.domain.utils.glide.GlideProvider
 import com.developeek.circleon.view.screen.login.LoginActivity
 import com.developeek.circleon.view.viewmodel.CircleDetailViewModel
@@ -73,19 +75,23 @@ class CircleDetailFragment : Fragment() {
     ) {
         super.onViewCreated(view, savedInstanceState)
 
-        initView()
+        initView(requireActivity())
         initObserver(requireActivity())
         initListener()
     }
 
-    private fun initView() {
+    private fun initView(activity: Activity) {
         initAppBar()
-        initOverflowMenu()
+        initOverflowMenu(activity)
         loadCircleDetailContent()
     }
 
-    private fun initOverflowMenu() {
+    private fun initOverflowMenu(activity: Activity) {
         binding.tbCircleDetail.inflateMenu(R.menu.menu_circle_settings)
+        Utils.changeMenuItemTextColor(
+            binding.tbCircleDetail.menu.findItem(R.id.resign_circle),
+            ContextCompat.getColor(activity, R.color.error),
+        )
     }
 
     private fun initAppBar() {

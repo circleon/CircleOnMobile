@@ -2,7 +2,7 @@ package com.developeek.circleon.data.dto.home
 
 import com.developeek.circleon.domain.enums.Category
 import com.developeek.circleon.domain.model.CircleModel
-import com.developeek.circleon.domain.utils.Utils.circleImageUrl
+import com.developeek.circleon.domain.utils.Utils
 import com.google.gson.annotations.SerializedName
 
 data class Circles(
@@ -33,8 +33,8 @@ data class Circle(
         CircleModel(
             id,
             name,
-            circleImageUrl(profileImgUrl),
-            circleImageUrl(thumbnailUrl),
+            Utils.circleImageUrl(profileImgUrl),
+            Utils.circleImageUrl(thumbnailUrl),
             Category.findOrDefault(category),
             comment,
             memberCount,

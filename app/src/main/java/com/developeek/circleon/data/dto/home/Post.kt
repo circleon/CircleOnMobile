@@ -4,8 +4,8 @@ import android.util.TimeFormatException
 import com.developeek.circleon.domain.enums.PostType
 import com.developeek.circleon.domain.model.AuthorModel
 import com.developeek.circleon.domain.model.PostModel
+import com.developeek.circleon.domain.utils.Utils
 import com.developeek.circleon.domain.utils.Utils.circleImageUrl
-import com.developeek.circleon.domain.utils.Utils.postImageUrl
 import com.google.gson.annotations.SerializedName
 import java.time.LocalDateTime
 
@@ -34,7 +34,7 @@ data class Post(
             id,
             PostType.findOrDefault(type),
             isPinned,
-            postImageUrl(imgUrl),
+            Utils.postImageUrl(imgUrl),
             content,
             localDateTime(createdAt),
             localDateTime(updatedAt),
