@@ -219,8 +219,6 @@ class CircleDetailFragment : Fragment() {
     private fun replaceToIntroductionScreen(bundle: Bundle) {
         bundle.putSerializable(Const.TAG_CIRCLE_DETAIL, viewModel.circleDetail)
         replaceTo(CircleDetailIntroductionFragment(), bundle)
-
-        removeNotMemberViewIfVisible()
     }
 
     private fun replaceToNoticeScreen(bundle: Bundle) {
@@ -244,8 +242,6 @@ class CircleDetailFragment : Fragment() {
 
     private fun replaceToPhotoScreen(bundle: Bundle) {
         replaceTo(CircleDetailActivityPhotoFragment())
-
-        removeNotMemberViewIfVisible()
     }
 
     private fun replaceTo(
@@ -259,6 +255,7 @@ class CircleDetailFragment : Fragment() {
         val transaction = fragmentManager.beginTransaction()
         transaction
             .replace(binding.flCircleDetail.id, fragment)
+            .runOnCommit { removeNotMemberViewIfVisible() } // 비공개 뷰는 fragment 가 아니기 때문에 커밋 직후 별도로 전환
             .commit()
     }
 
