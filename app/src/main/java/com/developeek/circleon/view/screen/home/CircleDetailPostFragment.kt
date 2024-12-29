@@ -247,6 +247,7 @@ class CircleDetailPostFragment : Fragment() {
         }
     }
 
+    // 게시글 상세 화면 진입 시 post fragment 가 파괴되지 않기 때문에 onStop 에서 scroll state 저장
     override fun onStop() {
         super.onStop()
 

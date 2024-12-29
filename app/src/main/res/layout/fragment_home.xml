@@ -92,6 +92,17 @@
             android:indeterminate="true"
             android:visibility="gone"/>
 
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/txtNoCircle"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:paddingBottom="140dp"
+            android:gravity="center"
+            android:text="@string/message_no_circle"
+            android:textAppearance="@style/large_bold_text"
+            android:textColor="@color/grey_5"
+            android:visibility="gone"/>
+
         <androidx.appcompat.widget.LinearLayoutCompat
             android:id="@+id/llServiceError"
             android:layout_width="match_parent"

@@ -22,6 +22,8 @@ data class CircleModels(private val data: List<CircleModel>) {
 
     fun size() = models.size
 
+    fun isEmpty() = models.isEmpty()
+
     fun add(model: CircleModel): CircleModels {
         val tmp = Stack<CircleModel>()
 

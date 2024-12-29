@@ -124,8 +124,12 @@ class HomeFragment : Fragment() {
                     toggleView(binding.pgbLoading)
                 }
                 UiState.Success -> {
-                    toggleView(binding.rvCircle)
-                    loadCircles()
+                    if (viewModel.circles.isEmpty()) {
+                        toggleView(binding.txtNoCircle)
+                    } else {
+                        toggleView(binding.rvCircle)
+                        loadCircles()
+                    }
                 }
                 UiState.AuthenticationError -> {
                     sendUserToLoginScreen(activity)
@@ -245,6 +249,7 @@ class HomeFragment : Fragment() {
     private fun toggleView(view: View) {
         binding.rvCircle.visibility = visibleWhenTrue(view == binding.rvCircle)
         binding.pgbLoading.visibility = visibleWhenTrue(view == binding.pgbLoading)
+        binding.txtNoCircle.visibility = visibleWhenTrue(view == binding.txtNoCircle)
         binding.llServiceError.visibility = visibleWhenTrue(view == binding.llServiceError)
     }
 

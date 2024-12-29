@@ -25,6 +25,10 @@ class HomeActivity : AppCompatActivity() {
         binding = ActivityHomeBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
+        initView()
+    }
+
+    private fun initView() {
         initBottomNav()
         initFinishWaitingToast()
     }
