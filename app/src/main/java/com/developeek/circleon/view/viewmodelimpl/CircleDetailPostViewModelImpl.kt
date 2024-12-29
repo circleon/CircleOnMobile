@@ -116,14 +116,18 @@ class CircleDetailPostViewModelImpl
             this.scrollState = scrollState
         }
 
+        override fun removeScrollState() {
+            this.scrollState = null
+        }
+
         override fun setTopOrNot(isTop: Boolean) {
             this.isTop = isTop
         }
 
         // 현재는 공지사항용 핀 고정 기능이고, 나중에 게시글 고정 기능 추가 시 사용
-        override fun pin(postId: Int) {}
+        override fun pinAndLoad(postId: Int) {}
 
-        override fun removePin(postId: Int) {}
+        override fun removePinAndLoad(postId: Int) {}
 
         companion object {
             private const val SIZE_BY_PAGE = 10

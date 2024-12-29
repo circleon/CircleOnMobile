@@ -81,51 +81,12 @@ class CircleDetailNoticeFragment : Fragment() {
     ) {
         super.onViewCreated(view, savedInstanceState)
 
+        initView(requireActivity())
         initObserver(requireActivity())
         initListener()
     }
 
-    private fun initObserver(activity: Activity) {
-        viewModel.state.observe(
-            viewLifecycleOwner,
-            stateObserver(activity),
-        )
-        viewModel.scrollOver.observe(
-            viewLifecycleOwner,
-            scrollOverObserver(),
-        )
-    }
-
-    private fun stateObserver(activity: Activity) =
-        Observer<UiState> {
-            when (it) {
-                UiState.Loading -> {
-                    toggleView(binding.pgbLoading)
-                }
-                UiState.Success -> {
-                    if (viewModel.posts.isEmpty()) {
-                        toggleView(binding.txtNoNotice)
-                    } else {
-                        toggleView(binding.rvCircleNotice)
-                        loadCircleNotices(activity)
-                    }
-                }
-                UiState.AuthenticationError -> {
-                    sendUserToLoginScreen(activity)
-                    if (ErrorToast.previousFinished()) {
-                        ErrorToast(activity, viewModel.error).show()
-                    }
-                }
-                UiState.ServiceError -> {
-                    toggleView(binding.llServiceError)
-                    if (ErrorToast.previousFinished()) {
-                        ErrorToast(activity, viewModel.error).show()
-                    }
-                }
-            }
-        }
-
-    private fun loadCircleNotices(activity: Activity) {
+    private fun initView(activity: Activity) {
         binding.rvCircleNotice.adapter =
             CirclePostAdapter(
                 activity,
@@ -159,11 +120,10 @@ class CircleDetailNoticeFragment : Fragment() {
                             when (it.itemId) {
                                 R.id.pin_post -> {
                                     if (item.isPinned) {
-                                        viewModel.removePin(item.id)
+                                        viewModel.removePinAndLoad(item.id)
                                     } else {
-                                        viewModel.pin(item.id)
+                                        viewModel.pinAndLoad(item.id)
                                     }
-                                    viewModel.load()
                                 }
 
                                 R.id.modify_post -> {
@@ -182,10 +142,58 @@ class CircleDetailNoticeFragment : Fragment() {
                 role = role,
             )
         binding.rvCircleNotice.layoutManager = LinearLayoutManager(requireActivity())
-        binding.rvCircleNotice.adapter?.let {
-            (it as CirclePostAdapter).update(viewModel.posts) { binding.rvCircleNotice.scrollToPosition(0) }
+        binding.rvCircleNotice.itemAnimator = null
+    }
+
+    private fun initObserver(activity: Activity) {
+        viewModel.state.observe(
+            viewLifecycleOwner,
+            stateObserver(activity),
+        )
+        viewModel.scrollOver.observe(
+            viewLifecycleOwner,
+            scrollOverObserver(),
+        )
+    }
+
+    private fun stateObserver(activity: Activity) =
+        Observer<UiState> {
+            when (it) {
+                UiState.Loading -> {
+                    toggleView(binding.pgbLoading)
+                }
+                UiState.Success -> {
+                    if (viewModel.posts.isEmpty()) {
+                        toggleView(binding.txtNoNotice)
+                    } else {
+                        toggleView(binding.rvCircleNotice)
+                        loadCircleNotices()
+                    }
+                }
+                UiState.AuthenticationError -> {
+                    sendUserToLoginScreen(activity)
+                    if (ErrorToast.previousFinished()) {
+                        ErrorToast(activity, viewModel.error).show()
+                    }
+                }
+                UiState.ServiceError -> {
+                    toggleView(binding.llServiceError)
+                    if (ErrorToast.previousFinished()) {
+                        ErrorToast(activity, viewModel.error).show()
+                    }
+                }
+            }
         }
-        binding.rvCircleNotice.layoutManager?.onRestoreInstanceState(viewModel.currentScrollState)
+
+    private fun loadCircleNotices() {
+        binding.rvCircleNotice.adapter?.let {
+            (it as CirclePostAdapter).update(viewModel.posts) {
+                viewModel.currentScrollState?.let {
+                    binding.rvCircleNotice.layoutManager?.onRestoreInstanceState(viewModel.currentScrollState)
+                    viewModel.removeScrollState()
+                } ?: binding.rvCircleNotice.scrollToPosition(0)
+            }
+        }
     }
 
     private fun sendUserToLoginScreen(activity: Activity) {

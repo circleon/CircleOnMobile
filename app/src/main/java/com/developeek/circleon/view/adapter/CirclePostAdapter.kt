@@ -42,7 +42,8 @@ class CirclePostAdapter(
                     oldItem: PostModel,
                     newItem: PostModel,
                 ): Boolean {
-                    return oldItem.id == newItem.id
+                    return oldItem.id == newItem.id &&
+                        oldItem.isPinned == newItem.isPinned
                 }
             },
         )

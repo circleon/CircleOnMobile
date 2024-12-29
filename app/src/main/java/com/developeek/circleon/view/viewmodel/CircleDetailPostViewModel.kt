@@ -21,9 +21,11 @@ interface CircleDetailPostViewModel {
 
     fun saveScrollState(scrollState: Parcelable?)
 
+    fun removeScrollState()
+
     fun setTopOrNot(isTop: Boolean)
 
-    fun pin(postId: Int)
+    fun pinAndLoad(postId: Int)
 
-    fun removePin(postId: Int)
+    fun removePinAndLoad(postId: Int)
 }

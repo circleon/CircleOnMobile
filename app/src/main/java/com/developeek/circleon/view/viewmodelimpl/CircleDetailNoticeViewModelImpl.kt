@@ -117,19 +117,23 @@ class CircleDetailNoticeViewModelImpl
             this.scrollState = scrollState
         }
 
+        override fun removeScrollState() {
+            this.scrollState = null
+        }
+
         override fun setTopOrNot(isTop: Boolean) {
             this.isTop = isTop
         }
 
-        override fun pin(postId: Int) {
-            togglePin(postId, true)
+        override fun pinAndLoad(postId: Int) {
+            togglePinAndLoad(postId, true)
         }
 
-        override fun removePin(postId: Int) {
-            togglePin(postId, false)
+        override fun removePinAndLoad(postId: Int) {
+            togglePinAndLoad(postId, false)
         }
 
-        private fun togglePin(
+        private fun togglePinAndLoad(
             postId: Int,
             isPinned: Boolean,
         ) {
@@ -139,8 +143,10 @@ class CircleDetailNoticeViewModelImpl
                 viewModelScope.launch {
                     val result = repository.putPostPin(circleId, postId, isPinned)
 
-                    if (result is Error) {
-                        error = result.message()
+                    if (result is Success) {
+                        load()
+                    } else {
+                        error = (result as Error).message()
                         if (result.isAuthenticationError()) {
                             uiState.postValue(UiState.AuthenticationError)
                         } else {
