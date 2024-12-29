@@ -54,10 +54,10 @@ class CircleDetailPostViewModelImpl
         override lateinit var error: String
 
         init {
-            load()
+            loadPosts()
         }
 
-        override fun load() {
+        private fun loadPosts() {
             initPostLoading()
 
             postLoadingJob =
@@ -83,6 +83,10 @@ class CircleDetailPostViewModelImpl
             scrollOverLoadingJob?.cancel()
             uiState.postValue(UiState.Loading)
             currentPage = DEFAULT_PAGE
+        }
+
+        override fun refresh() {
+            loadPosts()
         }
 
         override fun scrollOver(circleId: Int) {

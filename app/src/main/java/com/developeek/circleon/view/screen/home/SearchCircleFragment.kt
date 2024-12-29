@@ -81,6 +81,11 @@ class SearchCircleFragment : Fragment() {
                                 navOption,
                             )
                     }
+
+                    override fun initialize(
+                        item: CircleSummaryModel,
+                        view: View?,
+                    ) { }
                 },
             )
         binding.rvCircle.layoutManager = LinearLayoutManager(activity)
@@ -184,7 +189,7 @@ class SearchCircleFragment : Fragment() {
 
     private fun setBtnRetryListener() {
         binding.btnRetry.setOnClickListener {
-            viewModel.loadCircles()
+            viewModel.refresh()
         }
     }
 

@@ -55,10 +55,10 @@ class CircleDetailNoticeViewModelImpl
         override lateinit var error: String
 
         init {
-            load()
+            loadNotices()
         }
 
-        override fun load() {
+        private fun loadNotices() {
             initNoticeLoading()
 
             noticeLoadingJob =
@@ -84,6 +84,10 @@ class CircleDetailNoticeViewModelImpl
             scrollOverLoadingJob?.cancel()
             uiState.postValue(UiState.Loading)
             currentPage = DEFAULT_PAGE
+        }
+
+        override fun refresh() {
+            loadNotices()
         }
 
         override fun scrollOver(circleId: Int) {
@@ -144,7 +148,7 @@ class CircleDetailNoticeViewModelImpl
                     val result = repository.putPostPin(circleId, postId, isPinned)
 
                     if (result is Success) {
-                        load()
+                        loadNotices()
                     } else {
                         error = (result as Error).message()
                         if (result.isAuthenticationError()) {

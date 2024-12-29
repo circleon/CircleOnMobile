@@ -258,7 +258,7 @@ class CircleDetailFragment : Fragment() {
 
     private fun setBtnRetryListener() {
         binding.btnRetry.setOnClickListener {
-            viewModel.load()
+            viewModel.refresh()
         }
     }
 

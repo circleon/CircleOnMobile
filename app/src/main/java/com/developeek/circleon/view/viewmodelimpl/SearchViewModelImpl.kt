@@ -38,7 +38,7 @@ class SearchViewModelImpl
             loadCircles()
         }
 
-        override fun loadCircles() {
+        private fun loadCircles() {
             circleLoadingJob?.cancel()
 
             circleLoadingJob =
@@ -57,6 +57,10 @@ class SearchViewModelImpl
                         }
                     }
                 }
+        }
+
+        override fun refresh() {
+            loadCircles()
         }
 
         override fun setKeywordAndFind(keyword: String) {

@@ -15,7 +15,7 @@ interface CircleDetailPostViewModel {
     val currentTopOrNot: Boolean
     val error: String
 
-    fun load()
+    fun refresh()
 
     fun scrollOver(circleId: Int)
 

@@ -12,7 +12,7 @@ interface CircleDetailViewModel {
     val currentAppBarExpanded: Boolean
     val error: String
 
-    fun load()
+    fun refresh()
 
     fun setTabPosition(position: Int)
 

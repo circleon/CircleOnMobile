@@ -49,10 +49,10 @@ class CircleDetailViewModelImpl
         override lateinit var error: String
 
         init {
-            load()
+            loadCircleDetail()
         }
 
-        override fun load() {
+        private fun loadCircleDetail() {
             circleDetailLoadingJob?.cancel()
             uiState.postValue(UiState.Loading)
 
@@ -73,6 +73,10 @@ class CircleDetailViewModelImpl
                         }
                     }
                 }
+        }
+
+        override fun refresh() {
+            loadCircleDetail()
         }
 
         override fun setTabPosition(position: Int) {

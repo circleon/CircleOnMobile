@@ -78,51 +78,12 @@ class CircleDetailPostFragment : Fragment() {
     ) {
         super.onViewCreated(view, savedInstanceState)
 
+        initView(requireActivity())
         initObserver(requireActivity())
         initListener()
     }
 
-    private fun initObserver(activity: Activity) {
-        viewModel.state.observe(
-            viewLifecycleOwner,
-            stateObserver(activity),
-        )
-        viewModel.scrollOver.observe(
-            viewLifecycleOwner,
-            scrollOverObserver(),
-        )
-    }
-
-    private fun stateObserver(activity: Activity) =
-        Observer<UiState> {
-            when (it) {
-                UiState.Loading -> {
-                    toggleView(binding.pgbLoading)
-                }
-                UiState.Success -> {
-                    if (viewModel.posts.isEmpty()) {
-                        toggleView(binding.txtNoPost)
-                    } else {
-                        toggleView(binding.rvCirclePost)
-                        loadCircleNotices(activity)
-                    }
-                }
-                UiState.AuthenticationError -> {
-                    sendUserToLoginScreen(activity)
-                    if (ErrorToast.previousFinished()) {
-                        ErrorToast(activity, viewModel.error).show()
-                    }
-                }
-                UiState.ServiceError -> {
-                    toggleView(binding.llServiceError)
-                    if (ErrorToast.previousFinished()) {
-                        ErrorToast(activity, viewModel.error).show()
-                    }
-                }
-            }
-        }
-
-    private fun loadCircleNotices(activity: Activity) {
+    private fun initView(activity: Activity) {
         binding.rvCirclePost.adapter =
             CirclePostAdapter(
                 activity,
@@ -169,10 +130,58 @@ class CircleDetailPostFragment : Fragment() {
                 userId = userManager.getUser()?.id,
             )
         binding.rvCirclePost.layoutManager = LinearLayoutManager(requireActivity())
-        binding.rvCirclePost.adapter?.let {
-            (it as CirclePostAdapter).update(viewModel.posts) { binding.rvCirclePost.scrollToPosition(0) }
+        binding.rvCirclePost.itemAnimator = null
+    }
+
+    private fun initObserver(activity: Activity) {
+        viewModel.state.observe(
+            viewLifecycleOwner,
+            stateObserver(activity),
+        )
+        viewModel.scrollOver.observe(
+            viewLifecycleOwner,
+            scrollOverObserver(),
+        )
+    }
+
+    private fun stateObserver(activity: Activity) =
+        Observer<UiState> {
+            when (it) {
+                UiState.Loading -> {
+                    toggleView(binding.pgbLoading)
+                }
+                UiState.Success -> {
+                    if (viewModel.posts.isEmpty()) {
+                        toggleView(binding.txtNoPost)
+                    } else {
+                        toggleView(binding.rvCirclePost)
+                        loadCircleNotices()
+                    }
+                }
+                UiState.AuthenticationError -> {
+                    sendUserToLoginScreen(activity)
+                    if (ErrorToast.previousFinished()) {
+                        ErrorToast(activity, viewModel.error).show()
+                    }
+                }
+                UiState.ServiceError -> {
+                    toggleView(binding.llServiceError)
+                    if (ErrorToast.previousFinished()) {
+                        ErrorToast(activity, viewModel.error).show()
+                    }
+                }
+            }
         }
-        binding.rvCirclePost.layoutManager?.onRestoreInstanceState(viewModel.currentScrollState)
+
+    private fun loadCircleNotices() {
+        binding.rvCirclePost.adapter?.let {
+            (it as CirclePostAdapter).update(viewModel.posts) {
+                viewModel.currentScrollState?.let {
+                    binding.rvCirclePost.layoutManager?.onRestoreInstanceState(viewModel.currentScrollState)
+                    viewModel.removeScrollState()
+                } ?: binding.rvCirclePost.scrollToPosition(0)
+            }
+        }
     }
 
     private fun sendUserToLoginScreen(activity: Activity) {
@@ -215,7 +224,7 @@ class CircleDetailPostFragment : Fragment() {
 
     private fun setBtnRetryListener() {
         binding.btnRetry.setOnClickListener {
-            viewModel.load()
+            viewModel.refresh()
         }
     }
 
