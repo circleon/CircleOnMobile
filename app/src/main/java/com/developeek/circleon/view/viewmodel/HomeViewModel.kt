@@ -17,6 +17,8 @@ interface HomeViewModel {
     val currentScrollState: Parcelable?
     val error: String
 
+    fun refresh()
+
     fun setFilterAndLoad(category: Category)
 
     fun scrollOver()
@@ -24,6 +26,4 @@ interface HomeViewModel {
     fun saveScrollState(scrollState: Parcelable?)
 
     fun removeScrollState()
-
-    fun restore()
 }

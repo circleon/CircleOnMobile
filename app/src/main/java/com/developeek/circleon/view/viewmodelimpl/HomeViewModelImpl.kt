@@ -116,7 +116,11 @@ class HomeViewModelImpl
             this.scrollState = null
         }
 
-        override fun restore() {
+        override fun refresh() {
+            loadByUiState()
+        }
+
+        private fun loadByUiState() {
             if (uiState.value == UiState.Success) {
                 categoryFilter.postValue(categoryFilter.value)
             } else {

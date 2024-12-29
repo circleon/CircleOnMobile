@@ -87,19 +87,17 @@ class CircleDetailNoticeFragment : Fragment() {
     }
 
     private fun initView(activity: Activity) {
+        initRecyclerView(activity)
+    }
+
+    private fun initRecyclerView(activity: Activity) {
         binding.rvCircleNotice.adapter =
             CirclePostAdapter(
                 activity,
                 glideProvider,
                 object : ItemListenerInitializer<PostModel> {
                     override fun initialize(item: PostModel) {
-                        findNavController()
-                            .navigate(
-                                R.id.action_circleDetailFragment_to_circleDetailPostDetailFragment,
-                                bundleOf(
-                                    Pair(Const.TAG_CIRCLE_POST, item),
-                                ),
-                            )
+                        sendUserToNoticeDetailScreen(item)
                     }
 
                     override fun initialize(
@@ -114,29 +112,7 @@ class CircleDetailNoticeFragment : Fragment() {
                         item: PostModel,
                         view: View?,
                     ) {
-                        val popupMenu = object : PopupMenu(activity, view!!) {}
-                        popupMenu.inflate(R.menu.menu_notice_settings)
-                        popupMenu.setOnMenuItemClickListener {
-                            when (it.itemId) {
-                                R.id.pin_post -> {
-                                    if (item.isPinned) {
-                                        viewModel.removePinAndLoad(item.id)
-                                    } else {
-                                        viewModel.pinAndLoad(item.id)
-                                    }
-                                }
-
-                                R.id.modify_post -> {
-                                    Toast.makeText(activity, "수정하기 ${item.id}", Toast.LENGTH_SHORT).show()
-                                }
-
-                                R.id.delete_post -> {
-                                    Toast.makeText(activity, "삭제하기 ${item.id}", Toast.LENGTH_SHORT).show()
-                                }
-                            }
-                            true
-                        }
-                        popupMenu.show()
+                        initNoticeOverflowMenuAndShow(activity, item, view!!)
                     }
                 },
                 role = role,
@@ -144,6 +120,54 @@ class CircleDetailNoticeFragment : Fragment() {
         binding.rvCircleNotice.layoutManager = LinearLayoutManager(requireActivity())
         binding.rvCircleNotice.itemAnimator = null
     }
+
+    private fun sendUserToNoticeDetailScreen(item: PostModel) {
+        findNavController()
+            .navigate(
+                R.id.action_circleDetailFragment_to_circleDetailPostDetailFragment,
+                bundleOf(
+                    Pair(Const.TAG_CIRCLE_POST, item),
+                ),
+            )
+    }
+
+    private fun initNoticeOverflowMenuAndShow(
+        activity: Activity,
+        item: PostModel,
+        view: View,
+    ) {
+        val popupMenu = object : PopupMenu(activity, view) {}
+        if (item.isPinned) {
+            popupMenu.inflate(R.menu.menu_pinned_notice_settings)
+        } else {
+            popupMenu.inflate(R.menu.menu_notice_settings)
+        }
+
+        popupMenu.setOnMenuItemClickListener(noticeOverflowMenuItemClickListener(item))
+        popupMenu.show()
+    }
+
+    private fun noticeOverflowMenuItemClickListener(item: PostModel) =
+        PopupMenu.OnMenuItemClickListener {
+            when (it.itemId) {
+                R.id.pin_post -> {
+                    if (item.isPinned) {
+                        viewModel.removePinAndLoad(item.id)
+                    } else {
+                        viewModel.pinAndLoad(item.id)
+                    }
+                }
+
+                R.id.modify_post -> {
+                    Toast.makeText(activity, "수정하기 ${item.id}", Toast.LENGTH_SHORT).show()
+                }
+
+                R.id.delete_post -> {
+                    Toast.makeText(activity, "삭제하기 ${item.id}", Toast.LENGTH_SHORT).show()
+                }
+            }
+            true
+        }
 
     private fun initObserver(activity: Activity) {
         viewModel.state.observe(

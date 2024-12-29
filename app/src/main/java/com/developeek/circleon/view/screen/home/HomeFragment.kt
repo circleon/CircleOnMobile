@@ -64,6 +64,11 @@ class HomeFragment : Fragment() {
     }
 
     private fun initView(activity: Activity) {
+        initRecyclerView(activity)
+        loadUserInfo()
+    }
+
+    private fun initRecyclerView(activity: Activity) {
         binding.rvCircle.adapter =
             CircleAdapter(
                 activity,
@@ -88,6 +93,9 @@ class HomeFragment : Fragment() {
             )
         binding.rvCircle.layoutManager = LinearLayoutManager(activity)
         binding.rvCircle.itemAnimator = null
+    }
+
+    private fun loadUserInfo() {
         userManager.getUser()?.let {
             binding.txtUnivName.text = it.univ.univName()
             binding.txtContentTitleCircle.text = String.format(CONTENT_TITLE_CIRCLE, it.name)
@@ -203,7 +211,7 @@ class HomeFragment : Fragment() {
 
     private fun setBtnRetryListener() {
         binding.btnRetry.setOnClickListener {
-            viewModel.restore()
+            viewModel.refresh()
         }
     }
 

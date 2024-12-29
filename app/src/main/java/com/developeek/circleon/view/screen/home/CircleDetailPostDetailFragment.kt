@@ -84,8 +84,12 @@ class CircleDetailPostDetailFragment : Fragment() {
 
     private fun setBtnBackListener() {
         binding.btnBack.setOnClickListener {
-            findNavController().navigateUp()
+            sendUserToPreviousScreen()
         }
+    }
+
+    private fun sendUserToPreviousScreen() {
+        findNavController().navigateUp()
     }
 
     companion object {

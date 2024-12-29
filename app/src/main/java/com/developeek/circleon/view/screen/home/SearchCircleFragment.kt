@@ -57,29 +57,16 @@ class SearchCircleFragment : Fragment() {
     }
 
     private fun initView(activity: Activity) {
+        initRecyclerView()
+        initSoftKeyboard(activity)
+    }
+
+    private fun initRecyclerView() {
         binding.rvCircle.adapter =
             CircleSearchResultAdapter(
                 object : ItemListenerInitializer<CircleSummaryModel> {
                     override fun initialize(item: CircleSummaryModel) {
-                        val navOption =
-                            NavOptions
-                                .Builder()
-                                .setPopUpTo(
-                                    R.id.searchCircleFragment,
-                                    true,
-                                    false,
-                                )
-                                .build()
-
-                        findNavController()
-                            .navigate(
-                                R.id.action_searchCircleFragment_to_circleDetailFragment,
-                                bundleOf(
-                                    Pair(Const.TAG_CIRCLE_ID, item.id),
-                                    Pair(Const.TAG_CIRCLE_NAME, item.name),
-                                ),
-                                navOption,
-                            )
+                        sendUserToCircleDetailScreen(item)
                     }
 
                     override fun initialize(
@@ -90,6 +77,32 @@ class SearchCircleFragment : Fragment() {
             )
         binding.rvCircle.layoutManager = LinearLayoutManager(activity)
         binding.rvCircle.itemAnimator = null
+    }
+
+    private fun sendUserToCircleDetailScreen(item: CircleSummaryModel) {
+        // 상세 화면 이동 시 검색 화면은 백스택에서 제거
+        val navOption =
+            NavOptions
+                .Builder()
+                .setPopUpTo(
+                    R.id.searchCircleFragment,
+                    true,
+                    false,
+                )
+                .build()
+
+        findNavController()
+            .navigate(
+                R.id.action_searchCircleFragment_to_circleDetailFragment,
+                bundleOf(
+                    Pair(Const.TAG_CIRCLE_ID, item.id),
+                    Pair(Const.TAG_CIRCLE_NAME, item.name),
+                ),
+                navOption,
+            )
+    }
+
+    private fun initSoftKeyboard(activity: Activity) {
         showSoftInput(binding.edtSearchCircle, activity)
     }
 

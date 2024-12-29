@@ -52,16 +52,21 @@ class CircleDetailIntroductionFragment : Fragment() {
     }
 
     private fun initView() {
+        loadIntroductionContent()
+        loadRecruitmentDate()
+    }
+
+    private fun loadIntroductionContent() {
         binding.txtCircleIntroductionContent.text = circleDetail.introduction
+
         if (circleDetail.introImgUrl == null) {
             binding.imgCircleIntroduction.isVisible = false
         } else {
             glideProvider.callImage(circleDetail.introImgUrl!!, requireActivity(), binding.imgCircleIntroduction)
         }
-        initRecruitmentDate()
     }
 
-    private fun initRecruitmentDate() {
+    private fun loadRecruitmentDate() {
         if (circleDetail.recruitmentStartDate == null || circleDetail.recruitmentEndDate == null) {
             binding.txtRecruitmentDate.text = NO_RECRUITMENT_MESSAGE
         } else {

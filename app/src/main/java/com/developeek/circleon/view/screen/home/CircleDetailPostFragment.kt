@@ -84,19 +84,17 @@ class CircleDetailPostFragment : Fragment() {
     }
 
     private fun initView(activity: Activity) {
+        initRecyclerView(activity)
+    }
+
+    private fun initRecyclerView(activity: Activity) {
         binding.rvCirclePost.adapter =
             CirclePostAdapter(
                 activity,
                 glideProvider,
                 object : ItemListenerInitializer<PostModel> {
                     override fun initialize(item: PostModel) {
-                        findNavController()
-                            .navigate(
-                                R.id.action_circleDetailFragment_to_circleDetailPostDetailFragment,
-                                bundleOf(
-                                    Pair(Const.TAG_CIRCLE_POST, item),
-                                ),
-                            )
+                        sendUserToPostDetailFragment(item)
                     }
 
                     override fun initialize(
@@ -111,20 +109,7 @@ class CircleDetailPostFragment : Fragment() {
                         item: PostModel,
                         view: View?,
                     ) {
-                        val popupMenu = object : PopupMenu(activity, view!!) {}
-                        popupMenu.inflate(R.menu.menu_post_settings)
-                        popupMenu.setOnMenuItemClickListener {
-                            when (it.itemId) {
-                                R.id.modify_post -> {
-                                    Toast.makeText(activity, "수정하기", Toast.LENGTH_SHORT).show()
-                                }
-                                R.id.delete_post -> {
-                                    Toast.makeText(activity, "삭제하기", Toast.LENGTH_SHORT).show()
-                                }
-                            }
-                            true
-                        }
-                        popupMenu.show()
+                        initPostOverflowMenuAndShow(activity, item, view!!)
                     }
                 },
                 userId = userManager.getUser()?.id,
@@ -132,6 +117,40 @@ class CircleDetailPostFragment : Fragment() {
         binding.rvCirclePost.layoutManager = LinearLayoutManager(requireActivity())
         binding.rvCirclePost.itemAnimator = null
     }
+
+    private fun sendUserToPostDetailFragment(item: PostModel) {
+        findNavController()
+            .navigate(
+                R.id.action_circleDetailFragment_to_circleDetailPostDetailFragment,
+                bundleOf(
+                    Pair(Const.TAG_CIRCLE_POST, item),
+                ),
+            )
+    }
+
+    private fun initPostOverflowMenuAndShow(
+        activity: Activity,
+        item: PostModel,
+        view: View,
+    ) {
+        val popupMenu = object : PopupMenu(activity, view) {}
+        popupMenu.inflate(R.menu.menu_post_settings)
+        popupMenu.setOnMenuItemClickListener(postOverflowMenuItemClickListener(item))
+        popupMenu.show()
+    }
+
+    private fun postOverflowMenuItemClickListener(item: PostModel) =
+        PopupMenu.OnMenuItemClickListener {
+            when (it.itemId) {
+                R.id.modify_post -> {
+                    Toast.makeText(activity, "수정하기", Toast.LENGTH_SHORT).show()
+                }
+                R.id.delete_post -> {
+                    Toast.makeText(activity, "삭제하기", Toast.LENGTH_SHORT).show()
+                }
+            }
+            true
+        }
 
     private fun initObserver(activity: Activity) {
         viewModel.state.observe(
