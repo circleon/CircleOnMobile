@@ -6,6 +6,7 @@ object Const {
     const val TAG_CIRCLE_NAME = "circle_name"
     const val TAG_CIRCLE_DETAIL = "circle_detail"
     const val TAG_CIRCLE_POST = "circle_post"
-
     const val TAG_USER_ROLE = "user_role"
+
+    const val TAG_ANIM_STATE = "anim_state"
 }

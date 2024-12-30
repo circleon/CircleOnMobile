@@ -1,5 +1,8 @@
 package com.developeek.circleon.view.screen.home
 
+import android.animation.Animator
+import android.animation.AnimatorInflater
+import android.animation.AnimatorSet
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -90,6 +93,40 @@ class CircleDetailPostDetailFragment : Fragment() {
 
     private fun sendUserToPreviousScreen() {
         findNavController().navigateUp()
+    }
+
+    override fun onCreateAnimator(
+        transit: Int,
+        enter: Boolean,
+        nextAnim: Int,
+    ): Animator? {
+        if (nextAnim == R.animator.slide_end_to_start) {
+            val animState = arguments?.getBoolean(Const.TAG_ANIM_STATE)
+            animState?.let {
+                if (!it) {
+                    val animator = AnimatorInflater.loadAnimator(context, nextAnim) as AnimatorSet
+                    changeAnimDuration(animator, 0)
+
+                    return animator
+                }
+            }
+        }
+        return super.onCreateAnimator(transit, enter, nextAnim)
+    }
+
+    private fun changeAnimDuration(
+        animator: AnimatorSet,
+        duration: Long,
+    ) {
+        animator.childAnimations.forEach {
+            it.setDuration(duration)
+        }
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+
+        arguments?.putBoolean(Const.TAG_ANIM_STATE, false)
     }
 
     companion object {
