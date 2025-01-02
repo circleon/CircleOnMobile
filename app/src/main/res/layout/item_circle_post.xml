@@ -122,11 +122,12 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:paddingHorizontal="@dimen/margin_padding_large"
+        android:paddingBottom="@dimen/margin_padding_small"
         android:src="@drawable/ic_overflow"
         android:clickable="true"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        android:visibility="gone"/>
+        android:visibility="gone" />
 
     <androidx.appcompat.widget.LinearLayoutCompat
         android:id="@+id/llComment"
