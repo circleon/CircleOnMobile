@@ -1,10 +1,11 @@
 package com.developeek.circleon.data.source.remote.retrofit.service
 
+import com.developeek.circleon.data.dto.home.Circle
 import com.developeek.circleon.data.dto.home.CircleDetail
 import com.developeek.circleon.data.dto.home.CircleSummaries
-import com.developeek.circleon.data.dto.home.Circles
 import com.developeek.circleon.data.dto.home.Pin
-import com.developeek.circleon.data.dto.home.Posts
+import com.developeek.circleon.data.dto.home.Post
+import com.developeek.circleon.data.dto.home.ScrollContents
 import retrofit2.http.Body
 import retrofit2.http.GET
 import retrofit2.http.PUT
@@ -14,19 +15,20 @@ import retrofit2.http.Query
 interface CircleService {
     // GET
     @GET("circles")
-    suspend fun getCircles(
+    suspend fun getCircleScrollContents(
         @Query("page") page: Int,
         @Query("size") size: Int,
         @Query("sort") sort: String,
         @Query("categoryType") category: String,
-    ): Circles
+    ): ScrollContents<Circle>
 
+    // TODO: categoryType 생략 대신에 nullable 로 처리 가능한지? 되면은 getCircle 하나로 통합 가능
     @GET("circles")
     suspend fun getAllCircles(
         @Query("page") page: Int,
         @Query("size") size: Int,
         @Query("sort") sort: String,
-    ): Circles
+    ): ScrollContents<Circle>
 
     @GET("circles/summary")
     suspend fun getCircleSummaries(): CircleSummaries
@@ -42,7 +44,7 @@ interface CircleService {
         @Query("page") page: Int,
         @Query("size") size: Int,
         @Query("postType") postType: String,
-    ): Posts
+    ): ScrollContents<Post>
 
     // PUT
     @PUT("circles/{circleId}/posts/{postId}/pin")

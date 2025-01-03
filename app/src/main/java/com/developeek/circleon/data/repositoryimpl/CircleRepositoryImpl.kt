@@ -29,7 +29,7 @@ class CircleRepositoryImpl(
                     if (category == Category.ALL) {
                         service.getAllCircles(page, size, SORT_LATEST)
                     } else {
-                        service.getCircles(page, size, SORT_LATEST, category.codeName())
+                        service.getCircleScrollContents(page, size, SORT_LATEST, category.codeName())
                     }
                 Result.success(
                     CircleModels(response.content.map { it.toCircleModel() }).apply {
