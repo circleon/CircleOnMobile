@@ -1,14 +1,12 @@
 package com.developeek.circleon.domain.model
 
-import com.developeek.circleon.domain.enums.PostType
 import com.developeek.circleon.domain.utils.Const
-import java.io.Serializable
 import java.time.LocalDateTime
 import java.util.EmptyStackException
 import java.util.Stack
 
-data class PostModels(private val data: List<PostModel>) {
-    private val models = Stack<PostModel>()
+data class CommentModels(private val data: List<CommentModel>) {
+    private val models = Stack<CommentModel>()
     private var isLastPage = false
 
     init {
@@ -25,22 +23,22 @@ data class PostModels(private val data: List<PostModel>) {
 
     fun isEmpty() = models.isEmpty()
 
-    fun add(model: PostModel): PostModels {
-        val tmp = Stack<PostModel>()
+    fun add(model: CommentModel): CommentModels {
+        val tmp = Stack<CommentModel>()
 
         tmp.addAll(this.models)
         tmp.add(model)
 
-        return PostModels(tmp)
+        return CommentModels(tmp)
     }
 
-    fun addAll(models: PostModels): PostModels {
-        val tmp = Stack<PostModel>()
+    fun addAll(models: CommentModels): CommentModels {
+        val tmp = Stack<CommentModel>()
 
         tmp.addAll(this.models)
         tmp.addAll(models.get())
 
-        return PostModels(tmp)
+        return CommentModels(tmp)
     }
 
     fun setAsLast() {
@@ -50,32 +48,24 @@ data class PostModels(private val data: List<PostModel>) {
     fun isLastPage() = isLastPage
 
     companion object {
-        fun emptyInstance() = PostModels(listOf())
+        fun emptyInstance() = CommentModels(listOf())
     }
 }
 
-data class PostModel(
+data class CommentModel(
     val id: Int,
-    val type: PostType,
-    val isPinned: Boolean,
-    val imgUrl: String?,
     val content: String,
     val createdAt: LocalDateTime,
     val updatedAt: LocalDateTime,
-    val commentCount: Int,
     val author: AuthorModel,
-) : Serializable {
+) {
     companion object {
         fun emptyInstance() =
-            PostModel(
+            CommentModel(
                 0,
-                PostType.POST,
-                false,
-                null,
                 Const.EMPTY_TEXT,
                 LocalDateTime.of(1, 1, 1, 1, 1),
                 LocalDateTime.of(1, 1, 1, 1, 1),
-                0,
                 AuthorModel.emptyInstance(),
             )
     }

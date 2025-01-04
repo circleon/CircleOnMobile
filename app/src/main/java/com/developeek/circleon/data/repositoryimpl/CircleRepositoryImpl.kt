@@ -9,6 +9,7 @@ import com.developeek.circleon.domain.enums.Category
 import com.developeek.circleon.domain.model.CircleDetailModel
 import com.developeek.circleon.domain.model.CircleModels
 import com.developeek.circleon.domain.model.CircleSummaryModels
+import com.developeek.circleon.domain.model.CommentModels
 import com.developeek.circleon.domain.model.PostModels
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
@@ -111,6 +112,30 @@ class CircleRepositoryImpl(
             }
         } catch (e: ServiceException.NoResultException) {
             Result.success(PostModels.emptyInstance())
+        } catch (e: IOException) {
+            Result.error(e)
+        }
+    }
+
+    override suspend fun getPostComments(
+        circleId: Int,
+        postId: Int,
+        page: Int,
+        size: Int,
+    ): Result<CommentModels> {
+        return try {
+            withContext(dispatcher) {
+                val response = service.getPostComments(circleId, postId, page, size)
+                Result.success(
+                    CommentModels(response.content.map { it.toCommentModel() }).apply {
+                        if (response.isLastPage()) {
+                            setAsLast()
+                        }
+                    },
+                )
+            }
+        } catch (e: ServiceException.NoResultException) {
+            Result.success(CommentModels.emptyInstance())
         } catch (e: IOException) {
             Result.error(e)
         }

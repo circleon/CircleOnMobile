@@ -127,6 +127,7 @@ class CircleDetailNoticeFragment : Fragment() {
             .navigate(
                 R.id.action_circleDetailFragment_to_circleDetailPostDetailFragment,
                 bundleOf(
+                    Pair(Const.TAG_CIRCLE_ID, circleId),
                     Pair(Const.TAG_CIRCLE_POST, item),
                     Pair(Const.TAG_ANIM_STATE, true),
                 ),

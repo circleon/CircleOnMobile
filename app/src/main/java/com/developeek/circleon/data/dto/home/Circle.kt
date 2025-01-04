@@ -18,8 +18,8 @@ data class Circle(
         CircleModel(
             id,
             name,
-            Utils.circleImageUrl(profileImgUrl),
-            Utils.circleImageUrl(thumbnailUrl),
+            Utils.getCircleImageUrlOrNull(profileImgUrl),
+            Utils.getCircleImageUrlOrNull(thumbnailUrl),
             Category.findOrDefault(category),
             comment,
             memberCount,

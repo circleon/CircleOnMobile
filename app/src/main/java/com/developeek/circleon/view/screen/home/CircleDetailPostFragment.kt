@@ -124,6 +124,7 @@ class CircleDetailPostFragment : Fragment() {
             .navigate(
                 R.id.action_circleDetailFragment_to_circleDetailPostDetailFragment,
                 bundleOf(
+                    Pair(Const.TAG_CIRCLE_ID, circleId),
                     Pair(Const.TAG_CIRCLE_POST, item),
                     Pair(Const.TAG_ANIM_STATE, true),
                 ),
@@ -254,7 +255,7 @@ class CircleDetailPostFragment : Fragment() {
         }
     }
 
-    // 게시글 상세 화면 진입 시 post fragment 가 파괴되지 않기 때문에 onStop 에서 scroll state 저장
+    // 게시글 상세 화면 진입 시 post fragment 가 파괴되지 않기 때문에 onDestroy 가 아닌 onStop 에서 scroll state 저장
     override fun onStop() {
         super.onStop()
 

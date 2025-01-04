@@ -3,6 +3,7 @@ package com.developeek.circleon.data.source.remote.retrofit.service
 import com.developeek.circleon.data.dto.home.Circle
 import com.developeek.circleon.data.dto.home.CircleDetail
 import com.developeek.circleon.data.dto.home.CircleSummaries
+import com.developeek.circleon.data.dto.home.Comment
 import com.developeek.circleon.data.dto.home.Pin
 import com.developeek.circleon.data.dto.home.Post
 import com.developeek.circleon.data.dto.home.ScrollContents
@@ -45,6 +46,14 @@ interface CircleService {
         @Query("size") size: Int,
         @Query("postType") postType: String,
     ): ScrollContents<Post>
+
+    @GET("circles/{circleId}/posts/{postId}/comments")
+    suspend fun getPostComments(
+        @Path("circleId") circleId: Int,
+        @Path("postId") postId: Int,
+        @Query("page") page: Int,
+        @Query("size") size: Int,
+    ): ScrollContents<Comment>
 
     // PUT
     @PUT("circles/{circleId}/posts/{postId}/pin")

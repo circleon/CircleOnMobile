@@ -23,6 +23,7 @@
     </androidx.appcompat.widget.Toolbar>
 
     <ScrollView
+        android:id="@+id/svPostDetail"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
@@ -125,10 +126,66 @@
 
             </androidx.constraintlayout.widget.ConstraintLayout>
 
-            <androidx.appcompat.widget.LinearLayoutCompat
-                android:id="@+id/llComment"
+            <FrameLayout
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content" />
+                android:layout_height="0dp"
+                android:layout_weight="1">
+
+                <androidx.appcompat.widget.LinearLayoutCompat
+                    android:id="@+id/llComment"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:visibility="gone"/>
+
+                <com.google.android.material.progressindicator.CircularProgressIndicator
+                    android:id="@+id/pgbLoading"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_gravity="center"
+                    app:indicatorColor="@color/grey_5"
+                    app:trackColor="@color/grey_3"
+                    app:trackThickness="1dp"
+                    android:indeterminate="true"
+                    android:visibility="gone"/>
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/txtNoComment"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:paddingBottom="140dp"
+                    android:gravity="center"
+                    android:text=""
+                    android:textAppearance="@style/large_bold_text"
+                    android:textColor="@color/grey_5"
+                    android:visibility="gone"/>
+
+                <androidx.appcompat.widget.LinearLayoutCompat
+                    android:id="@+id/llServiceError"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:gravity="center"
+                    android:orientation="vertical"
+                    android:visibility="gone">
+
+                    <androidx.appcompat.widget.AppCompatTextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/message_service_error"
+                        android:textAppearance="@style/large_bold_text"
+                        android:textColor="@color/grey_5"/>
+
+                    <androidx.appcompat.widget.AppCompatImageView
+                        android:id="@+id/btnRetry"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="@dimen/margin_padding_small"
+                        android:src="@drawable/ic_retry"
+                        android:clickable="true"/>
+
+                </androidx.appcompat.widget.LinearLayoutCompat>
+
+            </FrameLayout>
 
         </androidx.appcompat.widget.LinearLayoutCompat>
 
