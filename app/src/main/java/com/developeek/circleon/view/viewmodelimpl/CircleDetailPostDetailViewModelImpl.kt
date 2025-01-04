@@ -41,6 +41,8 @@ class CircleDetailPostDetailViewModelImpl
         private var commentLoadingJob: Job? = null
         private var currentPage = DEFAULT_PAGE
 
+        private lateinit var tmpState: UiState
+
         override lateinit var error: String
 
         init {
@@ -56,13 +58,13 @@ class CircleDetailPostDetailViewModelImpl
 
                     if (result is Success) {
                         comments = result.data
-                        uiState.postValue(UiState.Success)
+                        tmpState = UiState.Success
                     } else {
                         error = (result as Error).message()
                         if (result.isAuthenticationError()) {
-                            uiState.postValue(UiState.AuthenticationError)
+                            tmpState = UiState.AuthenticationError
                         } else {
-                            uiState.postValue(UiState.ServiceError)
+                            tmpState = UiState.ServiceError
                         }
                     }
                 }
@@ -70,12 +72,19 @@ class CircleDetailPostDetailViewModelImpl
 
         private fun initCommentLoading() {
             commentLoadingJob?.cancel()
-            uiState.postValue(UiState.Loading)
+            tmpState = UiState.Loading
             currentPage = DEFAULT_PAGE
         }
 
         override fun refresh() {
             loadComments()
+            commentLoadingJob?.invokeOnCompletion {
+                updateUiState()
+            }
+        }
+
+        override fun updateUiState() {
+            uiState.postValue(tmpState)
         }
 
         companion object {

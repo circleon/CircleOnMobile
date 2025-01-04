@@ -9,6 +9,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.animation.addListener
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
@@ -166,11 +167,18 @@ class CircleDetailPostDetailFragment : Fragment() {
 
     private fun initListener() {
         setBtnBackListener()
+        setBtnRetryListener()
     }
 
     private fun setBtnBackListener() {
         binding.btnBack.setOnClickListener {
             sendUserToPreviousScreen()
+        }
+    }
+
+    private fun setBtnRetryListener() {
+        binding.btnRetry.setOnClickListener {
+            viewModel.refresh()
         }
     }
 
@@ -186,9 +194,15 @@ class CircleDetailPostDetailFragment : Fragment() {
         if (nextAnim == R.animator.slide_end_to_start) {
             val animState = arguments?.getBoolean(Const.TAG_ANIM_STATE)
             animState?.let {
+                val animator = AnimatorInflater.loadAnimator(context, nextAnim) as AnimatorSet
                 if (!it) {
-                    val animator = AnimatorInflater.loadAnimator(context, nextAnim) as AnimatorSet
                     changeAnimDuration(animator, 0)
+
+                    return animator
+                } else {
+                    animator.addListener(onEnd = {
+                        viewModel.updateUiState()
+                    })
 
                     return animator
                 }
