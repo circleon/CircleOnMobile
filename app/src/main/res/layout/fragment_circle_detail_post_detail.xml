@@ -142,6 +142,7 @@
                     android:id="@+id/pgbLoading"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
+                    android:paddingTop="200dp"
                     android:layout_gravity="center"
                     app:indicatorColor="@color/grey_5"
                     app:trackColor="@color/grey_3"
@@ -153,7 +154,6 @@
                     android:id="@+id/txtNoComment"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:paddingBottom="140dp"
                     android:gravity="center"
                     android:text=""
                     android:textAppearance="@style/large_bold_text"
@@ -164,6 +164,7 @@
                     android:id="@+id/llServiceError"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
+                    android:paddingTop="200dp"
                     android:gravity="center"
                     android:orientation="vertical"
                     android:visibility="gone">
