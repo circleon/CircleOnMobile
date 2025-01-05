@@ -43,7 +43,7 @@ class HomeActivity : AppCompatActivity() {
     private fun setDestinationChangedListener() {
         navController.addOnDestinationChangedListener { _, destination, _ ->
             onMainFragment = destination.id == R.id.homeFragment
-            if (destination.id == R.id.searchCircleFragment) {
+            if (destination.id == R.id.searchCircleFragment || destination.id == R.id.circleDetailPostDetailFragment) {
                 binding.btmNav.isVisible = false
             } else if (!binding.btmNav.isVisible) {
                 binding.btmNav.isVisible = true

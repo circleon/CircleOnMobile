@@ -120,10 +120,11 @@ class CircleDetailPostDetailFragment : Fragment() {
                     toggleView(binding.pgbLoading)
                 }
                 UiState.Success -> {
+                    toggleView(binding.svPostDetail)
                     if (viewModel.comments.isEmpty()) {
-                        toggleView(binding.txtNoComment)
+                        toggleComment(binding.txtNoComment)
                     } else {
-                        toggleView(binding.llComment)
+                        toggleComment(binding.llComment)
                         loadComments(activity)
                     }
                 }
@@ -195,14 +196,14 @@ class CircleDetailPostDetailFragment : Fragment() {
             val animState = arguments?.getBoolean(Const.TAG_ANIM_STATE)
             animState?.let {
                 val animator = AnimatorInflater.loadAnimator(context, nextAnim) as AnimatorSet
-                if (!it) {
-                    changeAnimDuration(animator, 0)
-
-                    return animator
-                } else {
+                if (it) {
                     animator.addListener(onEnd = {
                         viewModel.updateUiState()
                     })
+
+                    return animator
+                } else {
+                    changeAnimDuration(animator, 0)
 
                     return animator
                 }
@@ -227,10 +228,14 @@ class CircleDetailPostDetailFragment : Fragment() {
     }
 
     private fun toggleView(view: View) {
-        binding.llComment.visibility = visibleWhenTrue(view == binding.llComment)
+        binding.svPostDetail.visibility = visibleWhenTrue(view == binding.svPostDetail)
         binding.pgbLoading.visibility = visibleWhenTrue(view == binding.pgbLoading)
-        binding.txtNoComment.visibility = visibleWhenTrue(view == binding.txtNoComment)
         binding.llServiceError.visibility = visibleWhenTrue(view == binding.llServiceError)
+    }
+
+    private fun toggleComment(view: View) {
+        binding.llComment.visibility = visibleWhenTrue(view == binding.llComment)
+        binding.txtNoComment.visibility = visibleWhenTrue(view == binding.txtNoComment)
     }
 
     private fun visibleWhenTrue(state: Boolean) = if (state) View.VISIBLE else View.GONE
