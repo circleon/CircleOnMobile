@@ -72,5 +72,6 @@
 
     <!-- Post Detail-->
     <string name="btn_register_comment">입력</string>
+    <string name="message_no_comment">작성된 댓글이 없어요</string>
 
 </resources>

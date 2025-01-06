@@ -124,11 +124,10 @@ class CircleDetailPostDetailFragment : Fragment() {
                     toggleView(binding.pgbLoading)
                 }
                 UiState.Success -> {
-                    toggleView(binding.svPostDetail)
                     if (viewModel.comments.isEmpty()) {
-                        toggleComment(binding.txtNoComment)
+                        toggleView(binding.txtNoComment)
                     } else {
-                        toggleComment(binding.llComment)
+                        toggleView(binding.llComment)
                         loadComments(activity)
                     }
                 }
@@ -233,14 +232,10 @@ class CircleDetailPostDetailFragment : Fragment() {
     }
 
     private fun toggleView(view: View) {
-        binding.svPostDetail.isVisible = view == binding.svPostDetail
-        binding.pgbLoading.isVisible = view == binding.pgbLoading
-        binding.llServiceError.isVisible = view == binding.llServiceError
-    }
-
-    private fun toggleComment(view: View) {
         binding.llComment.isVisible = view == binding.llComment
         binding.txtNoComment.isVisible = view == binding.txtNoComment
+        binding.pgbLoading.isVisible = view == binding.pgbLoading
+        binding.llServiceError.isVisible = view == binding.llServiceError
     }
 
     companion object {

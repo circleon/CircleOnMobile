@@ -4,6 +4,7 @@
         <item name="android:statusBarColor">@color/grey_3</item>
         <item name="actionOverflowMenuStyle">@style/pop_up_menu</item>
         <item name="popupMenuStyle">@style/pop_up_menu</item>
+        <item name="android:windowBackground">@color/grey_1</item>
     </style>
     <style name="Theme.CircleOn" parent="Base.Theme.CircleOn" />v
 </resources>
