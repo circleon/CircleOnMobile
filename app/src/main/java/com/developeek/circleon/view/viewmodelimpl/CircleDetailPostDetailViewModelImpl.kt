@@ -41,6 +41,7 @@ class CircleDetailPostDetailViewModelImpl
         private var commentLoadingJob: Job? = null
         private var currentPage = DEFAULT_PAGE
 
+        private var enterAnimFinished = false
         private lateinit var tmpState: UiState
 
         override lateinit var error: String
@@ -58,33 +59,45 @@ class CircleDetailPostDetailViewModelImpl
 
                     if (result is Success) {
                         comments = result.data
-                        tmpState = UiState.Success
+                        uiState.postValueWhenAnimFinished(UiState.Success)
                     } else {
                         error = (result as Error).message()
                         if (result.isAuthenticationError()) {
-                            tmpState = UiState.AuthenticationError
+                            uiState.postValueWhenAnimFinished(UiState.AuthenticationError)
                         } else {
-                            tmpState = UiState.ServiceError
+                            uiState.postValueWhenAnimFinished(UiState.ServiceError)
                         }
                     }
                 }
         }
 
         private fun initCommentLoading() {
+            uiState.postValueWhenAnimFinished(UiState.Loading)
             commentLoadingJob?.cancel()
-            tmpState = UiState.Loading
             currentPage = DEFAULT_PAGE
         }
 
         override fun refresh() {
             loadComments()
-            commentLoadingJob?.invokeOnCompletion {
-                updateUiState()
-            }
         }
 
-        override fun updateUiState() {
-            uiState.postValue(tmpState)
+        override fun notifyEnterAnimFinishedAndUpdateUI() {
+            enterAnimFinished = true
+            if (::tmpState.isInitialized) uiState.postValue(tmpState)
+        }
+
+        /**
+         * MutableLiveData.postValue()
+         *
+         * enterAnim 이 종료되지 않은 경우 tmpState 에 저장
+         * enterAnim 이 종료된 경우 postValue
+         */
+        private fun MutableLiveData<UiState>.postValueWhenAnimFinished(data: UiState) {
+            if (enterAnimFinished) {
+                this.postValue(data)
+            } else {
+                tmpState = data
+            }
         }
 
         companion object {

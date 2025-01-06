@@ -202,7 +202,7 @@ class CircleDetailPostDetailFragment : Fragment() {
                 val animator = AnimatorInflater.loadAnimator(context, nextAnim) as AnimatorSet
                 if (it) {
                     animator.addListener(onEnd = {
-                        viewModel.updateUiState()
+                        viewModel.notifyEnterAnimFinishedAndUpdateUI()
                     })
 
                     return animator
