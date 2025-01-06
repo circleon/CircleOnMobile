@@ -10,6 +10,7 @@ import android.widget.Toast
 import androidx.appcompat.widget.PopupMenu
 import androidx.core.content.ContextCompat
 import androidx.core.os.bundleOf
+import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
@@ -263,11 +264,9 @@ class CircleDetailPostFragment : Fragment() {
     }
 
     private fun toggleView(view: View) {
-        binding.rvCirclePost.visibility = visibleWhenTrue(view == binding.rvCirclePost)
-        binding.pgbLoading.visibility = visibleWhenTrue(view == binding.pgbLoading)
-        binding.txtNoPost.visibility = visibleWhenTrue(view == binding.txtNoPost)
-        binding.llServiceError.visibility = visibleWhenTrue(view == binding.llServiceError)
+        binding.rvCirclePost.isVisible = view == binding.rvCirclePost
+        binding.pgbLoading.isVisible = view == binding.pgbLoading
+        binding.txtNoPost.isVisible = view == binding.txtNoPost
+        binding.llServiceError.isVisible = view == binding.llServiceError
     }
-
-    private fun visibleWhenTrue(state: Boolean) = if (state) View.VISIBLE else View.GONE
 }

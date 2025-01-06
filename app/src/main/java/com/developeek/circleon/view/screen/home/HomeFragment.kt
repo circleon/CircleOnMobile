@@ -7,6 +7,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.core.os.bundleOf
+import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Observer
@@ -247,13 +248,11 @@ class HomeFragment : Fragment() {
     }
 
     private fun toggleView(view: View) {
-        binding.rvCircle.visibility = visibleWhenTrue(view == binding.rvCircle)
-        binding.pgbLoading.visibility = visibleWhenTrue(view == binding.pgbLoading)
-        binding.txtNoCircle.visibility = visibleWhenTrue(view == binding.txtNoCircle)
-        binding.llServiceError.visibility = visibleWhenTrue(view == binding.llServiceError)
+        binding.rvCircle.isVisible = view == binding.rvCircle
+        binding.pgbLoading.isVisible = view == binding.pgbLoading
+        binding.txtNoCircle.isVisible = view == binding.txtNoCircle
+        binding.llServiceError.isVisible = view == binding.llServiceError
     }
-
-    private fun visibleWhenTrue(state: Boolean) = if (state) View.VISIBLE else View.GONE
 
     companion object {
         private const val CONTENT_TITLE_CIRCLE = "%s 님 이런 동아리는 어떠신가요?"

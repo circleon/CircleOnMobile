@@ -8,6 +8,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.inputmethod.InputMethodManager
 import androidx.core.os.bundleOf
+import androidx.core.view.isVisible
 import androidx.core.widget.doOnTextChanged
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
@@ -207,11 +208,9 @@ class SearchCircleFragment : Fragment() {
     }
 
     private fun toggleView(view: View) {
-        binding.rvCircle.visibility = visibleWhenTrue(view == binding.rvCircle)
-        binding.pgbLoading.visibility = visibleWhenTrue(view == binding.pgbLoading)
-        binding.txtNoResult.visibility = visibleWhenTrue(view == binding.txtNoResult)
-        binding.llServiceError.visibility = visibleWhenTrue(view == binding.llServiceError)
+        binding.rvCircle.isVisible = view == binding.rvCircle
+        binding.pgbLoading.isVisible = view == binding.pgbLoading
+        binding.txtNoResult.isVisible = view == binding.txtNoResult
+        binding.llServiceError.isVisible = view == binding.llServiceError
     }
-
-    private fun visibleWhenTrue(state: Boolean) = if (state) View.VISIBLE else View.GONE
 }

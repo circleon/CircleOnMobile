@@ -233,17 +233,15 @@ class CircleDetailPostDetailFragment : Fragment() {
     }
 
     private fun toggleView(view: View) {
-        binding.svPostDetail.visibility = visibleWhenTrue(view == binding.svPostDetail)
-        binding.pgbLoading.visibility = visibleWhenTrue(view == binding.pgbLoading)
-        binding.llServiceError.visibility = visibleWhenTrue(view == binding.llServiceError)
+        binding.svPostDetail.isVisible = view == binding.svPostDetail
+        binding.pgbLoading.isVisible = view == binding.pgbLoading
+        binding.llServiceError.isVisible = view == binding.llServiceError
     }
 
     private fun toggleComment(view: View) {
-        binding.llComment.visibility = visibleWhenTrue(view == binding.llComment)
-        binding.txtNoComment.visibility = visibleWhenTrue(view == binding.txtNoComment)
+        binding.llComment.isVisible = view == binding.llComment
+        binding.txtNoComment.isVisible = view == binding.txtNoComment
     }
-
-    private fun visibleWhenTrue(state: Boolean) = if (state) View.VISIBLE else View.GONE
 
     companion object {
         private const val CREATED_DATE_FORMAT = "M월 d일 hh:mm"

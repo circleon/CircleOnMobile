@@ -304,9 +304,9 @@ class CircleDetailFragment : Fragment() {
     }
 
     private fun toggleView(view: View) {
-        binding.flCircleDetail.visibility = visibleWhenTrue(view == binding.flCircleDetail)
-        binding.pgbLoading.visibility = visibleWhenTrue(view == binding.pgbLoading)
-        binding.llServiceError.visibility = visibleWhenTrue(view == binding.llServiceError)
+        binding.flCircleDetail.isVisible = view == binding.flCircleDetail
+        binding.pgbLoading.isVisible = view == binding.pgbLoading
+        binding.llServiceError.isVisible = view == binding.llServiceError
     }
 
     private fun removeNotMemberViewIfVisible() {
@@ -314,8 +314,6 @@ class CircleDetailFragment : Fragment() {
             binding.llNotMember.isVisible = false
         }
     }
-
-    private fun visibleWhenTrue(state: Boolean) = if (state) View.VISIBLE else View.GONE
 
     companion object {
         private const val MEMBER_COUNT_UNIT = "멤버 %d명"
