@@ -9,6 +9,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.WindowManager
 import androidx.core.animation.addListener
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
@@ -59,6 +60,9 @@ class CircleDetailPostDetailFragment : Fragment() {
             circleId = it.getInt(Const.TAG_CIRCLE_ID)
             post = it.getSerializable(Const.TAG_CIRCLE_POST) as PostModel
         }
+
+        // post 상세 화면에서만 adjust resize mode 로 전환
+        activity?.window?.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE)
     }
 
     override fun onCreateView(
@@ -225,6 +229,7 @@ class CircleDetailPostDetailFragment : Fragment() {
         super.onDestroyView()
 
         arguments?.putBoolean(Const.TAG_ANIM_STATE, false)
+        activity?.window?.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_PAN) // softInputMode 복원
     }
 
     private fun toggleView(view: View) {
