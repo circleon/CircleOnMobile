@@ -43,11 +43,11 @@ class SignUpViewModelImpl
         private var email: UserEmail? = null
         private lateinit var requestEmailCodeJob: Job
         private var emailCode: String? = null
-        private lateinit var emailCodeExpirationTimerJob: Job
+        private lateinit var countEmailCodeExpirationTimeJob: Job
         private var password: Password? = null
         private var passwordMatched: Boolean = false
         private var emailAuthenticated: Boolean = false
-        private lateinit var emailAuthenticationJob: Job
+        private lateinit var authenticateEmailJob: Job
         private lateinit var signUpJob: Job
 
         override lateinit var error: String
@@ -115,9 +115,9 @@ class SignUpViewModelImpl
         }
 
         private fun startEmailAuthenticationTimer() {
-            if (::emailCodeExpirationTimerJob.isInitialized) emailCodeExpirationTimerJob.cancel()
+            if (::countEmailCodeExpirationTimeJob.isInitialized) countEmailCodeExpirationTimeJob.cancel()
 
-            emailCodeExpirationTimerJob =
+            countEmailCodeExpirationTimeJob =
                 viewModelScope.launch {
                     withContext(Dispatchers.Default) {
                         timer.postValue(TIMER_INIT)
@@ -137,16 +137,16 @@ class SignUpViewModelImpl
         }
 
         override fun authenticateEmail() {
-            if ((!::emailAuthenticationJob.isInitialized || emailAuthenticationJob.isCompleted) &&
+            if ((!::authenticateEmailJob.isInitialized || authenticateEmailJob.isCompleted) &&
                 email != null && emailCode != null
             ) {
-                emailAuthenticationJob =
+                authenticateEmailJob =
                     viewModelScope.launch {
                         val result = repository.authenticateEmail(email!!, emailCode!!)
 
                         if (result is Success) {
                             emailAuthenticated = true
-                            emailCodeExpirationTimerJob.cancel()
+                            countEmailCodeExpirationTimeJob.cancel()
                             validationMessage.postValue(EMAIL_AUTHENTICATED)
                         } else {
                             emailAuthenticated = false

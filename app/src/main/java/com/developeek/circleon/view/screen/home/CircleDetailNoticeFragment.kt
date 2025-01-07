@@ -161,9 +161,9 @@ class CircleDetailNoticeFragment : Fragment() {
             when (it.itemId) {
                 R.id.pin_post -> {
                     if (item.isPinned) {
-                        viewModel.removePinAndLoad(item.id)
+                        viewModel.removePinAndFetch(item.id)
                     } else {
-                        viewModel.pinAndLoad(item.id)
+                        viewModel.pinAndFetch(item.id)
                     }
                 }
 

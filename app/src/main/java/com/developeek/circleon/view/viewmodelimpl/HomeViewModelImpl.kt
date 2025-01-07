@@ -32,13 +32,13 @@ class HomeViewModelImpl
         private val categoryFilter = MutableLiveData<Category>()
 
         override lateinit var circles: CircleModels
-        private var circleLoadingJob: Job? = null
+        private var fetchCircleJob: Job? = null
         private var currentPage = DEFAULT_PAGE
 
         override val scrollOver: LiveData<Boolean>
             get() = scrollOverCompleted
         private var scrollOverCompleted = MutableLiveData<Boolean>()
-        private var scrollOverLoadingJob: Job? = null
+        private var scrollOverCircleJob: Job? = null
         override val scrollListener = RecyclerViewInfiniteScrollListener()
         override val currentScrollState: Parcelable?
             get() = scrollState
@@ -47,13 +47,13 @@ class HomeViewModelImpl
         override lateinit var error: String
 
         init {
-            setFilterAndLoad(Category.ALL)
+            setFilterAndFetch(Category.ALL)
         }
 
-        override fun setFilterAndLoad(category: Category) {
+        override fun setFilterAndFetch(category: Category) {
             initCategoryFiltering(category)
 
-            circleLoadingJob =
+            fetchCircleJob =
                 viewModelScope.launch {
                     val result = repository.getCircles(currentPage, SIZE_BY_PAGE, category)
 
@@ -72,17 +72,17 @@ class HomeViewModelImpl
         }
 
         private fun initCategoryFiltering(category: Category) {
-            circleLoadingJob?.cancel()
-            scrollOverLoadingJob?.cancel()
+            fetchCircleJob?.cancel()
+            scrollOverCircleJob?.cancel()
             categoryFilter.postValue(category)
             uiState.postValue(UiState.Loading)
             currentPage = DEFAULT_PAGE
         }
 
         override fun scrollOver() {
-            scrollOverLoadingJob?.cancel()
+            scrollOverCircleJob?.cancel()
 
-            scrollOverLoadingJob =
+            scrollOverCircleJob =
                 viewModelScope.launch {
                     val result = repository.getCircles(currentPage + 1, SIZE_BY_PAGE, categoryFilter.value!!)
 
@@ -115,17 +115,17 @@ class HomeViewModelImpl
         }
 
         override fun refresh() {
-            loadByUiState()
+            fetchOrNotByUiState()
         }
 
-        private fun loadByUiState() {
+        private fun fetchOrNotByUiState() {
             if (uiState.value == UiState.Success) {
                 categoryFilter.postValue(categoryFilter.value)
             } else {
                 if (categoryFilter.value == null) {
-                    setFilterAndLoad(Category.ALL)
+                    setFilterAndFetch(Category.ALL)
                 } else {
-                    setFilterAndLoad(categoryFilter.value!!)
+                    setFilterAndFetch(categoryFilter.value!!)
                 }
             }
         }

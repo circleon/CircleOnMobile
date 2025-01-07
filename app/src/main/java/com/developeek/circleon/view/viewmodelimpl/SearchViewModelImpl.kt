@@ -28,20 +28,20 @@ class SearchViewModelImpl
             get() = searchResult
         private val searchResult = MutableLiveData<CircleSummaryModels>()
         private lateinit var circleSummaryModels: CircleSummaryModels
-        private var circleLoadingJob: Job? = null
+        private var fetchCircleSummaryJob: Job? = null
 
         private var keyword = Const.EMPTY_TEXT
 
         override lateinit var error: String
 
         init {
-            loadCircles()
+            fetchCircleSummaries()
         }
 
-        private fun loadCircles() {
-            circleLoadingJob?.cancel()
+        private fun fetchCircleSummaries() {
+            fetchCircleSummaryJob?.cancel()
 
-            circleLoadingJob =
+            fetchCircleSummaryJob =
                 viewModelScope.launch {
                     val result = repository.getCircleSummaries()
 
@@ -60,7 +60,7 @@ class SearchViewModelImpl
         }
 
         override fun refresh() {
-            loadCircles()
+            fetchCircleSummaries()
         }
 
         override fun setKeywordAndFind(keyword: String) {
@@ -70,7 +70,7 @@ class SearchViewModelImpl
                 notifySearchResultByKeyword()
             }
             if (uiState.value is UiState.ServiceError) {
-                loadCircles()
+                fetchCircleSummaries()
             }
         }
 

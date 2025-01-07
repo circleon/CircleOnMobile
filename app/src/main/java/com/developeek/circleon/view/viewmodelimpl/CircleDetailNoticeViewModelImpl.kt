@@ -36,14 +36,14 @@ class CircleDetailNoticeViewModelImpl
         private val uiState = MutableLiveData<UiState>()
 
         override lateinit var posts: PostModels
-        private var noticeLoadingJob: Job? = null
+        private var fetchNoticeJob: Job? = null
         private var pinNoticeJob: Job? = null
         private var currentPage = DEFAULT_PAGE
 
         override val scrollOver: LiveData<Boolean>
             get() = scrollOverCompleted
         private var scrollOverCompleted = MutableLiveData<Boolean>()
-        private var scrollOverLoadingJob: Job? = null
+        private var scrollOverNoticeJob: Job? = null
         override val scrollListener = RecyclerViewInfiniteScrollListener()
         override val currentScrollState: Parcelable?
             get() = scrollState
@@ -55,13 +55,13 @@ class CircleDetailNoticeViewModelImpl
         override lateinit var error: String
 
         init {
-            loadNotices()
+            fetchNotices()
         }
 
-        private fun loadNotices() {
-            initNoticeLoading()
+        private fun fetchNotices() {
+            initNoticeFetching()
 
-            noticeLoadingJob =
+            fetchNoticeJob =
                 viewModelScope.launch {
                     val result = repository.getCircleNotices(circleId, currentPage, SIZE_BY_PAGE)
 
@@ -79,21 +79,21 @@ class CircleDetailNoticeViewModelImpl
                 }
         }
 
-        private fun initNoticeLoading() {
-            noticeLoadingJob?.cancel()
-            scrollOverLoadingJob?.cancel()
+        private fun initNoticeFetching() {
             uiState.postValue(UiState.Loading)
+            fetchNoticeJob?.cancel()
+            scrollOverNoticeJob?.cancel()
             currentPage = DEFAULT_PAGE
         }
 
         override fun refresh() {
-            loadNotices()
+            fetchNotices()
         }
 
         override fun scrollOver(circleId: Int) {
-            scrollOverLoadingJob?.cancel()
+            scrollOverNoticeJob?.cancel()
 
-            scrollOverLoadingJob =
+            scrollOverNoticeJob =
                 viewModelScope.launch {
                     val result = repository.getCircleNotices(circleId, currentPage + 1, SIZE_BY_PAGE)
 
@@ -129,15 +129,15 @@ class CircleDetailNoticeViewModelImpl
             this.isTop = isTop
         }
 
-        override fun pinAndLoad(postId: Int) {
-            togglePinAndLoad(postId, true)
+        override fun pinAndFetch(postId: Int) {
+            togglePinAndFetch(postId, true)
         }
 
-        override fun removePinAndLoad(postId: Int) {
-            togglePinAndLoad(postId, false)
+        override fun removePinAndFetch(postId: Int) {
+            togglePinAndFetch(postId, false)
         }
 
-        private fun togglePinAndLoad(
+        private fun togglePinAndFetch(
             postId: Int,
             isPinned: Boolean,
         ) {
@@ -148,7 +148,7 @@ class CircleDetailNoticeViewModelImpl
                     val result = repository.putPostPin(circleId, postId, isPinned)
 
                     if (result is Success) {
-                        loadNotices()
+                        fetchNotices()
                     } else {
                         error = (result as Error).message()
                         if (result.isAuthenticationError()) {

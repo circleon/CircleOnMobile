@@ -33,7 +33,7 @@ class CircleDetailViewModelImpl
         private val uiState = MutableLiveData<UiState>()
 
         override lateinit var circleDetail: CircleDetailModel
-        private var circleDetailLoadingJob: Job? = null
+        private var fetchCircleDetailJob: Job? = null
         override val circleDetailInitialized: Boolean
             get() = isCircleDetailInitialized
         private var isCircleDetailInitialized = false
@@ -49,14 +49,14 @@ class CircleDetailViewModelImpl
         override lateinit var error: String
 
         init {
-            loadCircleDetail()
+            fetchCircleDetail()
         }
 
-        private fun loadCircleDetail() {
-            circleDetailLoadingJob?.cancel()
+        private fun fetchCircleDetail() {
+            fetchCircleDetailJob?.cancel()
             uiState.postValue(UiState.Loading)
 
-            circleDetailLoadingJob =
+            fetchCircleDetailJob =
                 viewModelScope.launch {
                     val result = repository.getCircleDetail(circleId)
 
@@ -76,7 +76,7 @@ class CircleDetailViewModelImpl
         }
 
         override fun refresh() {
-            loadCircleDetail()
+            fetchCircleDetail()
         }
 
         override fun setTabPosition(position: Int) {

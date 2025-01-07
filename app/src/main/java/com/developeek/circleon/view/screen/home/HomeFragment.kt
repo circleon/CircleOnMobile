@@ -175,7 +175,7 @@ class HomeFragment : Fragment() {
                             if (viewModel.selectedCategory.value!!.isSame(item)) {
                                 binding.rvCircle.scrollToPosition(0)
                             } else {
-                                viewModel.setFilterAndLoad(item)
+                                viewModel.setFilterAndFetch(item)
                             }
                         }
 

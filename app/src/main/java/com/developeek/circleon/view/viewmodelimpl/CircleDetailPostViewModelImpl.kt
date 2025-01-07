@@ -36,13 +36,13 @@ class CircleDetailPostViewModelImpl
         private val uiState = MutableLiveData<UiState>()
 
         override lateinit var posts: PostModels
-        private var postLoadingJob: Job? = null
+        private var fetchPostJob: Job? = null
         private var currentPage = DEFAULT_PAGE
 
         override val scrollOver: LiveData<Boolean>
             get() = scrollOverCompleted
         private var scrollOverCompleted = MutableLiveData<Boolean>()
-        private var scrollOverLoadingJob: Job? = null
+        private var scrollOverPostJob: Job? = null
         override val scrollListener = RecyclerViewInfiniteScrollListener()
         override val currentScrollState: Parcelable?
             get() = scrollState
@@ -54,13 +54,13 @@ class CircleDetailPostViewModelImpl
         override lateinit var error: String
 
         init {
-            loadPosts()
+            fetchPosts()
         }
 
-        private fun loadPosts() {
-            initPostLoading()
+        private fun fetchPosts() {
+            initPostFetching()
 
-            postLoadingJob =
+            fetchPostJob =
                 viewModelScope.launch {
                     val result = repository.getCirclePosts(circleId, currentPage, SIZE_BY_PAGE)
 
@@ -78,21 +78,21 @@ class CircleDetailPostViewModelImpl
                 }
         }
 
-        private fun initPostLoading() {
-            postLoadingJob?.cancel()
-            scrollOverLoadingJob?.cancel()
+        private fun initPostFetching() {
+            fetchPostJob?.cancel()
+            scrollOverPostJob?.cancel()
             uiState.postValue(UiState.Loading)
             currentPage = DEFAULT_PAGE
         }
 
         override fun refresh() {
-            loadPosts()
+            fetchPosts()
         }
 
         override fun scrollOver(circleId: Int) {
-            scrollOverLoadingJob?.cancel()
+            scrollOverPostJob?.cancel()
 
-            scrollOverLoadingJob =
+            scrollOverPostJob =
                 viewModelScope.launch {
                     val result = repository.getCirclePosts(circleId, currentPage + 1, SIZE_BY_PAGE)
 
@@ -129,9 +129,9 @@ class CircleDetailPostViewModelImpl
         }
 
         // 현재는 공지사항용 핀 고정 기능이고, 나중에 게시글 고정 기능 추가 시 사용
-        override fun pinAndLoad(postId: Int) {}
+        override fun pinAndFetch(postId: Int) {}
 
-        override fun removePinAndLoad(postId: Int) {}
+        override fun removePinAndFetch(postId: Int) {}
 
         companion object {
             private const val SIZE_BY_PAGE = 10

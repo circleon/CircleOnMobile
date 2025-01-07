@@ -19,7 +19,7 @@ interface HomeViewModel {
 
     fun refresh()
 
-    fun setFilterAndLoad(category: Category)
+    fun setFilterAndFetch(category: Category)
 
     fun scrollOver()
 
