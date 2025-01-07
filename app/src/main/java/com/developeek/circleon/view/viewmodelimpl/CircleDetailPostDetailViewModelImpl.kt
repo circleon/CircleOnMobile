@@ -98,7 +98,7 @@ class CircleDetailPostDetailViewModelImpl
                     val result = repository.postComment(circleId, postId, comment)
 
                     if (result is Success) {
-                        comments.add(result.data)
+                        comments = comments.add(result.data)
                         commentState.postValueWhenAnimFinished(true)
                     } else {
                         error = (result as Error).message()

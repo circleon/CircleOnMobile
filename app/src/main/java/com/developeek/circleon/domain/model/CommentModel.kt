@@ -29,7 +29,7 @@ data class CommentModels(private val data: List<CommentModel>) {
         val tmp = Stack<CommentModel>()
 
         tmp.addAll(this.models)
-        tmp.add(model)
+        tmp.push(model)
 
         return CommentModels(tmp)
     }

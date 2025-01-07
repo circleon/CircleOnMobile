@@ -31,9 +31,7 @@ class HomeViewModelImpl
             get() = categoryFilter
         private val categoryFilter = MutableLiveData<Category>()
 
-        override val circles: CircleModels
-            get() = circleModels
-        private var circleModels = CircleModels.emptyInstance()
+        override lateinit var circles: CircleModels
         private var circleLoadingJob: Job? = null
         private var currentPage = DEFAULT_PAGE
 
@@ -60,7 +58,7 @@ class HomeViewModelImpl
                     val result = repository.getCircles(currentPage, SIZE_BY_PAGE, category)
 
                     if (result is Success) {
-                        circleModels = result.data
+                        circles = result.data
                         uiState.postValue(UiState.Success)
                     } else {
                         error = (result as Error).message()
@@ -89,8 +87,8 @@ class HomeViewModelImpl
                     val result = repository.getCircles(currentPage + 1, SIZE_BY_PAGE, categoryFilter.value!!)
 
                     if (result is Success) {
-                        circleModels =
-                            circleModels.addAll(result.data).also {
+                        circles =
+                            circles.addAll(result.data).also {
                                 if (result.data.isLastPage()) {
                                     it.setAsLast()
                                 }

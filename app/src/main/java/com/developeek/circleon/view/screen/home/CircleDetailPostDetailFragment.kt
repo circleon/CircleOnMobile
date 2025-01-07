@@ -10,6 +10,8 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.WindowManager
+import android.view.inputmethod.InputMethodManager
+import android.widget.EditText
 import androidx.core.animation.addListener
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
@@ -185,12 +187,22 @@ class CircleDetailPostDetailFragment : Fragment() {
     private fun registerCommentStateObserver(activity: Activity) =
         Observer<Boolean> {
             if (it) {
+                toggleView(binding.llComment)
                 loadComment(activity, viewModel.comments.last())
+                hideSoftInput(activity, binding.edtComment)
                 binding.edtComment.text.clear()
             } else {
                 CustomAlertDialog(activity, viewModel.error).show()
             }
         }
+
+    private fun hideSoftInput(
+        activity: Activity,
+        view: EditText,
+    ) {
+        val imm = activity.getSystemService(InputMethodManager::class.java)
+        imm.hideSoftInputFromWindow(view.windowToken, 0)
+    }
 
     private fun initListener() {
         setBtnBackListener()
