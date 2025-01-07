@@ -22,14 +22,14 @@ class CircleSearchResultAdapter(private val itemListenerInitializer: ItemListene
                     oldItem: CircleSummaryModel,
                     newItem: CircleSummaryModel,
                 ): Boolean {
-                    return oldItem.id == newItem.id
+                    return oldItem.isSame(newItem)
                 }
 
                 override fun areContentsTheSame(
                     oldItem: CircleSummaryModel,
                     newItem: CircleSummaryModel,
                 ): Boolean {
-                    return oldItem.id == newItem.id
+                    return oldItem.areContentsSame(newItem)
                 }
             },
         )

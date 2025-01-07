@@ -38,6 +38,10 @@ data class CommentModel(
     val updatedAt: LocalDateTime,
     val author: AuthorModel,
 ) {
+    fun isSame(commentModel: CommentModel) = this.id == commentModel.id
+
+    fun areContentsSame(commentModel: CommentModel) = this == commentModel
+
     companion object {
         fun emptyInstance() =
             CommentModel(

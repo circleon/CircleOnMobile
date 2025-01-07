@@ -39,6 +39,10 @@ data class CircleModel(
     val comment: String,
     val memberCount: Int,
 ) : Serializable {
+    fun isSame(circleModel: CircleModel) = this.id == circleModel.id
+
+    fun areContentsSame(circleModel: CircleModel) = this == circleModel
+
     companion object {
         fun emptyInstance() =
             CircleModel(

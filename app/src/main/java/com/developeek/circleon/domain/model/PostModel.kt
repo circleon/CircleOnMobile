@@ -42,6 +42,10 @@ data class PostModel(
     val commentCount: Int,
     val author: AuthorModel,
 ) : Serializable {
+    fun isSame(postModel: PostModel) = this.id == postModel.id
+
+    fun areContentsSame(postModel: PostModel) = this == postModel
+
     companion object {
         fun emptyInstance() =
             PostModel(

@@ -8,6 +8,10 @@ data class AuthorModel(
     val name: String,
     val profileUrl: String?,
 ) : Serializable {
+    fun isSame(authorModel: AuthorModel) = this.id == authorModel.id
+
+    fun areContentsSame(authorModel: AuthorModel) = this == authorModel
+
     companion object {
         fun emptyInstance() =
             AuthorModel(

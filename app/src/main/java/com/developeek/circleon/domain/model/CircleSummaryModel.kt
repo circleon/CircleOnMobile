@@ -30,4 +30,8 @@ data class CircleSummaryModel(
     val id: Int,
     val name: String,
     val category: Category,
-) : Serializable
+) : Serializable {
+    fun isSame(circleSummaryModel: CircleSummaryModel) = this.id == circleSummaryModel.id
+
+    fun areContentsSame(circleSummaryModel: CircleSummaryModel) = this == circleSummaryModel
+}

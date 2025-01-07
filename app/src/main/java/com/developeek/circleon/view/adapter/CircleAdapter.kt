@@ -29,14 +29,14 @@ class CircleAdapter(
                     oldItem: CircleModel,
                     newItem: CircleModel,
                 ): Boolean {
-                    return oldItem.id == newItem.id
+                    return oldItem.isSame(newItem)
                 }
 
                 override fun areContentsTheSame(
                     oldItem: CircleModel,
                     newItem: CircleModel,
                 ): Boolean {
-                    return oldItem.id == newItem.id
+                    return oldItem.areContentsSame(newItem)
                 }
             },
         )
