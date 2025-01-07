@@ -4,44 +4,21 @@ import com.developeek.circleon.domain.enums.PostType
 import com.developeek.circleon.domain.utils.Const
 import java.io.Serializable
 import java.time.LocalDateTime
-import java.util.EmptyStackException
-import java.util.Stack
 
-data class PostModels(private val data: List<PostModel>) {
-    private val models = Stack<PostModel>()
+data class PostModels(private val models: List<PostModel>) {
     private var isLastPage = false
-
-    init {
-        for (c in data) {
-            models.push(c)
-        }
-    }
 
     fun get() = models
 
-    fun get(index: Int) = models[index] ?: throw EmptyStackException()
+    fun get(index: Int) = models[index]
 
     fun size() = models.size
 
     fun isEmpty() = models.isEmpty()
 
-    fun add(model: PostModel): PostModels {
-        val tmp = Stack<PostModel>()
+    fun add(postModel: PostModel) = PostModels(models + postModel)
 
-        tmp.addAll(this.models)
-        tmp.add(model)
-
-        return PostModels(tmp)
-    }
-
-    fun addAll(models: PostModels): PostModels {
-        val tmp = Stack<PostModel>()
-
-        tmp.addAll(this.models)
-        tmp.addAll(models.get())
-
-        return PostModels(tmp)
-    }
+    fun addAll(postModels: PostModels) = PostModels(models + postModels.get())
 
     fun setAsLast() {
         isLastPage = true

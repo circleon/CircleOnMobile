@@ -2,22 +2,13 @@ package com.developeek.circleon.domain.model
 
 import com.developeek.circleon.domain.utils.Const
 import java.time.LocalDateTime
-import java.util.EmptyStackException
-import java.util.Stack
 
-data class CommentModels(private val data: List<CommentModel>) {
-    private val models = Stack<CommentModel>()
+data class CommentModels(private val models: List<CommentModel>) {
     private var isLastPage = false
-
-    init {
-        for (c in data) {
-            models.push(c)
-        }
-    }
 
     fun get() = models
 
-    fun get(index: Int) = models[index] ?: throw EmptyStackException()
+    fun get(index: Int) = models[index]
 
     fun last() = models.last()
 
@@ -25,23 +16,9 @@ data class CommentModels(private val data: List<CommentModel>) {
 
     fun isEmpty() = models.isEmpty()
 
-    fun add(model: CommentModel): CommentModels {
-        val tmp = Stack<CommentModel>()
+    fun add(commentModel: CommentModel) = CommentModels(models + commentModel)
 
-        tmp.addAll(this.models)
-        tmp.push(model)
-
-        return CommentModels(tmp)
-    }
-
-    fun addAll(models: CommentModels): CommentModels {
-        val tmp = Stack<CommentModel>()
-
-        tmp.addAll(this.models)
-        tmp.addAll(models.get())
-
-        return CommentModels(tmp)
-    }
+    fun addAll(commentModels: CommentModels) = CommentModels(models + commentModels.get())
 
     fun setAsLast() {
         isLastPage = true

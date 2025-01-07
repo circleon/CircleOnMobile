@@ -3,44 +3,21 @@ package com.developeek.circleon.domain.model
 import com.developeek.circleon.domain.enums.Category
 import com.developeek.circleon.domain.utils.Const
 import java.io.Serializable
-import java.util.EmptyStackException
-import java.util.Stack
 
-data class CircleModels(private val data: List<CircleModel>) {
-    private val models = Stack<CircleModel>()
+data class CircleModels(private val models: List<CircleModel>) {
     private var isLastPage = false
-
-    init {
-        for (c in data) {
-            models.push(c)
-        }
-    }
 
     fun get() = models
 
-    fun get(index: Int) = models[index] ?: throw EmptyStackException()
+    fun get(index: Int) = models[index]
 
     fun size() = models.size
 
     fun isEmpty() = models.isEmpty()
 
-    fun add(model: CircleModel): CircleModels {
-        val tmp = Stack<CircleModel>()
+    fun add(circleModel: CircleModel) = CircleModels(models + circleModel)
 
-        tmp.addAll(this.models)
-        tmp.add(model)
-
-        return CircleModels(tmp)
-    }
-
-    fun addAll(models: CircleModels): CircleModels {
-        val tmp = Stack<CircleModel>()
-
-        tmp.addAll(this.models)
-        tmp.addAll(models.get())
-
-        return CircleModels(tmp)
-    }
+    fun addAll(circleModels: CircleModels) = CircleModels(models + circleModels.get())
 
     fun setAsLast() {
         isLastPage = true

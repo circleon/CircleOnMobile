@@ -2,22 +2,12 @@ package com.developeek.circleon.domain.model
 
 import com.developeek.circleon.domain.enums.Category
 import java.io.Serializable
-import java.util.EmptyStackException
-import java.util.Stack
 import kotlin.math.absoluteValue
 
-data class CircleSummaryModels(private val data: List<CircleSummaryModel>) {
-    private val models = Stack<CircleSummaryModel>()
-
-    init {
-        for (c in data) {
-            models.push(c)
-        }
-    }
-
+data class CircleSummaryModels(private val models: List<CircleSummaryModel>) {
     fun get() = models
 
-    fun get(index: Int) = models[index] ?: throw EmptyStackException()
+    fun get(index: Int) = models[index]
 
     fun isEmpty() = models.isEmpty()
 
