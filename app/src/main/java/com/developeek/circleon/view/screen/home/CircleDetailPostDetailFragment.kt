@@ -20,6 +20,7 @@ import com.developeek.circleon.R
 import com.developeek.circleon.data.source.manager.UserManager
 import com.developeek.circleon.databinding.FragmentCircleDetailPostDetailBinding
 import com.developeek.circleon.databinding.ItemPostCommentBinding
+import com.developeek.circleon.domain.model.CommentModel
 import com.developeek.circleon.domain.model.PostModel
 import com.developeek.circleon.domain.state.UiState
 import com.developeek.circleon.domain.utils.Const
@@ -27,6 +28,7 @@ import com.developeek.circleon.domain.utils.glide.GlideProvider
 import com.developeek.circleon.view.screen.login.LoginActivity
 import com.developeek.circleon.view.viewmodel.CircleDetailPostDetailViewModel
 import com.developeek.circleon.view.viewmodelimpl.CircleDetailPostDetailViewModelImpl
+import com.developeek.circleon.view.widget.CustomAlertDialog
 import com.developeek.circleon.view.widget.ErrorToast
 import dagger.hilt.android.AndroidEntryPoint
 import dagger.hilt.android.lifecycle.withCreationCallback
@@ -115,6 +117,10 @@ class CircleDetailPostDetailFragment : Fragment() {
             viewLifecycleOwner,
             stateObserver(activity),
         )
+        viewModel.registerCommentState.observe(
+            viewLifecycleOwner,
+            registerCommentStateObserver(activity),
+        )
     }
 
     private fun stateObserver(activity: Activity) =
@@ -148,19 +154,26 @@ class CircleDetailPostDetailFragment : Fragment() {
 
     private fun loadComments(activity: Activity) {
         viewModel.comments.get().forEach {
-            val itemBinding = ItemPostCommentBinding.inflate(layoutInflater)
-
-            itemBinding.apply {
-                txtAuthorName.text = it.author.name
-                txtCreated.text = it.createdAt.format(DateTimeFormatter.ofPattern(CREATED_DATE_FORMAT))
-                txtComment.text = it.content
-                it.author.profileUrl?.let {
-                    glideProvider.callImage(it, activity, imgAuthorProfile)
-                } ?: imgAuthorProfile.setImageResource(R.drawable.ic_author_placeholder)
-            }
-
-            binding.llComment.addView(itemBinding.root)
+            loadComment(activity, it)
         }
+    }
+
+    private fun loadComment(
+        activity: Activity,
+        comment: CommentModel,
+    ) {
+        val itemBinding = ItemPostCommentBinding.inflate(layoutInflater)
+
+        itemBinding.apply {
+            txtAuthorName.text = comment.author.name
+            txtCreated.text = comment.createdAt.format(DateTimeFormatter.ofPattern(CREATED_DATE_FORMAT))
+            txtComment.text = comment.content
+            comment.author.profileUrl?.let {
+                glideProvider.callImage(it, activity, imgAuthorProfile)
+            } ?: imgAuthorProfile.setImageResource(R.drawable.ic_author_placeholder)
+        }
+
+        binding.llComment.addView(itemBinding.root)
     }
 
     private fun sendUserToLoginScreen(activity: Activity) {
@@ -169,14 +182,31 @@ class CircleDetailPostDetailFragment : Fragment() {
         startActivity(intent)
     }
 
+    private fun registerCommentStateObserver(activity: Activity) =
+        Observer<Boolean> {
+            if (it) {
+                loadComment(activity, viewModel.comments.last())
+                binding.edtComment.text.clear()
+            } else {
+                CustomAlertDialog(activity, viewModel.error).show()
+            }
+        }
+
     private fun initListener() {
         setBtnBackListener()
+        setBtnRegisterCommentListener()
         setBtnRetryListener()
     }
 
     private fun setBtnBackListener() {
         binding.btnBack.setOnClickListener {
             sendUserToPreviousScreen()
+        }
+    }
+
+    private fun setBtnRegisterCommentListener() {
+        binding.btnRegisterComment.setOnClickListener {
+            viewModel.registerComment(binding.edtComment.text.toString())
         }
     }
 

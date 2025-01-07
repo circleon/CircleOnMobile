@@ -19,6 +19,8 @@ data class CommentModels(private val data: List<CommentModel>) {
 
     fun get(index: Int) = models[index] ?: throw EmptyStackException()
 
+    fun last() = models.last()
+
     fun size() = models.size
 
     fun isEmpty() = models.isEmpty()

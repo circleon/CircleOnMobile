@@ -20,3 +20,7 @@ data class Comment(
             author.toAuthorModel(),
         )
 }
+
+data class CommentContent(
+    val content: String,
+)

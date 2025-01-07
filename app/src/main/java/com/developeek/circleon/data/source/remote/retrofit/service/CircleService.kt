@@ -4,11 +4,13 @@ import com.developeek.circleon.data.dto.home.Circle
 import com.developeek.circleon.data.dto.home.CircleDetail
 import com.developeek.circleon.data.dto.home.CircleSummaries
 import com.developeek.circleon.data.dto.home.Comment
+import com.developeek.circleon.data.dto.home.CommentContent
+import com.developeek.circleon.data.dto.home.Paging
 import com.developeek.circleon.data.dto.home.Pin
 import com.developeek.circleon.data.dto.home.Post
-import com.developeek.circleon.data.dto.home.ScrollContents
 import retrofit2.http.Body
 import retrofit2.http.GET
+import retrofit2.http.POST
 import retrofit2.http.PUT
 import retrofit2.http.Path
 import retrofit2.http.Query
@@ -21,7 +23,7 @@ interface CircleService {
         @Query("size") size: Int,
         @Query("sort") sort: String,
         @Query("categoryType") category: String,
-    ): ScrollContents<Circle>
+    ): Paging<Circle>
 
     // TODO: categoryType 생략 대신에 nullable 로 처리 가능한지? 되면은 getCircle 하나로 통합 가능
     @GET("circles")
@@ -29,7 +31,7 @@ interface CircleService {
         @Query("page") page: Int,
         @Query("size") size: Int,
         @Query("sort") sort: String,
-    ): ScrollContents<Circle>
+    ): Paging<Circle>
 
     @GET("circles/summary")
     suspend fun getCircleSummaries(): CircleSummaries
@@ -45,7 +47,7 @@ interface CircleService {
         @Query("page") page: Int,
         @Query("size") size: Int,
         @Query("postType") postType: String,
-    ): ScrollContents<Post>
+    ): Paging<Post>
 
     @GET("circles/{circleId}/posts/{postId}/comments")
     suspend fun getPostComments(
@@ -53,7 +55,7 @@ interface CircleService {
         @Path("postId") postId: Int,
         @Query("page") page: Int,
         @Query("size") size: Int,
-    ): ScrollContents<Comment>
+    ): Paging<Comment>
 
     // PUT
     @PUT("circles/{circleId}/posts/{postId}/pin")
@@ -62,4 +64,12 @@ interface CircleService {
         @Path("postId") postId: Int,
         @Body data: Pin,
     )
+
+    // POST
+    @POST("circles/{circleId}/posts/{postId}/comments")
+    suspend fun postComment(
+        @Path("circleId") circleId: Int,
+        @Path("postId") postId: Int,
+        @Body data: CommentContent,
+    ): Comment
 }

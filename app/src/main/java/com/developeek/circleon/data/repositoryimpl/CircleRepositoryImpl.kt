@@ -1,5 +1,6 @@
 package com.developeek.circleon.data.repositoryimpl
 
+import com.developeek.circleon.data.dto.home.CommentContent
 import com.developeek.circleon.data.dto.home.Pin
 import com.developeek.circleon.data.exception.ServiceException
 import com.developeek.circleon.data.repository.CircleRepository
@@ -9,6 +10,7 @@ import com.developeek.circleon.domain.enums.Category
 import com.developeek.circleon.domain.model.CircleDetailModel
 import com.developeek.circleon.domain.model.CircleModels
 import com.developeek.circleon.domain.model.CircleSummaryModels
+import com.developeek.circleon.domain.model.CommentModel
 import com.developeek.circleon.domain.model.CommentModels
 import com.developeek.circleon.domain.model.PostModels
 import kotlinx.coroutines.CoroutineDispatcher
@@ -150,6 +152,21 @@ class CircleRepositoryImpl(
             withContext(dispatcher) {
                 service.putPostPin(circleId, postId, Pin(isPinned))
                 Result.success(true)
+            }
+        } catch (e: IOException) {
+            Result.error(e)
+        }
+    }
+
+    override suspend fun postComment(
+        circleId: Int,
+        postId: Int,
+        comment: String,
+    ): Result<CommentModel> {
+        return try {
+            withContext(dispatcher) {
+                val response = service.postComment(circleId, postId, CommentContent(comment))
+                Result.success(response.toCommentModel())
             }
         } catch (e: IOException) {
             Result.error(e)

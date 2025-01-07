@@ -36,9 +36,13 @@ class CircleDetailPostDetailViewModelImpl
         override val state: LiveData<UiState>
             get() = uiState
         private val uiState = MutableLiveData<UiState>()
+        override val registerCommentState: LiveData<Boolean>
+            get() = commentState
+        private val commentState = MutableLiveData<Boolean>()
 
         override lateinit var comments: CommentModels
-        private var commentLoadingJob: Job? = null
+        private var fetchCommentJob: Job? = null
+        private var registerCommentJob: Job? = null
         private var currentPage = DEFAULT_PAGE
 
         private var enterAnimFinished = false
@@ -47,13 +51,13 @@ class CircleDetailPostDetailViewModelImpl
         override lateinit var error: String
 
         init {
-            loadComments()
+            fetchComments()
         }
 
-        private fun loadComments() {
-            initCommentLoading()
+        private fun fetchComments() {
+            initCommentFetching()
 
-            commentLoadingJob =
+            fetchCommentJob =
                 viewModelScope.launch {
                     val result = repository.getPostComments(circleId, postId, currentPage, SIZE_BY_PAGE)
 
@@ -71,14 +75,14 @@ class CircleDetailPostDetailViewModelImpl
                 }
         }
 
-        private fun initCommentLoading() {
+        private fun initCommentFetching() {
             uiState.postValueWhenAnimFinished(UiState.Loading)
-            commentLoadingJob?.cancel()
+            fetchCommentJob?.cancel()
             currentPage = DEFAULT_PAGE
         }
 
         override fun refresh() {
-            loadComments()
+            fetchComments()
         }
 
         override fun notifyEnterAnimFinishedAndUpdateUI() {
@@ -86,17 +90,49 @@ class CircleDetailPostDetailViewModelImpl
             if (::tmpState.isInitialized) uiState.postValue(tmpState)
         }
 
+        override fun registerComment(comment: String) {
+            registerCommentJob?.cancel()
+
+            registerCommentJob =
+                viewModelScope.launch {
+                    val result = repository.postComment(circleId, postId, comment)
+
+                    if (result is Success) {
+                        comments.add(result.data)
+                        commentState.postValueWhenAnimFinished(true)
+                    } else {
+                        error = (result as Error).message()
+                        commentState.postValueWhenAnimFinished(false)
+                        if (result.isAuthenticationError()) {
+                            uiState.postValueWhenAnimFinished(UiState.AuthenticationError)
+                        } else {
+                            uiState.postValueWhenAnimFinished(UiState.ServiceError)
+                        }
+                    }
+                }
+        }
+
         /**
          * MutableLiveData.postValue()
          *
+         * - UiState
          * enterAnim 이 종료되지 않은 경우 tmpState 에 저장
          * enterAnim 이 종료된 경우 postValue
+         *
+         * - Boolean(registerComment)
+         * enterAnim 이 종료된 경우에만 postValue
          */
         private fun MutableLiveData<UiState>.postValueWhenAnimFinished(data: UiState) {
             if (enterAnimFinished) {
                 this.postValue(data)
             } else {
                 tmpState = data
+            }
+        }
+
+        private fun MutableLiveData<Boolean>.postValueWhenAnimFinished(data: Boolean) {
+            if (enterAnimFinished) {
+                this.postValue(data)
             }
         }
 

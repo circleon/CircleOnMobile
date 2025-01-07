@@ -5,6 +5,7 @@ import com.developeek.circleon.domain.enums.Category
 import com.developeek.circleon.domain.model.CircleDetailModel
 import com.developeek.circleon.domain.model.CircleModels
 import com.developeek.circleon.domain.model.CircleSummaryModels
+import com.developeek.circleon.domain.model.CommentModel
 import com.developeek.circleon.domain.model.CommentModels
 import com.developeek.circleon.domain.model.PostModels
 
@@ -45,4 +46,11 @@ interface CircleRepository {
         postId: Int,
         isPinned: Boolean,
     ): Result<Boolean>
+
+    // POST
+    suspend fun postComment(
+        circleId: Int,
+        postId: Int,
+        comment: String,
+    ): Result<CommentModel>
 }
