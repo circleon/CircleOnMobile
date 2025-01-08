@@ -130,7 +130,8 @@ class CircleDetailNoticeFragment : Fragment() {
                 bundleOf(
                     Pair(Const.TAG_CIRCLE_ID, circleId),
                     Pair(Const.TAG_CIRCLE_POST, item),
-                    Pair(Const.TAG_ANIM_STATE, true),
+                    // 상세 화면 진입 시에만 anim 작동, bottom tab 전환 시에는 작동 X
+                    Pair(Const.FLAG_ANIM_STATE, true),
                 ),
             )
     }
@@ -187,6 +188,14 @@ class CircleDetailNoticeFragment : Fragment() {
             viewLifecycleOwner,
             scrollOverObserver(),
         )
+        // 댓글 정보 수정 여부 감지
+        findNavController()
+            .currentBackStackEntry
+            ?.savedStateHandle
+            ?.getLiveData<Boolean>(Const.FLAG_DATA_CHANGED)
+            ?.observe(viewLifecycleOwner) {
+                if (it) viewModel.refresh()
+            }
     }
 
     private fun stateObserver(activity: Activity) =
@@ -223,7 +232,6 @@ class CircleDetailNoticeFragment : Fragment() {
             (it as CirclePostAdapter).update(viewModel.posts) {
                 viewModel.currentScrollState?.let {
                     binding.rvCircleNotice.layoutManager?.onRestoreInstanceState(viewModel.currentScrollState)
-                    viewModel.removeScrollState()
                 } ?: binding.rvCircleNotice.scrollToPosition(0)
             }
         }
@@ -273,9 +281,8 @@ class CircleDetailNoticeFragment : Fragment() {
         }
     }
 
-    // 공지사항 상세 화면 진입 시 notice fragment 가 파괴되지 않기 때문에 onStop 에서 scroll state 저장
-    override fun onStop() {
-        super.onStop()
+    override fun onDestroyView() {
+        super.onDestroyView()
 
         viewModel.saveScrollState(binding.rvCircleNotice.layoutManager?.onSaveInstanceState())
     }

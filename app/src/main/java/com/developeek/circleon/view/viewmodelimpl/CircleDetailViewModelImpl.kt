@@ -49,12 +49,12 @@ class CircleDetailViewModelImpl
         override lateinit var error: String
 
         init {
+            uiState.postValue(UiState.Loading)
             fetchCircleDetail()
         }
 
         private fun fetchCircleDetail() {
             fetchCircleDetailJob?.cancel()
-            uiState.postValue(UiState.Loading)
 
             fetchCircleDetailJob =
                 viewModelScope.launch {

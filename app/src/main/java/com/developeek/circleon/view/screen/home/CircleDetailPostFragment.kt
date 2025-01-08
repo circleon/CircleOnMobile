@@ -127,7 +127,8 @@ class CircleDetailPostFragment : Fragment() {
                 bundleOf(
                     Pair(Const.TAG_CIRCLE_ID, circleId),
                     Pair(Const.TAG_CIRCLE_POST, item),
-                    Pair(Const.TAG_ANIM_STATE, true),
+                    // 상세 화면 진입 시에만 anim 작동, bottom tab 전환 시에는 작동 X
+                    Pair(Const.FLAG_ANIM_STATE, true),
                 ),
             )
     }
@@ -170,6 +171,14 @@ class CircleDetailPostFragment : Fragment() {
             viewLifecycleOwner,
             scrollOverObserver(),
         )
+        // 댓글 정보 수정 여부 감지
+        findNavController()
+            .currentBackStackEntry
+            ?.savedStateHandle
+            ?.getLiveData<Boolean>(Const.FLAG_DATA_CHANGED)
+            ?.observe(viewLifecycleOwner) {
+                if (it) viewModel.refresh()
+            }
     }
 
     private fun stateObserver(activity: Activity) =
@@ -206,7 +215,6 @@ class CircleDetailPostFragment : Fragment() {
             (it as CirclePostAdapter).update(viewModel.posts) {
                 viewModel.currentScrollState?.let {
                     binding.rvCirclePost.layoutManager?.onRestoreInstanceState(viewModel.currentScrollState)
-                    viewModel.removeScrollState()
                 } ?: binding.rvCirclePost.scrollToPosition(0)
             }
         }
@@ -256,9 +264,8 @@ class CircleDetailPostFragment : Fragment() {
         }
     }
 
-    // 게시글 상세 화면 진입 시 post fragment 가 파괴되지 않기 때문에 onDestroy 가 아닌 onStop 에서 scroll state 저장
-    override fun onStop() {
-        super.onStop()
+    override fun onDestroyView() {
+        super.onDestroyView()
 
         viewModel.saveScrollState(binding.rvCirclePost.layoutManager?.onSaveInstanceState())
     }

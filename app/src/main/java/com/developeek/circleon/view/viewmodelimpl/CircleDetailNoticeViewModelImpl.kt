@@ -55,15 +55,20 @@ class CircleDetailNoticeViewModelImpl
         override lateinit var error: String
 
         init {
-            fetchNotices()
+            uiState.postValue(UiState.Loading)
+            fetchNotices(currentPage, SIZE_BY_PAGE)
         }
 
-        private fun fetchNotices() {
-            initNoticeFetching()
+        private fun fetchNotices(
+            page: Int,
+            size: Int,
+        ) {
+            fetchNoticeJob?.cancel()
+            scrollOverNoticeJob?.cancel()
 
             fetchNoticeJob =
                 viewModelScope.launch {
-                    val result = repository.getCircleNotices(circleId, currentPage, SIZE_BY_PAGE)
+                    val result = repository.getCircleNotices(circleId, page, size)
 
                     if (result is Success) {
                         posts = result.data
@@ -79,15 +84,10 @@ class CircleDetailNoticeViewModelImpl
                 }
         }
 
-        private fun initNoticeFetching() {
-            uiState.postValue(UiState.Loading)
-            fetchNoticeJob?.cancel()
-            scrollOverNoticeJob?.cancel()
-            currentPage = DEFAULT_PAGE
-        }
-
         override fun refresh() {
-            fetchNotices()
+            // currentPage: 0 == page 1
+            // currentPage: 1 == page 2 ...
+            fetchNotices(DEFAULT_PAGE, (currentPage + 1) * SIZE_BY_PAGE)
         }
 
         override fun scrollOver(circleId: Int) {
@@ -148,7 +148,7 @@ class CircleDetailNoticeViewModelImpl
                     val result = repository.putPostPin(circleId, postId, isPinned)
 
                     if (result is Success) {
-                        fetchNotices()
+                        fetchNotices(currentPage, SIZE_BY_PAGE)
                     } else {
                         error = (result as Error).message()
                         if (result.isAuthenticationError()) {

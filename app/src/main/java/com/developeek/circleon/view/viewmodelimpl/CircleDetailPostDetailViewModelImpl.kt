@@ -36,7 +36,9 @@ class CircleDetailPostDetailViewModelImpl
         override val state: LiveData<UiState>
             get() = uiState
         private val uiState = MutableLiveData<UiState>()
-        override val registerCommentState: LiveData<Boolean>
+        private lateinit var tmpState: UiState
+
+        override val registerCommentState: LiveData<Boolean> // 댓글 등록 성공 확인용
             get() = commentState
         private val commentState = MutableLiveData<Boolean>()
 
@@ -46,20 +48,23 @@ class CircleDetailPostDetailViewModelImpl
         private var currentPage = DEFAULT_PAGE
 
         private var enterAnimFinished = false
-        private lateinit var tmpState: UiState
 
         override lateinit var error: String
 
         init {
-            fetchComments()
+            uiState.postValueWhenAnimFinished(UiState.Loading)
+            fetchComments(currentPage, SIZE_BY_PAGE)
         }
 
-        private fun fetchComments() {
-            initCommentFetching()
+        private fun fetchComments(
+            page: Int,
+            size: Int,
+        ) {
+            fetchCommentJob?.cancel()
 
             fetchCommentJob =
                 viewModelScope.launch {
-                    val result = repository.getPostComments(circleId, postId, currentPage, SIZE_BY_PAGE)
+                    val result = repository.getPostComments(circleId, postId, page, size)
 
                     if (result is Success) {
                         comments = result.data
@@ -75,14 +80,8 @@ class CircleDetailPostDetailViewModelImpl
                 }
         }
 
-        private fun initCommentFetching() {
-            uiState.postValueWhenAnimFinished(UiState.Loading)
-            fetchCommentJob?.cancel()
-            currentPage = DEFAULT_PAGE
-        }
-
         override fun refresh() {
-            fetchComments()
+            fetchComments(DEFAULT_PAGE, (currentPage + 1) * SIZE_BY_PAGE)
         }
 
         override fun notifyEnterAnimFinishedAndUpdateUI() {

@@ -200,6 +200,8 @@ class CircleDetailPostDetailFragment : Fragment() {
                 loadComment(activity, viewModel.comments.last())
                 hideSoftInput(activity, binding.edtComment)
                 binding.edtComment.text.clear()
+                // 동아리 상세 화면에 댓글 정보 수정 여부 전달
+                findNavController().previousBackStackEntry?.savedStateHandle?.set(Const.FLAG_DATA_CHANGED, true)
             } else {
                 CustomAlertDialog(activity, viewModel.error).show()
             }
@@ -225,6 +227,10 @@ class CircleDetailPostDetailFragment : Fragment() {
         }
     }
 
+    private fun sendUserToPreviousScreen() {
+        findNavController().navigateUp()
+    }
+
     private fun setBtnRegisterCommentListener() {
         binding.btnRegisterComment.setOnClickListener {
             viewModel.registerComment(binding.edtComment.text.toString())
@@ -237,17 +243,13 @@ class CircleDetailPostDetailFragment : Fragment() {
         }
     }
 
-    private fun sendUserToPreviousScreen() {
-        findNavController().navigateUp()
-    }
-
     override fun onCreateAnimator(
         transit: Int,
         enter: Boolean,
         nextAnim: Int,
     ): Animator? {
         if (nextAnim == R.animator.slide_end_to_start) {
-            val animState = arguments?.getBoolean(Const.TAG_ANIM_STATE)
+            val animState = arguments?.getBoolean(Const.FLAG_ANIM_STATE)
             animState?.let {
                 val animator = AnimatorInflater.loadAnimator(context, nextAnim) as AnimatorSet
                 if (it) {
@@ -278,7 +280,7 @@ class CircleDetailPostDetailFragment : Fragment() {
     override fun onDestroyView() {
         super.onDestroyView()
 
-        arguments?.putBoolean(Const.TAG_ANIM_STATE, false)
+        arguments?.putBoolean(Const.FLAG_ANIM_STATE, false)
         activity?.window?.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_PAN) // softInputMode 복원
     }
 

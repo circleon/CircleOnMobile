@@ -54,15 +54,20 @@ class CircleDetailPostViewModelImpl
         override lateinit var error: String
 
         init {
-            fetchPosts()
+            uiState.postValue(UiState.Loading)
+            fetchPosts(currentPage, SIZE_BY_PAGE)
         }
 
-        private fun fetchPosts() {
-            initPostFetching()
+        private fun fetchPosts(
+            page: Int,
+            size: Int,
+        ) {
+            fetchPostJob?.cancel()
+            scrollOverPostJob?.cancel()
 
             fetchPostJob =
                 viewModelScope.launch {
-                    val result = repository.getCirclePosts(circleId, currentPage, SIZE_BY_PAGE)
+                    val result = repository.getCirclePosts(circleId, page, size)
 
                     if (result is Success) {
                         posts = result.data
@@ -78,15 +83,8 @@ class CircleDetailPostViewModelImpl
                 }
         }
 
-        private fun initPostFetching() {
-            fetchPostJob?.cancel()
-            scrollOverPostJob?.cancel()
-            uiState.postValue(UiState.Loading)
-            currentPage = DEFAULT_PAGE
-        }
-
         override fun refresh() {
-            fetchPosts()
+            fetchPosts(DEFAULT_PAGE, (currentPage + 1) * SIZE_BY_PAGE)
         }
 
         override fun scrollOver(circleId: Int) {
