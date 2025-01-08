@@ -91,8 +91,17 @@ class CircleDetailPostDetailFragment : Fragment() {
     }
 
     private fun initView(activity: Activity) {
+        initToolbar()
         loadAuthor(activity)
         loadPost(activity)
+    }
+
+    private fun initToolbar() {
+        if (post.type.isNotice()) {
+            binding.txtTbTitle.text = TITLE_NOTICE
+        } else {
+            binding.txtTbTitle.text = TITLE_POST
+        }
     }
 
     private fun loadAuthor(activity: Activity) {
@@ -282,5 +291,7 @@ class CircleDetailPostDetailFragment : Fragment() {
 
     companion object {
         private const val CREATED_DATE_FORMAT = "M월 d일 hh:mm"
+        private const val TITLE_NOTICE = "공지사항 상세보기"
+        private const val TITLE_POST = "게시글 상세보기"
     }
 }

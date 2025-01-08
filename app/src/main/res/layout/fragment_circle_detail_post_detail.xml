@@ -24,6 +24,14 @@
             android:src="@drawable/ic_back"
             android:background="@null"/>
 
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/txtTbTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="@style/large_bold_text"
+            android:textColor="@color/grey_9"
+            tools:text="tbTitle"/>
+
     </androidx.appcompat.widget.Toolbar>
 
     <ScrollView
