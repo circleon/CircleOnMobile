@@ -238,15 +238,16 @@ class CircleDetailPostFragment : Fragment() {
         }
 
     private fun initListener() {
-        setRvCircleNoticeListener()
+        setRvCirclePostListener()
         setBtnRetryListener()
     }
 
-    private fun setRvCircleNoticeListener() {
+    private fun setRvCirclePostListener() {
         binding.rvCirclePost.addOnScrollListener(viewModel.scrollListener)
         (viewModel.scrollListener as RecyclerViewInfiniteScrollListener).setScrollEndListener {
             if (!viewModel.posts.isLastPage()) {
                 addScrollLoadingItemAndLoad()
+                viewModel.saveScrollState(binding.rvCirclePost.layoutManager?.onSaveInstanceState())
             }
         }
     }

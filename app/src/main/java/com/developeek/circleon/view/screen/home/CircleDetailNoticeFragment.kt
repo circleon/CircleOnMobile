@@ -264,6 +264,7 @@ class CircleDetailNoticeFragment : Fragment() {
         (viewModel.scrollListener as RecyclerViewInfiniteScrollListener).setScrollEndListener {
             if (!viewModel.posts.isLastPage()) {
                 addScrollLoadingItemAndLoad()
+                viewModel.saveScrollState(binding.rvCircleNotice.layoutManager?.onSaveInstanceState())
             }
         }
     }
