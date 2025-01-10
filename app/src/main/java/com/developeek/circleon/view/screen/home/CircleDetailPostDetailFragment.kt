@@ -35,6 +35,7 @@ import com.developeek.circleon.view.widget.ErrorToast
 import dagger.hilt.android.AndroidEntryPoint
 import dagger.hilt.android.lifecycle.withCreationCallback
 import java.time.format.DateTimeFormatter
+import java.util.Locale
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -108,7 +109,9 @@ class CircleDetailPostDetailFragment : Fragment() {
         binding.txtAuthorName.text = post.author.name
         binding.txtCreated.text =
             post.createdAt.format(
-                DateTimeFormatter.ofPattern(CREATED_DATE_FORMAT),
+                DateTimeFormatter
+                    .ofPattern(CREATED_DATE_FORMAT)
+                    .withLocale(Locale.KOREAN),
             )
         post.author.profileUrl?.let {
             glideProvider.callImage(it, activity, binding.imgAuthorProfile)
@@ -177,7 +180,12 @@ class CircleDetailPostDetailFragment : Fragment() {
 
         itemBinding.apply {
             txtAuthorName.text = comment.author.name
-            txtCreated.text = comment.createdAt.format(DateTimeFormatter.ofPattern(CREATED_DATE_FORMAT))
+            txtCreated.text =
+                comment.createdAt.format(
+                    DateTimeFormatter
+                        .ofPattern(CREATED_DATE_FORMAT)
+                        .withLocale(Locale.KOREAN),
+                )
             txtComment.text = comment.content
             comment.author.profileUrl?.let {
                 glideProvider.callImage(it, activity, imgAuthorProfile)
@@ -292,7 +300,7 @@ class CircleDetailPostDetailFragment : Fragment() {
     }
 
     companion object {
-        private const val CREATED_DATE_FORMAT = "M월 d일 hh:mm"
+        private const val CREATED_DATE_FORMAT = "M월 d일 a hh:mm"
         private const val TITLE_NOTICE = "공지사항 상세보기"
         private const val TITLE_POST = "게시글 상세보기"
     }

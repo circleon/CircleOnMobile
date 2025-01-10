@@ -18,6 +18,7 @@ import com.developeek.circleon.domain.utils.glide.GlideProvider
 import com.developeek.circleon.view.listener.ItemClickListener
 import com.developeek.circleon.view.listener.ItemListenerInitializer
 import java.time.format.DateTimeFormatter
+import java.util.Locale
 
 class CirclePostAdapter(
     private val activity: Activity,
@@ -78,7 +79,9 @@ class CirclePostAdapter(
             } ?: binding.imgAuthorProfile.setImageResource(R.drawable.ic_author_placeholder)
             binding.txtCreated.text =
                 post.createdAt.format(
-                    DateTimeFormatter.ofPattern(CREATED_DATE_FORMAT),
+                    DateTimeFormatter
+                        .ofPattern(CREATED_DATE_FORMAT)
+                        .withLocale(Locale.KOREAN),
                 )
         }
 
@@ -190,7 +193,7 @@ class CirclePostAdapter(
 
     companion object {
         private const val COMMENT_COUNT_UNIT = "%d개"
-        private const val CREATED_DATE_FORMAT = "M월 d일 hh:mm"
+        private const val CREATED_DATE_FORMAT = "M월 d일 a hh:mm"
         private const val VIEW_TYPE_LOADING = 0
         private const val VIEW_TYPE_ITEM = 1
         private const val VIEW_TYPE_ITEM_WITH_IMAGE = 2
