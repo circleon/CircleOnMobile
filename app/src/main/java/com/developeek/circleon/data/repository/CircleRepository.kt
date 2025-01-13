@@ -45,7 +45,7 @@ interface CircleRepository {
         circleId: Int,
         postId: Int,
         isPinned: Boolean,
-    ): Result<Boolean>
+    ): Result<Unit>
 
     // POST
     suspend fun postComment(

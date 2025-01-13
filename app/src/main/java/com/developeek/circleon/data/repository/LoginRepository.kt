@@ -9,18 +9,18 @@ interface LoginRepository {
     suspend fun login(
         email: String,
         password: String,
-    ): Result<Boolean>
+    ): Result<Unit>
 
     suspend fun signUp(
         email: UserEmail,
         userName: UserName,
         password: Password,
-    ): Result<Boolean>
+    ): Result<Unit>
 
-    suspend fun requestEmailAuthenticationCode(email: UserEmail): Result<Boolean>
+    suspend fun requestEmailAuthenticationCode(email: UserEmail): Result<Unit>
 
     suspend fun authenticateEmail(
         email: UserEmail,
         code: String,
-    ): Result<Boolean>
+    ): Result<Unit>
 }

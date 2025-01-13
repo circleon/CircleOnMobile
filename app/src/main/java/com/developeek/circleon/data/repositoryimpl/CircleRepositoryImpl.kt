@@ -147,11 +147,11 @@ class CircleRepositoryImpl(
         circleId: Int,
         postId: Int,
         isPinned: Boolean,
-    ): Result<Boolean> {
+    ): Result<Unit> {
         return try {
             withContext(dispatcher) {
                 service.putPostPin(circleId, postId, Pin(isPinned))
-                Result.success(true)
+                Result.success(Unit)
             }
         } catch (e: IOException) {
             Result.error(e)
