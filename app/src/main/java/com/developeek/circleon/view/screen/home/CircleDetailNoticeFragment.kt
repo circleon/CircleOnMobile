@@ -161,6 +161,7 @@ class CircleDetailNoticeFragment : Fragment() {
 
     private fun noticeOverflowMenuItemClickListener(item: PostModel) =
         PopupMenu.OnMenuItemClickListener {
+            viewModel.saveScrollState(binding.rvCircleNotice.layoutManager?.onSaveInstanceState())
             when (it.itemId) {
                 R.id.pin_post -> {
                     if (item.isPinned) {
@@ -266,6 +267,7 @@ class CircleDetailNoticeFragment : Fragment() {
         (viewModel.scrollListener as RecyclerViewInfiniteScrollListener).setScrollEndListener {
             if (!viewModel.posts.isLastPage()) {
                 addScrollLoadingItemAndLoad()
+                // scrollOver 시 문제가 발생하더라도 정상으로 돌아온 경우 스크롤 복원하기 위함
                 viewModel.saveScrollState(binding.rvCircleNotice.layoutManager?.onSaveInstanceState())
             }
         }

@@ -151,6 +151,7 @@ class CircleDetailPostFragment : Fragment() {
 
     private fun postOverflowMenuItemClickListener(item: PostModel) =
         PopupMenu.OnMenuItemClickListener {
+            viewModel.saveScrollState(binding.rvCirclePost.layoutManager?.onSaveInstanceState())
             when (it.itemId) {
                 R.id.modify_post -> {
                     Toast.makeText(activity, "수정하기", Toast.LENGTH_SHORT).show()
