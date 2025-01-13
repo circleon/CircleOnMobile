@@ -38,6 +38,7 @@ class CircleDetailNoticeViewModelImpl
         override lateinit var posts: PostModels
         private var fetchNoticeJob: Job? = null
         private var pinNoticeJob: Job? = null
+        private var deleteNoticeJob: Job? = null
         private var currentPage = DEFAULT_PAGE
 
         override val scrollOver: LiveData<Boolean>
@@ -129,15 +130,15 @@ class CircleDetailNoticeViewModelImpl
             this.isTop = isTop
         }
 
-        override fun pinAndFetch(postId: Int) {
-            togglePinAndFetch(postId, true)
+        override fun pinAndRefresh(postId: Int) {
+            togglePinAndRefresh(postId, true)
         }
 
-        override fun removePinAndFetch(postId: Int) {
-            togglePinAndFetch(postId, false)
+        override fun removePinAndRefresh(postId: Int) {
+            togglePinAndRefresh(postId, false)
         }
 
-        private fun togglePinAndFetch(
+        private fun togglePinAndRefresh(
             postId: Int,
             isPinned: Boolean,
         ) {
@@ -148,7 +149,27 @@ class CircleDetailNoticeViewModelImpl
                     val result = repository.putPostPin(circleId, postId, isPinned)
 
                     if (result is Success) {
-                        fetchNotices(currentPage, SIZE_BY_PAGE)
+                        refresh()
+                    } else {
+                        error = (result as Error).message()
+                        if (result.isAuthenticationError()) {
+                            uiState.postValue(UiState.AuthenticationError)
+                        } else {
+                            uiState.postValue(UiState.ServiceError)
+                        }
+                    }
+                }
+        }
+
+        override fun deleteAndRefresh(postId: Int) {
+            deleteNoticeJob?.cancel()
+
+            deleteNoticeJob =
+                viewModelScope.launch {
+                    val result = repository.deletePost(circleId, postId)
+
+                    if (result is Success) {
+                        refresh()
                     } else {
                         error = (result as Error).message()
                         if (result.isAuthenticationError()) {

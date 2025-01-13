@@ -173,6 +173,20 @@ class CircleRepositoryImpl(
         }
     }
 
+    override suspend fun deletePost(
+        circleId: Int,
+        postId: Int,
+    ): Result<Unit> {
+        return try {
+            withContext(dispatcher) {
+                val response = service.deletePost(circleId, postId)
+                Result.success(Unit)
+            }
+        } catch (e: IOException) {
+            Result.error(e)
+        }
+    }
+
     companion object {
         private const val SORT_LATEST = "createdAt,desc"
         private const val TYPE_POST = "POST"

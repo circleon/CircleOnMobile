@@ -37,6 +37,7 @@ class CircleDetailPostViewModelImpl
 
         override lateinit var posts: PostModels
         private var fetchPostJob: Job? = null
+        private var deletePostJob: Job? = null
         private var currentPage = DEFAULT_PAGE
 
         override val scrollOver: LiveData<Boolean>
@@ -126,10 +127,30 @@ class CircleDetailPostViewModelImpl
             this.isTop = isTop
         }
 
-        // 현재는 공지사항용 핀 고정 기능이고, 나중에 게시글 고정 기능 추가 시 사용
-        override fun pinAndFetch(postId: Int) {}
+        override fun deleteAndRefresh(postId: Int) {
+            deletePostJob?.cancel()
 
-        override fun removePinAndFetch(postId: Int) {}
+            deletePostJob =
+                viewModelScope.launch {
+                    val result = repository.deletePost(circleId, postId)
+
+                    if (result is Success) {
+                        refresh()
+                    } else {
+                        error = (result as Error).message()
+                        if (result.isAuthenticationError()) {
+                            uiState.postValue(UiState.AuthenticationError)
+                        } else {
+                            uiState.postValue(UiState.ServiceError)
+                        }
+                    }
+                }
+        }
+
+        // 현재는 공지사항용 핀 고정 기능이고, 나중에 게시글 고정 기능 추가 시 사용
+        override fun pinAndRefresh(postId: Int) {}
+
+        override fun removePinAndRefresh(postId: Int) {}
 
         companion object {
             private const val SIZE_BY_PAGE = 10

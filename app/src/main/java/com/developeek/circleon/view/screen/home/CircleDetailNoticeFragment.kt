@@ -98,26 +98,28 @@ class CircleDetailNoticeFragment : Fragment() {
             CirclePostAdapter(
                 activity,
                 glideProvider,
-                object : ItemListenerInitializer<PostModel> {
-                    override fun initialize(item: PostModel) {
-                        sendUserToNoticeDetailScreen(item)
-                    }
+                itemListenerInitializer =
+                    object : ItemListenerInitializer<PostModel> {
+                        override fun initialize(item: PostModel) {
+                            sendUserToNoticeDetailScreen(item)
+                        }
 
-                    override fun initialize(
-                        item: PostModel,
-                        view: View?,
-                    ) {}
-                },
-                object : ItemListenerInitializer<PostModel> {
-                    override fun initialize(item: PostModel) {}
+                        override fun initialize(
+                            item: PostModel,
+                            view: View?,
+                        ) {}
+                    },
+                overflowListenerInitializer =
+                    object : ItemListenerInitializer<PostModel> {
+                        override fun initialize(item: PostModel) {}
 
-                    override fun initialize(
-                        item: PostModel,
-                        view: View?,
-                    ) {
-                        initNoticeOverflowMenuAndShow(activity, item, view!!)
-                    }
-                },
+                        override fun initialize(
+                            item: PostModel,
+                            view: View?,
+                        ) {
+                            initNoticeOverflowMenuAndShow(activity, item, view!!)
+                        }
+                    },
                 role = role,
             )
         binding.rvCircleNotice.layoutManager = LinearLayoutManager(requireActivity())
@@ -162,9 +164,9 @@ class CircleDetailNoticeFragment : Fragment() {
             when (it.itemId) {
                 R.id.pin_post -> {
                     if (item.isPinned) {
-                        viewModel.removePinAndFetch(item.id)
+                        viewModel.removePinAndRefresh(item.id)
                     } else {
-                        viewModel.pinAndFetch(item.id)
+                        viewModel.pinAndRefresh(item.id)
                     }
                 }
 
@@ -173,7 +175,7 @@ class CircleDetailNoticeFragment : Fragment() {
                 }
 
                 R.id.delete_post -> {
-                    Toast.makeText(activity, "삭제하기 ${item.id}", Toast.LENGTH_SHORT).show()
+                    viewModel.deleteAndRefresh(item.id)
                 }
             }
             true

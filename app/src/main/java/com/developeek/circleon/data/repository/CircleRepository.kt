@@ -53,4 +53,10 @@ interface CircleRepository {
         postId: Int,
         comment: String,
     ): Result<CommentModel>
+
+    // DELETE
+    suspend fun deletePost(
+        circleId: Int,
+        postId: Int,
+    ): Result<Unit>
 }

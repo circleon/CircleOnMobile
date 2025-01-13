@@ -9,6 +9,7 @@ import com.developeek.circleon.data.dto.home.Paging
 import com.developeek.circleon.data.dto.home.Pin
 import com.developeek.circleon.data.dto.home.Post
 import retrofit2.http.Body
+import retrofit2.http.DELETE
 import retrofit2.http.GET
 import retrofit2.http.POST
 import retrofit2.http.PUT
@@ -72,4 +73,11 @@ interface CircleService {
         @Path("postId") postId: Int,
         @Body data: CommentContent,
     ): Comment
+
+    // DELETE
+    @DELETE("circles/{circleId}/posts/{postId}")
+    suspend fun deletePost(
+        @Path("circleId") circleId: Int,
+        @Path("postId") postId: Int,
+    )
 }

@@ -156,7 +156,7 @@ class CircleDetailPostFragment : Fragment() {
                     Toast.makeText(activity, "수정하기", Toast.LENGTH_SHORT).show()
                 }
                 R.id.delete_post -> {
-                    Toast.makeText(activity, "삭제하기", Toast.LENGTH_SHORT).show()
+                    viewModel.deleteAndRefresh(item.id)
                 }
             }
             true
