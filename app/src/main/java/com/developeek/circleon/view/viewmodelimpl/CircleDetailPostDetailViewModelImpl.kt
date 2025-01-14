@@ -7,6 +7,7 @@ import androidx.lifecycle.viewModelScope
 import com.developeek.circleon.data.repository.CircleRepository
 import com.developeek.circleon.data.source.Error
 import com.developeek.circleon.data.source.Success
+import com.developeek.circleon.domain.model.CommentModel
 import com.developeek.circleon.domain.model.CommentModels
 import com.developeek.circleon.domain.state.UiState
 import com.developeek.circleon.view.viewmodel.CircleDetailPostDetailViewModel
@@ -47,6 +48,11 @@ class CircleDetailPostDetailViewModelImpl
             get() = postDeleteState
         private val postDeleteState = MutableLiveData<Boolean>()
         private var deletePostJob: Job? = null
+
+        override val deleteCommentState: LiveData<Boolean>
+            get() = commentDeleteState
+        private val commentDeleteState = MutableLiveData<Boolean>()
+        private var deleteCommentJob: Job? = null
 
         override lateinit var comments: CommentModels
         private var fetchCommentJob: Job? = null
@@ -151,8 +157,25 @@ class CircleDetailPostDetailViewModelImpl
                 }
         }
 
+        override fun deleteComment(comment: CommentModel) {
+            deleteCommentJob?.cancel()
+
+            deleteCommentJob =
+                viewModelScope.launch {
+                    val result = repository.deleteComment(circleId, postId, comment.id)
+
+                    if (result is Success) {
+                        comments = comments.minus(comment)
+                        commentDeleteState.postValue(true)
+                    } else {
+                        error = (result as Error).message()
+                        commentDeleteState.postValue(false)
+                    }
+                }
+        }
+
         companion object {
-            private const val SIZE_BY_PAGE = 50
+            private const val SIZE_BY_PAGE = 100
             private const val DEFAULT_PAGE = 0
         }
     }

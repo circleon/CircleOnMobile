@@ -20,6 +20,8 @@ data class CommentModels(private val models: List<CommentModel>) {
 
     fun addAll(commentModels: CommentModels) = CommentModels(models + commentModels.get())
 
+    fun minus(commentModel: CommentModel) = CommentModels(models - commentModel)
+
     fun setAsLast() {
         isLastPage = true
     }

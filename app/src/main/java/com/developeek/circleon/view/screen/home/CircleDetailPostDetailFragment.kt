@@ -150,6 +150,10 @@ class CircleDetailPostDetailFragment : Fragment() {
             viewLifecycleOwner,
             deletePostStateObserver(activity),
         )
+        viewModel.deleteCommentState.observe(
+            viewLifecycleOwner,
+            deleteCommentStateObserver(activity),
+        )
     }
 
     private fun stateObserver(activity: Activity) =
@@ -244,6 +248,7 @@ class CircleDetailPostDetailFragment : Fragment() {
                 R.id.modify_comment -> {
                 }
                 R.id.delete_comment -> {
+                    viewModel.deleteComment(comment)
                 }
             }
             true
@@ -267,11 +272,11 @@ class CircleDetailPostDetailFragment : Fragment() {
     private fun registerCommentStateObserver(activity: Activity) =
         Observer<Boolean> {
             if (it) {
+                requestRefreshToPreviousScreen()
                 toggleView(binding.llComment) // noComment 였던 경우, 댓글 등록 후에는 llComment 로 토글
                 loadComment(activity, viewModel.comments.last())
                 hideSoftInput(activity, binding.edtComment)
                 binding.edtComment.text?.clear()
-                requestRefreshToPreviousScreen()
             } else {
                 CustomAlertDialog(activity, viewModel.error).show()
             }
@@ -294,6 +299,18 @@ class CircleDetailPostDetailFragment : Fragment() {
             if (it) {
                 requestRefreshToPreviousScreen()
                 sendUserToPreviousScreen()
+            } else {
+                CustomAlertDialog(activity, viewModel.error).show()
+            }
+        }
+
+    private fun deleteCommentStateObserver(activity: Activity) =
+        Observer<Boolean> {
+            if (it) {
+                requestRefreshToPreviousScreen()
+                binding.llComment.removeAllViewsInLayout()
+                loadComments(activity)
+                if (viewModel.comments.isEmpty()) toggleView(binding.txtNoComment)
             } else {
                 CustomAlertDialog(activity, viewModel.error).show()
             }

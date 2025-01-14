@@ -80,4 +80,11 @@ interface CircleService {
         @Path("circleId") circleId: Int,
         @Path("postId") postId: Int,
     )
+
+    @DELETE("circles/{circleId}/posts/{postId}/comments/{commentId}")
+    suspend fun deleteComment(
+        @Path("circleId") circleId: Int,
+        @Path("postId") postId: Int,
+        @Path("commentId") commentId: Int,
+    )
 }
