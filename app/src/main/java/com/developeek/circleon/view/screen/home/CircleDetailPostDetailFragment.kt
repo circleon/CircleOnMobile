@@ -146,6 +146,10 @@ class CircleDetailPostDetailFragment : Fragment() {
             viewLifecycleOwner,
             registerCommentStateObserver(activity),
         )
+        viewModel.deletePostState.observe(
+            viewLifecycleOwner,
+            deletePostStateObserver(activity),
+        )
     }
 
     private fun stateObserver(activity: Activity) =
@@ -215,12 +219,11 @@ class CircleDetailPostDetailFragment : Fragment() {
     private fun registerCommentStateObserver(activity: Activity) =
         Observer<Boolean> {
             if (it) {
-                toggleView(binding.llComment)
+                toggleView(binding.llComment) // noComment 였던 경우, 댓글 등록 후에는 llComment 로 토글
                 loadComment(activity, viewModel.comments.last())
                 hideSoftInput(activity, binding.edtComment)
                 binding.edtComment.text.clear()
-                // 동아리 상세 화면에 댓글 정보 수정 여부 전달
-                findNavController().previousBackStackEntry?.savedStateHandle?.set(Const.FLAG_DATA_CHANGED, true)
+                requestRefreshToPreviousScreen()
             } else {
                 CustomAlertDialog(activity, viewModel.error).show()
             }
@@ -233,6 +236,20 @@ class CircleDetailPostDetailFragment : Fragment() {
         val imm = activity.getSystemService(InputMethodManager::class.java)
         imm.hideSoftInputFromWindow(view.windowToken, 0)
     }
+
+    private fun requestRefreshToPreviousScreen() {
+        findNavController().previousBackStackEntry?.savedStateHandle?.set(Const.FLAG_DATA_CHANGED, true)
+    }
+
+    private fun deletePostStateObserver(activity: Activity) =
+        Observer<Boolean> {
+            if (it) {
+                requestRefreshToPreviousScreen()
+                sendUserToPreviousScreen()
+            } else {
+                CustomAlertDialog(activity, viewModel.error).show()
+            }
+        }
 
     private fun initListener(activity: Activity) {
         setBtnBackListener()
@@ -280,7 +297,7 @@ class CircleDetailPostDetailFragment : Fragment() {
                     Toast.makeText(activity, "수정하기", Toast.LENGTH_SHORT).show()
                 }
                 R.id.delete_post -> {
-                    Toast.makeText(activity, "삭제하기", Toast.LENGTH_SHORT).show()
+                    viewModel.delete()
                 }
             }
             true

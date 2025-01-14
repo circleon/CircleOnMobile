@@ -39,12 +39,17 @@ class CircleDetailPostDetailViewModelImpl
         private lateinit var tmpState: UiState
 
         override val registerCommentState: LiveData<Boolean> // 댓글 등록 성공 확인용
-            get() = commentState
-        private val commentState = MutableLiveData<Boolean>()
+            get() = commentRegisterState
+        private val commentRegisterState = MutableLiveData<Boolean>()
+        private var registerCommentJob: Job? = null
+
+        override val deletePostState: LiveData<Boolean>
+            get() = postDeleteState
+        private val postDeleteState = MutableLiveData<Boolean>()
+        private var deletePostJob: Job? = null
 
         override lateinit var comments: CommentModels
         private var fetchCommentJob: Job? = null
-        private var registerCommentJob: Job? = null
         private var currentPage = DEFAULT_PAGE
 
         private var enterAnimFinished = false
@@ -98,15 +103,10 @@ class CircleDetailPostDetailViewModelImpl
 
                     if (result is Success) {
                         comments = comments.add(result.data)
-                        commentState.postValueWhenAnimFinished(true)
+                        commentRegisterState.postValueWhenAnimFinished(true)
                     } else {
                         error = (result as Error).message()
-                        commentState.postValueWhenAnimFinished(false)
-                        if (result.isAuthenticationError()) {
-                            uiState.postValueWhenAnimFinished(UiState.AuthenticationError)
-                        } else {
-                            uiState.postValueWhenAnimFinished(UiState.ServiceError)
-                        }
+                        commentRegisterState.postValueWhenAnimFinished(false)
                     }
                 }
         }
@@ -133,6 +133,22 @@ class CircleDetailPostDetailViewModelImpl
             if (enterAnimFinished) {
                 this.postValue(data)
             }
+        }
+
+        override fun delete() {
+            deletePostJob?.cancel()
+
+            deletePostJob =
+                viewModelScope.launch {
+                    val result = repository.deletePost(circleId, postId)
+
+                    if (result is Success) {
+                        postDeleteState.postValue(true)
+                    } else {
+                        error = (result as Error).message()
+                        postDeleteState.postValue(false)
+                    }
+                }
         }
 
         companion object {

@@ -123,7 +123,6 @@ class CircleDetailNoticeFragment : Fragment() {
                 role = role,
             )
         binding.rvCircleNotice.layoutManager = LinearLayoutManager(requireActivity())
-        binding.rvCircleNotice.itemAnimator = null
     }
 
     private fun sendUserToNoticeDetailScreen(item: PostModel) {
