@@ -118,6 +118,7 @@ class CircleDetailPostFragment : Fragment() {
                 userId = userManager.getUser()?.id,
             )
         binding.rvCirclePost.layoutManager = LinearLayoutManager(requireActivity())
+        binding.rvCirclePost.itemAnimator = null
     }
 
     private fun sendUserToPostDetailFragment(item: PostModel) {

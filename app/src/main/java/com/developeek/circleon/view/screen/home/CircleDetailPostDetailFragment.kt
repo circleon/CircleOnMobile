@@ -12,7 +12,10 @@ import android.view.ViewGroup
 import android.view.WindowManager
 import android.view.inputmethod.InputMethodManager
 import android.widget.EditText
+import android.widget.Toast
+import androidx.appcompat.widget.PopupMenu
 import androidx.core.animation.addListener
+import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
@@ -26,6 +29,7 @@ import com.developeek.circleon.domain.model.CommentModel
 import com.developeek.circleon.domain.model.PostModel
 import com.developeek.circleon.domain.state.UiState
 import com.developeek.circleon.domain.utils.Const
+import com.developeek.circleon.domain.utils.Utils
 import com.developeek.circleon.domain.utils.glide.GlideProvider
 import com.developeek.circleon.view.screen.login.LoginActivity
 import com.developeek.circleon.view.viewmodel.CircleDetailPostDetailViewModel
@@ -88,11 +92,12 @@ class CircleDetailPostDetailFragment : Fragment() {
 
         initView(requireActivity())
         initObserver(requireActivity())
-        initListener()
+        initListener(requireActivity())
     }
 
     private fun initView(activity: Activity) {
         initToolbar()
+        hideOverFlowOrNot()
         loadAuthor(activity)
         loadPost(activity)
     }
@@ -102,6 +107,12 @@ class CircleDetailPostDetailFragment : Fragment() {
             binding.txtTbTitle.text = TITLE_NOTICE
         } else {
             binding.txtTbTitle.text = TITLE_POST
+        }
+    }
+
+    private fun hideOverFlowOrNot() {
+        userManager.getUser()?.let {
+            binding.btnPostOverflow.isVisible = it.id == post.author.id
         }
     }
 
@@ -223,8 +234,9 @@ class CircleDetailPostDetailFragment : Fragment() {
         imm.hideSoftInputFromWindow(view.windowToken, 0)
     }
 
-    private fun initListener() {
+    private fun initListener(activity: Activity) {
         setBtnBackListener()
+        setBtnPostOverFlowMenuListener(activity)
         setBtnRegisterCommentListener()
         setBtnRetryListener()
     }
@@ -238,6 +250,41 @@ class CircleDetailPostDetailFragment : Fragment() {
     private fun sendUserToPreviousScreen() {
         findNavController().navigateUp()
     }
+
+    private fun setBtnPostOverFlowMenuListener(activity: Activity) {
+        binding.btnPostOverflow.setOnClickListener {
+            initPostOverflowMenuAndShow(activity, post, binding.btnPostOverflow)
+        }
+    }
+
+    private fun initPostOverflowMenuAndShow(
+        activity: Activity,
+        item: PostModel,
+        view: View,
+    ) {
+        val popupMenu = object : PopupMenu(activity, view) {}
+        popupMenu.inflate(R.menu.menu_post_settings)
+        popupMenu.setOnMenuItemClickListener(postOverflowMenuItemClickListener(item))
+        Utils.changeMenuItemTextColor(
+            popupMenu.menu.findItem(R.id.delete_post),
+            ContextCompat.getColor(activity, R.color.error),
+        )
+
+        popupMenu.show()
+    }
+
+    private fun postOverflowMenuItemClickListener(item: PostModel) =
+        PopupMenu.OnMenuItemClickListener {
+            when (it.itemId) {
+                R.id.modify_post -> {
+                    Toast.makeText(activity, "수정하기", Toast.LENGTH_SHORT).show()
+                }
+                R.id.delete_post -> {
+                    Toast.makeText(activity, "삭제하기", Toast.LENGTH_SHORT).show()
+                }
+            }
+            true
+        }
 
     private fun setBtnRegisterCommentListener() {
         binding.btnRegisterComment.setOnClickListener {

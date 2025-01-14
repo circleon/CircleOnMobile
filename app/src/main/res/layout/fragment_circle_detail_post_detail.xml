@@ -130,14 +130,18 @@
                 </androidx.appcompat.widget.LinearLayoutCompat>
 
                 <androidx.appcompat.widget.AppCompatImageView
-                    android:id="@+id/btnNoticeOverflow"
+                    android:id="@+id/btnPostOverflow"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:paddingEnd="@dimen/margin_padding_large"
+                    android:layout_marginEnd="@dimen/margin_padding_x_small"
+                    android:paddingHorizontal="@dimen/margin_padding_default"
                     android:src="@drawable/ic_overflow"
+                    app:tint="@color/grey_6"
                     android:clickable="true"
+                    android:background="?attr/selectableItemBackgroundBorderless"
                     app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintTop_toTopOf="parent" />
+                    app:layout_constraintTop_toTopOf="parent"
+                    />
 
             </androidx.constraintlayout.widget.ConstraintLayout>
 

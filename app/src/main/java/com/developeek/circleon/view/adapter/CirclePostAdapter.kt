@@ -67,7 +67,7 @@ class CirclePostAdapter(
 
             loadAuthor(post)
             loadPost(post)
-            hideOverFlow(post)
+            hideOverFlowOrNot(post)
             setItemClickListener(post)
             notifyListenerItemChanged(post)
         }
@@ -98,7 +98,7 @@ class CirclePostAdapter(
             binding.imgNoticePin.isVisible = post.isPinned
         }
 
-        private fun hideOverFlow(post: PostModel) {
+        private fun hideOverFlowOrNot(post: PostModel) {
             if (post.type.isPost()) {
                 userId?.let {
                     binding.btnPostOverflow.isVisible = it == post.author.id
