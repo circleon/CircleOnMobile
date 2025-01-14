@@ -97,7 +97,7 @@ class CircleDetailPostDetailFragment : Fragment() {
 
     private fun initView(activity: Activity) {
         initToolbar()
-        hideOverFlowOrNot()
+        hidePostOverFlowOrNot()
         loadAuthor(activity)
         loadPost(activity)
     }
@@ -110,7 +110,7 @@ class CircleDetailPostDetailFragment : Fragment() {
         }
     }
 
-    private fun hideOverFlowOrNot() {
+    private fun hidePostOverFlowOrNot() {
         userManager.getUser()?.let {
             binding.btnPostOverflow.isVisible = it.id == post.author.id
         }
@@ -206,8 +206,56 @@ class CircleDetailPostDetailFragment : Fragment() {
                 glideProvider.callImage(it, activity, imgAuthorProfile)
             } ?: imgAuthorProfile.setImageResource(R.drawable.ic_author_placeholder)
         }
+        setBtnCommentOverflowListener(activity, itemBinding, comment)
+        hideCommentOverflowOrNot(itemBinding, comment)
 
         binding.llComment.addView(itemBinding.root)
+    }
+
+    private fun setBtnCommentOverflowListener(
+        activity: Activity,
+        itemBinding: ItemPostCommentBinding,
+        comment: CommentModel,
+    ) {
+        itemBinding.btnCommentOverflow.setOnClickListener {
+            initCommentOverflowMenuAndShow(activity, comment, itemBinding.btnCommentOverflow)
+        }
+    }
+
+    private fun initCommentOverflowMenuAndShow(
+        activity: Activity,
+        comment: CommentModel,
+        view: View,
+    ) {
+        val popupMenu = object : PopupMenu(activity, view) {}
+        popupMenu.inflate(R.menu.menu_comment_settings)
+        popupMenu.setOnMenuItemClickListener(commentOverflowMenuItemClickListener(comment))
+        Utils.changeMenuItemTextColor(
+            popupMenu.menu.findItem(R.id.delete_comment),
+            ContextCompat.getColor(activity, R.color.error),
+        )
+
+        popupMenu.show()
+    }
+
+    private fun commentOverflowMenuItemClickListener(comment: CommentModel) =
+        PopupMenu.OnMenuItemClickListener {
+            when (it.itemId) {
+                R.id.modify_comment -> {
+                }
+                R.id.delete_comment -> {
+                }
+            }
+            true
+        }
+
+    private fun hideCommentOverflowOrNot(
+        itemBinding: ItemPostCommentBinding,
+        comment: CommentModel,
+    ) {
+        userManager.getUser()?.let {
+            itemBinding.btnCommentOverflow.isVisible = it.id == comment.author.id
+        }
     }
 
     private fun sendUserToLoginScreen(activity: Activity) {
@@ -222,7 +270,7 @@ class CircleDetailPostDetailFragment : Fragment() {
                 toggleView(binding.llComment) // noComment 였던 경우, 댓글 등록 후에는 llComment 로 토글
                 loadComment(activity, viewModel.comments.last())
                 hideSoftInput(activity, binding.edtComment)
-                binding.edtComment.text.clear()
+                binding.edtComment.text?.clear()
                 requestRefreshToPreviousScreen()
             } else {
                 CustomAlertDialog(activity, viewModel.error).show()
@@ -276,12 +324,12 @@ class CircleDetailPostDetailFragment : Fragment() {
 
     private fun initPostOverflowMenuAndShow(
         activity: Activity,
-        item: PostModel,
+        post: PostModel,
         view: View,
     ) {
         val popupMenu = object : PopupMenu(activity, view) {}
         popupMenu.inflate(R.menu.menu_post_settings)
-        popupMenu.setOnMenuItemClickListener(postOverflowMenuItemClickListener(item))
+        popupMenu.setOnMenuItemClickListener(postOverflowMenuItemClickListener(post))
         Utils.changeMenuItemTextColor(
             popupMenu.menu.findItem(R.id.delete_post),
             ContextCompat.getColor(activity, R.color.error),
@@ -290,7 +338,7 @@ class CircleDetailPostDetailFragment : Fragment() {
         popupMenu.show()
     }
 
-    private fun postOverflowMenuItemClickListener(item: PostModel) =
+    private fun postOverflowMenuItemClickListener(post: PostModel) =
         PopupMenu.OnMenuItemClickListener {
             when (it.itemId) {
                 R.id.modify_post -> {
