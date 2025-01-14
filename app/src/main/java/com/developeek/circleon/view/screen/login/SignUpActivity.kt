@@ -18,7 +18,7 @@ import com.developeek.circleon.domain.state.UiState
 import com.developeek.circleon.view.adapter.SignUpFragmentAdapter
 import com.developeek.circleon.view.viewmodel.SignUpViewModel
 import com.developeek.circleon.view.viewmodelimpl.SignUpViewModelImpl
-import com.developeek.circleon.view.widget.CustomAlertDialog
+import com.developeek.circleon.view.widget.ErrorAlertDialog
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -60,7 +60,7 @@ class SignUpActivity : AppCompatActivity() {
         Observer<UiState> {
             when (it) {
                 UiState.ServiceError -> {
-                    CustomAlertDialog(
+                    ErrorAlertDialog(
                         activity,
                         viewModel.error,
                     ).show()

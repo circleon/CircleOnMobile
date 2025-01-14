@@ -31,6 +31,7 @@ import com.developeek.circleon.view.listener.RecyclerViewInfiniteScrollListener
 import com.developeek.circleon.view.screen.login.LoginActivity
 import com.developeek.circleon.view.viewmodel.CircleDetailPostViewModel
 import com.developeek.circleon.view.viewmodelimpl.CircleDetailNoticeViewModelImpl
+import com.developeek.circleon.view.widget.DeleteAlertDialog
 import com.developeek.circleon.view.widget.ErrorToast
 import dagger.hilt.android.AndroidEntryPoint
 import dagger.hilt.android.lifecycle.withCreationCallback
@@ -150,7 +151,7 @@ class CircleDetailNoticeFragment : Fragment() {
             popupMenu.inflate(R.menu.menu_notice_settings)
         }
 
-        popupMenu.setOnMenuItemClickListener(noticeOverflowMenuItemClickListener(item))
+        popupMenu.setOnMenuItemClickListener(noticeOverflowMenuItemClickListener(activity, item))
         Utils.changeMenuItemTextColor(
             popupMenu.menu.findItem(R.id.delete_post),
             ContextCompat.getColor(activity, R.color.error),
@@ -159,28 +160,32 @@ class CircleDetailNoticeFragment : Fragment() {
         popupMenu.show()
     }
 
-    private fun noticeOverflowMenuItemClickListener(item: PostModel) =
-        PopupMenu.OnMenuItemClickListener {
-            viewModel.saveScrollState(binding.rvCircleNotice.layoutManager?.onSaveInstanceState())
-            when (it.itemId) {
-                R.id.pin_post -> {
-                    if (item.isPinned) {
-                        viewModel.removePinAndRefresh(item.id)
-                    } else {
-                        viewModel.pinAndRefresh(item.id)
-                    }
-                }
-
-                R.id.modify_post -> {
-                    Toast.makeText(activity, "수정하기 ${item.id}", Toast.LENGTH_SHORT).show()
-                }
-
-                R.id.delete_post -> {
-                    viewModel.deleteAndRefresh(item.id)
+    private fun noticeOverflowMenuItemClickListener(
+        activity: Activity,
+        item: PostModel,
+    ) = PopupMenu.OnMenuItemClickListener {
+        viewModel.saveScrollState(binding.rvCircleNotice.layoutManager?.onSaveInstanceState())
+        when (it.itemId) {
+            R.id.pin_post -> {
+                if (item.isPinned) {
+                    viewModel.removePinAndRefresh(item.id)
+                } else {
+                    viewModel.pinAndRefresh(item.id)
                 }
             }
-            true
+
+            R.id.modify_post -> {
+                Toast.makeText(activity, "수정하기 ${item.id}", Toast.LENGTH_SHORT).show()
+            }
+
+            R.id.delete_post -> {
+                DeleteAlertDialog(activity, MESSAGE_DELETE_NOTICE) {
+                    viewModel.deleteAndRefresh(item.id)
+                }.show()
+            }
         }
+        true
+    }
 
     private fun initObserver(activity: Activity) {
         viewModel.state.observe(
@@ -297,5 +302,9 @@ class CircleDetailNoticeFragment : Fragment() {
         binding.pgbLoading.isVisible = view == binding.pgbLoading
         binding.txtNoNotice.isVisible = view == binding.txtNoNotice
         binding.llServiceError.isVisible = view == binding.llServiceError
+    }
+
+    companion object {
+        private const val MESSAGE_DELETE_NOTICE = "공지사항을 삭제할까요?"
     }
 }

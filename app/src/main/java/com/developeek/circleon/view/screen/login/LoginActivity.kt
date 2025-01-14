@@ -12,7 +12,7 @@ import com.developeek.circleon.domain.state.UiState
 import com.developeek.circleon.view.screen.HomeActivity
 import com.developeek.circleon.view.viewmodel.LoginViewModel
 import com.developeek.circleon.view.viewmodelimpl.LoginViewModelImpl
-import com.developeek.circleon.view.widget.CustomAlertDialog
+import com.developeek.circleon.view.widget.ErrorAlertDialog
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -41,7 +41,7 @@ class LoginActivity : AppCompatActivity() {
             when (it) {
                 UiState.Success -> sendUserToHomeScreen(activity)
                 UiState.ServiceError ->
-                    CustomAlertDialog(
+                    ErrorAlertDialog(
                         activity,
                         viewModel.error,
                     ).show()

@@ -30,6 +30,7 @@ import com.developeek.circleon.view.listener.RecyclerViewInfiniteScrollListener
 import com.developeek.circleon.view.screen.login.LoginActivity
 import com.developeek.circleon.view.viewmodel.CircleDetailPostViewModel
 import com.developeek.circleon.view.viewmodelimpl.CircleDetailPostViewModelImpl
+import com.developeek.circleon.view.widget.DeleteAlertDialog
 import com.developeek.circleon.view.widget.ErrorToast
 import dagger.hilt.android.AndroidEntryPoint
 import dagger.hilt.android.lifecycle.withCreationCallback
@@ -95,26 +96,28 @@ class CircleDetailPostFragment : Fragment() {
             CirclePostAdapter(
                 activity,
                 glideProvider,
-                object : ItemListenerInitializer<PostModel> {
-                    override fun initialize(item: PostModel) {
-                        sendUserToPostDetailFragment(item)
-                    }
+                itemListenerInitializer =
+                    object : ItemListenerInitializer<PostModel> {
+                        override fun initialize(item: PostModel) {
+                            sendUserToPostDetailFragment(item)
+                        }
 
-                    override fun initialize(
-                        item: PostModel,
-                        view: View?,
-                    ) {}
-                },
-                object : ItemListenerInitializer<PostModel> {
-                    override fun initialize(item: PostModel) {}
+                        override fun initialize(
+                            item: PostModel,
+                            view: View?,
+                        ) {}
+                    },
+                overflowListenerInitializer =
+                    object : ItemListenerInitializer<PostModel> {
+                        override fun initialize(item: PostModel) {}
 
-                    override fun initialize(
-                        item: PostModel,
-                        view: View?,
-                    ) {
-                        initPostOverflowMenuAndShow(activity, item, view!!)
-                    }
-                },
+                        override fun initialize(
+                            item: PostModel,
+                            view: View?,
+                        ) {
+                            initPostOverflowMenuAndShow(activity, item, view!!)
+                        }
+                    },
                 userId = userManager.getUser()?.id,
             )
         binding.rvCirclePost.layoutManager = LinearLayoutManager(requireActivity())
@@ -140,7 +143,7 @@ class CircleDetailPostFragment : Fragment() {
     ) {
         val popupMenu = object : PopupMenu(activity, view) {}
         popupMenu.inflate(R.menu.menu_post_settings)
-        popupMenu.setOnMenuItemClickListener(postOverflowMenuItemClickListener(item))
+        popupMenu.setOnMenuItemClickListener(postOverflowMenuItemClickListener(activity, item))
         Utils.changeMenuItemTextColor(
             popupMenu.menu.findItem(R.id.delete_post),
             ContextCompat.getColor(activity, R.color.error),
@@ -149,19 +152,23 @@ class CircleDetailPostFragment : Fragment() {
         popupMenu.show()
     }
 
-    private fun postOverflowMenuItemClickListener(item: PostModel) =
-        PopupMenu.OnMenuItemClickListener {
-            viewModel.saveScrollState(binding.rvCirclePost.layoutManager?.onSaveInstanceState())
-            when (it.itemId) {
-                R.id.modify_post -> {
-                    Toast.makeText(activity, "수정하기", Toast.LENGTH_SHORT).show()
-                }
-                R.id.delete_post -> {
-                    viewModel.deleteAndRefresh(item.id)
-                }
+    private fun postOverflowMenuItemClickListener(
+        activity: Activity,
+        item: PostModel,
+    ) = PopupMenu.OnMenuItemClickListener {
+        viewModel.saveScrollState(binding.rvCirclePost.layoutManager?.onSaveInstanceState())
+        when (it.itemId) {
+            R.id.modify_post -> {
+                Toast.makeText(activity, "수정하기", Toast.LENGTH_SHORT).show()
             }
-            true
+            R.id.delete_post -> {
+                DeleteAlertDialog(activity, MESSAGE_DELETE_POST) {
+                    viewModel.deleteAndRefresh(item.id)
+                }.show()
+            }
         }
+        true
+    }
 
     private fun initObserver(activity: Activity) {
         viewModel.state.observe(
@@ -277,5 +284,9 @@ class CircleDetailPostFragment : Fragment() {
         binding.pgbLoading.isVisible = view == binding.pgbLoading
         binding.txtNoPost.isVisible = view == binding.txtNoPost
         binding.llServiceError.isVisible = view == binding.llServiceError
+    }
+
+    companion object {
+        private const val MESSAGE_DELETE_POST = "게시글을 삭제할까요?"
     }
 }

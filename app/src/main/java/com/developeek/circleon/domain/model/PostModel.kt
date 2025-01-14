@@ -44,6 +44,10 @@ data class PostModel(
 ) : Serializable {
     fun isSame(postModel: PostModel) = this.id == postModel.id
 
+    fun isNotice() = this.type.isNotice()
+
+    fun isPost() = !isNotice()
+
     fun areContentsSame(postModel: PostModel) = this == postModel
 
     companion object {

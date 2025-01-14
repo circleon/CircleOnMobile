@@ -7,7 +7,6 @@ import androidx.lifecycle.viewModelScope
 import com.developeek.circleon.data.repository.CircleRepository
 import com.developeek.circleon.data.source.Error
 import com.developeek.circleon.data.source.Success
-import com.developeek.circleon.domain.model.CommentModel
 import com.developeek.circleon.domain.model.CommentModels
 import com.developeek.circleon.domain.state.UiState
 import com.developeek.circleon.view.viewmodel.CircleDetailPostDetailViewModel
@@ -157,15 +156,15 @@ class CircleDetailPostDetailViewModelImpl
                 }
         }
 
-        override fun deleteComment(comment: CommentModel) {
+        override fun deleteComment(commentId: Int) {
             deleteCommentJob?.cancel()
 
             deleteCommentJob =
                 viewModelScope.launch {
-                    val result = repository.deleteComment(circleId, postId, comment.id)
+                    val result = repository.deleteComment(circleId, postId, commentId)
 
                     if (result is Success) {
-                        comments = comments.minus(comment)
+                        comments = comments.remove(commentId)
                         commentDeleteState.postValue(true)
                     } else {
                         error = (result as Error).message()

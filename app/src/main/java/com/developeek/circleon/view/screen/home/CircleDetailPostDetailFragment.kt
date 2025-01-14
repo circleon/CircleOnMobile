@@ -34,7 +34,8 @@ import com.developeek.circleon.domain.utils.glide.GlideProvider
 import com.developeek.circleon.view.screen.login.LoginActivity
 import com.developeek.circleon.view.viewmodel.CircleDetailPostDetailViewModel
 import com.developeek.circleon.view.viewmodelimpl.CircleDetailPostDetailViewModelImpl
-import com.developeek.circleon.view.widget.CustomAlertDialog
+import com.developeek.circleon.view.widget.DeleteAlertDialog
+import com.developeek.circleon.view.widget.ErrorAlertDialog
 import com.developeek.circleon.view.widget.ErrorToast
 import dagger.hilt.android.AndroidEntryPoint
 import dagger.hilt.android.lifecycle.withCreationCallback
@@ -103,7 +104,7 @@ class CircleDetailPostDetailFragment : Fragment() {
     }
 
     private fun initToolbar() {
-        if (post.type.isNotice()) {
+        if (post.isNotice()) {
             binding.txtTbTitle.text = TITLE_NOTICE
         } else {
             binding.txtTbTitle.text = TITLE_POST
@@ -233,7 +234,7 @@ class CircleDetailPostDetailFragment : Fragment() {
     ) {
         val popupMenu = object : PopupMenu(activity, view) {}
         popupMenu.inflate(R.menu.menu_comment_settings)
-        popupMenu.setOnMenuItemClickListener(commentOverflowMenuItemClickListener(comment))
+        popupMenu.setOnMenuItemClickListener(commentOverflowMenuItemClickListener(activity, comment))
         Utils.changeMenuItemTextColor(
             popupMenu.menu.findItem(R.id.delete_comment),
             ContextCompat.getColor(activity, R.color.error),
@@ -242,17 +243,21 @@ class CircleDetailPostDetailFragment : Fragment() {
         popupMenu.show()
     }
 
-    private fun commentOverflowMenuItemClickListener(comment: CommentModel) =
-        PopupMenu.OnMenuItemClickListener {
-            when (it.itemId) {
-                R.id.modify_comment -> {
-                }
-                R.id.delete_comment -> {
-                    viewModel.deleteComment(comment)
-                }
+    private fun commentOverflowMenuItemClickListener(
+        activity: Activity,
+        comment: CommentModel,
+    ) = PopupMenu.OnMenuItemClickListener {
+        when (it.itemId) {
+            R.id.modify_comment -> {
             }
-            true
+            R.id.delete_comment -> {
+                DeleteAlertDialog(activity, MESSAGE_DELETE_COMMENT) {
+                    viewModel.deleteComment(comment.id)
+                }.show()
+            }
         }
+        true
+    }
 
     private fun hideCommentOverflowOrNot(
         itemBinding: ItemPostCommentBinding,
@@ -278,7 +283,7 @@ class CircleDetailPostDetailFragment : Fragment() {
                 hideSoftInput(activity, binding.edtComment)
                 binding.edtComment.text?.clear()
             } else {
-                CustomAlertDialog(activity, viewModel.error).show()
+                ErrorAlertDialog(activity, viewModel.error).show()
             }
         }
 
@@ -300,7 +305,7 @@ class CircleDetailPostDetailFragment : Fragment() {
                 requestRefreshToPreviousScreen()
                 sendUserToPreviousScreen()
             } else {
-                CustomAlertDialog(activity, viewModel.error).show()
+                ErrorAlertDialog(activity, viewModel.error).show()
             }
         }
 
@@ -312,7 +317,7 @@ class CircleDetailPostDetailFragment : Fragment() {
                 loadComments(activity)
                 if (viewModel.comments.isEmpty()) toggleView(binding.txtNoComment)
             } else {
-                CustomAlertDialog(activity, viewModel.error).show()
+                ErrorAlertDialog(activity, viewModel.error).show()
             }
         }
 
@@ -346,7 +351,7 @@ class CircleDetailPostDetailFragment : Fragment() {
     ) {
         val popupMenu = object : PopupMenu(activity, view) {}
         popupMenu.inflate(R.menu.menu_post_settings)
-        popupMenu.setOnMenuItemClickListener(postOverflowMenuItemClickListener(post))
+        popupMenu.setOnMenuItemClickListener(postOverflowMenuItemClickListener(activity, post))
         Utils.changeMenuItemTextColor(
             popupMenu.menu.findItem(R.id.delete_post),
             ContextCompat.getColor(activity, R.color.error),
@@ -355,18 +360,22 @@ class CircleDetailPostDetailFragment : Fragment() {
         popupMenu.show()
     }
 
-    private fun postOverflowMenuItemClickListener(post: PostModel) =
-        PopupMenu.OnMenuItemClickListener {
-            when (it.itemId) {
-                R.id.modify_post -> {
-                    Toast.makeText(activity, "수정하기", Toast.LENGTH_SHORT).show()
-                }
-                R.id.delete_post -> {
-                    viewModel.delete()
-                }
+    private fun postOverflowMenuItemClickListener(
+        activity: Activity,
+        post: PostModel,
+    ) = PopupMenu.OnMenuItemClickListener {
+        when (it.itemId) {
+            R.id.modify_post -> {
+                Toast.makeText(activity, "수정하기", Toast.LENGTH_SHORT).show()
             }
-            true
+            R.id.delete_post -> {
+                DeleteAlertDialog(activity, if (post.isNotice()) MESSAGE_DELETE_NOTICE else MESSAGE_DELETE_POST) {
+                    viewModel.delete()
+                }.show()
+            }
         }
+        true
+    }
 
     private fun setBtnRegisterCommentListener() {
         binding.btnRegisterComment.setOnClickListener {
@@ -432,5 +441,8 @@ class CircleDetailPostDetailFragment : Fragment() {
         private const val CREATED_DATE_FORMAT = "M월 d일 a hh:mm"
         private const val TITLE_NOTICE = "공지사항 상세보기"
         private const val TITLE_POST = "게시글 상세보기"
+        private const val MESSAGE_DELETE_NOTICE = "공지사항을 삭제할까요?"
+        private const val MESSAGE_DELETE_POST = "게시글을 삭제할까요?"
+        private const val MESSAGE_DELETE_COMMENT = "댓글을 삭제할까요?"
     }
 }

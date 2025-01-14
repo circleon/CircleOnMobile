@@ -1,7 +1,6 @@
 package com.developeek.circleon.view.viewmodel
 
 import androidx.lifecycle.LiveData
-import com.developeek.circleon.domain.model.CommentModel
 import com.developeek.circleon.domain.model.CommentModels
 import com.developeek.circleon.domain.state.UiState
 
@@ -21,5 +20,5 @@ interface CircleDetailPostDetailViewModel {
 
     fun delete()
 
-    fun deleteComment(comment: CommentModel)
+    fun deleteComment(commentId: Int)
 }

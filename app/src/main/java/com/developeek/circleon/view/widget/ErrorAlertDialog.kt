@@ -3,7 +3,7 @@ package com.developeek.circleon.view.widget
 import android.app.Activity
 import android.app.AlertDialog
 
-class CustomAlertDialog(
+class ErrorAlertDialog(
     private val activity: Activity,
     private val message: String,
 ) {
@@ -11,11 +11,11 @@ class CustomAlertDialog(
 
     init {
         dialog =
-            AlertDialog.Builder(activity).also {
-                it.setMessage(message)
-                    .setPositiveButton(POSITIVE_BUTTON) { dialog, _ ->
-                        dialog.dismiss()
-                    }
+            AlertDialog.Builder(activity).apply {
+                setMessage(message)
+                setPositiveButton(POSITIVE_BUTTON) { dialog, _ ->
+                    dialog.dismiss()
+                }
             }.create()
     }
 
