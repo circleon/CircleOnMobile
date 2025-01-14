@@ -1,12 +1,18 @@
 package com.developeek.circleon.data.repositoryimpl
 
+import com.developeek.circleon.data.dto.home.CommentContent
+import com.developeek.circleon.data.dto.home.Pin
 import com.developeek.circleon.data.exception.ServiceException
 import com.developeek.circleon.data.repository.CircleRepository
 import com.developeek.circleon.data.source.Result
 import com.developeek.circleon.data.source.remote.retrofit.service.CircleService
 import com.developeek.circleon.domain.enums.Category
+import com.developeek.circleon.domain.model.CircleDetailModel
 import com.developeek.circleon.domain.model.CircleModels
 import com.developeek.circleon.domain.model.CircleSummaryModels
+import com.developeek.circleon.domain.model.CommentModel
+import com.developeek.circleon.domain.model.CommentModels
+import com.developeek.circleon.domain.model.PostModels
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
 import java.io.IOException
@@ -26,12 +32,12 @@ class CircleRepositoryImpl(
                     if (category == Category.ALL) {
                         service.getAllCircles(page, size, SORT_LATEST)
                     } else {
-                        service.getCircles(page, size, SORT_LATEST, category.codeName())
+                        service.getCircleScrollContents(page, size, SORT_LATEST, category.codeName())
                     }
                 Result.success(
-                    CircleModels(response.content.map { it.toCircleModel() }).also {
+                    CircleModels(response.content.map { it.toCircleModel() }).apply {
                         if (response.isLastPage()) {
-                            it.setAsLast()
+                            setAsLast()
                         }
                     },
                 )
@@ -56,7 +62,149 @@ class CircleRepositoryImpl(
         }
     }
 
+    override suspend fun getCircleDetail(circleId: Int): Result<CircleDetailModel> {
+        return try {
+            withContext(dispatcher) {
+                val response = service.getCircleDetail(circleId)
+                Result.success(response.toCircleDetailModel())
+            }
+        } catch (e: IOException) {
+            Result.error(e)
+        }
+    }
+
+    override suspend fun getCirclePosts(
+        circleId: Int,
+        page: Int,
+        size: Int,
+    ): Result<PostModels> {
+        return try {
+            withContext(dispatcher) {
+                val response = service.getCirclePosts(circleId, page, size, TYPE_POST)
+                Result.success(
+                    PostModels(response.content.map { it.toPostModel() }).apply {
+                        if (response.isLastPage()) {
+                            setAsLast()
+                        }
+                    },
+                )
+            }
+        } catch (e: ServiceException.NoResultException) {
+            Result.success(PostModels.emptyInstance())
+        } catch (e: IOException) {
+            Result.error(e)
+        }
+    }
+
+    override suspend fun getCircleNotices(
+        circleId: Int,
+        page: Int,
+        size: Int,
+    ): Result<PostModels> {
+        return try {
+            withContext(dispatcher) {
+                val response = service.getCirclePosts(circleId, page, size, TYPE_NOTICE)
+                Result.success(
+                    PostModels(response.content.map { it.toPostModel() }).apply {
+                        if (response.isLastPage()) {
+                            setAsLast()
+                        }
+                    },
+                )
+            }
+        } catch (e: ServiceException.NoResultException) {
+            Result.success(PostModels.emptyInstance())
+        } catch (e: IOException) {
+            Result.error(e)
+        }
+    }
+
+    override suspend fun getPostComments(
+        circleId: Int,
+        postId: Int,
+        page: Int,
+        size: Int,
+    ): Result<CommentModels> {
+        return try {
+            withContext(dispatcher) {
+                val response = service.getPostComments(circleId, postId, page, size)
+                Result.success(
+                    CommentModels(response.content.map { it.toCommentModel() }).apply {
+                        if (response.isLastPage()) {
+                            setAsLast()
+                        }
+                    },
+                )
+            }
+        } catch (e: ServiceException.NoResultException) {
+            Result.success(CommentModels.emptyInstance())
+        } catch (e: IOException) {
+            Result.error(e)
+        }
+    }
+
+    override suspend fun putPostPin(
+        circleId: Int,
+        postId: Int,
+        isPinned: Boolean,
+    ): Result<Unit> {
+        return try {
+            withContext(dispatcher) {
+                service.putPostPin(circleId, postId, Pin(isPinned))
+                Result.success(Unit)
+            }
+        } catch (e: IOException) {
+            Result.error(e)
+        }
+    }
+
+    override suspend fun postComment(
+        circleId: Int,
+        postId: Int,
+        comment: String,
+    ): Result<CommentModel> {
+        return try {
+            withContext(dispatcher) {
+                val response = service.postComment(circleId, postId, CommentContent(comment))
+                Result.success(response.toCommentModel())
+            }
+        } catch (e: IOException) {
+            Result.error(e)
+        }
+    }
+
+    override suspend fun deletePost(
+        circleId: Int,
+        postId: Int,
+    ): Result<Unit> {
+        return try {
+            withContext(dispatcher) {
+                val response = service.deletePost(circleId, postId)
+                Result.success(Unit)
+            }
+        } catch (e: IOException) {
+            Result.error(e)
+        }
+    }
+
+    override suspend fun deleteComment(
+        circleId: Int,
+        postId: Int,
+        commentId: Int,
+    ): Result<Unit> {
+        return try {
+            with(dispatcher) {
+                val response = service.deleteComment(circleId, postId, commentId)
+                Result.success(Unit)
+            }
+        } catch (e: IOException) {
+            Result.error(e)
+        }
+    }
+
     companion object {
         private const val SORT_LATEST = "createdAt,desc"
+        private const val TYPE_POST = "POST"
+        private const val TYPE_NOTICE = "NOTICE"
     }
 }

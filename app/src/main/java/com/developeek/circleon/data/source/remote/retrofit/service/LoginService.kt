@@ -1,14 +1,15 @@
 package com.developeek.circleon.data.source.remote.retrofit.service
 
-import com.developeek.circleon.data.entity.login.Email
-import com.developeek.circleon.data.entity.login.EmailAuthentication
-import com.developeek.circleon.data.entity.login.Login
-import com.developeek.circleon.data.entity.login.LoginResult
-import com.developeek.circleon.data.entity.login.SignUp
+import com.developeek.circleon.data.dto.login.Email
+import com.developeek.circleon.data.dto.login.EmailAuthentication
+import com.developeek.circleon.data.dto.login.Login
+import com.developeek.circleon.data.dto.login.LoginResult
+import com.developeek.circleon.data.dto.login.SignUp
 import retrofit2.http.Body
 import retrofit2.http.POST
 
 interface LoginService {
+    // POST
     @POST("auth/login")
     suspend fun login(
         @Body data: Login,

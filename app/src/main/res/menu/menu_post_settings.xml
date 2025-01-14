@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/modify_post"
+        android:title="@string/menu_post_settings_modify"/>
+    <item
+        android:id="@+id/delete_post"
+        android:title="@string/menu_post_settings_delete"/>
+</menu>

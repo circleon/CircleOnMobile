@@ -4,6 +4,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:paddingHorizontal="@dimen/margin_padding_large"
     android:background="@color/grey_1"
     android:orientation="vertical"
     tools:context=".view.screen.home.HomeFragment">
@@ -64,7 +65,7 @@
         android:id="@+id/txtContentTitleCircle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:paddingVertical="@dimen/margin_padding_default"
+        android:paddingVertical="@dimen/margin_padding_small"
         android:textAppearance="@style/content_title"
         android:textSize="16sp"
         android:text="@string/home_content_title_circle"/>
@@ -89,6 +90,17 @@
             app:trackColor="@color/grey_3"
             app:trackThickness="1dp"
             android:indeterminate="true"
+            android:visibility="gone"/>
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/txtNoCircle"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:paddingBottom="140dp"
+            android:gravity="center"
+            android:text="@string/message_no_circle"
+            android:textAppearance="@style/large_bold_text"
+            android:textColor="@color/grey_5"
             android:visibility="gone"/>
 
         <androidx.appcompat.widget.LinearLayoutCompat

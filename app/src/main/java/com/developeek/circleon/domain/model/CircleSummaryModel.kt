@@ -2,28 +2,12 @@ package com.developeek.circleon.domain.model
 
 import com.developeek.circleon.domain.enums.Category
 import java.io.Serializable
-import java.util.EmptyStackException
-import java.util.Stack
 import kotlin.math.absoluteValue
 
-data class CircleSummaryModel(
-    val id: Int,
-    val name: String,
-    val category: Category,
-) : Serializable
-
-data class CircleSummaryModels(private val data: List<CircleSummaryModel>) {
-    private val models = Stack<CircleSummaryModel>()
-
-    init {
-        for (c in data) {
-            models.push(c)
-        }
-    }
-
+data class CircleSummaryModels(private val models: List<CircleSummaryModel>) {
     fun get() = models
 
-    fun get(index: Int) = models[index] ?: throw EmptyStackException()
+    fun get(index: Int) = models[index]
 
     fun isEmpty() = models.isEmpty()
 
@@ -40,4 +24,14 @@ data class CircleSummaryModels(private val data: List<CircleSummaryModel>) {
     companion object {
         fun emptyInstance() = CircleSummaryModels(listOf())
     }
+}
+
+data class CircleSummaryModel(
+    val id: Int,
+    val name: String,
+    val category: Category,
+) : Serializable {
+    fun isSame(circleSummaryModel: CircleSummaryModel) = this.id == circleSummaryModel.id
+
+    fun areContentsSame(circleSummaryModel: CircleSummaryModel) = this == circleSummaryModel
 }

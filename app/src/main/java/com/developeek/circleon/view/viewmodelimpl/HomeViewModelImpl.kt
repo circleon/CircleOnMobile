@@ -1,5 +1,6 @@
 package com.developeek.circleon.view.viewmodelimpl
 
+import android.os.Parcelable
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -30,59 +31,64 @@ class HomeViewModelImpl
             get() = categoryFilter
         private val categoryFilter = MutableLiveData<Category>()
 
-        override val circles: CircleModels
-            get() = circleModels
-        private var circleModels = CircleModels.emptyInstance()
+        override lateinit var circles: CircleModels
+        private var fetchCircleJob: Job? = null
         private var currentPage = DEFAULT_PAGE
+
         override val scrollOver: LiveData<Boolean>
             get() = scrollOverCompleted
         private var scrollOverCompleted = MutableLiveData<Boolean>()
+        private var scrollOverCircleJob: Job? = null
         override val scrollListener = RecyclerViewInfiniteScrollListener()
-
-        private var circleLoadingJob: Job? = null
-        private var scrollOverLoadingJob: Job? = null
+        override val currentScrollState: Parcelable?
+            get() = scrollState
+        private var scrollState: Parcelable? = null
 
         override lateinit var error: String
 
-        override fun setFilterAndLoad(category: Category) {
+        init {
+            setFilterAndFetch(Category.ALL)
+        }
+
+        override fun setFilterAndFetch(category: Category) {
             initCategoryFiltering(category)
 
-            circleLoadingJob =
+            fetchCircleJob =
                 viewModelScope.launch {
                     val result = repository.getCircles(currentPage, SIZE_BY_PAGE, category)
 
                     if (result is Success) {
-                        circleModels = result.data
+                        circles = result.data
                         uiState.postValue(UiState.Success)
                     } else {
                         error = (result as Error).message()
-                        if (result.isRefreshExpired()) {
-                            uiState.postValue(UiState.RefreshExpiration)
+                        if (result.isAuthenticationError()) {
+                            uiState.postValue(UiState.AuthenticationError)
                         } else {
-                            uiState.postValue(UiState.Error)
+                            uiState.postValue(UiState.ServiceError)
                         }
                     }
                 }
         }
 
         private fun initCategoryFiltering(category: Category) {
-            circleLoadingJob?.cancel()
-            scrollOverLoadingJob?.cancel()
+            fetchCircleJob?.cancel()
+            scrollOverCircleJob?.cancel()
             categoryFilter.postValue(category)
             uiState.postValue(UiState.Loading)
             currentPage = DEFAULT_PAGE
         }
 
         override fun scrollOver() {
-            scrollOverLoadingJob?.cancel()
+            scrollOverCircleJob?.cancel()
 
-            scrollOverLoadingJob =
+            scrollOverCircleJob =
                 viewModelScope.launch {
                     val result = repository.getCircles(currentPage + 1, SIZE_BY_PAGE, categoryFilter.value!!)
 
                     if (result is Success) {
-                        circleModels =
-                            circleModels.addAll(result.data).also {
+                        circles =
+                            circles.addAll(result.data).also {
                                 if (result.data.isLastPage()) {
                                     it.setAsLast()
                                 }
@@ -90,24 +96,36 @@ class HomeViewModelImpl
                         currentPage++
                         scrollOverCompleted.postValue(true)
                     } else {
-                        if ((result as Error).isRefreshExpired()) {
-                            uiState.postValue(UiState.RefreshExpiration)
+                        error = (result as Error).message()
+                        if (result.isAuthenticationError()) {
+                            uiState.postValue(UiState.AuthenticationError)
                         } else {
-                            error = result.message()
-                            uiState.postValue(UiState.Error)
+                            uiState.postValue(UiState.ServiceError)
                         }
                     }
                 }
         }
 
-        override fun restore() {
+        override fun saveScrollState(scrollState: Parcelable?) {
+            this.scrollState = scrollState
+        }
+
+        override fun removeScrollState() {
+            this.scrollState = null
+        }
+
+        override fun refresh() {
+            fetchOrNotByUiState()
+        }
+
+        private fun fetchOrNotByUiState() {
             if (uiState.value == UiState.Success) {
                 categoryFilter.postValue(categoryFilter.value)
             } else {
                 if (categoryFilter.value == null) {
-                    setFilterAndLoad(Category.ALL)
+                    setFilterAndFetch(Category.ALL)
                 } else {
-                    setFilterAndLoad(categoryFilter.value!!)
+                    setFilterAndFetch(categoryFilter.value!!)
                 }
             }
         }

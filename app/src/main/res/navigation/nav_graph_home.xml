@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/nav_graph_home"
+    app:startDestination="@id/homeFragment">
+
+    <fragment
+        android:id="@+id/homeFragment"
+        android:name="com.developeek.circleon.view.screen.home.HomeFragment"
+        android:label="fragment_home"
+        tools:layout="@layout/fragment_home" >
+        <action
+            android:id="@+id/action_homeFragment_to_circleDetailFragment"
+            app:destination="@id/circleDetailFragment" />
+        <action
+            android:id="@+id/action_homeFragment_to_searchCircleFragment"
+            app:destination="@id/searchCircleFragment"/>
+    </fragment>
+    <fragment
+        android:id="@+id/searchCircleFragment"
+        android:name="com.developeek.circleon.view.screen.home.SearchCircleFragment"
+        android:label="fragment_search_circle"
+        tools:layout="@layout/fragment_search_circle" >
+        <action
+            android:id="@+id/action_searchCircleFragment_to_circleDetailFragment"
+            app:destination="@id/circleDetailFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/circleDetailFragment"
+        android:name="com.developeek.circleon.view.screen.home.CircleDetailFragment"
+        android:label="fragment_circle_detail"
+        tools:layout="@layout/fragment_circle_detail">
+        <action
+            android:id="@+id/action_circleDetailFragment_to_circleDetailPostDetailFragment"
+            app:destination="@id/circleDetailPostDetailFragment"
+            app:enterAnim="@animator/slide_end_to_start"/>
+    </fragment>
+    <fragment
+        android:id="@+id/circleDetailPostDetailFragment"
+        android:name="com.developeek.circleon.view.screen.home.CircleDetailPostDetailFragment"
+        android:label="fragment_circle_detail_post_detail"
+        tools:layout="@layout/fragment_circle_detail_post_detail" />
+</navigation>

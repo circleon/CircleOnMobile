@@ -21,7 +21,7 @@
         <androidx.appcompat.widget.AppCompatTextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/text_sign_up"
+            android:text="@string/btn_go_sign_up_page"
             android:textAppearance="@style/title"/>
 
         <androidx.appcompat.widget.AppCompatImageView

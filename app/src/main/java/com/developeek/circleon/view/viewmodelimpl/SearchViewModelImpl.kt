@@ -28,21 +28,20 @@ class SearchViewModelImpl
             get() = searchResult
         private val searchResult = MutableLiveData<CircleSummaryModels>()
         private lateinit var circleSummaryModels: CircleSummaryModels
+        private var fetchCircleSummaryJob: Job? = null
 
         private var keyword = Const.EMPTY_TEXT
-
-        private var loadCircleJob: Job? = null
 
         override lateinit var error: String
 
         init {
-            loadCircles()
+            fetchCircleSummaries()
         }
 
-        override fun loadCircles() {
-            loadCircleJob?.cancel()
+        private fun fetchCircleSummaries() {
+            fetchCircleSummaryJob?.cancel()
 
-            loadCircleJob =
+            fetchCircleSummaryJob =
                 viewModelScope.launch {
                     val result = repository.getCircleSummaries()
 
@@ -51,13 +50,17 @@ class SearchViewModelImpl
                         uiState.postValue(UiState.Success)
                     } else {
                         error = (result as Error).message()
-                        if (result.isRefreshExpired()) {
-                            uiState.postValue(UiState.RefreshExpiration)
+                        if (result.isAuthenticationError()) {
+                            uiState.postValue(UiState.AuthenticationError)
                         } else {
-                            uiState.postValue(UiState.Error)
+                            uiState.postValue(UiState.ServiceError)
                         }
                     }
                 }
+        }
+
+        override fun refresh() {
+            fetchCircleSummaries()
         }
 
         override fun setKeywordAndFind(keyword: String) {
@@ -66,8 +69,8 @@ class SearchViewModelImpl
             if (::circleSummaryModels.isInitialized) {
                 notifySearchResultByKeyword()
             }
-            if (uiState.value is UiState.Error) {
-                loadCircles()
+            if (uiState.value is UiState.ServiceError) {
+                fetchCircleSummaries()
             }
         }
 

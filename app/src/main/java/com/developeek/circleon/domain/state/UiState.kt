@@ -5,7 +5,7 @@ sealed class UiState {
 
     object Loading : UiState()
 
-    object Error : UiState()
+    object ServiceError : UiState()
 
-    object RefreshExpiration : UiState()
+    object AuthenticationError : UiState()
 }

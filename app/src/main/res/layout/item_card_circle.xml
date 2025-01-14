@@ -8,8 +8,7 @@
     android:padding="@dimen/margin_padding_large"
     android:layout_marginBottom="@dimen/margin_padding_small"
     android:background="@drawable/bg_card"
-    android:clickable="true"
-    android:elevation="1dp">
+    android:clickable="true">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/clCircleInfo"
@@ -50,7 +49,7 @@
                 android:paddingVertical="3dp"
                 tools:text="Category"
                 android:textColor="@color/purple_5"
-                android:textSize="@dimen/text_size_extremely_small"
+                android:textSize="@dimen/text_size_x_small"
                 android:background="@drawable/bg_chip"/>
 
         </androidx.appcompat.widget.LinearLayoutCompat>
@@ -85,10 +84,10 @@
                 android:src="@drawable/ic_circle_people"/>
 
             <TextView
-                android:id="@+id/txtCirclePeopleCount"
+                android:id="@+id/txtCircleMemberCount"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="@dimen/margin_padding_extremely_small"
+                android:layout_marginStart="@dimen/margin_padding_x_small"
                 tools:text="0명"
                 android:textSize="@dimen/text_size_small"
                 android:textColor="@color/grey_9"/>
@@ -102,8 +101,8 @@
         android:layout_width="64dp"
         android:layout_height="64dp"
         android:layout_marginStart="40dp"
-        android:padding="@dimen/margin_padding_default"
-        android:background="@drawable/bg_image"
+        android:background="@drawable/bg_image_rounded_rectangle"
+        android:scaleType="fitXY"
         android:clipToOutline="true"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent"

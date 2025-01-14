@@ -1,6 +1,6 @@
 package com.developeek.circleon.data.source.remote.interceptor
 
-import com.developeek.circleon.data.entity.login.RefreshToken
+import com.developeek.circleon.data.dto.login.RefreshToken
 import com.developeek.circleon.data.exception.ServiceException
 import com.developeek.circleon.data.source.manager.TokenManager
 import com.developeek.circleon.data.source.remote.retrofit.StatusCode
@@ -26,7 +26,7 @@ class TokenAuthenticator
             route: Route?,
             response: Response,
         ): Request? {
-            val refreshToken = tokenManager.getRefreshToken() ?: throw ServiceException.RefreshTokenExpiredException()
+            val refreshToken = tokenManager.getRefreshToken() ?: throw ServiceException.NoRefreshTokenException()
             val responseString = response.body()!!.string()
             val jsonObject = JSONTokener(responseString).nextValue() as JSONObject
             if (jsonObject.getString(PARAM_NAME_ERROR_CODE) == StatusCode.FAIL_REFRESH_TOKEN_VALIDATION.errorCode()) {

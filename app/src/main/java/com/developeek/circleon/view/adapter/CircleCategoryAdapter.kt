@@ -2,6 +2,7 @@ package com.developeek.circleon.view.adapter
 
 import android.content.Context
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
@@ -9,22 +10,24 @@ import com.developeek.circleon.R
 import com.developeek.circleon.databinding.ItemTagCircleCategoryBinding
 import com.developeek.circleon.domain.enums.Category
 import com.developeek.circleon.view.listener.ItemClickListener
+import com.developeek.circleon.view.listener.ItemListenerInitializer
 import com.developeek.circleon.view.viewmodel.HomeViewModel
 
 class CircleCategoryAdapter(
     private val viewModel: HomeViewModel,
-    private val itemClickListener: ItemClickListener,
+    private val itemListenerInitializer: ItemListenerInitializer<Category>,
     private val context: Context,
 ) : RecyclerView.Adapter<CircleCategoryAdapter.CircleCategoryAdapterViewHolder>() {
     inner class CircleCategoryAdapterViewHolder(
         private val binding: ItemTagCircleCategoryBinding,
+        private val itemClickListener: ItemClickListener<Category>,
     ) : RecyclerView.ViewHolder(binding.root) {
         fun bind(position: Int) {
             val category = viewModel.category[position]
 
             loadCategory(category)
             setItemColor(category, context)
-            setItemClickListener(position)
+            notifyListenerItemChanged(position)
         }
 
         private fun loadCategory(category: Category) {
@@ -38,7 +41,7 @@ class CircleCategoryAdapter(
             viewModel.selectedCategory.value?.let {
                 if (it.isSame(category)) {
                     binding.txtCircleCategory.background =
-                        ContextCompat.getDrawable(context, R.drawable.bg_active_tag)
+                        ContextCompat.getDrawable(context, R.drawable.bg_button)
                     binding.txtCircleCategory.setTextColor(ContextCompat.getColor(context, R.color.white))
                 } else {
                     binding.txtCircleCategory.background =
@@ -48,10 +51,8 @@ class CircleCategoryAdapter(
             }
         }
 
-        private fun setItemClickListener(position: Int) {
-            binding.clItemCircleCategory.setOnClickListener {
-                itemClickListener.onItemClicked(position)
-            }
+        private fun notifyListenerItemChanged(position: Int) {
+            itemClickListener.item = viewModel.category[position]
         }
     }
 
@@ -66,7 +67,16 @@ class CircleCategoryAdapter(
                 false,
             )
 
-        return CircleCategoryAdapterViewHolder(binding)
+        val itemClickListener =
+            object : ItemClickListener<Category> {
+                override lateinit var item: Category
+
+                override fun onClick(p0: View?) {
+                    itemListenerInitializer.initialize(item)
+                }
+            }
+        binding.clItemCircleCategory.setOnClickListener(itemClickListener)
+        return CircleCategoryAdapterViewHolder(binding, itemClickListener)
     }
 
     override fun getItemCount() = viewModel.category.size

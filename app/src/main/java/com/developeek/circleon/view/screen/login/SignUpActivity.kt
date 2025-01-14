@@ -18,7 +18,7 @@ import com.developeek.circleon.domain.state.UiState
 import com.developeek.circleon.view.adapter.SignUpFragmentAdapter
 import com.developeek.circleon.view.viewmodel.SignUpViewModel
 import com.developeek.circleon.view.viewmodelimpl.SignUpViewModelImpl
-import com.developeek.circleon.view.widget.CustomAlertDialog
+import com.developeek.circleon.view.widget.ErrorAlertDialog
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -59,8 +59,8 @@ class SignUpActivity : AppCompatActivity() {
     private fun stateObserver(activity: Activity) =
         Observer<UiState> {
             when (it) {
-                UiState.Error -> {
-                    CustomAlertDialog(
+                UiState.ServiceError -> {
+                    ErrorAlertDialog(
                         activity,
                         viewModel.error,
                     ).show()
@@ -93,7 +93,7 @@ class SignUpActivity : AppCompatActivity() {
                     setBtnBottomAsSignUp()
                 }
                 SIGN_UP_COMPLETED -> {
-                    Toast.makeText(activity, "회원 가입 완료", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(activity, "회원 가입이 완료되었습니다", Toast.LENGTH_SHORT).show()
                     finish()
                 }
                 else -> {

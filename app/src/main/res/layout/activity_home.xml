@@ -8,16 +8,15 @@
     android:background="@color/grey_1"
     tools:context=".view.screen.HomeActivity">
 
-    <FrameLayout
-        android:id="@+id/flHome"
+    <androidx.fragment.app.FragmentContainerView
+        android:id="@+id/containerHome"
+        android:name="androidx.navigation.fragment.NavHostFragment"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:paddingHorizontal="@dimen/margin_padding_large"
+        app:navGraph="@navigation/nav_graph"
+        app:defaultNavHost="true"
         app:layout_constraintBottom_toTopOf="@+id/btmNav"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
-    </FrameLayout>
+        app:layout_constraintTop_toTopOf="parent" />
 
     <com.google.android.material.bottomnavigation.BottomNavigationView
         android:id="@+id/btmNav"

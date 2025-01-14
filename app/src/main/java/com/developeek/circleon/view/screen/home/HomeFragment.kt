@@ -6,19 +6,24 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.os.bundleOf
+import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Observer
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.developeek.circleon.R
 import com.developeek.circleon.data.source.manager.UserManager
 import com.developeek.circleon.databinding.FragmentHomeBinding
 import com.developeek.circleon.domain.enums.Category
 import com.developeek.circleon.domain.model.CircleModel
 import com.developeek.circleon.domain.state.UiState
+import com.developeek.circleon.domain.utils.Const
 import com.developeek.circleon.domain.utils.glide.GlideProvider
 import com.developeek.circleon.view.adapter.CircleAdapter
 import com.developeek.circleon.view.adapter.CircleCategoryAdapter
-import com.developeek.circleon.view.listener.ItemClickListener
+import com.developeek.circleon.view.listener.ItemListenerInitializer
 import com.developeek.circleon.view.listener.RecyclerViewInfiniteScrollListener
 import com.developeek.circleon.view.screen.login.LoginActivity
 import com.developeek.circleon.view.viewmodel.HomeViewModel
@@ -56,13 +61,42 @@ class HomeFragment : Fragment() {
 
         initView(requireActivity())
         initObserver(requireActivity())
-        initListener(requireActivity())
+        initListener()
     }
 
     private fun initView(activity: Activity) {
-        binding.rvCircle.adapter = CircleAdapter(activity, glideProvider)
+        initRecyclerView(activity)
+        loadUserInfo()
+    }
+
+    private fun initRecyclerView(activity: Activity) {
+        binding.rvCircle.adapter =
+            CircleAdapter(
+                activity,
+                glideProvider,
+                object : ItemListenerInitializer<CircleModel> {
+                    override fun initialize(item: CircleModel) {
+                        findNavController()
+                            .navigate(
+                                R.id.action_homeFragment_to_circleDetailFragment,
+                                bundleOf(
+                                    Pair(Const.TAG_CIRCLE_ID, item.id),
+                                    Pair(Const.TAG_CIRCLE_NAME, item.name),
+                                ),
+                            )
+                    }
+
+                    override fun initialize(
+                        item: CircleModel,
+                        view: View?,
+                    ) {}
+                },
+            )
         binding.rvCircle.layoutManager = LinearLayoutManager(activity)
         binding.rvCircle.itemAnimator = null
+    }
+
+    private fun loadUserInfo() {
         userManager.getUser()?.let {
             binding.txtUnivName.text = it.univ.univName()
             binding.txtContentTitleCircle.text = String.format(CONTENT_TITLE_CIRCLE, it.name)
@@ -91,16 +125,20 @@ class HomeFragment : Fragment() {
                     toggleView(binding.pgbLoading)
                 }
                 UiState.Success -> {
-                    toggleView(binding.rvCircle)
-                    loadCircles()
+                    if (viewModel.circles.isEmpty()) {
+                        toggleView(binding.txtNoCircle)
+                    } else {
+                        toggleView(binding.rvCircle)
+                        loadCircles()
+                    }
                 }
-                UiState.RefreshExpiration -> {
+                UiState.AuthenticationError -> {
                     sendUserToLoginScreen(activity)
                     if (ErrorToast.previousFinished()) {
                         ErrorToast(activity, viewModel.error).show()
                     }
                 }
-                UiState.Error -> {
+                UiState.ServiceError -> {
                     toggleView(binding.llServiceError)
                     if (ErrorToast.previousFinished()) {
                         ErrorToast(activity, viewModel.error).show()
@@ -111,7 +149,12 @@ class HomeFragment : Fragment() {
 
     private fun loadCircles() {
         binding.rvCircle.adapter?.let {
-            (it as CircleAdapter).update(viewModel.circles) { binding.rvCircle.scrollToPosition(0) }
+            (it as CircleAdapter).update(viewModel.circles) {
+                viewModel.currentScrollState?.let {
+                    binding.rvCircle.layoutManager?.onRestoreInstanceState(viewModel.currentScrollState)
+                    viewModel.removeScrollState()
+                } ?: binding.rvCircle.scrollToPosition(0)
+            }
         }
     }
 
@@ -127,14 +170,19 @@ class HomeFragment : Fragment() {
             binding.rvCircleCategory.adapter =
                 CircleCategoryAdapter(
                     viewModel,
-                    object : ItemClickListener {
-                        override fun onItemClicked(position: Int) {
-                            if (viewModel.selectedCategory.value!!.isSame(viewModel.category[position])) {
+                    object : ItemListenerInitializer<Category> {
+                        override fun initialize(item: Category) {
+                            if (viewModel.selectedCategory.value!!.isSame(item)) {
                                 binding.rvCircle.scrollToPosition(0)
                             } else {
-                                viewModel.setFilterAndLoad(viewModel.category[position])
+                                viewModel.setFilterAndFetch(item)
                             }
                         }
+
+                        override fun initialize(
+                            item: Category,
+                            view: View?,
+                        ) {}
                     },
                     activity,
                 )
@@ -147,28 +195,28 @@ class HomeFragment : Fragment() {
         Observer<Boolean> { completed ->
             if (completed) {
                 binding.rvCircle.removeOnScrollListener(viewModel.scrollListener)
-                binding.rvCircle.addOnScrollListener(viewModel.scrollListener)
+                binding.rvCircle.addOnScrollListener(viewModel.scrollListener) // 아이템 정보 업데이트
                 binding.rvCircle.adapter?.let {
                     (it as CircleAdapter).update(viewModel.circles) {}
                 }
             }
         }
 
-    private fun initListener(activity: Activity) {
-        setBtnSearchCircleListener(activity)
+    private fun initListener() {
+        setBtnSearchCircleListener()
         setBtnRetryListener()
         setRvCircleListener()
     }
 
-    private fun setBtnSearchCircleListener(activity: Activity) {
+    private fun setBtnSearchCircleListener() {
         binding.btnSearch.setOnClickListener {
-            sendUserToSearchCircleScreen(activity)
+            sendUserToSearchCircleScreen()
         }
     }
 
     private fun setBtnRetryListener() {
         binding.btnRetry.setOnClickListener {
-            viewModel.restore()
+            viewModel.refresh()
         }
     }
 
@@ -188,26 +236,25 @@ class HomeFragment : Fragment() {
         viewModel.scrollOver()
     }
 
-    private fun sendUserToSearchCircleScreen(activity: Activity) {
-        val intent = Intent(activity, SearchCircleActivity::class.java)
-
-        startActivity(intent)
+    private fun sendUserToSearchCircleScreen() {
+        findNavController().navigate(R.id.action_homeFragment_to_searchCircleFragment)
     }
 
-    override fun onStart() {
-        super.onStart()
-        viewModel.restore()
+    // 화면이 잠깐 보여지지 않는 경우가 아니라, 무조건 bottom tab 전환인 경우에만 scroll state 를 저장
+    override fun onDestroyView() {
+        super.onDestroyView()
+
+        viewModel.saveScrollState(binding.rvCircle.layoutManager?.onSaveInstanceState())
     }
 
     private fun toggleView(view: View) {
-        binding.rvCircle.visibility = visibleWhenTrue(view == binding.rvCircle)
-        binding.pgbLoading.visibility = visibleWhenTrue(view == binding.pgbLoading)
-        binding.llServiceError.visibility = visibleWhenTrue(view == binding.llServiceError)
+        binding.rvCircle.isVisible = view == binding.rvCircle
+        binding.pgbLoading.isVisible = view == binding.pgbLoading
+        binding.txtNoCircle.isVisible = view == binding.txtNoCircle
+        binding.llServiceError.isVisible = view == binding.llServiceError
     }
 
-    private fun visibleWhenTrue(state: Boolean) = if (state) View.VISIBLE else View.GONE
-
     companion object {
-        private const val CONTENT_TITLE_CIRCLE = "%s님 이런 동아리는 어떠신가요?"
+        private const val CONTENT_TITLE_CIRCLE = "%s 님 이런 동아리는 어떠신가요?"
     }
 }

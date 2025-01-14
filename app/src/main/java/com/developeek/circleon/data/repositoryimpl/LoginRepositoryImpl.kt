@@ -1,8 +1,8 @@
 package com.developeek.circleon.data.repositoryimpl
 
-import com.developeek.circleon.data.entity.login.EmailAuthentication
-import com.developeek.circleon.data.entity.login.Login
-import com.developeek.circleon.data.entity.login.SignUp
+import com.developeek.circleon.data.dto.login.EmailAuthentication
+import com.developeek.circleon.data.dto.login.Login
+import com.developeek.circleon.data.dto.login.SignUp
 import com.developeek.circleon.data.repository.LoginRepository
 import com.developeek.circleon.data.source.Result
 import com.developeek.circleon.data.source.manager.TokenManager
@@ -24,7 +24,7 @@ class LoginRepositoryImpl(
     override suspend fun login(
         email: String,
         password: String,
-    ): Result<Boolean> {
+    ): Result<Unit> {
         return try {
             withContext(dispatcher) {
                 service.login(Login(email, password)).also {
@@ -35,7 +35,7 @@ class LoginRepositoryImpl(
                     tokenManager.setAccessToken(token.accessToken)
                     tokenManager.setRefreshToken(token.refreshToken)
                 }
-                Result.success(true)
+                Result.success(Unit)
             }
         } catch (e: IOException) {
             Result.error(e)
@@ -46,22 +46,22 @@ class LoginRepositoryImpl(
         email: UserEmail,
         userName: UserName,
         password: Password,
-    ): Result<Boolean> {
+    ): Result<Unit> {
         return try {
             withContext(dispatcher) {
                 service.signUp(SignUp(email.get(), userName.get(), password.get()))
-                Result.success(true)
+                Result.success(Unit)
             }
         } catch (e: IOException) {
             return Result.error(e)
         }
     }
 
-    override suspend fun requestEmailAuthenticationCode(email: UserEmail): Result<Boolean> {
+    override suspend fun requestEmailAuthenticationCode(email: UserEmail): Result<Unit> {
         return try {
             withContext(dispatcher) {
-                service.requestEmailAuthenticationCode(com.developeek.circleon.data.entity.login.Email(email.get()))
-                Result.success(true)
+                service.requestEmailAuthenticationCode(com.developeek.circleon.data.dto.login.Email(email.get()))
+                Result.success(Unit)
             }
         } catch (e: IOException) {
             return Result.error(e)
@@ -71,11 +71,11 @@ class LoginRepositoryImpl(
     override suspend fun authenticateEmail(
         email: UserEmail,
         code: String,
-    ): Result<Boolean> {
+    ): Result<Unit> {
         return try {
             withContext(dispatcher) {
                 service.authenticateEmail(EmailAuthentication(email.get(), code))
-                Result.success(true)
+                Result.success(Unit)
             }
         } catch (e: IOException) {
             return Result.error(e)

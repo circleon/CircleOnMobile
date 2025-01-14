@@ -1,7 +1,8 @@
 package com.developeek.circleon.view.adapter
 
-import android.content.Context
+import android.app.Activity
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.AsyncListDiffer
 import androidx.recyclerview.widget.DiffUtil
@@ -12,10 +13,13 @@ import com.developeek.circleon.databinding.ItemLoadingBinding
 import com.developeek.circleon.domain.model.CircleModel
 import com.developeek.circleon.domain.model.CircleModels
 import com.developeek.circleon.domain.utils.glide.GlideProvider
+import com.developeek.circleon.view.listener.ItemClickListener
+import com.developeek.circleon.view.listener.ItemListenerInitializer
 
 class CircleAdapter(
-    private val parent: Context,
+    private val activity: Activity,
     private val glideProvider: GlideProvider,
+    private val itemListenerInitializer: ItemListenerInitializer<CircleModel>,
 ) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
     private val diffUtil =
         AsyncListDiffer(
@@ -25,36 +29,44 @@ class CircleAdapter(
                     oldItem: CircleModel,
                     newItem: CircleModel,
                 ): Boolean {
-                    return oldItem.id == newItem.id
+                    return oldItem.isSame(newItem)
                 }
 
                 override fun areContentsTheSame(
                     oldItem: CircleModel,
                     newItem: CircleModel,
                 ): Boolean {
-                    return oldItem.id == newItem.id
+                    return oldItem.areContentsSame(newItem)
                 }
             },
         )
 
     inner class CircleAdapterItemViewHolder(
         private val binding: ItemCardCircleBinding,
+        private val itemClickListener: ItemClickListener<CircleModel>,
     ) : RecyclerView.ViewHolder(binding.root) {
         fun bind(position: Int) {
             loadCircle(position)
+            notifyListenerItemChanged(position)
         }
 
         private fun loadCircle(position: Int) {
             binding.txtCircleName.text = diffUtil.currentList[position].name
             binding.txtCircleCategory.text = diffUtil.currentList[position].category.categoryName()
             binding.txtCircleComment.text = diffUtil.currentList[position].comment
-            binding.txtCirclePeopleCount.text =
+            binding.txtCircleMemberCount.text =
                 String.format(
-                    MEMBER_COUNT_UNIT, diffUtil.currentList[position].member,
+                    MEMBER_COUNT_UNIT, diffUtil.currentList[position].memberCount,
                 )
+            // ?.let ?: 구조인 경우 ?: 뒤에 블록 형태로 코드를 작성하면 실행이 안 되는데
+            // 싱글 라인인 경우에는 작동
             diffUtil.currentList[position].thumbnailUrl?.let {
-                glideProvider.callImage(it, parent, binding.imgCircleThumbnail)
-            } ?: binding.imgCircleThumbnail.setImageResource(R.drawable.logo_main)
+                glideProvider.callImage(it, activity, binding.imgCircleThumbnail)
+            } ?: binding.imgCircleThumbnail.setImageResource(R.drawable.ic_circle_thumbnail_placeholder)
+        }
+
+        private fun notifyListenerItemChanged(position: Int) {
+            itemClickListener.item = diffUtil.currentList[position]
         }
     }
 
@@ -83,7 +95,16 @@ class CircleAdapter(
                 false,
             )
 
-        return CircleAdapterItemViewHolder(binding)
+        val itemClickListener =
+            object : ItemClickListener<CircleModel> {
+                override lateinit var item: CircleModel
+
+                override fun onClick(p0: View?) {
+                    itemListenerInitializer.initialize(item)
+                }
+            }
+        binding.clItemCircle.setOnClickListener(itemClickListener)
+        return CircleAdapterItemViewHolder(binding, itemClickListener)
     }
 
     override fun getItemCount() = diffUtil.currentList.size
