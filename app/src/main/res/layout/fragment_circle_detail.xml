@@ -124,12 +124,15 @@
                 android:id="@+id/tbCircleDetail"
                 android:layout_width="match_parent"
                 android:layout_height="56dp"
+                app:contentInsetStart="0dp"
                 app:layout_collapseMode="pin">
 
                 <androidx.appcompat.widget.AppCompatImageView
                     android:id="@+id/btnBack"
                     android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
+                    android:layout_height="match_parent"
+                    android:paddingStart="@dimen/margin_padding_large"
+                    android:paddingEnd="@dimen/margin_padding_small"
                     android:src="@drawable/ic_back"
                     android:background="@null"/>
 
@@ -258,8 +261,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/margin_padding_small"
-                android:src="@drawable/ic_retry"
-                android:clickable="true"/>
+                android:src="@drawable/ic_retry" />
 
         </androidx.appcompat.widget.LinearLayoutCompat>
 

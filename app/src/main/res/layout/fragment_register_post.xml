@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/grey_1"
+    tools:context=".view.screen.home.RegisterPostFragment">
+
+    <androidx.appcompat.widget.Toolbar
+        android:id="@+id/tbPostDetail"
+        android:layout_width="match_parent"
+        android:layout_height="56dp"
+        android:background="@color/white"
+        app:contentInsetStart="0dp"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toTopOf="@id/imgPost">
+
+        <androidx.appcompat.widget.AppCompatImageView
+            android:id="@+id/btnCancel"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:paddingStart="@dimen/margin_padding_large"
+            android:paddingEnd="@dimen/margin_padding_small"
+            android:src="@drawable/ic_cancel" />
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/txtTbTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="@style/large_bold_text"
+            android:textColor="@color/grey_9"
+            tools:text="title"/>
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/btnFinish"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:paddingHorizontal="@dimen/margin_padding_large"
+            android:layout_gravity="end"
+            android:gravity="center"
+            android:text="@string/btn_finish"
+            android:textAppearance="@style/small_bold_text"
+            android:textColor="@color/purple_5" />
+
+    </androidx.appcompat.widget.Toolbar>
+
+    <androidx.appcompat.widget.AppCompatImageView
+        android:id="@+id/imgPost"
+        android:layout_width="80dp"
+        android:layout_height="80dp"
+        android:layout_margin="@dimen/margin_padding_large"
+        android:src="@drawable/ic_lock"
+        android:tint="@color/white"
+        android:scaleType="center"
+        android:background="@drawable/bg_rounded_rectangle"
+        android:backgroundTint="@color/grey_3"
+        app:layout_constraintHorizontal_bias="0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/tbPostDetail"
+        app:layout_constraintBottom_toTopOf="@id/edtPostContent" />
+
+    <androidx.appcompat.widget.AppCompatEditText
+        android:id="@+id/edtPostContent"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:padding="@dimen/margin_padding_large"
+        android:gravity="top"
+        android:hint="@string/hint_post_content"
+        android:textSize="@dimen/text_size_default"
+        android:textColor="@color/grey_5"
+        android:lineSpacingExtra="2sp"
+        android:translationY="-1.06sp"
+        android:background="@color/white"
+        app:layout_constraintTop_toBottomOf="@id/imgPost"
+        app:layout_constraintBottom_toBottomOf="parent"/>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

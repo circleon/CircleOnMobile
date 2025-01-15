@@ -33,6 +33,8 @@ import javax.inject.Inject
 class CircleDetailFragment : Fragment() {
     private lateinit var binding: FragmentCircleDetailBinding
     private lateinit var fragmentManager: FragmentManager
+    private var circleId: Int = 0
+    private lateinit var circleName: String
     private val viewModel: CircleDetailViewModel by viewModels<CircleDetailViewModelImpl>(
         extrasProducer = {
             defaultViewModelCreationExtras
@@ -41,8 +43,6 @@ class CircleDetailFragment : Fragment() {
                 }
         },
     )
-    private var circleId: Int = 0
-    private lateinit var circleName: String
 
     @Inject
     lateinit var glideProvider: GlideProvider

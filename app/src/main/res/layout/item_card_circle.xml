@@ -7,8 +7,7 @@
     android:layout_height="wrap_content"
     android:padding="@dimen/margin_padding_large"
     android:layout_marginBottom="@dimen/margin_padding_small"
-    android:background="@drawable/bg_card"
-    android:clickable="true">
+    android:background="@drawable/bg_card">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/clCircleInfo"

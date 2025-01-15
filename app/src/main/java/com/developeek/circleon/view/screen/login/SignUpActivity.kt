@@ -148,7 +148,7 @@ class SignUpActivity : AppCompatActivity() {
     }
 
     private fun setBtnFinishListener() {
-        binding.btnFinish.setOnClickListener {
+        binding.btnCancel.setOnClickListener {
             finish()
         }
     }

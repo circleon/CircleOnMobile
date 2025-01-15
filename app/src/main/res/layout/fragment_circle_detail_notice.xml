@@ -4,62 +4,80 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/grey_1"
     tools:context=".view.screen.home.CircleDetailNoticeFragment">
 
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/rvCircleNotice"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:visibility="gone"/>
-
-    <com.google.android.material.progressindicator.CircularProgressIndicator
-        android:id="@+id/pgbLoading"
+    <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:paddingBottom="182dp"
-        android:layout_gravity="center"
-        app:indicatorColor="@color/grey_5"
-        app:trackColor="@color/grey_3"
-        app:trackThickness="1dp"
-        android:indeterminate="true"
-        android:visibility="gone"/>
+        android:background="@color/grey_1">
 
-    <androidx.appcompat.widget.AppCompatTextView
-        android:id="@+id/txtNoNotice"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:paddingBottom="140dp"
-        android:gravity="center"
-        android:text="@string/message_no_notice"
-        android:textAppearance="@style/large_bold_text"
-        android:textColor="@color/grey_5"
-        android:visibility="gone"/>
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/rvCircleNotice"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:visibility="gone"/>
 
-    <androidx.appcompat.widget.LinearLayoutCompat
-        android:id="@+id/llServiceError"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:paddingBottom="182dp"
-        android:gravity="center"
-        android:orientation="vertical"
-        android:visibility="gone">
+        <com.google.android.material.progressindicator.CircularProgressIndicator
+            android:id="@+id/pgbLoading"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:paddingBottom="182dp"
+            android:layout_gravity="center"
+            app:indicatorColor="@color/grey_5"
+            app:trackColor="@color/grey_3"
+            app:trackThickness="1dp"
+            android:indeterminate="true"
+            android:visibility="gone"/>
 
         <androidx.appcompat.widget.AppCompatTextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/message_service_error"
+            android:id="@+id/txtNoNotice"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:paddingBottom="140dp"
+            android:gravity="center"
+            android:text="@string/message_no_notice"
             android:textAppearance="@style/large_bold_text"
-            android:textColor="@color/grey_5"/>
+            android:textColor="@color/grey_5"
+            android:visibility="gone"/>
 
-        <androidx.appcompat.widget.AppCompatImageView
-            android:id="@+id/btnRetry"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/margin_padding_small"
-            android:src="@drawable/ic_retry"
-            android:clickable="true"/>
+        <androidx.appcompat.widget.LinearLayoutCompat
+            android:id="@+id/llServiceError"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:paddingBottom="182dp"
+            android:gravity="center"
+            android:orientation="vertical"
+            android:visibility="gone">
 
-    </androidx.appcompat.widget.LinearLayoutCompat>
+            <androidx.appcompat.widget.AppCompatTextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/message_service_error"
+                android:textAppearance="@style/large_bold_text"
+                android:textColor="@color/grey_5"/>
+
+            <androidx.appcompat.widget.AppCompatImageView
+                android:id="@+id/btnRetry"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/margin_padding_small"
+                android:src="@drawable/ic_retry" />
+
+        </androidx.appcompat.widget.LinearLayoutCompat>
+
+    </FrameLayout>
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/fabRegisterNotice"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="@dimen/margin_padding_large"
+        android:layout_gravity="bottom|end"
+        android:src="@drawable/ic_register_post"
+        app:tint="@color/white"
+        android:backgroundTint="@color/purple_5"
+        app:shapeAppearance="@style/fab_rounded"
+        android:elevation="0dp"
+        android:visibility="gone"/>
 
 </FrameLayout>

@@ -12,7 +12,7 @@
     <androidx.appcompat.widget.Toolbar
         android:id="@+id/tbSignUp"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="56dp"
         app:contentInsetStart="0dp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
@@ -25,12 +25,12 @@
             android:textAppearance="@style/title"/>
 
         <androidx.appcompat.widget.AppCompatImageView
-            android:id="@+id/btnFinish"
+            android:id="@+id/btnCancel"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_height="match_parent"
+            android:paddingStart="@dimen/margin_padding_large"
             android:layout_gravity="end"
-            android:src="@drawable/ic_finish"
-            android:clickable="true"/>
+            android:src="@drawable/ic_cancel" />
 
     </androidx.appcompat.widget.Toolbar>
 
@@ -56,6 +56,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/vpgSignUp"
-        android:background="@drawable/bg_rounded_purple_rectangle" />
+        android:background="@drawable/bg_rounded_rectangle"
+        android:backgroundTint="@color/purple_5"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

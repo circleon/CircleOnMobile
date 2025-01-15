@@ -82,10 +82,10 @@
         android:id="@+id/btnCommentOverflow"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:paddingHorizontal="@dimen/margin_padding_large"
+        android:layout_marginEnd="@dimen/margin_padding_x_small"
+        android:paddingHorizontal="@dimen/margin_padding_default"
         android:background="?attr/selectableItemBackgroundBorderless"
         android:src="@drawable/ic_overflow"
-        android:clickable="true"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         android:visibility="gone"/>

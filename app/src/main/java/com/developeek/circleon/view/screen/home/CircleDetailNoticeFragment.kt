@@ -92,6 +92,7 @@ class CircleDetailNoticeFragment : Fragment() {
 
     private fun initView(activity: Activity) {
         initRecyclerView(activity)
+        hideFabRegisterNoticeOrNot()
     }
 
     private fun initRecyclerView(activity: Activity) {
@@ -187,6 +188,10 @@ class CircleDetailNoticeFragment : Fragment() {
         true
     }
 
+    private fun hideFabRegisterNoticeOrNot() {
+        binding.fabRegisterNotice.isVisible = role.isExecutive()
+    }
+
     private fun initObserver(activity: Activity) {
         viewModel.state.observe(
             viewLifecycleOwner,
@@ -265,6 +270,7 @@ class CircleDetailNoticeFragment : Fragment() {
     private fun initListener() {
         setRvCircleNoticeListener()
         setBtnRetryListener()
+        setFabRegisterNoticeListener()
     }
 
     private fun setRvCircleNoticeListener() {
@@ -289,6 +295,9 @@ class CircleDetailNoticeFragment : Fragment() {
         binding.btnRetry.setOnClickListener {
             viewModel.refresh()
         }
+    }
+
+    private fun setFabRegisterNoticeListener() {
     }
 
     override fun onDestroyView() {
