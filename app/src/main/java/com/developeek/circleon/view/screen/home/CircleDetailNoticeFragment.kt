@@ -92,7 +92,6 @@ class CircleDetailNoticeFragment : Fragment() {
 
     private fun initView(activity: Activity) {
         initRecyclerView(activity)
-        hideFabRegisterNoticeOrNot()
     }
 
     private fun initRecyclerView(activity: Activity) {
@@ -186,10 +185,6 @@ class CircleDetailNoticeFragment : Fragment() {
             }
         }
         true
-    }
-
-    private fun hideFabRegisterNoticeOrNot() {
-        binding.fabRegisterNotice.isVisible = role.isExecutive()
     }
 
     private fun initObserver(activity: Activity) {

@@ -10,4 +10,5 @@ object Const {
 
     const val FLAG_ANIM_STATE = "anim_state"
     const val FLAG_DATA_CHANGED = "data_changed"
+    const val FLAG_NOTICE_OR_NOT = "notice_or_not"
 }

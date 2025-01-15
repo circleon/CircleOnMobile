@@ -182,36 +182,39 @@ class CircleDetailFragment : Fragment() {
             object : TabLayout.OnTabSelectedListener {
                 override fun onTabSelected(tab: TabLayout.Tab?) {
                     viewModel.setTabPosition(tab?.position!!)
-                    replaceByTabPosition()
+                    if (viewModel.circleDetailInitialized) {
+                        replaceScreenByTabPosition()
+                        replaceFabContentByTabPosition()
+                    }
                 }
 
                 override fun onTabUnselected(p0: TabLayout.Tab?) {
                 }
 
                 override fun onTabReselected(p0: TabLayout.Tab?) {
-                    resetScrollByTabPosition()
+                    if (viewModel.circleDetailInitialized) {
+                        resetScrollByTabPosition()
+                    }
                 }
             },
         )
     }
 
-    private fun replaceByTabPosition() {
+    private fun replaceScreenByTabPosition() {
         val bundle = Bundle()
 
-        if (viewModel.circleDetailInitialized) {
-            when (viewModel.currentTabPosition) {
-                0 -> {
-                    replaceToIntroductionScreen(bundle)
-                }
-                1 -> {
-                    replaceToNoticeScreen(bundle)
-                }
-                2 -> {
-                    replaceToPostScreen(bundle)
-                }
-                3 -> {
-                    replaceToPhotoScreen(bundle)
-                }
+        when (viewModel.currentTabPosition) {
+            0 -> {
+                replaceToIntroductionScreen(bundle)
+            }
+            1 -> {
+                replaceToNoticeScreen(bundle)
+            }
+            2 -> {
+                replaceToPostScreen(bundle)
+            }
+            3 -> {
+                replaceToPhotoScreen(bundle)
             }
         }
     }
@@ -259,20 +262,46 @@ class CircleDetailFragment : Fragment() {
             .commit()
     }
 
+    private fun replaceFabContentByTabPosition() {
+        val bundle = Bundle()
+
+        when (viewModel.currentTabPosition) {
+            0 -> {
+                binding.fabRegisterCircleContent.isVisible = false
+            }
+            1 -> {
+                binding.fabRegisterCircleContent.isVisible = viewModel.circleDetail.isExecutive()
+                binding.fabRegisterCircleContent.setOnClickListener {
+                    bundle.putBoolean(Const.FLAG_NOTICE_OR_NOT, true)
+                    findNavController().navigate(R.id.action_circleDetailFragment_to_registerPostFragment, bundle)
+                }
+            }
+            2 -> {
+                binding.fabRegisterCircleContent.isVisible = viewModel.circleDetail.isMember()
+                binding.fabRegisterCircleContent.setOnClickListener {
+                    bundle.putBoolean(Const.FLAG_NOTICE_OR_NOT, false)
+                    findNavController().navigate(R.id.action_circleDetailFragment_to_registerPostFragment, bundle)
+                }
+            }
+            3 -> {
+                // TODO: 활동 사진 기능 추가 후 fab src 교체 및 리스너 설정
+                binding.fabRegisterCircleContent.isVisible = false
+            }
+        }
+    }
+
     private fun resetScrollByTabPosition() {
         val bundle = Bundle()
 
-        if (viewModel.circleDetailInitialized) {
-            when (viewModel.currentTabPosition) {
-                0 -> {
-                    replaceToIntroductionScreen(bundle)
-                }
-                1 -> {
-                    resetScrollOfNoticeView()
-                }
-                2 -> {
-                    resetScrollOfPostView()
-                }
+        when (viewModel.currentTabPosition) {
+            0 -> {
+                replaceToIntroductionScreen(bundle)
+            }
+            1 -> {
+                resetScrollOfNoticeView()
+            }
+            2 -> {
+                resetScrollOfPostView()
             }
         }
     }

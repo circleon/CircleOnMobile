@@ -35,10 +35,18 @@
             android:id="@+id/action_circleDetailFragment_to_circleDetailPostDetailFragment"
             app:destination="@id/circleDetailPostDetailFragment"
             app:enterAnim="@animator/slide_end_to_start"/>
+        <action
+            android:id="@+id/action_circleDetailFragment_to_registerPostFragment"
+            app:destination="@id/registerPostFragment" />
     </fragment>
     <fragment
         android:id="@+id/circleDetailPostDetailFragment"
         android:name="com.developeek.circleon.view.screen.home.CircleDetailPostDetailFragment"
         android:label="fragment_circle_detail_post_detail"
         tools:layout="@layout/fragment_circle_detail_post_detail" />
+    <fragment
+        android:id="@+id/registerPostFragment"
+        android:name="com.developeek.circleon.view.screen.home.RegisterPostFragment"
+        android:label="fragment_register_post"
+        tools:layout="@layout/fragment_register_post" />
 </navigation>
