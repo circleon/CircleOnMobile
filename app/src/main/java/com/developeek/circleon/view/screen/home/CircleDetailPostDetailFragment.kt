@@ -21,16 +21,18 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import androidx.navigation.fragment.findNavController
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.developeek.circleon.R
 import com.developeek.circleon.data.source.manager.UserManager
 import com.developeek.circleon.databinding.FragmentCircleDetailPostDetailBinding
-import com.developeek.circleon.databinding.ItemPostCommentBinding
 import com.developeek.circleon.domain.model.CommentModel
 import com.developeek.circleon.domain.model.PostModel
 import com.developeek.circleon.domain.state.UiState
 import com.developeek.circleon.domain.utils.Const
 import com.developeek.circleon.domain.utils.Utils
 import com.developeek.circleon.domain.utils.glide.GlideProvider
+import com.developeek.circleon.view.adapter.PostCommentAdapter
+import com.developeek.circleon.view.listener.ItemListenerInitializer
 import com.developeek.circleon.view.screen.login.LoginActivity
 import com.developeek.circleon.view.viewmodel.CircleDetailPostDetailViewModel
 import com.developeek.circleon.view.viewmodelimpl.CircleDetailPostDetailViewModelImpl
@@ -98,6 +100,7 @@ class CircleDetailPostDetailFragment : Fragment() {
 
     private fun initView(activity: Activity) {
         initToolbar()
+        initRecyclerView(activity)
         hidePostOverFlowOrNot()
         loadAuthor(activity)
         loadPost(activity)
@@ -111,120 +114,25 @@ class CircleDetailPostDetailFragment : Fragment() {
         }
     }
 
-    private fun hidePostOverFlowOrNot() {
-        userManager.getUser()?.let {
-            binding.btnPostOverflow.isVisible = it.id == post.author.id
-        }
-    }
+    private fun initRecyclerView(activity: Activity) {
+        binding.rvComment.adapter =
+            PostCommentAdapter(
+                activity,
+                glideProvider,
+                overflowListenerInitializer =
+                    object : ItemListenerInitializer<CommentModel> {
+                        override fun initialize(item: CommentModel) {}
 
-    private fun loadAuthor(activity: Activity) {
-        binding.txtAuthorName.text = post.author.name
-        binding.txtCreated.text =
-            post.createdAt.format(
-                DateTimeFormatter
-                    .ofPattern(CREATED_DATE_FORMAT)
-                    .withLocale(Locale.KOREAN),
+                        override fun initialize(
+                            item: CommentModel,
+                            view: View?,
+                        ) {
+                            initCommentOverflowMenuAndShow(activity, item, view!!)
+                        }
+                    },
+                userId = userManager.getUser()?.id,
             )
-        post.author.profileUrl?.let {
-            glideProvider.callImage(it, activity, binding.imgAuthorProfile)
-        } ?: binding.imgAuthorProfile.setImageResource(R.drawable.ic_author_placeholder)
-    }
-
-    private fun loadPost(activity: Activity) {
-        binding.txtPostContent.text = post.content
-        post.imgUrl?.let {
-            binding.imgPost.isVisible = true
-            glideProvider.callImage(it, activity, binding.imgPost)
-        }
-    }
-
-    private fun initObserver(activity: Activity) {
-        viewModel.state.observe(
-            viewLifecycleOwner,
-            stateObserver(activity),
-        )
-        viewModel.registerCommentState.observe(
-            viewLifecycleOwner,
-            registerCommentStateObserver(activity),
-        )
-        viewModel.deletePostState.observe(
-            viewLifecycleOwner,
-            deletePostStateObserver(activity),
-        )
-        viewModel.deleteCommentState.observe(
-            viewLifecycleOwner,
-            deleteCommentStateObserver(activity),
-        )
-    }
-
-    private fun stateObserver(activity: Activity) =
-        Observer<UiState> {
-            when (it) {
-                UiState.Loading -> {
-                    toggleView(binding.pgbLoading)
-                }
-                UiState.Success -> {
-                    if (viewModel.comments.isEmpty()) {
-                        toggleView(binding.txtNoComment)
-                    } else {
-                        toggleView(binding.llComment)
-                        loadComments(activity)
-                    }
-                }
-                UiState.AuthenticationError -> {
-                    sendUserToLoginScreen(activity)
-                    if (ErrorToast.previousFinished()) {
-                        ErrorToast(activity, viewModel.error).show()
-                    }
-                }
-                UiState.ServiceError -> {
-                    toggleView(binding.llServiceError)
-                    if (ErrorToast.previousFinished()) {
-                        ErrorToast(activity, viewModel.error).show()
-                    }
-                }
-            }
-        }
-
-    private fun loadComments(activity: Activity) {
-        viewModel.comments.get().forEach {
-            loadComment(activity, it)
-        }
-    }
-
-    private fun loadComment(
-        activity: Activity,
-        comment: CommentModel,
-    ) {
-        val itemBinding = ItemPostCommentBinding.inflate(layoutInflater)
-
-        itemBinding.apply {
-            txtAuthorName.text = comment.author.name
-            txtCreated.text =
-                comment.createdAt.format(
-                    DateTimeFormatter
-                        .ofPattern(CREATED_DATE_FORMAT)
-                        .withLocale(Locale.KOREAN),
-                )
-            txtComment.text = comment.content
-            comment.author.profileUrl?.let {
-                glideProvider.callImage(it, activity, imgAuthorProfile)
-            } ?: imgAuthorProfile.setImageResource(R.drawable.ic_author_placeholder)
-        }
-        setBtnCommentOverflowListener(activity, itemBinding, comment)
-        hideCommentOverflowOrNot(itemBinding, comment)
-
-        binding.llComment.addView(itemBinding.root)
-    }
-
-    private fun setBtnCommentOverflowListener(
-        activity: Activity,
-        itemBinding: ItemPostCommentBinding,
-        comment: CommentModel,
-    ) {
-        itemBinding.btnCommentOverflow.setOnClickListener {
-            initCommentOverflowMenuAndShow(activity, comment, itemBinding.btnCommentOverflow)
-        }
+        binding.rvComment.layoutManager = LinearLayoutManager(activity)
     }
 
     private fun initCommentOverflowMenuAndShow(
@@ -259,14 +167,76 @@ class CircleDetailPostDetailFragment : Fragment() {
         true
     }
 
-    private fun hideCommentOverflowOrNot(
-        itemBinding: ItemPostCommentBinding,
-        comment: CommentModel,
-    ) {
+    private fun hidePostOverFlowOrNot() {
         userManager.getUser()?.let {
-            itemBinding.btnCommentOverflow.isVisible = it.id == comment.author.id
+            binding.btnPostOverflow.isVisible = it.id == post.author.id
         }
     }
+
+    private fun loadAuthor(activity: Activity) {
+        binding.txtAuthorName.text = post.author.name
+        binding.txtCreated.text =
+            post.createdAt.format(
+                DateTimeFormatter
+                    .ofPattern(CREATED_DATE_FORMAT)
+                    .withLocale(Locale.KOREAN),
+            )
+        post.author.profileUrl?.let {
+            glideProvider.callImage(it, activity, binding.imgAuthorProfile)
+        } ?: binding.imgAuthorProfile.setImageResource(R.drawable.ic_author_placeholder)
+    }
+
+    private fun loadPost(activity: Activity) {
+        binding.txtPostContent.text = post.content
+        post.imgUrl?.let {
+            binding.imgPost.isVisible = true
+            glideProvider.callImage(it, activity, binding.imgPost)
+        }
+    }
+
+    private fun initObserver(activity: Activity) {
+        viewModel.state.observe(
+            viewLifecycleOwner,
+            stateObserver(activity),
+        )
+        viewModel.scrollOver.observe(
+            viewLifecycleOwner,
+            scrollOverObserver(),
+        )
+        viewModel.deletePostState.observe(
+            viewLifecycleOwner,
+            deletePostStateObserver(activity),
+        )
+    }
+
+    private fun stateObserver(activity: Activity) =
+        Observer<UiState> {
+            when (it) {
+                UiState.Loading -> {
+                    toggleView(binding.pgbLoading)
+                }
+                UiState.Success -> {
+                    if (viewModel.comments.isEmpty()) {
+                        toggleView(binding.txtNoComment)
+                    } else {
+                        toggleView(binding.rvComment)
+                        loadComments()
+                    }
+                }
+                UiState.AuthenticationError -> {
+                    sendUserToLoginScreen(activity)
+                    if (ErrorToast.previousFinished()) {
+                        ErrorToast(activity, viewModel.error).show()
+                    }
+                }
+                UiState.ServiceError -> {
+                    toggleView(binding.llServiceError)
+                    if (ErrorToast.previousFinished()) {
+                        ErrorToast(activity, viewModel.error).show()
+                    }
+                }
+            }
+        }
 
     private fun sendUserToLoginScreen(activity: Activity) {
         val intent = Intent(activity, LoginActivity::class.java)
@@ -274,18 +244,15 @@ class CircleDetailPostDetailFragment : Fragment() {
         startActivity(intent)
     }
 
-    private fun registerCommentStateObserver(activity: Activity) =
-        Observer<Boolean> {
-            if (it) {
-                requestRefreshToPreviousScreen()
-                toggleView(binding.llComment) // noComment 였던 경우, 댓글 등록 후에는 llComment 로 토글
-                loadComment(activity, viewModel.comments.last())
-                hideSoftInput(activity, binding.edtComment)
-                binding.edtComment.text?.clear()
-            } else {
-                ErrorAlertDialog(activity, viewModel.error).show()
+    private fun loadComments() {
+        binding.rvComment.adapter?.let {
+            (it as PostCommentAdapter).update(viewModel.comments) {
+                viewModel.currentScrollState?.let {
+                    binding.rvComment.layoutManager?.onRestoreInstanceState(viewModel.currentScrollState)
+                } ?: binding.rvComment.scrollToPosition(0)
             }
         }
+    }
 
     private fun hideSoftInput(
         activity: Activity,
@@ -295,9 +262,14 @@ class CircleDetailPostDetailFragment : Fragment() {
         imm.hideSoftInputFromWindow(view.windowToken, 0)
     }
 
-    private fun requestRefreshToPreviousScreen() {
-        findNavController().previousBackStackEntry?.savedStateHandle?.set(Const.FLAG_DATA_CHANGED, true)
-    }
+    private fun scrollOverObserver() =
+        Observer<Boolean> { completed ->
+            if (completed) {
+                binding.rvComment.adapter?.let {
+                    (it as PostCommentAdapter).update(viewModel.comments) {}
+                }
+            }
+        }
 
     private fun deletePostStateObserver(activity: Activity) =
         Observer<Boolean> {
@@ -309,23 +281,33 @@ class CircleDetailPostDetailFragment : Fragment() {
             }
         }
 
-    private fun deleteCommentStateObserver(activity: Activity) =
-        Observer<Boolean> {
-            if (it) {
-                requestRefreshToPreviousScreen()
-                binding.llComment.removeAllViewsInLayout()
-                loadComments(activity)
-                if (viewModel.comments.isEmpty()) toggleView(binding.txtNoComment)
-            } else {
-                ErrorAlertDialog(activity, viewModel.error).show()
-            }
-        }
+    private fun requestRefreshToPreviousScreen() {
+        findNavController().previousBackStackEntry?.savedStateHandle?.set(Const.FLAG_DATA_CHANGED, true)
+    }
 
     private fun initListener(activity: Activity) {
+        setRvCircleCommentListener()
         setBtnBackListener()
         setBtnPostOverFlowMenuListener(activity)
         setBtnRegisterCommentListener()
         setBtnRetryListener()
+    }
+
+    private fun setRvCircleCommentListener() {
+        binding.svPostDetail.setOnScrollChangeListener { v, scrollX, scrollY, oldScrollX, oldScrollY ->
+            if (!v.canScrollVertically(1) && !viewModel.comments.isLastPage()) {
+                addScrollLoadingItemAndLoad()
+                // scrollOver 시 문제가 발생하더라도 정상으로 돌아온 경우 스크롤 복원하기 위함
+                viewModel.saveScrollState(binding.rvComment.layoutManager?.onSaveInstanceState())
+            }
+        }
+    }
+
+    private fun addScrollLoadingItemAndLoad() {
+        binding.rvComment.adapter?.let {
+            (it as PostCommentAdapter).update(viewModel.comments.add(CommentModel.emptyInstance())) {}
+        }
+        viewModel.scrollOver()
     }
 
     private fun setBtnBackListener() {
@@ -411,7 +393,7 @@ class CircleDetailPostDetailFragment : Fragment() {
     }
 
     private fun toggleView(view: View) {
-        binding.llComment.isVisible = view == binding.llComment
+        binding.rvComment.isVisible = view == binding.rvComment
         binding.txtNoComment.isVisible = view == binding.txtNoComment
         binding.pgbLoading.isVisible = view == binding.pgbLoading
         binding.llServiceError.isVisible = view == binding.llServiceError

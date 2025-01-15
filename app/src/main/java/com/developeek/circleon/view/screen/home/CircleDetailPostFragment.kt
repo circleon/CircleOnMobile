@@ -120,7 +120,7 @@ class CircleDetailPostFragment : Fragment() {
                     },
                 userId = userManager.getUser()?.id,
             )
-        binding.rvCirclePost.layoutManager = LinearLayoutManager(requireActivity())
+        binding.rvCirclePost.layoutManager = LinearLayoutManager(activity)
     }
 
     private fun sendUserToPostDetailFragment(item: PostModel) {
@@ -262,7 +262,7 @@ class CircleDetailPostFragment : Fragment() {
         binding.rvCirclePost.adapter?.let {
             (it as CirclePostAdapter).update(viewModel.posts.add(PostModel.emptyInstance())) {}
         }
-        viewModel.scrollOver(circleId)
+        viewModel.scrollOver()
     }
 
     private fun setBtnRetryListener() {

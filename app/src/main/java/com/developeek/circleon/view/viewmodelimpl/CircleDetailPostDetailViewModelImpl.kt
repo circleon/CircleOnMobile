@@ -1,5 +1,6 @@
 package com.developeek.circleon.view.viewmodelimpl
 
+import android.os.Parcelable
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -38,24 +39,24 @@ class CircleDetailPostDetailViewModelImpl
         private val uiState = MutableLiveData<UiState>()
         private lateinit var tmpState: UiState
 
-        override val registerCommentState: LiveData<Boolean> // 댓글 등록 성공 확인용
-            get() = commentRegisterState
-        private val commentRegisterState = MutableLiveData<Boolean>()
-        private var registerCommentJob: Job? = null
-
         override val deletePostState: LiveData<Boolean>
             get() = postDeleteState
         private val postDeleteState = MutableLiveData<Boolean>()
         private var deletePostJob: Job? = null
 
-        override val deleteCommentState: LiveData<Boolean>
-            get() = commentDeleteState
-        private val commentDeleteState = MutableLiveData<Boolean>()
-        private var deleteCommentJob: Job? = null
-
         override lateinit var comments: CommentModels
         private var fetchCommentJob: Job? = null
+        private var registerCommentJob: Job? = null
+        private var deleteCommentJob: Job? = null
         private var currentPage = DEFAULT_PAGE
+
+        override val scrollOver: LiveData<Boolean>
+            get() = scrollOverCompleted
+        private var scrollOverCompleted = MutableLiveData<Boolean>()
+        private var scrollOverCommentJob: Job? = null
+        override val currentScrollState: Parcelable?
+            get() = scrollState
+        private var scrollState: Parcelable? = null
 
         private var enterAnimFinished = false
 
@@ -71,6 +72,7 @@ class CircleDetailPostDetailViewModelImpl
             size: Int,
         ) {
             fetchCommentJob?.cancel()
+            scrollOverCommentJob?.cancel()
 
             fetchCommentJob =
                 viewModelScope.launch {
@@ -94,6 +96,40 @@ class CircleDetailPostDetailViewModelImpl
             fetchComments(DEFAULT_PAGE, (currentPage + 1) * SIZE_BY_PAGE)
         }
 
+        override fun scrollOver() {
+            scrollOverCommentJob?.cancel()
+
+            scrollOverCommentJob =
+                viewModelScope.launch {
+                    val result =
+                        repository.getPostComments(
+                            circleId, postId, currentPage + 1, SIZE_BY_PAGE,
+                        )
+
+                    if (result is Success) {
+                        comments =
+                            comments.addAll(result.data).also {
+                                if (result.data.isLastPage()) {
+                                    it.setAsLast()
+                                }
+                            }
+                        currentPage++
+                        scrollOverCompleted.postValue(true)
+                    } else {
+                        error = (result as Error).message()
+                        if (result.isAuthenticationError()) {
+                            uiState.postValue(UiState.AuthenticationError)
+                        } else {
+                            uiState.postValue(UiState.ServiceError)
+                        }
+                    }
+                }
+        }
+
+        override fun saveScrollState(scrollState: Parcelable?) {
+            this.scrollState = scrollState
+        }
+
         override fun notifyEnterAnimFinishedAndUpdateUI() {
             enterAnimFinished = true
             if (::tmpState.isInitialized) uiState.postValue(tmpState)
@@ -108,10 +144,14 @@ class CircleDetailPostDetailViewModelImpl
 
                     if (result is Success) {
                         comments = comments.add(result.data)
-                        commentRegisterState.postValueWhenAnimFinished(true)
+                        scrollOverCompleted.postValue(true)
                     } else {
                         error = (result as Error).message()
-                        commentRegisterState.postValueWhenAnimFinished(false)
+                        if (result.isAuthenticationError()) {
+                            uiState.postValue(UiState.AuthenticationError)
+                        } else {
+                            uiState.postValue(UiState.ServiceError)
+                        }
                     }
                 }
         }
@@ -165,16 +205,20 @@ class CircleDetailPostDetailViewModelImpl
 
                     if (result is Success) {
                         comments = comments.remove(commentId)
-                        commentDeleteState.postValue(true)
+                        scrollOverCompleted.postValue(true)
                     } else {
                         error = (result as Error).message()
-                        commentDeleteState.postValue(false)
+                        if (result.isAuthenticationError()) {
+                            uiState.postValue(UiState.AuthenticationError)
+                        } else {
+                            uiState.postValue(UiState.ServiceError)
+                        }
                     }
                 }
         }
 
         companion object {
-            private const val SIZE_BY_PAGE = 100
+            private const val SIZE_BY_PAGE = 10
             private const val DEFAULT_PAGE = 0
         }
     }

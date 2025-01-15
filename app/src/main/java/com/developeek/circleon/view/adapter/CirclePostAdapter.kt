@@ -68,7 +68,6 @@ class CirclePostAdapter(
             loadAuthor(post)
             loadPost(post)
             hideOverFlowOrNot(post)
-            setItemClickListener(post)
             notifyListenerItemChanged(post)
         }
 
@@ -105,12 +104,6 @@ class CirclePostAdapter(
                 }
             } else if (post.type.isNotice() && role.isExecutive()) {
                 binding.btnPostOverflow.isVisible = true
-            }
-        }
-
-        private fun setItemClickListener(post: PostModel) {
-            binding.clItemCirclePost.setOnClickListener {
-                itemListenerInitializer.initialize(post)
             }
         }
 
@@ -162,6 +155,7 @@ class CirclePostAdapter(
                     itemListenerInitializer.initialize(item)
                 }
             }
+        binding.clItemCirclePost.setOnClickListener(itemClickListener)
         binding.imgPost.isVisible = viewType == VIEW_TYPE_ITEM_WITH_IMAGE
         return CirclePostAdapterItemViewHolder(binding, overflowClickListener, itemClickListener)
     }

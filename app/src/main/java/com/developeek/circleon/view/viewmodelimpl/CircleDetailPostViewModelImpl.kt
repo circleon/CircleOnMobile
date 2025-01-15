@@ -88,7 +88,7 @@ class CircleDetailPostViewModelImpl
             fetchPosts(DEFAULT_PAGE, (currentPage + 1) * SIZE_BY_PAGE)
         }
 
-        override fun scrollOver(circleId: Int) {
+        override fun scrollOver() {
             scrollOverPostJob?.cancel()
 
             scrollOverPostJob =
@@ -117,10 +117,6 @@ class CircleDetailPostViewModelImpl
 
         override fun saveScrollState(scrollState: Parcelable?) {
             this.scrollState = scrollState
-        }
-
-        override fun removeScrollState() {
-            this.scrollState = null
         }
 
         override fun setTopOrNot(isTop: Boolean) {

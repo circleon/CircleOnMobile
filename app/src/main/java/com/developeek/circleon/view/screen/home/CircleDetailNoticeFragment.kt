@@ -123,7 +123,7 @@ class CircleDetailNoticeFragment : Fragment() {
                     },
                 role = role,
             )
-        binding.rvCircleNotice.layoutManager = LinearLayoutManager(requireActivity())
+        binding.rvCircleNotice.layoutManager = LinearLayoutManager(activity)
     }
 
     private fun sendUserToNoticeDetailScreen(item: PostModel) {
@@ -281,7 +281,7 @@ class CircleDetailNoticeFragment : Fragment() {
         binding.rvCircleNotice.adapter?.let {
             (it as CirclePostAdapter).update(viewModel.posts.add(PostModel.emptyInstance())) {}
         }
-        viewModel.scrollOver(circleId)
+        viewModel.scrollOver()
     }
 
     private fun setBtnRetryListener() {

@@ -17,11 +17,9 @@ interface CircleDetailPostViewModel {
 
     fun refresh()
 
-    fun scrollOver(circleId: Int)
+    fun scrollOver()
 
     fun saveScrollState(scrollState: Parcelable?)
-
-    fun removeScrollState()
 
     fun setTopOrNot(isTop: Boolean)
 
