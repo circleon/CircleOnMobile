@@ -395,38 +395,18 @@ class CircleDetailPostDetailFragment : Fragment() {
         nextAnim: Int,
     ): Animator? {
         if (nextAnim == R.animator.slide_end_to_start) {
-            val animState = arguments?.getBoolean(Const.FLAG_ANIM_STATE)
-            animState?.let {
-                val animator = AnimatorInflater.loadAnimator(context, nextAnim) as AnimatorSet
-                if (it) {
-                    animator.addListener(onEnd = {
-                        viewModel.notifyEnterAnimFinishedAndUpdateUI()
-                    })
-
-                    return animator
-                } else {
-                    changeAnimDuration(animator, 0)
-
-                    return animator
-                }
-            }
+            val animator = AnimatorInflater.loadAnimator(context, nextAnim) as AnimatorSet
+            animator.addListener(onEnd = {
+                viewModel.notifyEnterAnimFinishedAndUpdateUI()
+            })
+            return animator
         }
         return super.onCreateAnimator(transit, enter, nextAnim)
-    }
-
-    private fun changeAnimDuration(
-        animator: AnimatorSet,
-        duration: Long,
-    ) {
-        animator.childAnimations.forEach {
-            it.setDuration(duration)
-        }
     }
 
     override fun onDestroyView() {
         super.onDestroyView()
 
-        arguments?.putBoolean(Const.FLAG_ANIM_STATE, false)
         activity?.window?.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_PAN) // softInputMode 복원
     }
 
