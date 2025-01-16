@@ -71,8 +71,7 @@
     <string name="menu_post_settings_delete">삭제하기</string>
 
     <!--Post Detail-->
-    <string name="btn_register_comment">입력</string>
-    <string name="message_no_comment">작성된 댓글이 없어요</string>
+    <string name="hint_comment">댓글을 입력해주세요.</string>
 
     <!--Register Post-->
     <string name="btn_finish">완료</string>

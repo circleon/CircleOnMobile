@@ -91,7 +91,12 @@
         android:id="@+id/llEditComment"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginHorizontal="@dimen/margin_padding_large"
+        android:layout_marginVertical="@dimen/margin_padding_small"
+        android:paddingHorizontal="@dimen/margin_padding_small"
         android:orientation="horizontal"
+        android:background="@drawable/bg_x_rounded_rectangle"
+        android:backgroundTint="@color/grey_2"
         app:layout_constraintTop_toBottomOf="@id/flPostDetail"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
@@ -102,21 +107,26 @@
             android:id="@+id/edtComment"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:padding="@dimen/margin_padding_small"
+            android:paddingVertical="10dp"
+            android:paddingStart="@dimen/margin_padding_small"
             android:layout_weight="1"
             android:maxLines="2"
             android:maxLength="255"
             android:textSize="@dimen/text_size_default"
             android:textColor="@color/grey_9"
-            android:background="@color/grey_3"/>
+            android:lineSpacingExtra="2sp"
+            android:translationY="-1.06sp"
+            android:hint="@string/hint_comment"
+            android:textColorHint="@color/grey_5"
+            android:background="@null"/>
 
-        <androidx.appcompat.widget.AppCompatTextView
+        <androidx.appcompat.widget.AppCompatImageView
             android:id="@+id/btnRegisterComment"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
+            android:src="@drawable/ic_register_comment"
             android:gravity="center"
-            android:paddingHorizontal="@dimen/margin_padding_small"
-            android:text="@string/btn_register_comment"/>
+            android:paddingHorizontal="@dimen/margin_padding_small" />
 
     </androidx.appcompat.widget.LinearLayoutCompat>
 
