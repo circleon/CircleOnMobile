@@ -53,7 +53,7 @@ class CircleDetailPostDetailFragment : Fragment() {
         extrasProducer = {
             defaultViewModelCreationExtras
                 .withCreationCallback<CircleDetailPostDetailViewModelImpl.CircleDetailPostDetailViewModelFactory> {
-                    it.create(circleId, post.id)
+                    it.create(circleId, post)
                 }
         },
     )
@@ -140,7 +140,6 @@ class CircleDetailPostDetailFragment : Fragment() {
                 userId = userManager.getUser()?.id,
             )
         binding.rvPostDetail.layoutManager = LinearLayoutManager(activity)
-        binding.rvPostDetail.itemAnimator = null
     }
 
     private fun initPostOverflowMenuAndShow(
@@ -196,6 +195,7 @@ class CircleDetailPostDetailFragment : Fragment() {
         activity: Activity,
         comment: CommentModel,
     ) = PopupMenu.OnMenuItemClickListener {
+        viewModel.saveScrollState(binding.rvPostDetail.layoutManager?.onSaveInstanceState())
         when (it.itemId) {
             R.id.modify_comment -> {
             }
@@ -213,13 +213,21 @@ class CircleDetailPostDetailFragment : Fragment() {
             viewLifecycleOwner,
             stateObserver(activity),
         )
-        viewModel.scrollOver.observe(
+        viewModel.registerCommentState.observe(
             viewLifecycleOwner,
-            scrollOverObserver(),
+            registerCommentStateObserver(activity),
         )
         viewModel.deletePostState.observe(
             viewLifecycleOwner,
             deletePostStateObserver(activity),
+        )
+        viewModel.deleteCommentState.observe(
+            viewLifecycleOwner,
+            deleteCommentStateObserver(activity),
+        )
+        viewModel.scrollOver.observe(
+            viewLifecycleOwner,
+            scrollOverObserver(),
         )
     }
 
@@ -256,13 +264,25 @@ class CircleDetailPostDetailFragment : Fragment() {
 
     private fun loadContents() {
         binding.rvPostDetail.adapter?.let {
-            (it as PostDetailAdapter).update(listOf(post) + viewModel.comments.get()) {
+            (it as PostDetailAdapter).update(viewModel.contents) {
                 viewModel.currentScrollState?.let {
                     binding.rvPostDetail.layoutManager?.onRestoreInstanceState(viewModel.currentScrollState)
                 } ?: binding.rvPostDetail.scrollToPosition(0)
             }
         }
     }
+
+    private fun registerCommentStateObserver(activity: Activity) =
+        Observer<Boolean> {
+            if (it) {
+                requestRefreshToPreviousScreen()
+                loadContents()
+                hideSoftInput(activity, binding.edtComment)
+                binding.edtComment.text?.clear()
+            } else {
+                ErrorAlertDialog(activity, viewModel.error).show()
+            }
+        }
 
     // TODO: register, delete comment 관련 처리 필요
     private fun hideSoftInput(
@@ -273,17 +293,6 @@ class CircleDetailPostDetailFragment : Fragment() {
         imm.hideSoftInputFromWindow(view.windowToken, 0)
     }
 
-    private fun scrollOverObserver() =
-        Observer<Boolean> { completed ->
-            if (completed) {
-                binding.rvPostDetail.removeOnScrollListener(viewModel.scrollListener)
-                binding.rvPostDetail.addOnScrollListener(viewModel.scrollListener)
-                binding.rvPostDetail.adapter?.let {
-                    (it as PostDetailAdapter).update(listOf(post) + viewModel.comments.get()) {}
-                }
-            }
-        }
-
     private fun deletePostStateObserver(activity: Activity) =
         Observer<Boolean> {
             if (it) {
@@ -291,6 +300,27 @@ class CircleDetailPostDetailFragment : Fragment() {
                 sendUserToPreviousScreen()
             } else {
                 ErrorAlertDialog(activity, viewModel.error).show()
+            }
+        }
+
+    private fun deleteCommentStateObserver(activity: Activity) =
+        Observer<Boolean> {
+            if (it) {
+                requestRefreshToPreviousScreen()
+                loadContents()
+            } else {
+                ErrorAlertDialog(activity, viewModel.error).show()
+            }
+        }
+
+    private fun scrollOverObserver() =
+        Observer<Boolean> { completed ->
+            if (completed) {
+                binding.rvPostDetail.removeOnScrollListener(viewModel.scrollListener)
+                binding.rvPostDetail.addOnScrollListener(viewModel.scrollListener)
+                binding.rvPostDetail.adapter?.let {
+                    (it as PostDetailAdapter).update(viewModel.contents) {}
+                }
             }
         }
 
@@ -318,9 +348,7 @@ class CircleDetailPostDetailFragment : Fragment() {
 
     private fun addScrollLoadingItemAndLoad() {
         binding.rvPostDetail.adapter?.let {
-            (it as PostDetailAdapter).update(
-                listOf(post) + viewModel.comments.add(CommentModel.emptyInstance()).get(),
-            ) {}
+            (it as PostDetailAdapter).update(viewModel.contents + CommentModel.emptyInstance()) {}
         }
         viewModel.scrollOver()
     }
@@ -337,6 +365,7 @@ class CircleDetailPostDetailFragment : Fragment() {
 
     private fun setBtnRegisterCommentListener() {
         binding.btnRegisterComment.setOnClickListener {
+            viewModel.saveScrollState(binding.rvPostDetail.layoutManager?.onSaveInstanceState())
             viewModel.registerComment(binding.edtComment.text.toString())
         }
     }

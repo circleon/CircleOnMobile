@@ -9,6 +9,8 @@ import com.developeek.circleon.data.repository.CircleRepository
 import com.developeek.circleon.data.source.Error
 import com.developeek.circleon.data.source.Success
 import com.developeek.circleon.domain.model.CommentModels
+import com.developeek.circleon.domain.model.Identifiable
+import com.developeek.circleon.domain.model.PostModel
 import com.developeek.circleon.domain.state.UiState
 import com.developeek.circleon.view.listener.RecyclerViewInfiniteScrollListener
 import com.developeek.circleon.view.viewmodel.CircleDetailPostDetailViewModel
@@ -24,14 +26,14 @@ class CircleDetailPostDetailViewModelImpl
     @AssistedInject
     constructor(
         @Assisted("circleId") private val circleId: Int,
-        @Assisted("postId") private val postId: Int,
+        @Assisted("post") private val post: PostModel,
         private val repository: CircleRepository,
     ) : CircleDetailPostDetailViewModel, ViewModel() {
         @AssistedFactory
         interface CircleDetailPostDetailViewModelFactory {
             fun create(
                 @Assisted("circleId") circleId: Int,
-                @Assisted("postId") postId: Int,
+                @Assisted("post") post: PostModel,
             ): CircleDetailPostDetailViewModelImpl
         }
 
@@ -40,15 +42,24 @@ class CircleDetailPostDetailViewModelImpl
         private val uiState = MutableLiveData<UiState>()
         private lateinit var tmpState: UiState
 
+        override val registerCommentState: LiveData<Boolean>
+            get() = commentRegisterState
+        private val commentRegisterState = MutableLiveData<Boolean>()
+        private var registerCommentJob: Job? = null
+
         override val deletePostState: LiveData<Boolean>
             get() = postDeleteState
         private val postDeleteState = MutableLiveData<Boolean>()
         private var deletePostJob: Job? = null
 
+        override val deleteCommentState: LiveData<Boolean>
+            get() = commentDeleteState
+        private val commentDeleteState = MutableLiveData<Boolean>()
+        private var deleteCommentJob: Job? = null
+
+        override lateinit var contents: List<Identifiable>
         override lateinit var comments: CommentModels
         private var fetchCommentJob: Job? = null
-        private var registerCommentJob: Job? = null
-        private var deleteCommentJob: Job? = null
         private var currentPage = DEFAULT_PAGE
 
         override val scrollOver: LiveData<Boolean>
@@ -78,10 +89,11 @@ class CircleDetailPostDetailViewModelImpl
 
             fetchCommentJob =
                 viewModelScope.launch {
-                    val result = repository.getPostComments(circleId, postId, page, size)
+                    val result = repository.getPostComments(circleId, post.id, page, size)
 
                     if (result is Success) {
                         comments = result.data
+                        contents = listOf(post) + comments.get()
                         uiState.postValueWhenAnimFinished(UiState.Success)
                     } else {
                         error = (result as Error).message()
@@ -105,7 +117,7 @@ class CircleDetailPostDetailViewModelImpl
                 viewModelScope.launch {
                     val result =
                         repository.getPostComments(
-                            circleId, postId, currentPage + 1, SIZE_BY_PAGE,
+                            circleId, post.id, currentPage + 1, SIZE_BY_PAGE,
                         )
 
                     if (result is Success) {
@@ -115,6 +127,7 @@ class CircleDetailPostDetailViewModelImpl
                                     it.setAsLast()
                                 }
                             }
+                        contents = listOf(post) + comments.get()
                         currentPage++
                         scrollOverCompleted.postValue(true)
                     } else {
@@ -142,18 +155,18 @@ class CircleDetailPostDetailViewModelImpl
 
             registerCommentJob =
                 viewModelScope.launch {
-                    val result = repository.postComment(circleId, postId, comment)
+                    val result = repository.postComment(circleId, post.id, comment)
 
                     if (result is Success) {
-                        comments = comments.add(result.data)
-                        scrollOverCompleted.postValue(true)
+                        comments =
+                            comments.add(result.data).also {
+                                if (comments.isLastPage()) it.setAsLast()
+                            }
+                        contents = listOf(post) + comments.get()
+                        commentRegisterState.postValueWhenAnimFinished(true)
                     } else {
                         error = (result as Error).message()
-                        if (result.isAuthenticationError()) {
-                            uiState.postValue(UiState.AuthenticationError)
-                        } else {
-                            uiState.postValue(UiState.ServiceError)
-                        }
+                        commentRegisterState.postValueWhenAnimFinished(false)
                     }
                 }
         }
@@ -187,7 +200,7 @@ class CircleDetailPostDetailViewModelImpl
 
             deletePostJob =
                 viewModelScope.launch {
-                    val result = repository.deletePost(circleId, postId)
+                    val result = repository.deletePost(circleId, post.id)
 
                     if (result is Success) {
                         postDeleteState.postValue(true)
@@ -203,18 +216,18 @@ class CircleDetailPostDetailViewModelImpl
 
             deleteCommentJob =
                 viewModelScope.launch {
-                    val result = repository.deleteComment(circleId, postId, commentId)
+                    val result = repository.deleteComment(circleId, post.id, commentId)
 
                     if (result is Success) {
-                        comments = comments.remove(commentId)
-                        scrollOverCompleted.postValue(true)
+                        comments =
+                            comments.remove(commentId).also {
+                                if (comments.isLastPage()) it.setAsLast()
+                            }
+                        contents = listOf(post) + comments.get()
+                        commentDeleteState.postValueWhenAnimFinished(true)
                     } else {
                         error = (result as Error).message()
-                        if (result.isAuthenticationError()) {
-                            uiState.postValue(UiState.AuthenticationError)
-                        } else {
-                            uiState.postValue(UiState.ServiceError)
-                        }
+                        commentDeleteState.postValueWhenAnimFinished(false)
                     }
                 }
         }
