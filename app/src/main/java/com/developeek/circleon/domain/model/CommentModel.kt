@@ -1,6 +1,7 @@
 package com.developeek.circleon.domain.model
 
 import com.developeek.circleon.domain.utils.Const
+import java.io.Serializable
 import java.time.LocalDateTime
 
 data class CommentModels(private val models: List<CommentModel>) {
@@ -34,15 +35,15 @@ data class CommentModels(private val models: List<CommentModel>) {
 }
 
 data class CommentModel(
-    val id: Int,
+    override val id: Int,
     val content: String,
     val createdAt: LocalDateTime,
     val updatedAt: LocalDateTime,
     val author: AuthorModel,
-) {
-    fun isSame(commentModel: CommentModel) = this.id == commentModel.id
+) : Serializable, Identifiable {
+    override fun isSame(target: Identifiable) = this.id == target.id
 
-    fun areContentsSame(commentModel: CommentModel) = this == commentModel
+    override fun areContentsSame(target: Identifiable) = this == target
 
     companion object {
         fun emptyInstance() =

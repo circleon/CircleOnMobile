@@ -14,10 +14,10 @@ import com.developeek.circleon.databinding.ItemPostCommentBinding
 import com.developeek.circleon.databinding.ItemPostContentBinding
 import com.developeek.circleon.domain.model.AuthorModel
 import com.developeek.circleon.domain.model.CommentModel
-import com.developeek.circleon.domain.model.CommentModels
+import com.developeek.circleon.domain.model.Identifiable
 import com.developeek.circleon.domain.model.PostModel
 import com.developeek.circleon.domain.utils.glide.GlideProvider
-import com.developeek.circleon.view.adapter.PostDetailViewType.*
+import com.developeek.circleon.view.adapter.ItemViewType.*
 import com.developeek.circleon.view.listener.ItemClickListener
 import com.developeek.circleon.view.listener.ItemListenerInitializer
 import java.time.format.DateTimeFormatter
@@ -26,7 +26,6 @@ import java.util.Locale
 class PostDetailAdapter(
     private val activity: Activity,
     private val glideProvider: GlideProvider,
-    private val post: PostModel,
     private val postOverflowListenerInitializer: ItemListenerInitializer<PostModel>,
     private val commentOverflowListenerInitializer: ItemListenerInitializer<CommentModel>,
     private val userId: Int?,
@@ -34,17 +33,17 @@ class PostDetailAdapter(
     private val diffUtil =
         AsyncListDiffer(
             this,
-            object : DiffUtil.ItemCallback<CommentModel>() {
+            object : DiffUtil.ItemCallback<Identifiable>() {
                 override fun areItemsTheSame(
-                    oldItem: CommentModel,
-                    newItem: CommentModel,
+                    oldItem: Identifiable,
+                    newItem: Identifiable,
                 ): Boolean {
                     return oldItem.isSame(newItem)
                 }
 
                 override fun areContentsTheSame(
-                    oldItem: CommentModel,
-                    newItem: CommentModel,
+                    oldItem: Identifiable,
+                    newItem: Identifiable,
                 ): Boolean {
                     return oldItem.areContentsSame(newItem)
                 }
@@ -53,11 +52,15 @@ class PostDetailAdapter(
 
     inner class PostContentAdapterItemViewHolder(
         private val binding: ItemPostContentBinding,
+        private val overflowClickListener: ItemClickListener<PostModel>,
     ) : RecyclerView.ViewHolder(binding.root) {
         fun onBind(position: Int) {
+            val post = diffUtil.currentList[position] as PostModel
+
             loadAuthor(post.author)
             loadContent(post)
             hideOverflowOrNot(post.author)
+            notifyListenerItemChanged(post)
         }
 
         private fun loadAuthor(author: AuthorModel) {
@@ -85,6 +88,10 @@ class PostDetailAdapter(
                 binding.btnPostOverflow.isVisible = author.id == it
             }
         }
+
+        private fun notifyListenerItemChanged(post: PostModel) {
+            overflowClickListener.item = post
+        }
     }
 
     inner class PostCommentAdapterItemViewHolder(
@@ -92,7 +99,7 @@ class PostDetailAdapter(
         private val overflowClickListener: ItemClickListener<CommentModel>,
     ) : RecyclerView.ViewHolder(binding.root) {
         fun onBind(position: Int) {
-            val comment = diffUtil.currentList[position]
+            val comment = diffUtil.currentList[position] as CommentModel
 
             loadAuthor(comment.author)
             loadComment(comment)
@@ -136,8 +143,8 @@ class PostDetailAdapter(
         parent: ViewGroup,
         viewType: Int,
     ): RecyclerView.ViewHolder {
-        return when (PostDetailViewType.findOrDefault(viewType)) {
-            VIEW_TYPE_CONTENT, VIEW_TYPE_CONTENT_WITH_IMAGE -> {
+        return when (ItemViewType.findOrDefault(viewType)) {
+            VIEW_TYPE_POST_CONTENT, VIEW_TYPE_POST_CONTENT_WITH_IMAGE -> {
                 val binding =
                     ItemPostContentBinding.inflate(
                         LayoutInflater.from(parent.context),
@@ -153,10 +160,10 @@ class PostDetailAdapter(
                         }
                     }
                 binding.btnPostOverflow.setOnClickListener(overflowClickListener)
-                binding.imgPost.isVisible = viewType == VIEW_TYPE_CONTENT_WITH_IMAGE.typeValue
-                PostContentAdapterItemViewHolder(binding)
+                binding.imgPost.isVisible = viewType == VIEW_TYPE_POST_CONTENT_WITH_IMAGE.typeValue
+                PostContentAdapterItemViewHolder(binding, overflowClickListener)
             }
-            VIEW_TYPE_COMMENT -> {
+            VIEW_TYPE_POST_COMMENT -> {
                 val binding =
                     ItemPostCommentBinding.inflate(
                         LayoutInflater.from(parent.context),
@@ -174,7 +181,7 @@ class PostDetailAdapter(
                 binding.btnCommentOverflow.setOnClickListener(overflowClickListener)
                 PostCommentAdapterItemViewHolder(binding, overflowClickListener)
             }
-            VIEW_TYPE_COMMENT_LOADING -> {
+            VIEW_TYPE_LOADING -> {
                 val binding =
                     ItemLoadingBinding.inflate(
                         LayoutInflater.from(parent.context),
@@ -189,18 +196,21 @@ class PostDetailAdapter(
 
     override fun getItemCount() = diffUtil.currentList.size
 
-    override fun getItemViewType(position: Int) =
-        if (position == 0) {
-            if (post.imgUrl == null) {
-                VIEW_TYPE_CONTENT.typeValue
+    override fun getItemViewType(position: Int): Int {
+        val item = diffUtil.currentList[position]
+
+        return if (item is PostModel) {
+            if (item.imgUrl == null) {
+                VIEW_TYPE_POST_CONTENT.typeValue
             } else {
-                VIEW_TYPE_CONTENT_WITH_IMAGE.typeValue
+                VIEW_TYPE_POST_CONTENT_WITH_IMAGE.typeValue
             }
-        } else if (diffUtil.currentList[position] == CommentModel.emptyInstance()) {
-            VIEW_TYPE_COMMENT_LOADING.typeValue
+        } else if (item.isSame(CommentModel.emptyInstance())) {
+            VIEW_TYPE_LOADING.typeValue
         } else {
-            VIEW_TYPE_COMMENT.typeValue
+            VIEW_TYPE_POST_COMMENT.typeValue
         }
+    }
 
     override fun onBindViewHolder(
         holder: RecyclerView.ViewHolder,
@@ -214,10 +224,10 @@ class PostDetailAdapter(
     }
 
     fun update(
-        models: CommentModels,
+        models: List<Identifiable>,
         commitCallback: Runnable,
     ) {
-        diffUtil.submitList(models.get(), commitCallback)
+        diffUtil.submitList(models, commitCallback)
     }
 
     companion object {
@@ -225,16 +235,15 @@ class PostDetailAdapter(
     }
 }
 
-enum class PostDetailViewType(val typeValue: Int) {
-    VIEW_TYPE_CONTENT(0),
-    VIEW_TYPE_CONTENT_WITH_IMAGE(1),
-    VIEW_TYPE_COMMENT_LOADING(2),
-    VIEW_TYPE_COMMENT(3),
-    ;
+enum class ItemViewType(val typeValue: Int) {
+    VIEW_TYPE_POST_CONTENT(0),
+    VIEW_TYPE_POST_CONTENT_WITH_IMAGE(1),
+    VIEW_TYPE_POST_COMMENT(2),
+    VIEW_TYPE_LOADING(3), ;
 
     companion object {
-        private val default = VIEW_TYPE_COMMENT_LOADING
+        private val default = VIEW_TYPE_LOADING
 
-        fun findOrDefault(typeValue: Int) = PostDetailViewType.entries.find { it.typeValue == typeValue } ?: default
+        fun findOrDefault(typeValue: Int) = ItemViewType.entries.find { it.typeValue == typeValue } ?: default
     }
 }

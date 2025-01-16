@@ -115,7 +115,6 @@ class CircleDetailPostDetailFragment : Fragment() {
             PostDetailAdapter(
                 activity,
                 glideProvider,
-                post,
                 postOverflowListenerInitializer =
                     object : ItemListenerInitializer<PostModel> {
                         override fun initialize(item: PostModel) {}
@@ -232,7 +231,7 @@ class CircleDetailPostDetailFragment : Fragment() {
                 }
                 UiState.Success -> {
                     toggleView(binding.rvPostDetail)
-                    loadComments()
+                    loadContents()
                 }
                 UiState.AuthenticationError -> {
                     sendUserToLoginScreen(activity)
@@ -255,9 +254,9 @@ class CircleDetailPostDetailFragment : Fragment() {
         startActivity(intent)
     }
 
-    private fun loadComments() {
+    private fun loadContents() {
         binding.rvPostDetail.adapter?.let {
-            (it as PostDetailAdapter).update(viewModel.comments) {
+            (it as PostDetailAdapter).update(listOf(post) + viewModel.comments.get()) {
                 viewModel.currentScrollState?.let {
                     binding.rvPostDetail.layoutManager?.onRestoreInstanceState(viewModel.currentScrollState)
                 } ?: binding.rvPostDetail.scrollToPosition(0)
@@ -280,7 +279,7 @@ class CircleDetailPostDetailFragment : Fragment() {
                 binding.rvPostDetail.removeOnScrollListener(viewModel.scrollListener)
                 binding.rvPostDetail.addOnScrollListener(viewModel.scrollListener)
                 binding.rvPostDetail.adapter?.let {
-                    (it as PostDetailAdapter).update(viewModel.comments) {}
+                    (it as PostDetailAdapter).update(listOf(post) + viewModel.comments.get()) {}
                 }
             }
         }
@@ -319,7 +318,9 @@ class CircleDetailPostDetailFragment : Fragment() {
 
     private fun addScrollLoadingItemAndLoad() {
         binding.rvPostDetail.adapter?.let {
-            (it as PostDetailAdapter).update(viewModel.comments.add(CommentModel.emptyInstance())) {}
+            (it as PostDetailAdapter).update(
+                listOf(post) + viewModel.comments.add(CommentModel.emptyInstance()).get(),
+            ) {}
         }
         viewModel.scrollOver()
     }
