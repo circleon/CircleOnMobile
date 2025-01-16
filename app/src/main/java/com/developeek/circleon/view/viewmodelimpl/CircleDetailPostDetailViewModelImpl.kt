@@ -10,6 +10,7 @@ import com.developeek.circleon.data.source.Error
 import com.developeek.circleon.data.source.Success
 import com.developeek.circleon.domain.model.CommentModels
 import com.developeek.circleon.domain.state.UiState
+import com.developeek.circleon.view.listener.RecyclerViewInfiniteScrollListener
 import com.developeek.circleon.view.viewmodel.CircleDetailPostDetailViewModel
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
@@ -54,6 +55,7 @@ class CircleDetailPostDetailViewModelImpl
             get() = scrollOverCompleted
         private var scrollOverCompleted = MutableLiveData<Boolean>()
         private var scrollOverCommentJob: Job? = null
+        override val scrollListener = RecyclerViewInfiniteScrollListener()
         override val currentScrollState: Parcelable?
             get() = scrollState
         private var scrollState: Parcelable? = null

@@ -2,6 +2,7 @@ package com.developeek.circleon.view.viewmodel
 
 import android.os.Parcelable
 import androidx.lifecycle.LiveData
+import androidx.recyclerview.widget.RecyclerView
 import com.developeek.circleon.domain.model.CommentModels
 import com.developeek.circleon.domain.state.UiState
 
@@ -10,6 +11,7 @@ interface CircleDetailPostDetailViewModel {
     val deletePostState: LiveData<Boolean>
     val comments: CommentModels
     val scrollOver: LiveData<Boolean>
+    val scrollListener: RecyclerView.OnScrollListener
     val currentScrollState: Parcelable?
     val error: String
 
