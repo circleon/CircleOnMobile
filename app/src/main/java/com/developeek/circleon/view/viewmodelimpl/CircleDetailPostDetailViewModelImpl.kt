@@ -158,11 +158,7 @@ class CircleDetailPostDetailViewModelImpl
                     val result = repository.postComment(circleId, post.id, comment)
 
                     if (result is Success) {
-                        comments =
-                            comments.add(result.data).also {
-                                if (comments.isLastPage()) it.setAsLast()
-                            }
-                        contents = listOf(post) + comments.get()
+                        refresh()
                         commentRegisterState.postValueWhenAnimFinished(true)
                     } else {
                         error = (result as Error).message()

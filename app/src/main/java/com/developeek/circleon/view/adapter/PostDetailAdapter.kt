@@ -205,10 +205,10 @@ class PostDetailAdapter(
             } else {
                 VIEW_TYPE_POST_CONTENT_WITH_IMAGE.typeValue
             }
-        } else if (item.isSame(CommentModel.emptyInstance())) {
-            VIEW_TYPE_LOADING.typeValue
-        } else {
+        } else if (!item.isSame(CommentModel.emptyInstance())) {
             VIEW_TYPE_POST_COMMENT.typeValue
+        } else {
+            VIEW_TYPE_LOADING.typeValue
         }
     }
 

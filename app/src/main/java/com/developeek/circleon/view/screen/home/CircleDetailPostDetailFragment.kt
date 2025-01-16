@@ -284,7 +284,6 @@ class CircleDetailPostDetailFragment : Fragment() {
             }
         }
 
-    // TODO: register, delete comment 관련 처리 필요
     private fun hideSoftInput(
         activity: Activity,
         view: EditText,
