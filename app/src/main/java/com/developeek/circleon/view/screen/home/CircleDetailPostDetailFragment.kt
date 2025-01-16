@@ -33,6 +33,7 @@ import com.developeek.circleon.domain.utils.Utils
 import com.developeek.circleon.domain.utils.glide.GlideProvider
 import com.developeek.circleon.view.adapter.PostDetailAdapter
 import com.developeek.circleon.view.listener.ItemListenerInitializer
+import com.developeek.circleon.view.listener.RecyclerViewHideSoftInputListener
 import com.developeek.circleon.view.listener.RecyclerViewInfiniteScrollListener
 import com.developeek.circleon.view.screen.login.LoginActivity
 import com.developeek.circleon.view.viewmodel.CircleDetailPostDetailViewModel
@@ -94,7 +95,7 @@ class CircleDetailPostDetailFragment : Fragment() {
 
         initView(requireActivity())
         initObserver(requireActivity())
-        initListener()
+        initListener(requireActivity())
     }
 
     private fun initView(activity: Activity) {
@@ -327,15 +328,16 @@ class CircleDetailPostDetailFragment : Fragment() {
         findNavController().previousBackStackEntry?.savedStateHandle?.set(Const.FLAG_DATA_CHANGED, true)
     }
 
-    private fun initListener() {
-        setRvCircleCommentListener()
+    private fun initListener(activity: Activity) {
+        setRvCircleCommentListener(activity)
         setBtnBackListener()
         setBtnRegisterCommentListener()
         setBtnRetryListener()
     }
 
-    private fun setRvCircleCommentListener() {
+    private fun setRvCircleCommentListener(activity: Activity) {
         binding.rvPostDetail.addOnScrollListener(viewModel.scrollListener)
+        binding.rvPostDetail.addOnScrollListener(RecyclerViewHideSoftInputListener(activity))
         (viewModel.scrollListener as RecyclerViewInfiniteScrollListener).setScrollEndListener {
             if (!viewModel.comments.isLastPage()) {
                 addScrollLoadingItemAndLoad()
