@@ -102,8 +102,8 @@ class CirclePostAdapter(
                 userId?.let {
                     binding.btnPostOverflow.isVisible = it == post.author.id
                 }
-            } else if (post.type.isNotice() && role.isExecutive()) {
-                binding.btnPostOverflow.isVisible = true
+            } else if (post.type.isNotice()) {
+                binding.btnPostOverflow.isVisible = role.isExecutive()
             }
         }
 
