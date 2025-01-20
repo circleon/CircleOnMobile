@@ -101,8 +101,7 @@
         <androidx.appcompat.widget.LinearLayoutCompat
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginHorizontal="@dimen/margin_padding_large"
-            android:layout_marginVertical="@dimen/margin_padding_small"
+            android:layout_margin="@dimen/margin_padding_large"
             android:paddingHorizontal="@dimen/margin_padding_small"
             android:orientation="horizontal"
             android:background="@drawable/bg_x_rounded_rectangle"
