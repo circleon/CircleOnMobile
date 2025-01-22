@@ -9,20 +9,22 @@ import android.net.Uri
 import android.text.Spannable
 import android.text.SpannableString
 import android.text.style.ForegroundColorSpan
+import android.util.Log
 import android.util.TimeFormatException
 import android.view.MenuItem
 import com.developeek.circleon.BuildConfig
 import java.io.File
 import java.io.FileOutputStream
 import java.time.LocalDateTime
+import kotlin.math.max
 import kotlin.math.min
 
 object Utils {
     // TODO: local properties 로 이동
     private const val CIRCLE_IMAGE_PATH = "circles/images/"
     private const val POST_IMAGE_PATH = "posts/images/"
-    private const val MAX_IMAGE_WIDTH = 800
-    private const val MAX_IMAGE_HEIGHT = 800
+    private const val MAX_IMAGE_WIDTH = 800f
+    private const val MAX_IMAGE_HEIGHT = 800f
 
     fun getCircleImageUrlOrNull(url: String?): String? {
         url ?: return null
@@ -64,14 +66,14 @@ object Utils {
 
     fun Uri.toJPEG(context: Context): File? {
         val inputStream = context.contentResolver.openInputStream(this)
-        val tempFile = File.createTempFile("temp", ".jpeg")
+        val tempFile = File.createTempFile("temp", ".jpg")
         return try {
             tempFile.outputStream().use { fileOut ->
                 inputStream?.copyTo(fileOut)
             }
             tempFile.deleteOnExit()
             inputStream?.close()
-            resizeImageFile(context, tempFile, MAX_IMAGE_WIDTH, MAX_IMAGE_HEIGHT)
+            resizeImageFile(context, tempFile)
         } catch (e: Exception) {
             null
         }
@@ -80,8 +82,6 @@ object Utils {
     private fun resizeImageFile(
         context: Context,
         file: File,
-        maxWidth: Int,
-        maxHeight: Int,
     ): File? {
         val options =
             BitmapFactory.Options().apply {
@@ -90,15 +90,19 @@ object Utils {
         BitmapFactory.decodeFile(file.absolutePath, options)
 
         val scaleFactor =
-            min(
-                options.outWidth.toFloat() / maxWidth,
-                options.outHeight.toFloat() / maxHeight,
-            ).toInt()
+            max(
+                1,
+                min(
+                    options.outWidth.toFloat() / MAX_IMAGE_WIDTH,
+                    options.outHeight.toFloat() / MAX_IMAGE_HEIGHT,
+                ).toInt(),
+            )
 
         options.inJustDecodeBounds = false
         options.inSampleSize = scaleFactor
 
         val bitMap = BitmapFactory.decodeFile(file.absolutePath, options) ?: return null
+        Log.d("bitMap", "${bitMap.width}, ${bitMap.height}")
 
         val matrix = Matrix()
         val exif = ExifInterface(file)
@@ -114,11 +118,8 @@ object Utils {
         }
 
         val rotatedBitMap = Bitmap.createBitmap(bitMap, 0, 0, bitMap.width, bitMap.height, matrix, true)
-        bitMap.recycle()
 
-        return saveBitmapAsFile(context, rotatedBitMap, file.name).also {
-            rotatedBitMap.recycle()
-        }
+        return saveBitmapAsFile(context, rotatedBitMap, file.name)
     }
 
     private fun saveBitmapAsFile(
@@ -130,7 +131,7 @@ object Utils {
 
         return try {
             FileOutputStream(file).use { outputStream ->
-                bitmap?.compress(Bitmap.CompressFormat.JPEG, 85, outputStream)
+                bitmap?.compress(Bitmap.CompressFormat.JPEG, 100, outputStream)
             }
             file
         } catch (e: Exception) {
