@@ -7,7 +7,7 @@ object Const {
     const val TAG_CIRCLE_DETAIL = "circle_detail"
     const val TAG_CIRCLE_POST = "circle_post"
     const val TAG_USER_ROLE = "user_role"
+    const val TAG_POST_TYPE = "post_type"
 
     const val FLAG_DATA_CHANGED = "data_changed"
-    const val FLAG_NOTICE_OR_NOT = "notice_or_not"
 }

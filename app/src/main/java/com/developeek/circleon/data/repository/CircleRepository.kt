@@ -2,12 +2,13 @@ package com.developeek.circleon.data.repository
 
 import com.developeek.circleon.data.source.Result
 import com.developeek.circleon.domain.enums.Category
+import com.developeek.circleon.domain.enums.PostType
 import com.developeek.circleon.domain.model.CircleDetailModel
 import com.developeek.circleon.domain.model.CircleModels
 import com.developeek.circleon.domain.model.CircleSummaryModels
-import com.developeek.circleon.domain.model.CommentModel
 import com.developeek.circleon.domain.model.CommentModels
 import com.developeek.circleon.domain.model.PostModels
+import java.io.File
 
 interface CircleRepository {
     // GET
@@ -40,6 +41,20 @@ interface CircleRepository {
         size: Int,
     ): Result<CommentModels>
 
+    // POST
+    suspend fun postCirclePost(
+        circleId: Int,
+        postType: PostType,
+        content: String,
+        image: File?,
+    ): Result<Unit>
+
+    suspend fun postCircleComment(
+        circleId: Int,
+        postId: Int,
+        comment: String,
+    ): Result<Unit>
+
     // PUT
     suspend fun putPostPin(
         circleId: Int,
@@ -47,20 +62,13 @@ interface CircleRepository {
         isPinned: Boolean,
     ): Result<Unit>
 
-    // POST
-    suspend fun postComment(
-        circleId: Int,
-        postId: Int,
-        comment: String,
-    ): Result<CommentModel>
-
     // DELETE
-    suspend fun deletePost(
+    suspend fun deleteCirclePost(
         circleId: Int,
         postId: Int,
     ): Result<Unit>
 
-    suspend fun deleteComment(
+    suspend fun deletePostComment(
         circleId: Int,
         postId: Int,
         commentId: Int,

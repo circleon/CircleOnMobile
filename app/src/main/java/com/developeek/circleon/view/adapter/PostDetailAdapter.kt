@@ -66,14 +66,14 @@ class PostDetailAdapter(
         private fun loadAuthor(author: AuthorModel) {
             binding.txtAuthorName.text = author.name
             author.profileUrl?.let {
-                glideProvider.callImage(it, activity, binding.imgAuthorProfile)
+                glideProvider.fetchImage(it, activity, binding.imgAuthorProfile)
             } ?: binding.imgAuthorProfile.setImageResource(R.drawable.ic_author_placeholder)
         }
 
         private fun loadContent(post: PostModel) {
             binding.txtPostContent.text = post.content
             post.imgUrl?.let {
-                glideProvider.callImage(it, activity, binding.imgPost)
+                glideProvider.fetchImage(it, activity, binding.imgPost)
             }
             binding.txtCreated.text =
                 post.createdAt.format(
@@ -110,7 +110,7 @@ class PostDetailAdapter(
         private fun loadAuthor(author: AuthorModel) {
             binding.txtAuthorName.text = author.name
             author.profileUrl?.let {
-                glideProvider.callImage(it, activity, binding.imgAuthorProfile)
+                glideProvider.fetchImage(it, activity, binding.imgAuthorProfile)
             } ?: binding.imgAuthorProfile.setImageResource(R.drawable.ic_author_placeholder)
         }
 

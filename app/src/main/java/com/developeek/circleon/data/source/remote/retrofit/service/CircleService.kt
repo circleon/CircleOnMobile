@@ -4,15 +4,19 @@ import com.developeek.circleon.data.dto.home.Circle
 import com.developeek.circleon.data.dto.home.CircleDetail
 import com.developeek.circleon.data.dto.home.CircleSummaries
 import com.developeek.circleon.data.dto.home.Comment
-import com.developeek.circleon.data.dto.home.CommentContent
 import com.developeek.circleon.data.dto.home.Paging
 import com.developeek.circleon.data.dto.home.Pin
 import com.developeek.circleon.data.dto.home.Post
+import com.developeek.circleon.data.dto.home.RequestBodyComment
+import okhttp3.MultipartBody
+import okhttp3.RequestBody
 import retrofit2.http.Body
 import retrofit2.http.DELETE
 import retrofit2.http.GET
+import retrofit2.http.Multipart
 import retrofit2.http.POST
 import retrofit2.http.PUT
+import retrofit2.http.Part
 import retrofit2.http.Path
 import retrofit2.http.Query
 
@@ -37,14 +41,14 @@ interface CircleService {
     @GET("circles/summary")
     suspend fun getCircleSummaries(): CircleSummaries
 
-    @GET("circles/{id}")
+    @GET("circles/{circleId}")
     suspend fun getCircleDetail(
-        @Path("id") circleId: Int,
+        @Path("circleId") circleId: Int,
     ): CircleDetail
 
-    @GET("circles/{id}/posts")
+    @GET("circles/{circleId}/posts")
     suspend fun getCirclePosts(
-        @Path("id") circleId: Int,
+        @Path("circleId") circleId: Int,
         @Query("page") page: Int,
         @Query("size") size: Int,
         @Query("postType") postType: String,
@@ -58,6 +62,23 @@ interface CircleService {
         @Query("size") size: Int,
     ): Paging<Comment>
 
+    // POST
+    @Multipart
+    @POST("circles/{circleId}/posts")
+    suspend fun postCirclePost(
+        @Path("circleId") circleId: Int,
+        @Part("postType") postType: RequestBody,
+        @Part("content") content: RequestBody,
+        @Part image: MultipartBody.Part?,
+    )
+
+    @POST("circles/{circleId}/posts/{postId}/comments")
+    suspend fun postCircleComment(
+        @Path("circleId") circleId: Int,
+        @Path("postId") postId: Int,
+        @Body data: RequestBodyComment,
+    )
+
     // PUT
     @PUT("circles/{circleId}/posts/{postId}/pin")
     suspend fun putPostPin(
@@ -66,23 +87,15 @@ interface CircleService {
         @Body data: Pin,
     )
 
-    // POST
-    @POST("circles/{circleId}/posts/{postId}/comments")
-    suspend fun postComment(
-        @Path("circleId") circleId: Int,
-        @Path("postId") postId: Int,
-        @Body data: CommentContent,
-    ): Comment
-
     // DELETE
     @DELETE("circles/{circleId}/posts/{postId}")
-    suspend fun deletePost(
+    suspend fun deleteCirclePost(
         @Path("circleId") circleId: Int,
         @Path("postId") postId: Int,
     )
 
     @DELETE("circles/{circleId}/posts/{postId}/comments/{commentId}")
-    suspend fun deleteComment(
+    suspend fun deletePostComment(
         @Path("circleId") circleId: Int,
         @Path("postId") postId: Int,
         @Path("commentId") commentId: Int,

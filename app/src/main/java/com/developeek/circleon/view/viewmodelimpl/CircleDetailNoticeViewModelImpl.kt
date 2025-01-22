@@ -162,7 +162,7 @@ class CircleDetailNoticeViewModelImpl
 
             deleteNoticeJob =
                 viewModelScope.launch {
-                    val result = repository.deletePost(circleId, postId)
+                    val result = repository.deleteCirclePost(circleId, postId)
 
                     if (result is Success) {
                         refresh()

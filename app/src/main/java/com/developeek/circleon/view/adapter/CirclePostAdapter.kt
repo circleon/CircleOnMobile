@@ -74,7 +74,7 @@ class CirclePostAdapter(
         private fun loadAuthor(post: PostModel) {
             binding.txtAuthorName.text = post.author.name
             post.author.profileUrl?.let {
-                glideProvider.callImage(it, activity, binding.imgAuthorProfile)
+                glideProvider.fetchImage(it, activity, binding.imgAuthorProfile)
             } ?: binding.imgAuthorProfile.setImageResource(R.drawable.ic_author_placeholder)
             binding.txtCreated.text =
                 post.createdAt.format(
@@ -92,7 +92,7 @@ class CirclePostAdapter(
                     post.commentCount,
                 )
             post.imgUrl?.let {
-                glideProvider.callImage(it, activity, binding.imgPost)
+                glideProvider.fetchImage(it, activity, binding.imgPost)
             }
             binding.imgNoticePin.isVisible = post.isPinned
         }

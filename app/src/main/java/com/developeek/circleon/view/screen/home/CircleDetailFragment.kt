@@ -16,6 +16,7 @@ import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.RecyclerView
 import com.developeek.circleon.R
 import com.developeek.circleon.databinding.FragmentCircleDetailBinding
+import com.developeek.circleon.domain.enums.PostType
 import com.developeek.circleon.domain.state.UiState
 import com.developeek.circleon.domain.utils.Const
 import com.developeek.circleon.domain.utils.Utils
@@ -138,7 +139,7 @@ class CircleDetailFragment : Fragment() {
     private fun loadCircleDetail(activity: Activity) {
         binding.tlCircleDetail.getTabAt(viewModel.currentTabPosition)?.select() // 탭 복원
         viewModel.circleDetail.thumbnailUrl?.let {
-            glideProvider.callImage(it, activity, binding.imgCircleThumbnail)
+            glideProvider.fetchImage(it, activity, binding.imgCircleThumbnail)
         }
         binding.txtCircleCategory.text = viewModel.circleDetail.category.categoryName()
         binding.txtCircleMemberCount.text = String.format(MEMBER_COUNT_UNIT, viewModel.circleDetail.memberCount)
@@ -272,15 +273,17 @@ class CircleDetailFragment : Fragment() {
             1 -> {
                 binding.fabRegisterCircleContent.isVisible = viewModel.circleDetail.isExecutive()
                 binding.fabRegisterCircleContent.setOnClickListener {
-                    bundle.putBoolean(Const.FLAG_NOTICE_OR_NOT, true)
-                    findNavController().navigate(R.id.action_circleDetailFragment_to_registerPostFragment, bundle)
+                    bundle.putInt(Const.TAG_CIRCLE_ID, circleId)
+                    bundle.putSerializable(Const.TAG_POST_TYPE, PostType.NOTICE)
+                    findNavController().navigate(R.id.action_circleDetailFragment_to_newPostFragment, bundle)
                 }
             }
             2 -> {
                 binding.fabRegisterCircleContent.isVisible = viewModel.circleDetail.isMember()
                 binding.fabRegisterCircleContent.setOnClickListener {
-                    bundle.putBoolean(Const.FLAG_NOTICE_OR_NOT, false)
-                    findNavController().navigate(R.id.action_circleDetailFragment_to_registerPostFragment, bundle)
+                    bundle.putInt(Const.TAG_CIRCLE_ID, circleId)
+                    bundle.putSerializable(Const.TAG_POST_TYPE, PostType.POST)
+                    findNavController().navigate(R.id.action_circleDetailFragment_to_newPostFragment, bundle)
                 }
             }
             3 -> {

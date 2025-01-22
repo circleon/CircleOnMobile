@@ -8,6 +8,8 @@ enum class PostType(
     NOTICE("NOTICE", "공지사항"),
     ;
 
+    fun code() = this.code
+
     fun isPost() = this.code == POST.code
 
     fun isNotice() = this.code == NOTICE.code

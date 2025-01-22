@@ -155,7 +155,7 @@ class CircleDetailPostDetailViewModelImpl
 
             registerCommentJob =
                 viewModelScope.launch {
-                    val result = repository.postComment(circleId, post.id, comment)
+                    val result = repository.postCircleComment(circleId, post.id, comment)
 
                     if (result is Success) {
                         refresh()
@@ -196,7 +196,7 @@ class CircleDetailPostDetailViewModelImpl
 
             deletePostJob =
                 viewModelScope.launch {
-                    val result = repository.deletePost(circleId, post.id)
+                    val result = repository.deleteCirclePost(circleId, post.id)
 
                     if (result is Success) {
                         postDeleteState.postValue(true)
@@ -212,7 +212,7 @@ class CircleDetailPostDetailViewModelImpl
 
             deleteCommentJob =
                 viewModelScope.launch {
-                    val result = repository.deleteComment(circleId, post.id, commentId)
+                    val result = repository.deletePostComment(circleId, post.id, commentId)
 
                     if (result is Success) {
                         comments =

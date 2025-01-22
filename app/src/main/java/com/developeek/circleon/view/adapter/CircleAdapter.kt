@@ -61,7 +61,7 @@ class CircleAdapter(
             // ?.let ?: 구조인 경우 ?: 뒤에 블록 형태로 코드를 작성하면 실행이 안 되는데
             // 싱글 라인인 경우에는 작동
             diffUtil.currentList[position].thumbnailUrl?.let {
-                glideProvider.callImage(it, activity, binding.imgCircleThumbnail)
+                glideProvider.fetchImage(it, activity, binding.imgCircleThumbnail)
             } ?: binding.imgCircleThumbnail.setImageResource(R.drawable.ic_circle_thumbnail_placeholder)
         }
 

@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/grey_1"
-    tools:context=".view.screen.home.RegisterPostFragment">
+    tools:context=".view.screen.home.NewPostFragment">
 
     <androidx.appcompat.widget.Toolbar
         android:id="@+id/tbPostDetail"
@@ -35,7 +35,7 @@
             tools:text="title"/>
 
         <androidx.appcompat.widget.AppCompatTextView
-            android:id="@+id/btnFinish"
+            android:id="@+id/btnUpload"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
             android:paddingHorizontal="@dimen/margin_padding_large"
@@ -77,12 +77,12 @@
         app:layout_constraintBottom_toBottomOf="parent" >
 
         <androidx.appcompat.widget.AppCompatImageView
-            android:id="@+id/imgPost"
+            android:id="@+id/btnAddPostImage"
             android:layout_width="48dp"
             android:layout_height="48dp"
             android:src="@drawable/ic_lock"
-            android:tint="@color/white"
             android:scaleType="center"
+            android:clipToOutline="true"
             android:background="@drawable/bg_rounded_rectangle"
             android:backgroundTint="@color/grey_3" />
 

@@ -1,20 +1,24 @@
 package com.developeek.circleon.data.repositoryimpl
 
-import com.developeek.circleon.data.dto.home.CommentContent
 import com.developeek.circleon.data.dto.home.Pin
+import com.developeek.circleon.data.dto.home.RequestBodyComment
 import com.developeek.circleon.data.exception.ServiceException
 import com.developeek.circleon.data.repository.CircleRepository
 import com.developeek.circleon.data.source.Result
 import com.developeek.circleon.data.source.remote.retrofit.service.CircleService
 import com.developeek.circleon.domain.enums.Category
+import com.developeek.circleon.domain.enums.PostType
 import com.developeek.circleon.domain.model.CircleDetailModel
 import com.developeek.circleon.domain.model.CircleModels
 import com.developeek.circleon.domain.model.CircleSummaryModels
-import com.developeek.circleon.domain.model.CommentModel
 import com.developeek.circleon.domain.model.CommentModels
 import com.developeek.circleon.domain.model.PostModels
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
+import okhttp3.MediaType
+import okhttp3.MultipartBody
+import okhttp3.RequestBody
+import java.io.File
 import java.io.IOException
 
 class CircleRepositoryImpl(
@@ -143,6 +147,46 @@ class CircleRepositoryImpl(
         }
     }
 
+    override suspend fun postCirclePost(
+        circleId: Int,
+        postType: PostType,
+        content: String,
+        image: File?,
+    ): Result<Unit> {
+        return try {
+            withContext(dispatcher) {
+                val type = RequestBody.create(MediaType.parse("text/plain"), postType.code())
+                val content = RequestBody.create(MediaType.parse("text/plain"), content)
+                val body =
+                    if (image == null) {
+                        null
+                    } else {
+                        val imageRequestBody = RequestBody.create(MediaType.parse("image/jpeg"), image)
+                        MultipartBody.Part.createFormData("image", image.name, imageRequestBody)
+                    }
+                val response = service.postCirclePost(circleId, type, content, body)
+                Result.success(Unit)
+            }
+        } catch (e: IOException) {
+            Result.error(e)
+        }
+    }
+
+    override suspend fun postCircleComment(
+        circleId: Int,
+        postId: Int,
+        comment: String,
+    ): Result<Unit> {
+        return try {
+            withContext(dispatcher) {
+                val response = service.postCircleComment(circleId, postId, RequestBodyComment(comment))
+                Result.success(Unit)
+            }
+        } catch (e: IOException) {
+            Result.error(e)
+        }
+    }
+
     override suspend fun putPostPin(
         circleId: Int,
         postId: Int,
@@ -158,28 +202,13 @@ class CircleRepositoryImpl(
         }
     }
 
-    override suspend fun postComment(
-        circleId: Int,
-        postId: Int,
-        comment: String,
-    ): Result<CommentModel> {
-        return try {
-            withContext(dispatcher) {
-                val response = service.postComment(circleId, postId, CommentContent(comment))
-                Result.success(response.toCommentModel())
-            }
-        } catch (e: IOException) {
-            Result.error(e)
-        }
-    }
-
-    override suspend fun deletePost(
+    override suspend fun deleteCirclePost(
         circleId: Int,
         postId: Int,
     ): Result<Unit> {
         return try {
             withContext(dispatcher) {
-                val response = service.deletePost(circleId, postId)
+                val response = service.deleteCirclePost(circleId, postId)
                 Result.success(Unit)
             }
         } catch (e: IOException) {
@@ -187,14 +216,14 @@ class CircleRepositoryImpl(
         }
     }
 
-    override suspend fun deleteComment(
+    override suspend fun deletePostComment(
         circleId: Int,
         postId: Int,
         commentId: Int,
     ): Result<Unit> {
         return try {
             with(dispatcher) {
-                val response = service.deleteComment(circleId, postId, commentId)
+                val response = service.deletePostComment(circleId, postId, commentId)
                 Result.success(Unit)
             }
         } catch (e: IOException) {
