@@ -9,6 +9,8 @@ import com.developeek.circleon.data.source.Error
 import com.developeek.circleon.data.source.Success
 import com.developeek.circleon.domain.enums.PostType
 import com.developeek.circleon.domain.state.UiState
+import com.developeek.circleon.domain.utils.validator.Invalid
+import com.developeek.circleon.domain.utils.validator.Validator
 import com.developeek.circleon.view.viewmodel.NewPostViewModel
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
@@ -46,6 +48,8 @@ class NewPostViewModelImpl
         override lateinit var error: String
 
         override fun upload(content: String) {
+            if (!isContentFormat(content)) return
+
             uploadPostJob?.cancel()
             uiState.postValue(UiState.Loading)
             saveLoadingStartTime()
@@ -66,6 +70,18 @@ class NewPostViewModelImpl
                         }
                     }
                 }
+        }
+
+        private fun isContentFormat(content: String): Boolean {
+            val validation = Validator.checkContent(content)
+
+            return if (validation is Invalid) {
+                error = validation.message()
+                uiState.postValue(UiState.ServiceError)
+                false
+            } else {
+                true
+            }
         }
 
         override fun setPostImage(image: File?) {

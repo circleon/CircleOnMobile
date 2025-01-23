@@ -12,6 +12,8 @@ import com.developeek.circleon.domain.model.CommentModels
 import com.developeek.circleon.domain.model.Identifiable
 import com.developeek.circleon.domain.model.PostModel
 import com.developeek.circleon.domain.state.UiState
+import com.developeek.circleon.domain.utils.validator.Invalid
+import com.developeek.circleon.domain.utils.validator.Validator
 import com.developeek.circleon.view.listener.RecyclerViewInfiniteScrollListener
 import com.developeek.circleon.view.viewmodel.CircleDetailPostDetailViewModel
 import dagger.assisted.Assisted
@@ -153,6 +155,8 @@ class CircleDetailPostDetailViewModelImpl
         }
 
         override fun registerComment(comment: String) {
+            if (!isCommentFormat(comment)) return
+
             registerCommentJob?.cancel()
             commentRegisterState.postValueWhenAnimFinished(UiState.Loading)
             saveLoadingStartTime()
@@ -173,6 +177,18 @@ class CircleDetailPostDetailViewModelImpl
                         commentRegisterState.postValueWhenAnimFinished(errorState)
                     }
                 }
+        }
+
+        private fun isCommentFormat(comment: String): Boolean {
+            val validation = Validator.checkContent(comment)
+
+            return if (validation is Invalid) {
+                error = validation.message()
+                commentRegisterState.postValueWhenAnimFinished(UiState.ServiceError)
+                false
+            } else {
+                true
+            }
         }
 
         /**

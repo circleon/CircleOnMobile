@@ -43,14 +43,21 @@ object Validator {
     fun checkPasswordMatch(
         password: String,
         data: String,
-    ): InputValidationResult<Boolean> {
+    ): InputValidationResult<Unit> {
         return try {
-            if (password != data) {
-                throw IllegalArgumentException(String.format(ValidatorExceptionMessage.MESSAGE_WRONG_PASSWORD_CHECK))
-            }
-            InputValidationResult.valid(true)
+            require(password == data)
+            InputValidationResult.valid(Unit)
         } catch (e: IllegalArgumentException) {
-            InputValidationResult.invalid(e)
+            InputValidationResult.invalid(IOException(ValidatorExceptionMessage.MESSAGE_WRONG_PASSWORD_CHECK))
+        }
+    }
+
+    fun checkContent(data: String): InputValidationResult<String> {
+        return try {
+            require(data.isNotEmpty())
+            InputValidationResult.valid(data)
+        } catch (e: IllegalArgumentException) {
+            InputValidationResult.invalid(IOException(ValidatorExceptionMessage.MESSAGE_EMPTY_CONTENT))
         }
     }
 }
