@@ -232,18 +232,6 @@
 
             </LinearLayout>
 
-            <com.google.android.material.progressindicator.CircularProgressIndicator
-                android:id="@+id/pgbLoading"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:paddingBottom="182dp"
-                android:layout_gravity="center"
-                app:indicatorColor="@color/grey_5"
-                app:trackColor="@color/grey_3"
-                app:trackThickness="1dp"
-                android:indeterminate="true"
-                android:visibility="gone"/>
-
             <androidx.appcompat.widget.LinearLayoutCompat
                 android:id="@+id/llServiceError"
                 android:layout_width="match_parent"
@@ -272,6 +260,22 @@
         </FrameLayout>
 
     </androidx.coordinatorlayout.widget.CoordinatorLayout>
+
+    <com.google.android.material.progressindicator.CircularProgressIndicator
+        android:id="@+id/pgbContentLoading"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:padding="@dimen/margin_padding_large"
+        android:background="@drawable/bg_rounded_rectangle"
+        android:backgroundTint="@color/grey_3"
+        android:layout_gravity="center"
+        app:indicatorColor="@color/purple_5"
+        app:trackColor="@color/grey_3"
+        app:trackThickness="1dp"
+        android:indeterminate="true"
+        android:visibility="gone">
+
+    </com.google.android.material.progressindicator.CircularProgressIndicator>
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/fabRegisterCircleContent"

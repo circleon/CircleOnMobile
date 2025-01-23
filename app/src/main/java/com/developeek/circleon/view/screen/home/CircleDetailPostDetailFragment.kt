@@ -236,26 +236,35 @@ class CircleDetailPostDetailFragment : Fragment() {
         Observer<UiState> {
             when (it) {
                 UiState.Loading -> {
-                    toggleView(binding.pgbLoading)
+                    binding.pgbContentLoading.isVisible = true
                 }
                 UiState.Success -> {
                     toggleView(binding.rvPostDetail)
+                    binding.pgbContentLoading.isVisible = false
                     loadContents()
                 }
                 UiState.AuthenticationError -> {
+                    binding.pgbContentLoading.isVisible = false
                     sendUserToLoginScreen(activity)
-                    if (ErrorToast.previousFinished()) {
-                        ErrorToast(activity, viewModel.error).show()
-                    }
+                    showErrorToast(activity)
                 }
                 UiState.ServiceError -> {
+                    binding.pgbContentLoading.isVisible = false
                     toggleView(binding.llServiceError)
-                    if (ErrorToast.previousFinished()) {
-                        ErrorToast(activity, viewModel.error).show()
-                    }
+                    showErrorToast(activity)
                 }
             }
         }
+
+    private fun showErrorToast(activity: Activity) {
+        if (ErrorToast.previousFinished()) {
+            ErrorToast(activity, viewModel.error).show()
+        }
+    }
+
+    private fun showErrorDialog(activity: Activity) {
+        ErrorAlertDialog(activity, viewModel.error).show()
+    }
 
     private fun sendUserToLoginScreen(activity: Activity) {
         val intent = Intent(activity, LoginActivity::class.java)
@@ -274,14 +283,27 @@ class CircleDetailPostDetailFragment : Fragment() {
     }
 
     private fun registerCommentStateObserver(activity: Activity) =
-        Observer<Boolean> {
-            if (it) {
-                requestRefreshToPreviousScreen()
-                loadContents()
-                hideSoftInput(activity, binding.edtComment)
-                binding.edtComment.text?.clear()
-            } else {
-                ErrorAlertDialog(activity, viewModel.error).show()
+        Observer<UiState> {
+            when (it) {
+                UiState.Loading -> {
+                    binding.pgbContentLoading.isVisible = true
+                }
+                UiState.Success -> {
+                    binding.pgbContentLoading.isVisible = false
+                    requestRefreshToPreviousScreen()
+                    loadContents()
+                    hideSoftInput(activity, binding.edtComment)
+                    binding.edtComment.text?.clear()
+                }
+                UiState.AuthenticationError -> {
+                    binding.pgbContentLoading.isVisible = false
+                    sendUserToLoginScreen(activity)
+                    showErrorToast(activity)
+                }
+                UiState.ServiceError -> {
+                    binding.pgbContentLoading.isVisible = false
+                    showErrorDialog(activity)
+                }
             }
         }
 
@@ -294,22 +316,48 @@ class CircleDetailPostDetailFragment : Fragment() {
     }
 
     private fun deletePostStateObserver(activity: Activity) =
-        Observer<Boolean> {
-            if (it) {
-                requestRefreshToPreviousScreen()
-                sendUserToPreviousScreen()
-            } else {
-                ErrorAlertDialog(activity, viewModel.error).show()
+        Observer<UiState> {
+            when (it) {
+                UiState.Loading -> {
+                    binding.pgbContentLoading.isVisible = true
+                }
+                UiState.Success -> {
+                    binding.pgbContentLoading.isVisible = false
+                    requestRefreshToPreviousScreen()
+                    sendUserToPreviousScreen()
+                }
+                UiState.AuthenticationError -> {
+                    binding.pgbContentLoading.isVisible = false
+                    sendUserToLoginScreen(activity)
+                    showErrorToast(activity)
+                }
+                UiState.ServiceError -> {
+                    binding.pgbContentLoading.isVisible = false
+                    ErrorAlertDialog(activity, viewModel.error).show()
+                }
             }
         }
 
     private fun deleteCommentStateObserver(activity: Activity) =
-        Observer<Boolean> {
-            if (it) {
-                requestRefreshToPreviousScreen()
-                loadContents()
-            } else {
-                ErrorAlertDialog(activity, viewModel.error).show()
+        Observer<UiState> {
+            when (it) {
+                UiState.Loading -> {
+                    binding.pgbContentLoading.isVisible = true
+                }
+                UiState.Success -> {
+                    binding.pgbContentLoading.isVisible = false
+                    requestRefreshToPreviousScreen()
+                    loadContents()
+                }
+                UiState.AuthenticationError -> {
+                    binding.pgbContentLoading.isVisible = false
+                    sendUserToLoginScreen(activity)
+                    showErrorToast(activity)
+                }
+                UiState.ServiceError -> {
+                    binding.pgbContentLoading.isVisible = false
+                    ErrorAlertDialog(activity, viewModel.error).show()
+                }
             }
         }
 
@@ -365,7 +413,7 @@ class CircleDetailPostDetailFragment : Fragment() {
     }
 
     private fun setBtnRegisterCommentListener() {
-        binding.btnRegisterComment.setOnClickListener {
+        binding.btnUploadComment.setOnClickListener {
             viewModel.saveScrollState(binding.rvPostDetail.layoutManager?.onSaveInstanceState())
             viewModel.registerComment(binding.edtComment.text.toString())
         }
@@ -400,12 +448,10 @@ class CircleDetailPostDetailFragment : Fragment() {
 
     private fun toggleView(view: View) {
         binding.rvPostDetail.isVisible = view == binding.rvPostDetail
-        binding.pgbLoading.isVisible = view == binding.pgbLoading
         binding.llServiceError.isVisible = view == binding.llServiceError
     }
 
     companion object {
-        private const val CREATED_DATE_FORMAT = "M월 d일 a hh:mm"
         private const val TITLE_NOTICE = "공지사항 상세보기"
         private const val TITLE_POST = "게시글 상세보기"
         private const val MESSAGE_DELETE_NOTICE = "공지사항을 삭제할까요?"

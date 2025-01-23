@@ -15,6 +15,7 @@ import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import java.io.File
 
@@ -40,16 +41,19 @@ class NewPostViewModelImpl
 
         private var image: File? = null
         private var uploadPostJob: Job? = null
+        private var loadingStartTime = 0L
 
         override lateinit var error: String
 
         override fun upload(content: String) {
             uploadPostJob?.cancel()
             uiState.postValue(UiState.Loading)
+            saveLoadingStartTime()
 
             uploadPostJob =
                 viewModelScope.launch {
                     val result = repository.postCirclePost(circleId, postType, content, image)
+                    delay(remainedLoadingTime())
 
                     if (result is Success) {
                         uiState.postValue(UiState.Success)
@@ -70,5 +74,24 @@ class NewPostViewModelImpl
 
         override fun removePostImage() {
             this.image = null
+        }
+
+        private fun saveLoadingStartTime() {
+            this.loadingStartTime = System.currentTimeMillis()
+        }
+
+        /**
+         * remainedLoadingTime()
+         *
+         * 코루틴 수행 시 LoadingState 에 머무르는 최소 시간을 계산하여 보장
+         */
+        private fun remainedLoadingTime(): Long {
+            val remainTime = MAX_DEFAULT_ANIM_TIME_MILLIS - (System.currentTimeMillis() - loadingStartTime)
+
+            return if (remainTime > 0) remainTime else 0
+        }
+
+        companion object {
+            private const val MAX_DEFAULT_ANIM_TIME_MILLIS = 200L
         }
     }

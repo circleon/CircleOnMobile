@@ -115,19 +115,22 @@ class CircleDetailFragment : Fragment() {
         Observer<UiState> {
             when (it) {
                 UiState.Loading -> {
-                    toggleView(binding.pgbLoading)
+                    binding.pgbContentLoading.isVisible = true
                 }
                 UiState.Success -> {
+                    binding.pgbContentLoading.isVisible = false
                     toggleView(binding.flCircleDetail)
                     loadCircleDetail(activity)
                 }
                 UiState.AuthenticationError -> {
+                    binding.pgbContentLoading.isVisible = false
                     sendUserToLoginScreen(activity)
                     if (ErrorToast.previousFinished()) {
                         ErrorToast(activity, viewModel.error).show()
                     }
                 }
                 UiState.ServiceError -> {
+                    binding.pgbContentLoading.isVisible = false
                     toggleView(binding.llServiceError)
                     if (ErrorToast.previousFinished()) {
                         ErrorToast(activity, viewModel.error).show()
@@ -337,7 +340,6 @@ class CircleDetailFragment : Fragment() {
 
     private fun toggleView(view: View) {
         binding.flCircleDetail.isVisible = view == binding.flCircleDetail
-        binding.pgbLoading.isVisible = view == binding.pgbLoading
         binding.llServiceError.isVisible = view == binding.llServiceError
     }
 

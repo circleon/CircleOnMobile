@@ -9,6 +9,7 @@ import android.view.ViewGroup
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
@@ -105,18 +106,23 @@ class NewPostFragment : Fragment() {
     private fun stateObserver(activity: Activity) =
         Observer<UiState> {
             when (it) {
-                UiState.Loading -> {}
+                UiState.Loading -> {
+                    binding.pgbContentLoading.isVisible = true
+                }
                 UiState.Success -> {
+                    binding.pgbContentLoading.isVisible = false
                     requestRefreshToPreviousScreen()
                     sendUserToPreviousScreen()
                 }
                 UiState.AuthenticationError -> {
+                    binding.pgbContentLoading.isVisible = false
                     sendUserToLoginScreen(activity)
                     if (ErrorToast.previousFinished()) {
                         ErrorToast(activity, viewModel.error).show()
                     }
                 }
                 UiState.ServiceError -> {
+                    binding.pgbContentLoading.isVisible = false
                     ErrorAlertDialog(activity, viewModel.error).show()
                 }
             }

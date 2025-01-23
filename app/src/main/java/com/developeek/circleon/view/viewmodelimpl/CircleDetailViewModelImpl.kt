@@ -15,6 +15,7 @@ import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 @HiltViewModel(assistedFactory = CircleDetailViewModelImpl.CircleDetailViewModelFactory::class)
@@ -46,19 +47,22 @@ class CircleDetailViewModelImpl
             get() = appBarExpanded
         private var appBarExpanded = true
 
+        private var loadingStartTime = 0L
         override lateinit var error: String
 
         init {
-            uiState.postValue(UiState.Loading)
             fetchCircleDetail()
         }
 
         private fun fetchCircleDetail() {
             fetchCircleDetailJob?.cancel()
+            uiState.postValue(UiState.Loading)
+            saveLoadingStartTime()
 
             fetchCircleDetailJob =
                 viewModelScope.launch {
                     val result = repository.getCircleDetail(circleId)
+                    delay(remainedLoadingTime())
 
                     if (result is Success) {
                         circleDetail = result.data
@@ -85,5 +89,24 @@ class CircleDetailViewModelImpl
 
         override fun setAppBarExpanded(expanded: Boolean) {
             appBarExpanded = expanded
+        }
+
+        private fun saveLoadingStartTime() {
+            this.loadingStartTime = System.currentTimeMillis()
+        }
+
+        /**
+         * remainedLoadingTime()
+         *
+         * 코루틴 수행 시 LoadingState 에 머무르는 최소 시간을 계산하여 보장
+         */
+        private fun remainedLoadingTime(): Long {
+            val remainTime = MAX_DEFAULT_ANIM_TIME_MILLIS - (System.currentTimeMillis() - loadingStartTime)
+
+            return if (remainTime > 0) remainTime else 0
+        }
+
+        companion object {
+            private const val MAX_DEFAULT_ANIM_TIME_MILLIS = 200L
         }
     }

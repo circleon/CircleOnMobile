@@ -9,9 +9,9 @@ import com.developeek.circleon.domain.state.UiState
 
 interface CircleDetailPostDetailViewModel {
     val state: LiveData<UiState>
-    val registerCommentState: LiveData<Boolean>
-    val deletePostState: LiveData<Boolean>
-    val deleteCommentState: LiveData<Boolean>
+    val registerCommentState: LiveData<UiState>
+    val deletePostState: LiveData<UiState>
+    val deleteCommentState: LiveData<UiState>
     val contents: List<Identifiable>
     val comments: CommentModels
     val scrollOver: LiveData<Boolean>

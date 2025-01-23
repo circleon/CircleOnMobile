@@ -19,7 +19,7 @@
         android:layout_height="match_parent"
         android:paddingBottom="182dp"
         android:layout_gravity="center"
-        app:indicatorColor="@color/grey_5"
+        app:indicatorColor="@color/purple_5"
         app:trackColor="@color/grey_3"
         app:trackThickness="1dp"
         android:indeterminate="true"
