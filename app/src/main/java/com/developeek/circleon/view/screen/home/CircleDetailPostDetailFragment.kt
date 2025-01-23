@@ -251,7 +251,8 @@ class CircleDetailPostDetailFragment : Fragment() {
                 UiState.ServiceError -> {
                     binding.pgbContentLoading.isVisible = false
                     toggleView(binding.llServiceError)
-                    showErrorToast(activity)
+                    requestRefreshToPreviousScreen()
+                    showErrorDialog(activity)
                 }
             }
         }

@@ -66,7 +66,7 @@ object Utils {
 
     fun Uri.toJPEG(context: Context): File? {
         val inputStream = context.contentResolver.openInputStream(this)
-        val tempFile = File.createTempFile("temp", ".jpg")
+        val tempFile = File.createTempFile("temp", ".jpeg")
         return try {
             tempFile.outputStream().use { fileOut ->
                 inputStream?.copyTo(fileOut)

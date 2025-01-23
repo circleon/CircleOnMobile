@@ -83,6 +83,7 @@
             android:background="@drawable/bg_rounded_rectangle"
             android:backgroundTint="@color/white"
             android:clipToOutline="true"
+            android:adjustViewBounds="true"
             android:visibility="gone" />
 
     </androidx.appcompat.widget.LinearLayoutCompat>
