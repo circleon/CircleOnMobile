@@ -6,7 +6,6 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
 import androidx.appcompat.widget.PopupMenu
 import androidx.core.content.ContextCompat
 import androidx.core.os.bundleOf
@@ -19,6 +18,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.developeek.circleon.R
 import com.developeek.circleon.data.source.manager.UserManager
 import com.developeek.circleon.databinding.FragmentCircleDetailPostBinding
+import com.developeek.circleon.domain.enums.PostType
 import com.developeek.circleon.domain.model.PostModel
 import com.developeek.circleon.domain.state.UiState
 import com.developeek.circleon.domain.utils.Const
@@ -157,7 +157,7 @@ class CircleDetailPostFragment : Fragment() {
         viewModel.saveScrollState(binding.rvCirclePost.layoutManager?.onSaveInstanceState())
         when (it.itemId) {
             R.id.modify_post -> {
-                Toast.makeText(activity, "수정하기", Toast.LENGTH_SHORT).show()
+                sendUserToEditPostScreen(circleId, item)
             }
             R.id.delete_post -> {
                 DeleteAlertDialog(activity, MESSAGE_DELETE_POST) {
@@ -166,6 +166,19 @@ class CircleDetailPostFragment : Fragment() {
             }
         }
         true
+    }
+
+    private fun sendUserToEditPostScreen(
+        circleId: Int,
+        item: PostModel,
+    ) {
+        val bundle = Bundle()
+
+        bundle.putInt(Const.TAG_CIRCLE_ID, circleId)
+        bundle.putSerializable(Const.TAG_POST_TYPE, PostType.POST)
+        bundle.putSerializable(Const.TAG_CIRCLE_POST, item)
+        bundle.putBoolean(Const.FLAG_EDIT_OR_NOT, true) // 수정 기능 전용 활성화
+        findNavController().navigate(R.id.action_circleDetailFragment_to_uploadPostFragment, bundle)
     }
 
     private fun initObserver(activity: Activity) {

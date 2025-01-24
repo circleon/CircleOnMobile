@@ -4,8 +4,6 @@ import com.developeek.circleon.domain.enums.PostType
 import com.developeek.circleon.domain.model.PostModel
 import com.developeek.circleon.domain.utils.Utils
 import com.google.gson.annotations.SerializedName
-import okhttp3.MultipartBody
-import retrofit2.http.Part
 
 data class Post(
     @SerializedName("postId") val id: Int,
@@ -36,8 +34,7 @@ data class Pin(
     val isPinned: Boolean,
 )
 
-data class RequestBodyPost(
-    @SerializedName("postType") val type: String,
+data class RequestBodyEditPost(
+    val postType: String,
     val content: String,
-    @Part val image: MultipartBody.Part?,
 )

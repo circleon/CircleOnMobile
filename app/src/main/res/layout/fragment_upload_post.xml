@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".view.screen.home.NewPostFragment">
+    tools:context=".view.screen.home.UploadPostFragment">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
@@ -55,7 +55,7 @@
             android:id="@+id/edtPostContent"
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            android:layout_marginTop="@dimen/margin_padding_small"
+            android:layout_marginVertical="@dimen/margin_padding_small"
             android:padding="@dimen/margin_padding_large"
             android:gravity="top"
             android:hint="@string/hint_post_content"
@@ -73,7 +73,7 @@
             android:id="@+id/llPostImg"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginVertical="@dimen/margin_padding_small"
+            android:layout_marginBottom="@dimen/margin_padding_small"
             android:padding="@dimen/margin_padding_default"
             android:gravity="center_vertical"
             android:background="@color/white"

@@ -36,8 +36,8 @@
             app:destination="@id/circleDetailPostDetailFragment"
             app:enterAnim="@animator/slide_end_to_start" />
         <action
-            android:id="@+id/action_circleDetailFragment_to_newPostFragment"
-            app:destination="@id/newPostFragment"
+            android:id="@+id/action_circleDetailFragment_to_uploadPostFragment"
+            app:destination="@id/uploadPostFragment"
             app:enterAnim="@animator/scale_up"/>
     </fragment>
     <fragment
@@ -46,8 +46,8 @@
         android:label="fragment_circle_detail_post_detail"
         tools:layout="@layout/fragment_circle_detail_post_detail" />
     <fragment
-        android:id="@+id/newPostFragment"
-        android:name="com.developeek.circleon.view.screen.home.NewPostFragment"
-        android:label="fragment_new_post"
-        tools:layout="@layout/fragment_new_post" />
+        android:id="@+id/uploadPostFragment"
+        android:name="com.developeek.circleon.view.screen.home.UploadPostFragment"
+        android:label="fragment_upload_post"
+        tools:layout="@layout/fragment_upload_post" />
 </navigation>

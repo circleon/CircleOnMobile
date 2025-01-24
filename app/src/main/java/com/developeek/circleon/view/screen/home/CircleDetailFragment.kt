@@ -271,29 +271,36 @@ class CircleDetailFragment : Fragment() {
 
         when (viewModel.currentTabPosition) {
             0 -> {
-                binding.fabRegisterCircleContent.isVisible = false
+                binding.fabUploadCircleContent.isVisible = false
             }
             1 -> {
-                binding.fabRegisterCircleContent.isVisible = viewModel.circleDetail.isExecutive()
-                binding.fabRegisterCircleContent.setOnClickListener {
-                    bundle.putInt(Const.TAG_CIRCLE_ID, circleId)
-                    bundle.putSerializable(Const.TAG_POST_TYPE, PostType.NOTICE)
-                    findNavController().navigate(R.id.action_circleDetailFragment_to_newPostFragment, bundle)
+                binding.fabUploadCircleContent.isVisible = viewModel.circleDetail.isExecutive()
+                binding.fabUploadCircleContent.setOnClickListener {
+                    sendUserToUploadPostScreen(circleId, PostType.NOTICE, bundle)
                 }
             }
             2 -> {
-                binding.fabRegisterCircleContent.isVisible = viewModel.circleDetail.isMember()
-                binding.fabRegisterCircleContent.setOnClickListener {
-                    bundle.putInt(Const.TAG_CIRCLE_ID, circleId)
-                    bundle.putSerializable(Const.TAG_POST_TYPE, PostType.POST)
-                    findNavController().navigate(R.id.action_circleDetailFragment_to_newPostFragment, bundle)
+                binding.fabUploadCircleContent.isVisible = viewModel.circleDetail.isMember()
+                binding.fabUploadCircleContent.setOnClickListener {
+                    sendUserToUploadPostScreen(circleId, PostType.POST, bundle)
                 }
             }
             3 -> {
                 // TODO: 활동 사진 기능 추가 후 fab src 교체 및 리스너 설정
-                binding.fabRegisterCircleContent.isVisible = false
+                binding.fabUploadCircleContent.isVisible = false
             }
         }
+    }
+
+    private fun sendUserToUploadPostScreen(
+        circleId: Int,
+        postType: PostType,
+        bundle: Bundle,
+    ) {
+        bundle.putInt(Const.TAG_CIRCLE_ID, circleId)
+        bundle.putSerializable(Const.TAG_POST_TYPE, postType)
+        bundle.putBoolean(Const.FLAG_EDIT_OR_NOT, false) // 신규 작성 전용 기능 활성화
+        findNavController().navigate(R.id.action_circleDetailFragment_to_uploadPostFragment, bundle)
     }
 
     private fun resetScrollByTabPosition() {
