@@ -14,6 +14,7 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import androidx.navigation.fragment.findNavController
+import com.developeek.circleon.R
 import com.developeek.circleon.databinding.FragmentNewPostBinding
 import com.developeek.circleon.domain.enums.PostType
 import com.developeek.circleon.domain.state.UiState
@@ -40,6 +41,8 @@ class NewPostFragment : Fragment() {
             uri?.let {
                 glideProvider.loadImage(it, requireActivity(), binding.btnAddPostImage)
                 viewModel.setPostImage(it.toJPEG(requireActivity()))
+                binding.btnRemovePostImage.isVisible = true
+                binding.txtAddPostImage.isVisible = false
             }
         }
     private val viewModel: NewPostViewModel by viewModels<NewPostViewModelImpl>(
@@ -146,6 +149,7 @@ class NewPostFragment : Fragment() {
         setBtnCancelListener()
         setBtnUploadListener()
         setBtnAddPostImageListener()
+        setBtnRemovePostImageListener()
     }
 
     private fun setBtnCancelListener() {
@@ -164,6 +168,15 @@ class NewPostFragment : Fragment() {
         binding.btnAddPostImage.setOnClickListener {
             val mimeType = "image/jpeg"
             pickMedia.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.SingleMimeType(mimeType)))
+        }
+    }
+
+    private fun setBtnRemovePostImageListener() {
+        binding.btnRemovePostImage.setOnClickListener {
+            viewModel.removePostImage()
+            binding.btnAddPostImage.setImageResource(R.drawable.ic_add)
+            binding.btnRemovePostImage.isVisible = false
+            binding.txtAddPostImage.isVisible = true
         }
     }
 

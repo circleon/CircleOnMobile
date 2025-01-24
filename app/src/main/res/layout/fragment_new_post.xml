@@ -75,20 +75,48 @@
             android:layout_height="wrap_content"
             android:layout_marginVertical="@dimen/margin_padding_small"
             android:padding="@dimen/margin_padding_default"
+            android:gravity="center_vertical"
             android:background="@color/white"
+            android:orientation="horizontal"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/edtPostContent"
             app:layout_constraintBottom_toBottomOf="parent" >
 
-            <androidx.appcompat.widget.AppCompatImageView
-                android:id="@+id/btnAddPostImage"
-                android:layout_width="48dp"
-                android:layout_height="48dp"
-                android:src="@drawable/ic_lock"
-                android:scaleType="center"
-                android:clipToOutline="true"
-                android:background="@drawable/bg_rounded_rectangle"
-                android:backgroundTint="@color/grey_3" />
+            <FrameLayout
+                android:layout_width="72dp"
+                android:layout_height="72dp">
+
+                <androidx.appcompat.widget.AppCompatImageView
+                    android:id="@+id/btnAddPostImage"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:src="@drawable/ic_add"
+                    android:scaleType="center"
+                    android:clipToOutline="true"
+                    android:background="@drawable/bg_dotted_rounded_rectangle" />
+
+                <androidx.appcompat.widget.AppCompatImageView
+                    android:id="@+id/btnRemovePostImage"
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    android:layout_margin="@dimen/margin_padding_x_small"
+                    android:layout_gravity="top|end"
+                    android:src="@drawable/ic_cancel"
+                    app:tint="@color/grey_5"
+                    android:visibility="gone" />
+
+            </FrameLayout>
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/txtAddPostImage"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/margin_padding_large"
+                android:text="@string/add_image"
+                android:textColor="@color/grey_5"
+                android:textSize="@dimen/text_size_default"
+                android:lineSpacingExtra="2sp"
+                android:translationY="-1.06sp"/>
 
         </androidx.appcompat.widget.LinearLayoutCompat>
 

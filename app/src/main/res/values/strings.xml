@@ -73,8 +73,9 @@
     <!--Post Detail-->
     <string name="hint_comment">댓글을 입력해주세요.</string>
 
-    <!--Register Post-->
+    <!--New Post-->
     <string name="btn_finish">완료</string>
     <string name="hint_post_content">내용을 입력하세요.</string>
+    <string name="add_image">사진 추가하기</string>
 
 </resources>
