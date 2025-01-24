@@ -123,7 +123,7 @@ class CircleDetailNoticeFragment : Fragment() {
                     },
                 role = role,
             )
-        binding.rvCircleNotice.layoutManager = LinearLayoutManager(requireActivity())
+        binding.rvCircleNotice.layoutManager = LinearLayoutManager(activity)
     }
 
     private fun sendUserToNoticeDetailScreen(item: PostModel) {
@@ -133,8 +133,6 @@ class CircleDetailNoticeFragment : Fragment() {
                 bundleOf(
                     Pair(Const.TAG_CIRCLE_ID, circleId),
                     Pair(Const.TAG_CIRCLE_POST, item),
-                    // 상세 화면 진입 시에만 anim 작동, bottom tab 전환 시에는 작동 X
-                    Pair(Const.FLAG_ANIM_STATE, true),
                 ),
             )
     }
@@ -265,6 +263,7 @@ class CircleDetailNoticeFragment : Fragment() {
     private fun initListener() {
         setRvCircleNoticeListener()
         setBtnRetryListener()
+        setFabRegisterNoticeListener()
     }
 
     private fun setRvCircleNoticeListener() {
@@ -282,13 +281,16 @@ class CircleDetailNoticeFragment : Fragment() {
         binding.rvCircleNotice.adapter?.let {
             (it as CirclePostAdapter).update(viewModel.posts.add(PostModel.emptyInstance())) {}
         }
-        viewModel.scrollOver(circleId)
+        viewModel.scrollOver()
     }
 
     private fun setBtnRetryListener() {
         binding.btnRetry.setOnClickListener {
             viewModel.refresh()
         }
+    }
+
+    private fun setFabRegisterNoticeListener() {
     }
 
     override fun onDestroyView() {

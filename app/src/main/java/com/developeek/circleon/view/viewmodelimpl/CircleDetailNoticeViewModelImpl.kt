@@ -91,7 +91,7 @@ class CircleDetailNoticeViewModelImpl
             fetchNotices(DEFAULT_PAGE, (currentPage + 1) * SIZE_BY_PAGE)
         }
 
-        override fun scrollOver(circleId: Int) {
+        override fun scrollOver() {
             scrollOverNoticeJob?.cancel()
 
             scrollOverNoticeJob =
@@ -120,10 +120,6 @@ class CircleDetailNoticeViewModelImpl
 
         override fun saveScrollState(scrollState: Parcelable?) {
             this.scrollState = scrollState
-        }
-
-        override fun removeScrollState() {
-            this.scrollState = null
         }
 
         override fun setTopOrNot(isTop: Boolean) {
@@ -166,7 +162,7 @@ class CircleDetailNoticeViewModelImpl
 
             deleteNoticeJob =
                 viewModelScope.launch {
-                    val result = repository.deletePost(circleId, postId)
+                    val result = repository.deleteCirclePost(circleId, postId)
 
                     if (result is Success) {
                         refresh()

@@ -7,9 +7,11 @@ import androidx.lifecycle.viewModelScope
 import com.developeek.circleon.data.repository.CircleRepository
 import com.developeek.circleon.data.source.Error
 import com.developeek.circleon.data.source.Success
-import com.developeek.circleon.domain.model.CircleDetailModel
+import com.developeek.circleon.domain.enums.PostType
 import com.developeek.circleon.domain.state.UiState
-import com.developeek.circleon.view.viewmodel.CircleDetailViewModel
+import com.developeek.circleon.domain.utils.validator.Invalid
+import com.developeek.circleon.domain.utils.validator.Validator
+import com.developeek.circleon.view.viewmodel.NewPostViewModel
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
@@ -17,56 +19,47 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import java.io.File
 
-@HiltViewModel(assistedFactory = CircleDetailViewModelImpl.CircleDetailViewModelFactory::class)
-class CircleDetailViewModelImpl
+@HiltViewModel(assistedFactory = NewPostViewModelImpl.NewPostViewModelFactory::class)
+class NewPostViewModelImpl
     @AssistedInject
     constructor(
-        @Assisted private val circleId: Int,
+        @Assisted("circleId") private val circleId: Int,
+        @Assisted("postType") private val postType: PostType,
         private val repository: CircleRepository,
-    ) : CircleDetailViewModel, ViewModel() {
-        @AssistedFactory interface CircleDetailViewModelFactory {
-            fun create(circleId: Int): CircleDetailViewModelImpl
+    ) : NewPostViewModel, ViewModel() {
+        @AssistedFactory
+        interface NewPostViewModelFactory {
+            fun create(
+                @Assisted("circleId") circleId: Int,
+                @Assisted("postType") postType: PostType,
+            ): NewPostViewModelImpl
         }
 
         override val state: LiveData<UiState>
             get() = uiState
         private val uiState = MutableLiveData<UiState>()
 
-        override lateinit var circleDetail: CircleDetailModel
-        private var fetchCircleDetailJob: Job? = null
-        override val circleDetailInitialized: Boolean
-            get() = isCircleDetailInitialized
-        private var isCircleDetailInitialized = false
-
-        override val currentTabPosition: Int
-            get() = tabPosition
-        private var tabPosition = 0
-
-        override val currentAppBarExpanded: Boolean
-            get() = appBarExpanded
-        private var appBarExpanded = true
-
+        private var image: File? = null
+        private var uploadPostJob: Job? = null
         private var loadingStartTime = 0L
+
         override lateinit var error: String
 
-        init {
-            fetchCircleDetail()
-        }
+        override fun upload(content: String) {
+            if (!isContentFormat(content)) return
 
-        private fun fetchCircleDetail() {
-            fetchCircleDetailJob?.cancel()
+            uploadPostJob?.cancel()
             uiState.postValue(UiState.Loading)
             saveLoadingStartTime()
 
-            fetchCircleDetailJob =
+            uploadPostJob =
                 viewModelScope.launch {
-                    val result = repository.getCircleDetail(circleId)
+                    val result = repository.postCirclePost(circleId, postType, content, image)
                     delay(remainedLoadingTime())
 
                     if (result is Success) {
-                        circleDetail = result.data
-                        if (!isCircleDetailInitialized) isCircleDetailInitialized = true
                         uiState.postValue(UiState.Success)
                     } else {
                         error = (result as Error).message()
@@ -79,16 +72,24 @@ class CircleDetailViewModelImpl
                 }
         }
 
-        override fun refresh() {
-            fetchCircleDetail()
+        private fun isContentFormat(content: String): Boolean {
+            val validation = Validator.checkContent(content)
+
+            return if (validation is Invalid) {
+                error = validation.message()
+                uiState.postValue(UiState.ServiceError)
+                false
+            } else {
+                true
+            }
         }
 
-        override fun setTabPosition(position: Int) {
-            tabPosition = position
+        override fun setPostImage(image: File?) {
+            this.image = image
         }
 
-        override fun setAppBarExpanded(expanded: Boolean) {
-            appBarExpanded = expanded
+        override fun removePostImage() {
+            this.image = null
         }
 
         private fun saveLoadingStartTime() {

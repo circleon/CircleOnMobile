@@ -62,7 +62,7 @@ class CircleDetailIntroductionFragment : Fragment() {
         if (circleDetail.introImgUrl == null) {
             binding.imgCircleIntroduction.isVisible = false
         } else {
-            glideProvider.callImage(circleDetail.introImgUrl!!, requireActivity(), binding.imgCircleIntroduction)
+            glideProvider.fetchImage(circleDetail.introImgUrl!!, requireActivity(), binding.imgCircleIntroduction)
         }
     }
 

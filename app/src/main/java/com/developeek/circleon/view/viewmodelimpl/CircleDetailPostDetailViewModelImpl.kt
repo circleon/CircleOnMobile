@@ -1,5 +1,6 @@
 package com.developeek.circleon.view.viewmodelimpl
 
+import android.os.Parcelable
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -8,13 +9,19 @@ import com.developeek.circleon.data.repository.CircleRepository
 import com.developeek.circleon.data.source.Error
 import com.developeek.circleon.data.source.Success
 import com.developeek.circleon.domain.model.CommentModels
+import com.developeek.circleon.domain.model.Identifiable
+import com.developeek.circleon.domain.model.PostModel
 import com.developeek.circleon.domain.state.UiState
+import com.developeek.circleon.domain.utils.validator.Invalid
+import com.developeek.circleon.domain.utils.validator.Validator
+import com.developeek.circleon.view.listener.RecyclerViewInfiniteScrollListener
 import com.developeek.circleon.view.viewmodel.CircleDetailPostDetailViewModel
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 @HiltViewModel(assistedFactory = CircleDetailPostDetailViewModelImpl.CircleDetailPostDetailViewModelFactory::class)
@@ -22,14 +29,14 @@ class CircleDetailPostDetailViewModelImpl
     @AssistedInject
     constructor(
         @Assisted("circleId") private val circleId: Int,
-        @Assisted("postId") private val postId: Int,
+        @Assisted("post") private val post: PostModel,
         private val repository: CircleRepository,
     ) : CircleDetailPostDetailViewModel, ViewModel() {
         @AssistedFactory
         interface CircleDetailPostDetailViewModelFactory {
             fun create(
                 @Assisted("circleId") circleId: Int,
-                @Assisted("postId") postId: Int,
+                @Assisted("post") post: PostModel,
             ): CircleDetailPostDetailViewModelImpl
         }
 
@@ -38,31 +45,43 @@ class CircleDetailPostDetailViewModelImpl
         private val uiState = MutableLiveData<UiState>()
         private lateinit var tmpState: UiState
 
-        override val registerCommentState: LiveData<Boolean> // 댓글 등록 성공 확인용
+        override val registerCommentState: LiveData<UiState>
             get() = commentRegisterState
-        private val commentRegisterState = MutableLiveData<Boolean>()
+        private val commentRegisterState = MutableLiveData<UiState>()
         private var registerCommentJob: Job? = null
 
-        override val deletePostState: LiveData<Boolean>
+        override val deletePostState: LiveData<UiState>
             get() = postDeleteState
-        private val postDeleteState = MutableLiveData<Boolean>()
+        private val postDeleteState = MutableLiveData<UiState>()
         private var deletePostJob: Job? = null
 
-        override val deleteCommentState: LiveData<Boolean>
+        override val deleteCommentState: LiveData<UiState>
             get() = commentDeleteState
-        private val commentDeleteState = MutableLiveData<Boolean>()
+        private val commentDeleteState = MutableLiveData<UiState>()
         private var deleteCommentJob: Job? = null
 
+        override lateinit var contents: List<Identifiable>
         override lateinit var comments: CommentModels
         private var fetchCommentJob: Job? = null
         private var currentPage = DEFAULT_PAGE
 
+        override val scrollOver: LiveData<Boolean>
+            get() = scrollOverCompleted
+        private var scrollOverCompleted = MutableLiveData<Boolean>()
+        private var scrollOverCommentJob: Job? = null
+        override val scrollListener = RecyclerViewInfiniteScrollListener()
+        override val currentScrollState: Parcelable?
+            get() = scrollState
+        private var scrollState: Parcelable? = null
+
         private var enterAnimFinished = false
+        private var loadingStartTime = 0L
 
         override lateinit var error: String
 
         init {
-            uiState.postValueWhenAnimFinished(UiState.Loading)
+            uiState.postValue(UiState.Loading)
+            saveLoadingStartTime()
             fetchComments(currentPage, SIZE_BY_PAGE)
         }
 
@@ -71,13 +90,16 @@ class CircleDetailPostDetailViewModelImpl
             size: Int,
         ) {
             fetchCommentJob?.cancel()
+            scrollOverCommentJob?.cancel()
 
             fetchCommentJob =
                 viewModelScope.launch {
-                    val result = repository.getPostComments(circleId, postId, page, size)
+                    val result = repository.getPostComments(circleId, post.id, page, size)
+                    delay(remainedLoadingTime())
 
                     if (result is Success) {
                         comments = result.data
+                        contents = listOf(post) + comments.get()
                         uiState.postValueWhenAnimFinished(UiState.Success)
                     } else {
                         error = (result as Error).message()
@@ -94,26 +116,79 @@ class CircleDetailPostDetailViewModelImpl
             fetchComments(DEFAULT_PAGE, (currentPage + 1) * SIZE_BY_PAGE)
         }
 
+        override fun scrollOver() {
+            scrollOverCommentJob?.cancel()
+
+            scrollOverCommentJob =
+                viewModelScope.launch {
+                    val result =
+                        repository.getPostComments(
+                            circleId, post.id, currentPage + 1, SIZE_BY_PAGE,
+                        )
+
+                    if (result is Success) {
+                        comments =
+                            comments.addAll(result.data).also {
+                                if (result.data.isLastPage()) {
+                                    it.setAsLast()
+                                }
+                            }
+                        contents = listOf(post) + comments.get()
+                        currentPage++
+                        scrollOverCompleted.postValue(true)
+                    } else {
+                        error = (result as Error).message()
+                        val errorState =
+                            if (result.isAuthenticationError()) UiState.AuthenticationError else UiState.ServiceError
+                        uiState.postValueWhenAnimFinished(errorState)
+                    }
+                }
+        }
+
+        override fun saveScrollState(scrollState: Parcelable?) {
+            this.scrollState = scrollState
+        }
+
         override fun notifyEnterAnimFinishedAndUpdateUI() {
             enterAnimFinished = true
             if (::tmpState.isInitialized) uiState.postValue(tmpState)
         }
 
         override fun registerComment(comment: String) {
+            if (!isCommentFormat(comment)) return
+
             registerCommentJob?.cancel()
+            commentRegisterState.postValueWhenAnimFinished(UiState.Loading)
+            saveLoadingStartTime()
 
             registerCommentJob =
                 viewModelScope.launch {
-                    val result = repository.postComment(circleId, postId, comment)
+                    val result = repository.postCircleComment(circleId, post.id, comment)
+                    delay(remainedLoadingTime())
 
                     if (result is Success) {
-                        comments = comments.add(result.data)
-                        commentRegisterState.postValueWhenAnimFinished(true)
+                        delay(200)
+                        refresh()
+                        commentRegisterState.postValueWhenAnimFinished(UiState.Success)
                     } else {
                         error = (result as Error).message()
-                        commentRegisterState.postValueWhenAnimFinished(false)
+                        val errorState =
+                            if (result.isAuthenticationError()) UiState.AuthenticationError else UiState.ServiceError
+                        commentRegisterState.postValueWhenAnimFinished(errorState)
                     }
                 }
+        }
+
+        private fun isCommentFormat(comment: String): Boolean {
+            val validation = Validator.checkContent(comment)
+
+            return if (validation is Invalid) {
+                error = validation.message()
+                commentRegisterState.postValueWhenAnimFinished(UiState.ServiceError)
+                false
+            } else {
+                true
+            }
         }
 
         /**
@@ -142,39 +217,69 @@ class CircleDetailPostDetailViewModelImpl
 
         override fun delete() {
             deletePostJob?.cancel()
+            postDeleteState.postValue(UiState.Loading)
+            saveLoadingStartTime()
 
             deletePostJob =
                 viewModelScope.launch {
-                    val result = repository.deletePost(circleId, postId)
+                    val result = repository.deleteCirclePost(circleId, post.id)
+                    delay(remainedLoadingTime())
 
                     if (result is Success) {
-                        postDeleteState.postValue(true)
+                        postDeleteState.postValueWhenAnimFinished(UiState.Success)
                     } else {
                         error = (result as Error).message()
-                        postDeleteState.postValue(false)
+                        val errorState =
+                            if (result.isAuthenticationError()) UiState.AuthenticationError else UiState.ServiceError
+                        postDeleteState.postValueWhenAnimFinished(errorState)
                     }
                 }
         }
 
         override fun deleteComment(commentId: Int) {
             deleteCommentJob?.cancel()
+            commentDeleteState.postValueWhenAnimFinished(UiState.Loading)
+            saveLoadingStartTime()
 
             deleteCommentJob =
                 viewModelScope.launch {
-                    val result = repository.deleteComment(circleId, postId, commentId)
+                    val result = repository.deletePostComment(circleId, post.id, commentId)
+                    delay(remainedLoadingTime())
 
                     if (result is Success) {
-                        comments = comments.remove(commentId)
-                        commentDeleteState.postValue(true)
+                        comments =
+                            comments.remove(commentId).also {
+                                if (comments.isLastPage()) it.setAsLast()
+                            }
+                        contents = listOf(post) + comments.get()
+                        commentDeleteState.postValueWhenAnimFinished(UiState.Success)
                     } else {
                         error = (result as Error).message()
-                        commentDeleteState.postValue(false)
+                        val errorState =
+                            if (result.isAuthenticationError()) UiState.AuthenticationError else UiState.ServiceError
+                        commentDeleteState.postValueWhenAnimFinished(errorState)
                     }
                 }
         }
 
+        private fun saveLoadingStartTime() {
+            this.loadingStartTime = System.currentTimeMillis()
+        }
+
+        /**
+         * remainedLoadingTime()
+         *
+         * 코루틴 수행 시 LoadingState 에 머무르는 최소 시간을 계산하여 보장
+         */
+        private fun remainedLoadingTime(): Long {
+            val remainTime = MAX_DEFAULT_ANIM_TIME_MILLIS - (System.currentTimeMillis() - loadingStartTime)
+
+            return if (remainTime > 0) remainTime else 0
+        }
+
         companion object {
-            private const val SIZE_BY_PAGE = 100
+            private const val SIZE_BY_PAGE = 10
             private const val DEFAULT_PAGE = 0
+            private const val MAX_DEFAULT_ANIM_TIME_MILLIS = 200L
         }
     }

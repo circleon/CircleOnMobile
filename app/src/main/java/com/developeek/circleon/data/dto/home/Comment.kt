@@ -21,6 +21,6 @@ data class Comment(
         )
 }
 
-data class CommentContent(
+data class RequestBodyComment(
     val content: String,
 )

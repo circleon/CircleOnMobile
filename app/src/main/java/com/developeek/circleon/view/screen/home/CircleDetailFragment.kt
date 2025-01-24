@@ -16,6 +16,7 @@ import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.RecyclerView
 import com.developeek.circleon.R
 import com.developeek.circleon.databinding.FragmentCircleDetailBinding
+import com.developeek.circleon.domain.enums.PostType
 import com.developeek.circleon.domain.state.UiState
 import com.developeek.circleon.domain.utils.Const
 import com.developeek.circleon.domain.utils.Utils
@@ -33,6 +34,8 @@ import javax.inject.Inject
 class CircleDetailFragment : Fragment() {
     private lateinit var binding: FragmentCircleDetailBinding
     private lateinit var fragmentManager: FragmentManager
+    private var circleId: Int = 0
+    private lateinit var circleName: String
     private val viewModel: CircleDetailViewModel by viewModels<CircleDetailViewModelImpl>(
         extrasProducer = {
             defaultViewModelCreationExtras
@@ -41,8 +44,6 @@ class CircleDetailFragment : Fragment() {
                 }
         },
     )
-    private var circleId: Int = 0
-    private lateinit var circleName: String
 
     @Inject
     lateinit var glideProvider: GlideProvider
@@ -114,19 +115,22 @@ class CircleDetailFragment : Fragment() {
         Observer<UiState> {
             when (it) {
                 UiState.Loading -> {
-                    toggleView(binding.pgbLoading)
+                    binding.pgbContentLoading.isVisible = true
                 }
                 UiState.Success -> {
+                    binding.pgbContentLoading.isVisible = false
                     toggleView(binding.flCircleDetail)
                     loadCircleDetail(activity)
                 }
                 UiState.AuthenticationError -> {
+                    binding.pgbContentLoading.isVisible = false
                     sendUserToLoginScreen(activity)
                     if (ErrorToast.previousFinished()) {
                         ErrorToast(activity, viewModel.error).show()
                     }
                 }
                 UiState.ServiceError -> {
+                    binding.pgbContentLoading.isVisible = false
                     toggleView(binding.llServiceError)
                     if (ErrorToast.previousFinished()) {
                         ErrorToast(activity, viewModel.error).show()
@@ -138,7 +142,7 @@ class CircleDetailFragment : Fragment() {
     private fun loadCircleDetail(activity: Activity) {
         binding.tlCircleDetail.getTabAt(viewModel.currentTabPosition)?.select() // 탭 복원
         viewModel.circleDetail.thumbnailUrl?.let {
-            glideProvider.callImage(it, activity, binding.imgCircleThumbnail)
+            glideProvider.fetchImage(it, activity, binding.imgCircleThumbnail)
         }
         binding.txtCircleCategory.text = viewModel.circleDetail.category.categoryName()
         binding.txtCircleMemberCount.text = String.format(MEMBER_COUNT_UNIT, viewModel.circleDetail.memberCount)
@@ -182,36 +186,39 @@ class CircleDetailFragment : Fragment() {
             object : TabLayout.OnTabSelectedListener {
                 override fun onTabSelected(tab: TabLayout.Tab?) {
                     viewModel.setTabPosition(tab?.position!!)
-                    replaceByTabPosition()
+                    if (viewModel.circleDetailInitialized) {
+                        replaceScreenByTabPosition()
+                        replaceFabContentByTabPosition()
+                    }
                 }
 
                 override fun onTabUnselected(p0: TabLayout.Tab?) {
                 }
 
                 override fun onTabReselected(p0: TabLayout.Tab?) {
-                    resetScrollByTabPosition()
+                    if (viewModel.circleDetailInitialized) {
+                        resetScrollByTabPosition()
+                    }
                 }
             },
         )
     }
 
-    private fun replaceByTabPosition() {
+    private fun replaceScreenByTabPosition() {
         val bundle = Bundle()
 
-        if (viewModel.circleDetailInitialized) {
-            when (viewModel.currentTabPosition) {
-                0 -> {
-                    replaceToIntroductionScreen(bundle)
-                }
-                1 -> {
-                    replaceToNoticeScreen(bundle)
-                }
-                2 -> {
-                    replaceToPostScreen(bundle)
-                }
-                3 -> {
-                    replaceToPhotoScreen(bundle)
-                }
+        when (viewModel.currentTabPosition) {
+            0 -> {
+                replaceToIntroductionScreen(bundle)
+            }
+            1 -> {
+                replaceToNoticeScreen(bundle)
+            }
+            2 -> {
+                replaceToPostScreen(bundle)
+            }
+            3 -> {
+                replaceToPhotoScreen(bundle)
             }
         }
     }
@@ -259,20 +266,48 @@ class CircleDetailFragment : Fragment() {
             .commit()
     }
 
+    private fun replaceFabContentByTabPosition() {
+        val bundle = Bundle()
+
+        when (viewModel.currentTabPosition) {
+            0 -> {
+                binding.fabRegisterCircleContent.isVisible = false
+            }
+            1 -> {
+                binding.fabRegisterCircleContent.isVisible = viewModel.circleDetail.isExecutive()
+                binding.fabRegisterCircleContent.setOnClickListener {
+                    bundle.putInt(Const.TAG_CIRCLE_ID, circleId)
+                    bundle.putSerializable(Const.TAG_POST_TYPE, PostType.NOTICE)
+                    findNavController().navigate(R.id.action_circleDetailFragment_to_newPostFragment, bundle)
+                }
+            }
+            2 -> {
+                binding.fabRegisterCircleContent.isVisible = viewModel.circleDetail.isMember()
+                binding.fabRegisterCircleContent.setOnClickListener {
+                    bundle.putInt(Const.TAG_CIRCLE_ID, circleId)
+                    bundle.putSerializable(Const.TAG_POST_TYPE, PostType.POST)
+                    findNavController().navigate(R.id.action_circleDetailFragment_to_newPostFragment, bundle)
+                }
+            }
+            3 -> {
+                // TODO: 활동 사진 기능 추가 후 fab src 교체 및 리스너 설정
+                binding.fabRegisterCircleContent.isVisible = false
+            }
+        }
+    }
+
     private fun resetScrollByTabPosition() {
         val bundle = Bundle()
 
-        if (viewModel.circleDetailInitialized) {
-            when (viewModel.currentTabPosition) {
-                0 -> {
-                    replaceToIntroductionScreen(bundle)
-                }
-                1 -> {
-                    resetScrollOfNoticeView()
-                }
-                2 -> {
-                    resetScrollOfPostView()
-                }
+        when (viewModel.currentTabPosition) {
+            0 -> {
+                replaceToIntroductionScreen(bundle)
+            }
+            1 -> {
+                resetScrollOfNoticeView()
+            }
+            2 -> {
+                resetScrollOfPostView()
             }
         }
     }
@@ -305,7 +340,6 @@ class CircleDetailFragment : Fragment() {
 
     private fun toggleView(view: View) {
         binding.flCircleDetail.isVisible = view == binding.flCircleDetail
-        binding.pgbLoading.isVisible = view == binding.pgbLoading
         binding.llServiceError.isVisible = view == binding.llServiceError
     }
 

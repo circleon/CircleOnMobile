@@ -6,6 +6,7 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.isVisible
 import androidx.navigation.NavController
+import androidx.navigation.NavDestination
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.NavigationUI
 import com.developeek.circleon.R
@@ -43,13 +44,18 @@ class HomeActivity : AppCompatActivity() {
     private fun setDestinationChangedListener() {
         navController.addOnDestinationChangedListener { _, destination, _ ->
             onMainFragment = destination.id == R.id.homeFragment
-            if (destination.id == R.id.searchCircleFragment || destination.id == R.id.circleDetailPostDetailFragment) {
+            if (whenHideBtmNav(destination)) {
                 binding.btmNav.isVisible = false
             } else if (!binding.btmNav.isVisible) {
                 binding.btmNav.isVisible = true
             }
         }
     }
+
+    private fun whenHideBtmNav(destination: NavDestination) =
+        destination.id == R.id.searchCircleFragment ||
+            destination.id == R.id.circleDetailPostDetailFragment ||
+            destination.id == R.id.newPostFragment
 
     private fun initFinishWaitingToast() {
         finishWaitingToast =

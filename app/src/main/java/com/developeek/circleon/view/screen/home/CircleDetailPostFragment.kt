@@ -120,7 +120,7 @@ class CircleDetailPostFragment : Fragment() {
                     },
                 userId = userManager.getUser()?.id,
             )
-        binding.rvCirclePost.layoutManager = LinearLayoutManager(requireActivity())
+        binding.rvCirclePost.layoutManager = LinearLayoutManager(activity)
     }
 
     private fun sendUserToPostDetailFragment(item: PostModel) {
@@ -130,8 +130,6 @@ class CircleDetailPostFragment : Fragment() {
                 bundleOf(
                     Pair(Const.TAG_CIRCLE_ID, circleId),
                     Pair(Const.TAG_CIRCLE_POST, item),
-                    // 상세 화면 진입 시에만 anim 작동, bottom tab 전환 시에는 작동 X
-                    Pair(Const.FLAG_ANIM_STATE, true),
                 ),
             )
     }
@@ -264,7 +262,7 @@ class CircleDetailPostFragment : Fragment() {
         binding.rvCirclePost.adapter?.let {
             (it as CirclePostAdapter).update(viewModel.posts.add(PostModel.emptyInstance())) {}
         }
-        viewModel.scrollOver(circleId)
+        viewModel.scrollOver()
     }
 
     private fun setBtnRetryListener() {

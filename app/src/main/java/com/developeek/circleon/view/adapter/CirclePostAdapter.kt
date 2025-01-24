@@ -68,14 +68,13 @@ class CirclePostAdapter(
             loadAuthor(post)
             loadPost(post)
             hideOverFlowOrNot(post)
-            setItemClickListener(post)
             notifyListenerItemChanged(post)
         }
 
         private fun loadAuthor(post: PostModel) {
             binding.txtAuthorName.text = post.author.name
             post.author.profileUrl?.let {
-                glideProvider.callImage(it, activity, binding.imgAuthorProfile)
+                glideProvider.fetchImage(it, activity, binding.imgAuthorProfile)
             } ?: binding.imgAuthorProfile.setImageResource(R.drawable.ic_author_placeholder)
             binding.txtCreated.text =
                 post.createdAt.format(
@@ -93,7 +92,7 @@ class CirclePostAdapter(
                     post.commentCount,
                 )
             post.imgUrl?.let {
-                glideProvider.callImage(it, activity, binding.imgPost)
+                glideProvider.fetchImage(it, activity, binding.imgPost)
             }
             binding.imgNoticePin.isVisible = post.isPinned
         }
@@ -103,14 +102,8 @@ class CirclePostAdapter(
                 userId?.let {
                     binding.btnPostOverflow.isVisible = it == post.author.id
                 }
-            } else if (post.type.isNotice() && role.isExecutive()) {
-                binding.btnPostOverflow.isVisible = true
-            }
-        }
-
-        private fun setItemClickListener(post: PostModel) {
-            binding.clItemCirclePost.setOnClickListener {
-                itemListenerInitializer.initialize(post)
+            } else if (post.type.isNotice()) {
+                binding.btnPostOverflow.isVisible = role.isExecutive()
             }
         }
 
@@ -162,6 +155,7 @@ class CirclePostAdapter(
                     itemListenerInitializer.initialize(item)
                 }
             }
+        binding.clItemCirclePost.setOnClickListener(itemClickListener)
         binding.imgPost.isVisible = viewType == VIEW_TYPE_ITEM_WITH_IMAGE
         return CirclePostAdapterItemViewHolder(binding, overflowClickListener, itemClickListener)
     }

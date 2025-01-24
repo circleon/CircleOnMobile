@@ -88,7 +88,7 @@ class CircleDetailPostViewModelImpl
             fetchPosts(DEFAULT_PAGE, (currentPage + 1) * SIZE_BY_PAGE)
         }
 
-        override fun scrollOver(circleId: Int) {
+        override fun scrollOver() {
             scrollOverPostJob?.cancel()
 
             scrollOverPostJob =
@@ -119,10 +119,6 @@ class CircleDetailPostViewModelImpl
             this.scrollState = scrollState
         }
 
-        override fun removeScrollState() {
-            this.scrollState = null
-        }
-
         override fun setTopOrNot(isTop: Boolean) {
             this.isTop = isTop
         }
@@ -132,7 +128,7 @@ class CircleDetailPostViewModelImpl
 
             deletePostJob =
                 viewModelScope.launch {
-                    val result = repository.deletePost(circleId, postId)
+                    val result = repository.deleteCirclePost(circleId, postId)
 
                     if (result is Success) {
                         refresh()

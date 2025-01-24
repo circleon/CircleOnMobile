@@ -32,7 +32,7 @@ data class PostModels(private val models: List<PostModel>) {
 }
 
 data class PostModel(
-    val id: Int,
+    override val id: Int,
     val type: PostType,
     val isPinned: Boolean,
     val imgUrl: String?,
@@ -41,8 +41,10 @@ data class PostModel(
     val updatedAt: LocalDateTime,
     val commentCount: Int,
     val author: AuthorModel,
-) : Serializable {
-    fun isSame(postModel: PostModel) = this.id == postModel.id
+) : Serializable, Identifiable {
+    override fun isSame(target: Identifiable) = this.id == target.id
+
+    override fun areContentsSame(target: Identifiable) = this == target
 
     fun isNotice() = this.type.isNotice()
 

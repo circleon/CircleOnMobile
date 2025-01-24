@@ -1,9 +1,9 @@
 package com.developeek.circleon.domain.utils.glide
 
 import android.content.Context
+import android.net.Uri
 import android.widget.ImageView
 import com.bumptech.glide.Glide
-import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.bumptech.glide.load.model.GlideUrl
 import com.bumptech.glide.load.model.LazyHeaders
 import com.developeek.circleon.data.source.manager.TokenManager
@@ -14,7 +14,7 @@ import javax.inject.Singleton
 class GlideProvider
     @Inject
     constructor(private val tokenManager: TokenManager) {
-        fun callImage(
+        fun fetchImage(
             url: String,
             parent: Context,
             view: ImageView,
@@ -22,14 +22,11 @@ class GlideProvider
             var glideUrl: GlideUrl? = null
 
             tokenManager.getAccessToken()?.let {
-                val imageExtension = getImageExtension(url)
-
                 glideUrl =
                     GlideUrl(
-                        url.substring(0, url.length - imageExtension.length - 1),
+                        url,
                         LazyHeaders.Builder()
                             .addHeader(AUTHORIZATION, "Bearer $it")
-                            .addHeader(CONTENT_TYPE, "image/$imageExtension")
                             .build(),
                     )
             }
@@ -37,22 +34,18 @@ class GlideProvider
             glideUrl?.let {
                 Glide.with(parent)
                     .load(it)
-                    .diskCacheStrategy(DiskCacheStrategy.ALL)
                     .into(view)
             }
         }
 
-        private fun getImageExtension(url: String): String {
-            var symbolIdx = 0
-
-            for (i in (url.length - 1) downTo 0) {
-                if (url[i] == EXTENSION_SYMBOL) {
-                    symbolIdx = i
-                    break
-                }
-            }
-
-            return url.substring(symbolIdx + 1, url.length)
+        fun loadImage(
+            uri: Uri,
+            parent: Context,
+            view: ImageView,
+        ) {
+            Glide.with(parent)
+                .load(uri)
+                .into(view)
         }
 
         companion object {

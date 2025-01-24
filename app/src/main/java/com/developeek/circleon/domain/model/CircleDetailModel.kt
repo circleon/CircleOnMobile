@@ -21,4 +21,6 @@ data class CircleDetailModel(
     val recruitmentEndDate: LocalDateTime?,
 ) : Serializable {
     fun isMember() = role.isMember()
+
+    fun isExecutive() = role.isExecutive()
 }

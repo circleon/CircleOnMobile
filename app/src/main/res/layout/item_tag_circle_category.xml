@@ -5,8 +5,7 @@
     android:id="@+id/clItemCircleCategory"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
-    android:layout_marginEnd="@dimen/margin_padding_small"
-    android:clickable="true">
+    android:layout_marginEnd="@dimen/margin_padding_small">
 
     <androidx.appcompat.widget.AppCompatTextView
         android:id="@+id/txtCircleCategory"

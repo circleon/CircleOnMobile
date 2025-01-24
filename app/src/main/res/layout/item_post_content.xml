@@ -2,51 +2,29 @@
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/clItemCirclePost"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_marginTop="@dimen/margin_padding_small"
+    android:layout_marginVertical="@dimen/margin_padding_small"
     android:paddingVertical="@dimen/margin_padding_large"
     android:background="@color/white">
 
-    <androidx.appcompat.widget.AppCompatImageView
-        android:id="@+id/imgNoticePin"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:src="@drawable/ic_pin"
-        android:paddingStart="@dimen/margin_padding_large"
-        android:layout_marginBottom="@dimen/margin_padding_small"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintBottom_toTopOf="@id/llContent"
-        android:visibility="gone"/>
-
-    <androidx.constraintlayout.widget.ConstraintLayout
+    <androidx.appcompat.widget.LinearLayoutCompat
         android:id="@+id/llContent"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="@dimen/margin_padding_large"
         android:orientation="vertical"
-        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/imgNoticePin"
-        app:layout_constraintBottom_toTopOf="@id/llComment"
-        app:layout_constrainedWidth="true"
-        app:layout_constrainedHeight="true"
-        app:layout_constraintHorizontal_bias="0"
-        app:layout_constraintVertical_bias="0">
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent">
 
         <androidx.appcompat.widget.LinearLayoutCompat
-            android:id="@+id/llAuthor"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginBottom="@dimen/margin_padding_large"
-            android:paddingStart="@dimen/margin_padding_large"
             android:gravity="center_vertical"
             android:orientation="horizontal"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintBottom_toTopOf="@id/txtPostContent">
+            android:paddingStart="@dimen/margin_padding_large">
 
             <androidx.appcompat.widget.AppCompatImageView
                 android:id="@+id/imgAuthorProfile"
@@ -92,35 +70,26 @@
             android:paddingHorizontal="@dimen/margin_padding_large"
             android:textSize="@dimen/text_size_default"
             android:textColor="@color/grey_9"
+            android:autoLink="web"
+            android:linksClickable="true"
+            android:textColorLink="@android:color/holo_blue_light"
             android:lineSpacingExtra="2sp"
             android:translationY="-1.06sp"
-            android:maxLines="2"
-            android:ellipsize="end"
-            tools:text="게시글 컨텐츠"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/llAuthor"
-            app:layout_constraintBottom_toTopOf="@id/imgPost"
-            app:layout_constraintHorizontal_bias="0"/>
+            tools:text="게시글 컨텐츠"/>
 
         <androidx.appcompat.widget.AppCompatImageView
             android:id="@+id/imgPost"
             android:layout_width="match_parent"
-            android:layout_height="0dp"
+            android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/margin_padding_large"
             android:layout_marginHorizontal="@dimen/margin_padding_large"
             android:background="@drawable/bg_rounded_rectangle"
             android:backgroundTint="@color/white"
-            android:scaleType="centerCrop"
             android:clipToOutline="true"
-            app:layout_constraintDimensionRatio="3:2"
-            app:layout_constraintTop_toBottomOf="@id/txtPostContent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintBottom_toBottomOf="parent"
-            android:visibility="gone"/>
+            android:adjustViewBounds="true"
+            android:visibility="gone" />
 
-    </androidx.constraintlayout.widget.ConstraintLayout>
+    </androidx.appcompat.widget.LinearLayoutCompat>
 
     <androidx.appcompat.widget.AppCompatImageView
         android:id="@+id/btnPostOverflow"
@@ -128,39 +97,11 @@
         android:layout_height="wrap_content"
         android:layout_marginEnd="@dimen/margin_padding_x_small"
         android:paddingHorizontal="@dimen/margin_padding_default"
-        android:background="?attr/selectableItemBackgroundBorderless"
         android:src="@drawable/ic_overflow"
+        app:tint="@color/grey_6"
+        android:background="?attr/selectableItemBackgroundBorderless"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        />
-
-    <androidx.appcompat.widget.LinearLayoutCompat
-        android:id="@+id/llComment"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:paddingEnd="@dimen/margin_padding_large"
-        android:orientation="horizontal"
-        android:gravity="center"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent">
-
-        <androidx.appcompat.widget.AppCompatImageView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="@dimen/margin_padding_small"
-            android:src="@drawable/ic_comment"/>
-
-        <androidx.appcompat.widget.AppCompatTextView
-            android:id="@+id/txtCommentCount"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="2dp"
-            android:textSize="@dimen/text_size_small"
-            android:textColor="@color/grey_9"
-            android:lineSpacingExtra="2sp"
-            android:translationY="-0.91sp"
-            tools:text="0개"/>
-
-    </androidx.appcompat.widget.LinearLayoutCompat>
+        android:visibility="gone"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
