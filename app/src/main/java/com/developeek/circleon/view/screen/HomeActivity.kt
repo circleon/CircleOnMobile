@@ -44,9 +44,7 @@ class HomeActivity : AppCompatActivity() {
     private fun setDestinationChangedListener() {
         navController.addOnDestinationChangedListener { _, destination, _ ->
             onMainFragment = destination.id == R.id.homeFragment
-            if (whenHideBtmNav(destination)) {
-                binding.btmNav.isVisible = false
-            } else if (!binding.btmNav.isVisible) {
+            if (!whenHideBtmNav(destination) && !binding.btmNav.isVisible) {
                 binding.btmNav.isVisible = true
             }
         }

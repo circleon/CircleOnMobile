@@ -29,6 +29,7 @@ import com.developeek.circleon.view.screen.login.LoginActivity
 import com.developeek.circleon.view.viewmodel.SearchViewModel
 import com.developeek.circleon.view.viewmodelimpl.SearchViewModelImpl
 import com.developeek.circleon.view.widget.ErrorToast
+import com.google.android.material.bottomnavigation.BottomNavigationView
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -60,6 +61,7 @@ class SearchCircleFragment : Fragment() {
     private fun initView(activity: Activity) {
         initRecyclerView()
         initSoftKeyboard(activity)
+        hideBtmNav(activity)
     }
 
     private fun initRecyclerView() {
@@ -105,6 +107,10 @@ class SearchCircleFragment : Fragment() {
 
     private fun initSoftKeyboard(activity: Activity) {
         showSoftInput(binding.edtSearchCircle, activity)
+    }
+
+    private fun hideBtmNav(activity: Activity) {
+        activity.findViewById<BottomNavigationView>(R.id.btmNav).isVisible = false
     }
 
     private fun initObserver(activity: Activity) {
