@@ -6,6 +6,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.WindowManager
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
@@ -81,6 +82,7 @@ class UploadPostFragment : Fragment() {
                     }
                 }
         }
+        activity?.window?.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE)
     }
 
     override fun onCreateView(
@@ -248,6 +250,12 @@ class UploadPostFragment : Fragment() {
                 ContextCompat.getDrawable(activity, R.drawable.bg_dotted_rounded_rectangle),
             )
         }
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+
+        activity?.window?.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_PAN) // softInputMode 복원
     }
 
     companion object {

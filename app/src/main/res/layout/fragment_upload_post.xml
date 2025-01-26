@@ -74,7 +74,9 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="@dimen/margin_padding_small"
-            android:padding="@dimen/margin_padding_default"
+            android:paddingTop="@dimen/margin_padding_x_small"
+            android:paddingBottom="@dimen/margin_padding_small"
+            android:paddingStart="@dimen/margin_padding_large"
             android:gravity="center_vertical"
             android:background="@color/white"
             android:orientation="horizontal"
@@ -83,13 +85,14 @@
             app:layout_constraintBottom_toBottomOf="parent" >
 
             <FrameLayout
-                android:layout_width="72dp"
-                android:layout_height="72dp">
+                android:layout_width="60dp"
+                android:layout_height="60dp">
 
                 <androidx.appcompat.widget.AppCompatImageView
                     android:id="@+id/btnAddPostImage"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
+                    android:layout_width="56dp"
+                    android:layout_height="56dp"
+                    android:layout_gravity="start|bottom"
                     android:src="@drawable/ic_add"
                     android:scaleType="center"
                     android:clipToOutline="true"
@@ -97,13 +100,11 @@
 
                 <androidx.appcompat.widget.AppCompatImageView
                     android:id="@+id/btnRemovePostImage"
-                    android:layout_width="20dp"
-                    android:layout_height="20dp"
-                    android:layout_margin="@dimen/margin_padding_x_small"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
                     android:layout_gravity="top|end"
-                    android:src="@drawable/ic_cancel"
-                    app:tint="@color/grey_5"
-                    android:visibility="gone" />
+                    android:src="@drawable/ic_cancel_2"
+                    android:visibility="gone"/>
 
             </FrameLayout>
 
