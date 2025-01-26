@@ -38,9 +38,10 @@ import com.developeek.circleon.view.listener.RecyclerViewInfiniteScrollListener
 import com.developeek.circleon.view.screen.login.LoginActivity
 import com.developeek.circleon.view.viewmodel.CircleDetailPostDetailViewModel
 import com.developeek.circleon.view.viewmodelimpl.CircleDetailPostDetailViewModelImpl
-import com.developeek.circleon.view.widget.DeleteAlertDialog
+import com.developeek.circleon.view.widget.ContentDeleteAlertDialog
 import com.developeek.circleon.view.widget.ErrorAlertDialog
 import com.developeek.circleon.view.widget.ErrorToast
+import com.developeek.circleon.view.widget.TextInputAlertDialog
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import dagger.hilt.android.AndroidEntryPoint
 import dagger.hilt.android.lifecycle.withCreationCallback
@@ -166,11 +167,14 @@ class CircleDetailPostDetailFragment : Fragment() {
         post: PostModel,
     ) = PopupMenu.OnMenuItemClickListener {
         when (it.itemId) {
-            R.id.modify_post -> {
+            R.id.edit_post -> {
                 Toast.makeText(activity, "수정하기", Toast.LENGTH_SHORT).show()
             }
             R.id.delete_post -> {
-                DeleteAlertDialog(activity, if (post.isNotice()) MESSAGE_DELETE_NOTICE else MESSAGE_DELETE_POST) {
+                ContentDeleteAlertDialog(
+                    activity,
+                    if (post.isNotice()) MESSAGE_DELETE_NOTICE else MESSAGE_DELETE_POST,
+                ) {
                     viewModel.delete()
                 }.show()
             }
@@ -200,15 +204,40 @@ class CircleDetailPostDetailFragment : Fragment() {
     ) = PopupMenu.OnMenuItemClickListener {
         viewModel.saveScrollState(binding.rvPostDetail.layoutManager?.onSaveInstanceState())
         when (it.itemId) {
-            R.id.modify_comment -> {
+            R.id.edit_comment -> {
+                TextInputAlertDialog(
+                    activity,
+                    comment.content,
+                    object : ItemListenerInitializer<String> {
+                        override fun initialize(item: String) {
+                            viewModel.editComment(comment.id, item)
+                        }
+
+                        override fun initialize(
+                            item: String,
+                            view: View?,
+                        ) {}
+                    },
+                ).show()
             }
             R.id.delete_comment -> {
-                DeleteAlertDialog(activity, MESSAGE_DELETE_COMMENT) {
+                ContentDeleteAlertDialog(activity, MESSAGE_DELETE_COMMENT) {
+                    // 삭제 버튼 클릭 시
                     viewModel.deleteComment(comment.id)
                 }.show()
             }
         }
         true
+    }
+
+    private fun showSoftInput(
+        view: View,
+        activity: Activity,
+    ) {
+        if (view.requestFocus()) {
+            val imm = activity.getSystemService(InputMethodManager::class.java)
+            imm.showSoftInput(view, InputMethodManager.SHOW_IMPLICIT)
+        }
     }
 
     private fun hideBtmNav(activity: Activity) {
@@ -220,17 +249,17 @@ class CircleDetailPostDetailFragment : Fragment() {
             viewLifecycleOwner,
             stateObserver(activity),
         )
-        viewModel.registerCommentState.observe(
+        viewModel.uploadCommentState.observe(
             viewLifecycleOwner,
-            registerCommentStateObserver(activity),
-        )
-        viewModel.deletePostState.observe(
-            viewLifecycleOwner,
-            deletePostStateObserver(activity),
+            uploadCommentStateObserver(activity),
         )
         viewModel.deleteCommentState.observe(
             viewLifecycleOwner,
             deleteCommentStateObserver(activity),
+        )
+        viewModel.deletePostState.observe(
+            viewLifecycleOwner,
+            deletePostStateObserver(activity),
         )
         viewModel.scrollOver.observe(
             viewLifecycleOwner,
@@ -289,7 +318,7 @@ class CircleDetailPostDetailFragment : Fragment() {
         }
     }
 
-    private fun registerCommentStateObserver(activity: Activity) =
+    private fun uploadCommentStateObserver(activity: Activity) =
         Observer<UiState> {
             when (it) {
                 UiState.Loading -> {
@@ -314,6 +343,29 @@ class CircleDetailPostDetailFragment : Fragment() {
             }
         }
 
+    private fun deleteCommentStateObserver(activity: Activity) =
+        Observer<UiState> {
+            when (it) {
+                UiState.Loading -> {
+                    binding.pgbContentLoading.isVisible = true
+                }
+                UiState.Success -> {
+                    binding.pgbContentLoading.isVisible = false
+                    requestRefreshToPreviousScreen()
+                    loadContents()
+                }
+                UiState.AuthenticationError -> {
+                    binding.pgbContentLoading.isVisible = false
+                    sendUserToLoginScreen(activity)
+                    showErrorToast(activity)
+                }
+                UiState.ServiceError -> {
+                    binding.pgbContentLoading.isVisible = false
+                    ErrorAlertDialog(activity, viewModel.error).show()
+                }
+            }
+        }
+
     private fun hideSoftInput(
         activity: Activity,
         view: EditText,
@@ -332,29 +384,6 @@ class CircleDetailPostDetailFragment : Fragment() {
                     binding.pgbContentLoading.isVisible = false
                     requestRefreshToPreviousScreen()
                     sendUserToPreviousScreen()
-                }
-                UiState.AuthenticationError -> {
-                    binding.pgbContentLoading.isVisible = false
-                    sendUserToLoginScreen(activity)
-                    showErrorToast(activity)
-                }
-                UiState.ServiceError -> {
-                    binding.pgbContentLoading.isVisible = false
-                    ErrorAlertDialog(activity, viewModel.error).show()
-                }
-            }
-        }
-
-    private fun deleteCommentStateObserver(activity: Activity) =
-        Observer<UiState> {
-            when (it) {
-                UiState.Loading -> {
-                    binding.pgbContentLoading.isVisible = true
-                }
-                UiState.Success -> {
-                    binding.pgbContentLoading.isVisible = false
-                    requestRefreshToPreviousScreen()
-                    loadContents()
                 }
                 UiState.AuthenticationError -> {
                     binding.pgbContentLoading.isVisible = false
@@ -422,7 +451,7 @@ class CircleDetailPostDetailFragment : Fragment() {
     private fun setBtnRegisterCommentListener() {
         binding.btnUploadComment.setOnClickListener {
             viewModel.saveScrollState(binding.rvPostDetail.layoutManager?.onSaveInstanceState())
-            viewModel.registerComment(binding.edtComment.text.toString())
+            viewModel.uploadComment(binding.edtComment.text.toString())
         }
     }
 

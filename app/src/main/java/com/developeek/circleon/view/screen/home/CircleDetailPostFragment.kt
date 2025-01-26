@@ -30,7 +30,7 @@ import com.developeek.circleon.view.listener.RecyclerViewInfiniteScrollListener
 import com.developeek.circleon.view.screen.login.LoginActivity
 import com.developeek.circleon.view.viewmodel.CircleDetailPostViewModel
 import com.developeek.circleon.view.viewmodelimpl.CircleDetailPostViewModelImpl
-import com.developeek.circleon.view.widget.DeleteAlertDialog
+import com.developeek.circleon.view.widget.ContentDeleteAlertDialog
 import com.developeek.circleon.view.widget.ErrorToast
 import dagger.hilt.android.AndroidEntryPoint
 import dagger.hilt.android.lifecycle.withCreationCallback
@@ -156,11 +156,11 @@ class CircleDetailPostFragment : Fragment() {
     ) = PopupMenu.OnMenuItemClickListener {
         viewModel.saveScrollState(binding.rvCirclePost.layoutManager?.onSaveInstanceState())
         when (it.itemId) {
-            R.id.modify_post -> {
+            R.id.edit_post -> {
                 sendUserToEditPostScreen(circleId, item)
             }
             R.id.delete_post -> {
-                DeleteAlertDialog(activity, MESSAGE_DELETE_POST) {
+                ContentDeleteAlertDialog(activity, MESSAGE_DELETE_POST) {
                     viewModel.deleteAndRefresh(item.id)
                 }.show()
             }

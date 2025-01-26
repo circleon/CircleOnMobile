@@ -9,7 +9,7 @@ import com.developeek.circleon.domain.state.UiState
 
 interface CircleDetailPostDetailViewModel {
     val state: LiveData<UiState>
-    val registerCommentState: LiveData<UiState>
+    val uploadCommentState: LiveData<UiState>
     val deletePostState: LiveData<UiState>
     val deleteCommentState: LiveData<UiState>
     val contents: List<Identifiable>
@@ -27,9 +27,14 @@ interface CircleDetailPostDetailViewModel {
 
     fun saveScrollState(scrollState: Parcelable?)
 
-    fun registerComment(comment: String)
+    fun uploadComment(content: String)
 
-    fun delete()
+    fun editComment(
+        commentId: Int,
+        content: String,
+    )
 
     fun deleteComment(commentId: Int)
+
+    fun delete()
 }

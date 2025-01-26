@@ -219,6 +219,22 @@ class CircleRepositoryImpl(
         }
     }
 
+    override suspend fun putCircleComment(
+        circleId: Int,
+        postId: Int,
+        commentId: Int,
+        content: String,
+    ): Result<Unit> {
+        return try {
+            withContext(dispatcher) {
+                service.putCircleComment(circleId, postId, commentId, RequestBodyComment(content))
+                Result.success(Unit)
+            }
+        } catch (e: IOException) {
+            Result.error(e)
+        }
+    }
+
     override suspend fun deleteCirclePost(
         circleId: Int,
         postId: Int,

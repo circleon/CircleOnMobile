@@ -95,6 +95,14 @@ interface CircleService {
         @Body data: RequestBodyEditPost,
     )
 
+    @PUT("circles/{circleId}/posts/{postId}/comments/{commentId}")
+    suspend fun putCircleComment(
+        @Path("circleId") circleId: Int,
+        @Path("postId") postId: Int,
+        @Path("commentId") commentId: Int,
+        @Body data: RequestBodyComment,
+    )
+
     // DELETE
     @DELETE("circles/{circleId}/posts/{postId}")
     suspend fun deleteCirclePost(

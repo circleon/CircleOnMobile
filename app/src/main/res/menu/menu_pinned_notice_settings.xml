@@ -4,7 +4,7 @@
         android:id="@+id/pin_post"
         android:title="@string/menu_post_settings_remove_pin"/>
     <item
-        android:id="@+id/modify_post"
+        android:id="@+id/edit_post"
         android:title="@string/menu_post_settings_modify"/>
     <item
         android:id="@+id/delete_post"
