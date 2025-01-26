@@ -12,7 +12,6 @@ import android.view.ViewGroup
 import android.view.WindowManager
 import android.view.inputmethod.InputMethodManager
 import android.widget.EditText
-import android.widget.Toast
 import androidx.appcompat.widget.PopupMenu
 import androidx.core.animation.addListener
 import androidx.core.content.ContextCompat
@@ -164,22 +163,35 @@ class CircleDetailPostDetailFragment : Fragment() {
 
     private fun postOverflowMenuItemClickListener(
         activity: Activity,
-        post: PostModel,
+        item: PostModel,
     ) = PopupMenu.OnMenuItemClickListener {
         when (it.itemId) {
             R.id.edit_post -> {
-                Toast.makeText(activity, "수정하기", Toast.LENGTH_SHORT).show()
+                sendUserToEditPostScreen(circleId, item)
             }
             R.id.delete_post -> {
                 ContentDeleteAlertDialog(
                     activity,
-                    if (post.isNotice()) MESSAGE_DELETE_NOTICE else MESSAGE_DELETE_POST,
+                    if (item.isNotice()) MESSAGE_DELETE_NOTICE else MESSAGE_DELETE_POST,
                 ) {
                     viewModel.delete()
                 }.show()
             }
         }
         true
+    }
+
+    private fun sendUserToEditPostScreen(
+        circleId: Int,
+        item: PostModel,
+    ) {
+        val bundle = Bundle()
+
+        bundle.putInt(Const.TAG_CIRCLE_ID, circleId)
+        bundle.putSerializable(Const.TAG_POST_TYPE, item.type)
+        bundle.putSerializable(Const.TAG_CIRCLE_POST, item)
+        bundle.putBoolean(Const.FLAG_EDIT_OR_NOT, true) // 수정 기능 전용 활성화
+        findNavController().navigate(R.id.action_circleDetailPostDetailFragment_to_uploadPostFragment, bundle)
     }
 
     private fun initCommentOverflowMenuAndShow(
@@ -265,6 +277,17 @@ class CircleDetailPostDetailFragment : Fragment() {
             viewLifecycleOwner,
             scrollOverObserver(),
         )
+        // 정보 수정 여부 감지
+        findNavController()
+            .currentBackStackEntry
+            ?.savedStateHandle
+            ?.getLiveData<Boolean>(Const.FLAG_DATA_CHANGED)
+            ?.observe(viewLifecycleOwner) {
+                if (it) {
+                    requestRefreshToPreviousScreen()
+                    sendUserToPreviousScreen()
+                }
+            }
     }
 
     private fun stateObserver(activity: Activity) =

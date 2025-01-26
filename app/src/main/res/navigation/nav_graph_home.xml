@@ -44,7 +44,12 @@
         android:id="@+id/circleDetailPostDetailFragment"
         android:name="com.developeek.circleon.view.screen.home.CircleDetailPostDetailFragment"
         android:label="fragment_circle_detail_post_detail"
-        tools:layout="@layout/fragment_circle_detail_post_detail" />
+        tools:layout="@layout/fragment_circle_detail_post_detail">
+        <action
+            android:id="@+id/action_circleDetailPostDetailFragment_to_uploadPostFragment"
+            app:destination="@id/uploadPostFragment"
+            app:enterAnim="@animator/scale_up"/>
+    </fragment>
     <fragment
         android:id="@+id/uploadPostFragment"
         android:name="com.developeek.circleon.view.screen.home.UploadPostFragment"

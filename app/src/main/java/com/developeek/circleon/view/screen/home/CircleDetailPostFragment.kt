@@ -190,7 +190,7 @@ class CircleDetailPostFragment : Fragment() {
             viewLifecycleOwner,
             scrollOverObserver(),
         )
-        // 댓글 정보 수정 여부 감지
+        // 정보 수정 여부 감지
         findNavController()
             .currentBackStackEntry
             ?.savedStateHandle
