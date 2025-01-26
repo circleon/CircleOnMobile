@@ -54,7 +54,7 @@ object Validator {
 
     fun checkContent(data: String): InputValidationResult<String> {
         return try {
-            require(data.isNotEmpty())
+            require(data.trim().isNotEmpty())
             InputValidationResult.valid(data)
         } catch (e: IllegalArgumentException) {
             InputValidationResult.invalid(IOException(ValidatorExceptionMessage.MESSAGE_EMPTY_CONTENT))
