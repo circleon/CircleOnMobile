@@ -49,6 +49,10 @@ class CircleDetailPostDetailViewModelImpl
             get() = commentUploadState
         private val commentUploadState = MutableLiveData<UiState>()
         private var uploadCommentJob: Job? = null
+
+        override val editCommentState: LiveData<UiState>
+            get() = commentEditState
+        private val commentEditState = MutableLiveData<UiState>()
         private var editCommentJob: Job? = null
 
         override val deleteCommentState: LiveData<UiState>
@@ -186,23 +190,23 @@ class CircleDetailPostDetailViewModelImpl
             if (!isCommentFormat(content)) return
 
             editCommentJob?.cancel()
-            commentUploadState.postValueWhenAnimFinished(UiState.Loading)
+            commentEditState.postValueWhenAnimFinished(UiState.Loading)
             saveLoadingStartTime()
 
             editCommentJob =
                 viewModelScope.launch {
-                    // TODO: respository.editCircleComment
+                    // TODO: respository.editCircleComment 로 수정
                     val result = repository.putCircleComment(circleId, post.id, commentId, content)
                     delay(remainedLoadingTime())
 
                     if (result is Success) {
                         refresh()
-                        commentUploadState.postValueWhenAnimFinished(UiState.Success)
+                        commentEditState.postValueWhenAnimFinished(UiState.Success)
                     } else {
                         error = (result as Error).message()
                         val errorState =
                             if (result.isAuthenticationError()) UiState.AuthenticationError else UiState.ServiceError
-                        commentUploadState.postValueWhenAnimFinished(errorState)
+                        commentEditState.postValueWhenAnimFinished(errorState)
                     }
                 }
         }

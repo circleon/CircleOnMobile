@@ -265,6 +265,10 @@ class CircleDetailPostDetailFragment : Fragment() {
             viewLifecycleOwner,
             uploadCommentStateObserver(activity),
         )
+        viewModel.editCommentState.observe(
+            viewLifecycleOwner,
+            editCommentStateObserver(activity),
+        )
         viewModel.deleteCommentState.observe(
             viewLifecycleOwner,
             deleteCommentStateObserver(activity),
@@ -353,6 +357,29 @@ class CircleDetailPostDetailFragment : Fragment() {
                     loadContents()
                     hideSoftInput(activity, binding.edtComment)
                     binding.edtComment.text?.clear()
+                }
+                UiState.AuthenticationError -> {
+                    binding.pgbContentLoading.isVisible = false
+                    sendUserToLoginScreen(activity)
+                    showErrorToast(activity)
+                }
+                UiState.ServiceError -> {
+                    binding.pgbContentLoading.isVisible = false
+                    showErrorDialog(activity)
+                }
+            }
+        }
+
+    private fun editCommentStateObserver(activity: Activity) =
+        Observer<UiState> {
+            when (it) {
+                UiState.Loading -> {
+                    binding.pgbContentLoading.isVisible = true
+                }
+                UiState.Success -> {
+                    binding.pgbContentLoading.isVisible = false
+                    loadContents()
+                    hideSoftInput(activity, binding.edtComment)
                 }
                 UiState.AuthenticationError -> {
                     binding.pgbContentLoading.isVisible = false
