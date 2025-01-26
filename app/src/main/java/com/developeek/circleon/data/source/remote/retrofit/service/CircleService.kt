@@ -8,6 +8,7 @@ import com.developeek.circleon.data.dto.home.Paging
 import com.developeek.circleon.data.dto.home.Pin
 import com.developeek.circleon.data.dto.home.Post
 import com.developeek.circleon.data.dto.home.RequestBodyComment
+import com.developeek.circleon.data.dto.home.RequestBodyEditPost
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
 import retrofit2.http.Body
@@ -85,6 +86,13 @@ interface CircleService {
         @Path("circleId") circleId: Int,
         @Path("postId") postId: Int,
         @Body data: Pin,
+    )
+
+    @PUT("circles/{circleId}/posts/{postId}")
+    suspend fun putCirclePost(
+        @Path("circleId") circleId: Int,
+        @Path("postId") postId: Int,
+        @Body data: RequestBodyEditPost,
     )
 
     // DELETE

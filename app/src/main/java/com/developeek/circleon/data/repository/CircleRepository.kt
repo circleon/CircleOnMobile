@@ -62,6 +62,13 @@ interface CircleRepository {
         isPinned: Boolean,
     ): Result<Unit>
 
+    suspend fun putCirclePost(
+        circleId: Int,
+        postId: Int,
+        postType: PostType,
+        content: String,
+    ): Result<Unit>
+
     // DELETE
     suspend fun deleteCirclePost(
         circleId: Int,

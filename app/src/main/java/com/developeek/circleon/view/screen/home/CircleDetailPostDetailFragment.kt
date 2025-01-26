@@ -41,6 +41,7 @@ import com.developeek.circleon.view.viewmodelimpl.CircleDetailPostDetailViewMode
 import com.developeek.circleon.view.widget.DeleteAlertDialog
 import com.developeek.circleon.view.widget.ErrorAlertDialog
 import com.developeek.circleon.view.widget.ErrorToast
+import com.google.android.material.bottomnavigation.BottomNavigationView
 import dagger.hilt.android.AndroidEntryPoint
 import dagger.hilt.android.lifecycle.withCreationCallback
 import javax.inject.Inject
@@ -101,6 +102,7 @@ class CircleDetailPostDetailFragment : Fragment() {
     private fun initView(activity: Activity) {
         initToolbar()
         initRecyclerView(activity)
+        hideBtmNav(activity)
     }
 
     private fun initToolbar() {
@@ -207,6 +209,10 @@ class CircleDetailPostDetailFragment : Fragment() {
             }
         }
         true
+    }
+
+    private fun hideBtmNav(activity: Activity) {
+        activity.findViewById<BottomNavigationView>(R.id.btmNav).isVisible = false
     }
 
     private fun initObserver(activity: Activity) {

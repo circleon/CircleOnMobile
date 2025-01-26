@@ -44,9 +44,7 @@ class HomeActivity : AppCompatActivity() {
     private fun setDestinationChangedListener() {
         navController.addOnDestinationChangedListener { _, destination, _ ->
             onMainFragment = destination.id == R.id.homeFragment
-            if (whenHideBtmNav(destination)) {
-                binding.btmNav.isVisible = false
-            } else if (!binding.btmNav.isVisible) {
+            if (!whenHideBtmNav(destination) && !binding.btmNav.isVisible) {
                 binding.btmNav.isVisible = true
             }
         }
@@ -55,7 +53,7 @@ class HomeActivity : AppCompatActivity() {
     private fun whenHideBtmNav(destination: NavDestination) =
         destination.id == R.id.searchCircleFragment ||
             destination.id == R.id.circleDetailPostDetailFragment ||
-            destination.id == R.id.newPostFragment
+            destination.id == R.id.uploadPostFragment
 
     private fun initFinishWaitingToast() {
         finishWaitingToast =

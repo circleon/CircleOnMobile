@@ -2,6 +2,7 @@ package com.developeek.circleon.data.repositoryimpl
 
 import com.developeek.circleon.data.dto.home.Pin
 import com.developeek.circleon.data.dto.home.RequestBodyComment
+import com.developeek.circleon.data.dto.home.RequestBodyEditPost
 import com.developeek.circleon.data.exception.ServiceException
 import com.developeek.circleon.data.repository.CircleRepository
 import com.developeek.circleon.data.source.Result
@@ -164,7 +165,7 @@ class CircleRepositoryImpl(
                         val imageRequestBody = RequestBody.create(MediaType.parse("image/jpeg"), image)
                         MultipartBody.Part.createFormData("image", image.name, imageRequestBody)
                     }
-                val response = service.postCirclePost(circleId, type, content, body)
+                service.postCirclePost(circleId, type, content, body)
                 Result.success(Unit)
             }
         } catch (e: IOException) {
@@ -179,7 +180,7 @@ class CircleRepositoryImpl(
     ): Result<Unit> {
         return try {
             withContext(dispatcher) {
-                val response = service.postCircleComment(circleId, postId, RequestBodyComment(comment))
+                service.postCircleComment(circleId, postId, RequestBodyComment(comment))
                 Result.success(Unit)
             }
         } catch (e: IOException) {
@@ -202,13 +203,29 @@ class CircleRepositoryImpl(
         }
     }
 
+    override suspend fun putCirclePost(
+        circleId: Int,
+        postId: Int,
+        postType: PostType,
+        content: String,
+    ): Result<Unit> {
+        return try {
+            withContext(dispatcher) {
+                service.putCirclePost(circleId, postId, RequestBodyEditPost(postType.code(), content))
+                Result.success(Unit)
+            }
+        } catch (e: IOException) {
+            Result.error(e)
+        }
+    }
+
     override suspend fun deleteCirclePost(
         circleId: Int,
         postId: Int,
     ): Result<Unit> {
         return try {
             withContext(dispatcher) {
-                val response = service.deleteCirclePost(circleId, postId)
+                service.deleteCirclePost(circleId, postId)
                 Result.success(Unit)
             }
         } catch (e: IOException) {
@@ -223,7 +240,7 @@ class CircleRepositoryImpl(
     ): Result<Unit> {
         return try {
             with(dispatcher) {
-                val response = service.deletePostComment(circleId, postId, commentId)
+                service.deletePostComment(circleId, postId, commentId)
                 Result.success(Unit)
             }
         } catch (e: IOException) {

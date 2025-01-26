@@ -11,7 +11,7 @@ import com.developeek.circleon.domain.enums.PostType
 import com.developeek.circleon.domain.state.UiState
 import com.developeek.circleon.domain.utils.validator.Invalid
 import com.developeek.circleon.domain.utils.validator.Validator
-import com.developeek.circleon.view.viewmodel.NewPostViewModel
+import com.developeek.circleon.view.viewmodel.UploadPostViewModel
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
@@ -21,20 +21,20 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import java.io.File
 
-@HiltViewModel(assistedFactory = NewPostViewModelImpl.NewPostViewModelFactory::class)
-class NewPostViewModelImpl
+@HiltViewModel(assistedFactory = UploadPostViewModelImpl.UploadPostViewModelFactory::class)
+class UploadPostViewModelImpl
     @AssistedInject
     constructor(
         @Assisted("circleId") private val circleId: Int,
         @Assisted("postType") private val postType: PostType,
         private val repository: CircleRepository,
-    ) : NewPostViewModel, ViewModel() {
+    ) : UploadPostViewModel, ViewModel() {
         @AssistedFactory
-        interface NewPostViewModelFactory {
+        interface UploadPostViewModelFactory {
             fun create(
                 @Assisted("circleId") circleId: Int,
                 @Assisted("postType") postType: PostType,
-            ): NewPostViewModelImpl
+            ): UploadPostViewModelImpl
         }
 
         override val state: LiveData<UiState>
@@ -57,6 +57,34 @@ class NewPostViewModelImpl
             uploadPostJob =
                 viewModelScope.launch {
                     val result = repository.postCirclePost(circleId, postType, content, image)
+                    delay(remainedLoadingTime())
+
+                    if (result is Success) {
+                        uiState.postValue(UiState.Success)
+                    } else {
+                        error = (result as Error).message()
+                        if (result.isAuthenticationError()) {
+                            uiState.postValue(UiState.AuthenticationError)
+                        } else {
+                            uiState.postValue(UiState.ServiceError)
+                        }
+                    }
+                }
+        }
+
+        override fun edit(
+            postId: Int,
+            content: String,
+        ) {
+            if (!isContentFormat(content)) return
+
+            uploadPostJob?.cancel()
+            uiState.postValue(UiState.Loading)
+            saveLoadingStartTime()
+
+            uploadPostJob =
+                viewModelScope.launch {
+                    val result = repository.putCirclePost(circleId, postId, postType, content)
                     delay(remainedLoadingTime())
 
                     if (result is Success) {

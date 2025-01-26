@@ -278,7 +278,7 @@
     </com.google.android.material.progressindicator.CircularProgressIndicator>
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
-        android:id="@+id/fabRegisterCircleContent"
+        android:id="@+id/fabUploadCircleContent"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_margin="@dimen/margin_padding_large"

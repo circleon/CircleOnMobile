@@ -6,35 +6,41 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.WindowManager
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import androidx.navigation.fragment.findNavController
 import com.developeek.circleon.R
-import com.developeek.circleon.databinding.FragmentNewPostBinding
+import com.developeek.circleon.databinding.FragmentUploadPostBinding
 import com.developeek.circleon.domain.enums.PostType
+import com.developeek.circleon.domain.model.PostModel
 import com.developeek.circleon.domain.state.UiState
 import com.developeek.circleon.domain.utils.Const
 import com.developeek.circleon.domain.utils.Utils.toJPEG
 import com.developeek.circleon.domain.utils.glide.GlideProvider
 import com.developeek.circleon.view.screen.login.LoginActivity
-import com.developeek.circleon.view.viewmodel.NewPostViewModel
-import com.developeek.circleon.view.viewmodelimpl.NewPostViewModelImpl
+import com.developeek.circleon.view.viewmodel.UploadPostViewModel
+import com.developeek.circleon.view.viewmodelimpl.UploadPostViewModelImpl
 import com.developeek.circleon.view.widget.ErrorAlertDialog
 import com.developeek.circleon.view.widget.ErrorToast
+import com.google.android.material.bottomnavigation.BottomNavigationView
 import dagger.hilt.android.AndroidEntryPoint
 import dagger.hilt.android.lifecycle.withCreationCallback
 import javax.inject.Inject
 
 @AndroidEntryPoint
-class NewPostFragment : Fragment() {
-    private lateinit var binding: FragmentNewPostBinding
+class UploadPostFragment : Fragment() {
+    private lateinit var binding: FragmentUploadPostBinding
     private var circleId = 0
     private lateinit var postType: PostType
+    private var editOrNot = false
+    private lateinit var post: PostModel
     private val pickMedia: ActivityResultLauncher<PickVisualMediaRequest> =
         registerForActivityResult(ActivityResultContracts.PickVisualMedia()) {
                 uri ->
@@ -43,12 +49,18 @@ class NewPostFragment : Fragment() {
                 viewModel.setPostImage(it.toJPEG(requireActivity()))
                 binding.btnRemovePostImage.isVisible = true
                 binding.txtAddPostImage.isVisible = false
+                binding.btnAddPostImage.setBackgroundDrawable(
+                    ContextCompat.getDrawable(
+                        requireContext(),
+                        R.drawable.bg_small_rounded_rectangle,
+                    ),
+                )
             }
         }
-    private val viewModel: NewPostViewModel by viewModels<NewPostViewModelImpl>(
+    private val viewModel: UploadPostViewModel by viewModels<UploadPostViewModelImpl>(
         extrasProducer = {
             defaultViewModelCreationExtras
-                .withCreationCallback<NewPostViewModelImpl.NewPostViewModelFactory> {
+                .withCreationCallback<UploadPostViewModelImpl.UploadPostViewModelFactory> {
                     it.create(circleId, postType)
                 }
         },
@@ -63,7 +75,14 @@ class NewPostFragment : Fragment() {
         arguments?.let {
             circleId = it.getInt(Const.TAG_CIRCLE_ID)
             postType = it.getSerializable(Const.TAG_POST_TYPE) as PostType
+            editOrNot =
+                it.getBoolean(Const.FLAG_EDIT_OR_NOT).also { isEdit ->
+                    if (isEdit) {
+                        post = it.getSerializable(Const.TAG_CIRCLE_POST) as PostModel
+                    }
+                }
         }
+        activity?.window?.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE)
     }
 
     override fun onCreateView(
@@ -71,7 +90,7 @@ class NewPostFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?,
     ): View {
-        binding = FragmentNewPostBinding.inflate(layoutInflater)
+        binding = FragmentUploadPostBinding.inflate(layoutInflater)
 
         return binding.root
     }
@@ -82,21 +101,62 @@ class NewPostFragment : Fragment() {
     ) {
         super.onViewCreated(view, savedInstanceState)
 
-        initView()
+        initView(requireActivity())
         initObserver(requireActivity())
-        initListener()
+        initListener(requireActivity())
     }
 
-    private fun initView() {
+    private fun initView(activity: Activity) {
         initToolbar()
+        loadContentWhenEdit(activity)
+        hideBtmNav(activity)
     }
 
     private fun initToolbar() {
-        if (postType.isNotice()) {
-            binding.txtTbTitle.text = TITLE_NOTICE
-        } else {
-            binding.txtTbTitle.text = TITLE_POST
+        var title = Const.EMPTY_TEXT
+
+        if (postType.isNotice() && editOrNot) {
+            title = TITLE_NOTICE_EDIT
         }
+        if (postType.isNotice() && !editOrNot) {
+            title = TITLE_NOTICE
+        }
+        if (postType.isPost() && editOrNot) {
+            title = TITLE_POST_EDIT
+        }
+        if (postType.isPost() && !editOrNot) {
+            title = TITLE_POST
+        }
+
+        binding.txtTbTitle.text = title
+    }
+
+    private fun loadContentWhenEdit(activity: Activity) {
+        if (editOrNot) {
+            binding.edtPostContent.setText(post.content)
+            if (post.imgUrl == null) {
+                // 이미지 추가 레이아웃 비활성화
+                binding.llPostImg.isVisible = false
+            } else {
+                // 편집 화면에서 이미지 수정 기능 비활성화
+                glideProvider.fetchImage(
+                    post.imgUrl!!,
+                    activity,
+                    binding.btnAddPostImage,
+                )
+                binding.txtAddPostImage.isVisible = false
+                binding.btnAddPostImage.setBackgroundDrawable(
+                    ContextCompat.getDrawable(
+                        activity,
+                        R.drawable.bg_small_rounded_rectangle,
+                    ),
+                )
+            }
+        }
+    }
+
+    private fun hideBtmNav(activity: Activity) {
+        activity.findViewById<BottomNavigationView>(R.id.btmNav).isVisible = false
     }
 
     private fun initObserver(activity: Activity) {
@@ -145,11 +205,11 @@ class NewPostFragment : Fragment() {
         startActivity(intent)
     }
 
-    private fun initListener() {
+    private fun initListener(activity: Activity) {
         setBtnCancelListener()
         setBtnUploadListener()
         setBtnAddPostImageListener()
-        setBtnRemovePostImageListener()
+        setBtnRemovePostImageListener(activity)
     }
 
     private fun setBtnCancelListener() {
@@ -160,28 +220,48 @@ class NewPostFragment : Fragment() {
 
     private fun setBtnUploadListener() {
         binding.btnUpload.setOnClickListener {
-            viewModel.upload(binding.edtPostContent.text.toString())
+            if (editOrNot) {
+                viewModel.edit(post.id, binding.edtPostContent.text.toString())
+            } else {
+                viewModel.upload(binding.edtPostContent.text.toString())
+            }
         }
     }
 
     private fun setBtnAddPostImageListener() {
         binding.btnAddPostImage.setOnClickListener {
-            val mimeType = "image/jpeg"
-            pickMedia.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.SingleMimeType(mimeType)))
+            // 편집 화면에서는 이미지 수정 기능 비활성화
+            if (!editOrNot) {
+                val mimeType = "image/jpeg"
+                pickMedia.launch(
+                    PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.SingleMimeType(mimeType)),
+                )
+            }
         }
     }
 
-    private fun setBtnRemovePostImageListener() {
+    private fun setBtnRemovePostImageListener(activity: Activity) {
         binding.btnRemovePostImage.setOnClickListener {
             viewModel.removePostImage()
             binding.btnAddPostImage.setImageResource(R.drawable.ic_add)
             binding.btnRemovePostImage.isVisible = false
             binding.txtAddPostImage.isVisible = true
+            binding.btnAddPostImage.setBackgroundDrawable(
+                ContextCompat.getDrawable(activity, R.drawable.bg_dotted_rounded_rectangle),
+            )
         }
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+
+        activity?.window?.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_PAN) // softInputMode 복원
     }
 
     companion object {
         private const val TITLE_NOTICE = "공지사항 작성"
+        private const val TITLE_NOTICE_EDIT = "공지사항 수정"
         private const val TITLE_POST = "게시글 작성"
+        private const val TITLE_POST_EDIT = "게시글 수정"
     }
 }
