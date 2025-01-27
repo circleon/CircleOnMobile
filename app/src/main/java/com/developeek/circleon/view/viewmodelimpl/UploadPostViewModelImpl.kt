@@ -48,7 +48,7 @@ class UploadPostViewModelImpl
         override lateinit var error: String
 
         override fun upload(content: String) {
-            if (!isContentFormat(content)) return
+            if (!isPostFormat(content)) return
 
             uploadPostJob?.cancel()
             uiState.postValue(UiState.Loading)
@@ -76,7 +76,7 @@ class UploadPostViewModelImpl
             postId: Int,
             content: String,
         ) {
-            if (!isContentFormat(content)) return
+            if (!isPostFormat(content)) return
 
             uploadPostJob?.cancel()
             uiState.postValue(UiState.Loading)
@@ -100,8 +100,8 @@ class UploadPostViewModelImpl
                 }
         }
 
-        private fun isContentFormat(content: String): Boolean {
-            val validation = Validator.checkContent(content)
+        private fun isPostFormat(content: String): Boolean {
+            val validation = Validator.checkPost(content)
 
             return if (validation is Invalid) {
                 error = validation.message()

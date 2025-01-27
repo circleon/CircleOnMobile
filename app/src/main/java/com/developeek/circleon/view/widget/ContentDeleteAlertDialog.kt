@@ -3,7 +3,7 @@ package com.developeek.circleon.view.widget
 import android.app.Activity
 import android.app.AlertDialog
 
-class DeleteAlertDialog(
+class ContentDeleteAlertDialog(
     private val activity: Activity,
     private val message: String,
     private val positiveListener: Runnable,

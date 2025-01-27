@@ -31,7 +31,7 @@ import com.developeek.circleon.view.listener.RecyclerViewInfiniteScrollListener
 import com.developeek.circleon.view.screen.login.LoginActivity
 import com.developeek.circleon.view.viewmodel.CircleDetailPostViewModel
 import com.developeek.circleon.view.viewmodelimpl.CircleDetailNoticeViewModelImpl
-import com.developeek.circleon.view.widget.DeleteAlertDialog
+import com.developeek.circleon.view.widget.ContentDeleteAlertDialog
 import com.developeek.circleon.view.widget.ErrorToast
 import dagger.hilt.android.AndroidEntryPoint
 import dagger.hilt.android.lifecycle.withCreationCallback
@@ -172,12 +172,12 @@ class CircleDetailNoticeFragment : Fragment() {
                 }
             }
 
-            R.id.modify_post -> {
+            R.id.edit_post -> {
                 sendUserToEditNoticeScreen(circleId, item)
             }
 
             R.id.delete_post -> {
-                DeleteAlertDialog(activity, MESSAGE_DELETE_NOTICE) {
+                ContentDeleteAlertDialog(activity, MESSAGE_DELETE_NOTICE) {
                     viewModel.deleteAndRefresh(item.id)
                 }.show()
             }
@@ -207,7 +207,7 @@ class CircleDetailNoticeFragment : Fragment() {
             viewLifecycleOwner,
             scrollOverObserver(),
         )
-        // 댓글 정보 수정 여부 감지
+        // 정보 수정 여부 감지
         findNavController()
             .currentBackStackEntry
             ?.savedStateHandle

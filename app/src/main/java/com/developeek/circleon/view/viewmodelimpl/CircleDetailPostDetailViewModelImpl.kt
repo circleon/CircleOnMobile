@@ -45,20 +45,25 @@ class CircleDetailPostDetailViewModelImpl
         private val uiState = MutableLiveData<UiState>()
         private lateinit var tmpState: UiState
 
-        override val registerCommentState: LiveData<UiState>
-            get() = commentRegisterState
-        private val commentRegisterState = MutableLiveData<UiState>()
-        private var registerCommentJob: Job? = null
+        override val uploadCommentState: LiveData<UiState>
+            get() = commentUploadState
+        private val commentUploadState = MutableLiveData<UiState>()
+        private var uploadCommentJob: Job? = null
 
-        override val deletePostState: LiveData<UiState>
-            get() = postDeleteState
-        private val postDeleteState = MutableLiveData<UiState>()
-        private var deletePostJob: Job? = null
+        override val editCommentState: LiveData<UiState>
+            get() = commentEditState
+        private val commentEditState = MutableLiveData<UiState>()
+        private var editCommentJob: Job? = null
 
         override val deleteCommentState: LiveData<UiState>
             get() = commentDeleteState
         private val commentDeleteState = MutableLiveData<UiState>()
         private var deleteCommentJob: Job? = null
+
+        override val deletePostState: LiveData<UiState>
+            get() = postDeleteState
+        private val postDeleteState = MutableLiveData<UiState>()
+        private var deletePostJob: Job? = null
 
         override lateinit var contents: List<Identifiable>
         override lateinit var comments: CommentModels
@@ -154,37 +159,90 @@ class CircleDetailPostDetailViewModelImpl
             if (::tmpState.isInitialized) uiState.postValue(tmpState)
         }
 
-        override fun registerComment(comment: String) {
-            if (!isCommentFormat(comment)) return
+        override fun uploadComment(content: String) {
+            if (!isCommentFormat(content)) return
 
-            registerCommentJob?.cancel()
-            commentRegisterState.postValueWhenAnimFinished(UiState.Loading)
+            uploadCommentJob?.cancel()
+            commentUploadState.postValueWhenAnimFinished(UiState.Loading)
             saveLoadingStartTime()
 
-            registerCommentJob =
+            uploadCommentJob =
                 viewModelScope.launch {
-                    val result = repository.postCircleComment(circleId, post.id, comment)
+                    val result = repository.postCircleComment(circleId, post.id, content)
                     delay(remainedLoadingTime())
 
                     if (result is Success) {
-                        delay(200)
                         refresh()
-                        commentRegisterState.postValueWhenAnimFinished(UiState.Success)
+                        commentUploadState.postValueWhenAnimFinished(UiState.Success)
                     } else {
                         error = (result as Error).message()
                         val errorState =
                             if (result.isAuthenticationError()) UiState.AuthenticationError else UiState.ServiceError
-                        commentRegisterState.postValueWhenAnimFinished(errorState)
+                        commentUploadState.postValueWhenAnimFinished(errorState)
+                    }
+                }
+        }
+
+        override fun editComment(
+            commentId: Int,
+            content: String,
+        ) {
+            if (!isCommentFormat(content)) return
+
+            editCommentJob?.cancel()
+            commentEditState.postValueWhenAnimFinished(UiState.Loading)
+            saveLoadingStartTime()
+
+            editCommentJob =
+                viewModelScope.launch {
+                    // TODO: respository.editCircleComment 로 수정
+                    val result = repository.putCircleComment(circleId, post.id, commentId, content)
+                    delay(remainedLoadingTime())
+
+                    if (result is Success) {
+                        refresh()
+                        commentEditState.postValueWhenAnimFinished(UiState.Success)
+                    } else {
+                        error = (result as Error).message()
+                        val errorState =
+                            if (result.isAuthenticationError()) UiState.AuthenticationError else UiState.ServiceError
+                        commentEditState.postValueWhenAnimFinished(errorState)
+                    }
+                }
+        }
+
+        override fun deleteComment(commentId: Int) {
+            deleteCommentJob?.cancel()
+            commentDeleteState.postValueWhenAnimFinished(UiState.Loading)
+            saveLoadingStartTime()
+
+            deleteCommentJob =
+                viewModelScope.launch {
+                    val result = repository.deletePostComment(circleId, post.id, commentId)
+                    delay(remainedLoadingTime())
+
+                    if (result is Success) {
+                        comments =
+                            comments.remove(commentId).also {
+                                if (comments.isLastPage()) it.setAsLast()
+                            }
+                        contents = listOf(post) + comments.get()
+                        commentDeleteState.postValueWhenAnimFinished(UiState.Success)
+                    } else {
+                        error = (result as Error).message()
+                        val errorState =
+                            if (result.isAuthenticationError()) UiState.AuthenticationError else UiState.ServiceError
+                        commentDeleteState.postValueWhenAnimFinished(errorState)
                     }
                 }
         }
 
         private fun isCommentFormat(comment: String): Boolean {
-            val validation = Validator.checkContent(comment)
+            val validation = Validator.checkComment(comment)
 
             return if (validation is Invalid) {
                 error = validation.message()
-                commentRegisterState.postValueWhenAnimFinished(UiState.ServiceError)
+                commentUploadState.postValueWhenAnimFinished(UiState.ServiceError)
                 false
             } else {
                 true
@@ -232,32 +290,6 @@ class CircleDetailPostDetailViewModelImpl
                         val errorState =
                             if (result.isAuthenticationError()) UiState.AuthenticationError else UiState.ServiceError
                         postDeleteState.postValueWhenAnimFinished(errorState)
-                    }
-                }
-        }
-
-        override fun deleteComment(commentId: Int) {
-            deleteCommentJob?.cancel()
-            commentDeleteState.postValueWhenAnimFinished(UiState.Loading)
-            saveLoadingStartTime()
-
-            deleteCommentJob =
-                viewModelScope.launch {
-                    val result = repository.deletePostComment(circleId, post.id, commentId)
-                    delay(remainedLoadingTime())
-
-                    if (result is Success) {
-                        comments =
-                            comments.remove(commentId).also {
-                                if (comments.isLastPage()) it.setAsLast()
-                            }
-                        contents = listOf(post) + comments.get()
-                        commentDeleteState.postValueWhenAnimFinished(UiState.Success)
-                    } else {
-                        error = (result as Error).message()
-                        val errorState =
-                            if (result.isAuthenticationError()) UiState.AuthenticationError else UiState.ServiceError
-                        commentDeleteState.postValueWhenAnimFinished(errorState)
                     }
                 }
         }
