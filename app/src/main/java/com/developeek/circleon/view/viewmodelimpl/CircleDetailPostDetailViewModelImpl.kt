@@ -238,7 +238,7 @@ class CircleDetailPostDetailViewModelImpl
         }
 
         private fun isCommentFormat(comment: String): Boolean {
-            val validation = Validator.checkContent(comment)
+            val validation = Validator.checkComment(comment)
 
             return if (validation is Invalid) {
                 error = validation.message()

@@ -6,6 +6,8 @@ import com.developeek.circleon.domain.vo.UserName
 import java.io.IOException
 
 object Validator {
+    private const val MAX_COMMENT_SIZE = 255
+    private const val MAX_POST_SIZE = 1000
     // 텍스트 유효성 검증은 즉각적인 피드백이 요구되기 때문에 UI 스레드에서 진행
 
     fun checkName(data: String): InputValidationResult<UserName> {
@@ -52,7 +54,37 @@ object Validator {
         }
     }
 
-    fun checkContent(data: String): InputValidationResult<String> {
+    fun checkComment(data: String): InputValidationResult<String> {
+        checkEmpty(data)
+
+        return try {
+            require(data.length <= MAX_COMMENT_SIZE)
+            InputValidationResult.valid(data)
+        } catch (e: IllegalArgumentException) {
+            InputValidationResult.invalid(
+                IOException(
+                    String.format(ValidatorExceptionMessage.MESSAGE_OVER_SIZE_COMMENT, MAX_COMMENT_SIZE),
+                ),
+            )
+        }
+    }
+
+    fun checkPost(data: String): InputValidationResult<String> {
+        checkEmpty(data)
+
+        return try {
+            require(data.length <= MAX_POST_SIZE)
+            InputValidationResult.valid(data)
+        } catch (e: IllegalArgumentException) {
+            InputValidationResult.invalid(
+                IOException(
+                    String.format(ValidatorExceptionMessage.MESSAGE_OVER_SIZE_POST, MAX_POST_SIZE),
+                ),
+            )
+        }
+    }
+
+    private fun checkEmpty(data: String): InputValidationResult<String> {
         return try {
             require(data.trim().isNotEmpty())
             InputValidationResult.valid(data)
