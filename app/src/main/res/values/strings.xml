@@ -70,6 +70,9 @@
     <string name="menu_post_settings_modify">수정하기</string>
     <string name="menu_post_settings_delete">삭제하기</string>
 
+    <!--New Circle-->
+    <string name="text_circle_name">이름</string>
+    <string name="hint_circle_name">동아리 이름</string>
     <!--Post Detail-->
     <string name="hint_comment">댓글을 입력해주세요.</string>
 
