@@ -55,35 +55,50 @@
             android:id="@+id/svCircleContent"
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            app:layout_constraintTop_toBottomOf="@id/tbPostDetail"
-            app:layout_constraintBottom_toBottomOf="parent">
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/tbPostDetail">
 
             <androidx.appcompat.widget.LinearLayoutCompat
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/margin_padding_small"
-                android:paddingHorizontal="@dimen/margin_padding_xx_large"
                 android:background="@color/white"
-                android:orientation="vertical">
+                android:orientation="vertical"
+                android:paddingHorizontal="@dimen/margin_padding_xx_large">
 
-                <androidx.appcompat.widget.AppCompatImageView
-                    android:id="@+id/btnAddCircleThumbnail"
-                    android:layout_width="96dp"
-                    android:layout_height="96dp"
-                    android:layout_marginVertical="@dimen/margin_padding_xx_large"
+                <FrameLayout
+                    android:layout_width="100dp"
+                    android:layout_height="100dp"
                     android:layout_gravity="center_horizontal"
-                    android:scaleType="center"
-                    android:clipToOutline="true"
-                    android:src="@drawable/ic_add"
-                    android:background="@drawable/bg_dotted_circle"/>
+                    android:layout_marginVertical="@dimen/margin_padding_xx_large">
+
+                    <androidx.appcompat.widget.AppCompatImageView
+                        android:id="@+id/btnAddCircleThumbnail"
+                        android:layout_width="96dp"
+                        android:layout_height="96dp"
+                        android:layout_gravity="start|bottom"
+                        android:background="@drawable/bg_dotted_circle"
+                        android:clipToOutline="true"
+                        android:scaleType="center"
+                        android:src="@drawable/ic_add" />
+
+                    <androidx.appcompat.widget.AppCompatImageView
+                        android:id="@+id/btnRemovePostImage"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="top|end"
+                        android:src="@drawable/ic_cancel_2"
+                        android:visibility="gone"/>
+
+                </FrameLayout>
 
                 <androidx.appcompat.widget.AppCompatTextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="@string/text_circle_name"
-                    android:textSize="@dimen/text_size_small"
-                    android:textColor="@color/grey_9"
                     android:lineSpacingExtra="2sp"
+                    android:text="@string/text_circle_name"
+                    android:textColor="@color/grey_9"
+                    android:textSize="@dimen/text_size_small"
                     android:translationY="-0.91sp" />
 
                 <androidx.appcompat.widget.AppCompatEditText
@@ -91,35 +106,257 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="@dimen/margin_padding_small"
-                    android:paddingVertical="10dp"
                     android:paddingHorizontal="@dimen/margin_padding_large"
-                    android:textSize="@dimen/text_size_default"
-                    android:textColor="@color/grey_9"
-                    android:lineSpacingExtra="2sp"
-                    android:translationY="-1.06sp"
+                    android:paddingVertical="10dp"
+                    android:background="@drawable/bg_edit_content"
                     android:hint="@string/hint_circle_name"
-                    android:textColorHint="@color/grey_5"
+                    android:lineSpacingExtra="2sp"
                     android:maxLength="255"
+                    android:maxLines="2"
+                    android:textColor="@color/grey_9"
+                    android:textColorHint="@color/grey_5"
+                    android:textSize="@dimen/text_size_default"
+                    android:translationY="-1.06sp" />
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/margin_padding_xx_large"
+                    android:lineSpacingExtra="2sp"
+                    android:text="@string/text_recruitment_date"
+                    android:textColor="@color/grey_9"
+                    android:textSize="@dimen/text_size_small"
+                    android:translationY="-0.91sp" />
+
+                <androidx.appcompat.widget.LinearLayoutCompat
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/margin_padding_small"
+                    android:weightSum="1"
+                    android:gravity="center_vertical">
+
+                    <androidx.appcompat.widget.LinearLayoutCompat
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="0.45"
+                        android:paddingVertical="10dp"
+                        android:paddingHorizontal="@dimen/margin_padding_small"
+                        android:background="@drawable/bg_edit_content"
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal">
+
+                        <androidx.appcompat.widget.AppCompatImageView
+                            android:id="@+id/imgCalendar"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:src="@drawable/ic_calendar"/>
+
+                        <androidx.appcompat.widget.AppCompatTextView
+                            android:id="@+id/txtRecruitmentStartDate"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:gravity="center_vertical"
+                            android:layout_marginStart="@dimen/margin_padding_small"
+                            tools:text="recruitmentStart"
+                            android:lineSpacingExtra="2sp"
+                            android:textColor="@color/grey_9"
+                            android:textSize="@dimen/text_size_default"
+                            android:translationY="-1.06sp" />
+
+                    </androidx.appcompat.widget.LinearLayoutCompat>
+
+                    <androidx.appcompat.widget.AppCompatTextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="0.1"
+                        android:text="~"
+                        android:lineSpacingExtra="2sp"
+                        android:textColor="@color/grey_9"
+                        android:textSize="@dimen/text_size_default"
+                        android:translationY="-1.06sp"
+                        android:gravity="center"/>
+
+                    <androidx.appcompat.widget.LinearLayoutCompat
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="0.45"
+                        android:paddingVertical="10dp"
+                        android:paddingHorizontal="@dimen/margin_padding_small"
+                        android:background="@drawable/bg_edit_content"
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal">
+
+                        <androidx.appcompat.widget.AppCompatImageView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:src="@drawable/ic_calendar"/>
+
+                        <androidx.appcompat.widget.AppCompatTextView
+                            android:id="@+id/txtRecruitmentEndDate"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="@dimen/margin_padding_small"
+                            android:gravity="center_vertical"
+                            tools:text="recruitmentEnd"
+                            android:lineSpacingExtra="2sp"
+                            android:textColor="@color/grey_9"
+                            android:textSize="@dimen/text_size_default"
+                            android:translationY="-1.06sp" />
+
+                    </androidx.appcompat.widget.LinearLayoutCompat>
+
+                </androidx.appcompat.widget.LinearLayoutCompat>
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/margin_padding_xx_large"
+                    android:lineSpacingExtra="2sp"
+                    android:text="@string/text_circle_single_line_introduction"
+                    android:textColor="@color/grey_9"
+                    android:textSize="@dimen/text_size_small"
+                    android:translationY="-0.91sp" />
+
+                <androidx.appcompat.widget.LinearLayoutCompat
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/margin_padding_small"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:background="@drawable/bg_edit_content">
+
+                    <androidx.appcompat.widget.AppCompatEditText
+                        android:id="@+id/edtCircleSingleLineIntroduction"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:paddingHorizontal="@dimen/margin_padding_large"
+                        android:paddingVertical="10dp"
+                        android:maxLength="35"
+                        android:maxLines="2"
+                        android:hint="@string/hint_circle_single_line_introduction"
+                        android:textColor="@color/grey_9"
+                        android:textColorHint="@color/grey_5"
+                        android:textSize="@dimen/text_size_default"
+                        android:translationY="-1.06sp"
+                        android:background="null"/>
+
+                    <androidx.appcompat.widget.LinearLayoutCompat
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:gravity="center_vertical"
+                        android:paddingHorizontal="@dimen/margin_padding_small"
+                        android:orientation="horizontal">
+
+                        <androidx.appcompat.widget.AppCompatTextView
+                            android:id="@+id/txtCurrentCircleSingleIntroductionSize"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            tools:text="0"
+                            android:textColor="@color/grey_5"
+                            android:textSize="@dimen/text_size_small"
+                            android:translationY="-1.06sp"/>
+
+                        <androidx.appcompat.widget.AppCompatTextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="/"
+                            android:textColor="@color/grey_5"
+                            android:textSize="@dimen/text_size_small"
+                            android:translationY="-1.06sp"/>
+
+                        <androidx.appcompat.widget.AppCompatTextView
+                            android:id="@+id/txtMaxCircleSingleIntroductionSize"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="35"
+                            android:textColor="@color/grey_5"
+                            android:textSize="@dimen/text_size_small"
+                            android:translationY="-1.06sp"/>
+
+                    </androidx.appcompat.widget.LinearLayoutCompat>
+
+                </androidx.appcompat.widget.LinearLayoutCompat>
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/margin_padding_xx_large"
+                    android:lineSpacingExtra="2sp"
+                    android:text="@string/text_circle_introduction"
+                    android:textColor="@color/grey_9"
+                    android:textSize="@dimen/text_size_small"
+                    android:translationY="-0.91sp" />
+
+                <androidx.appcompat.widget.AppCompatEditText
+                    android:id="@+id/edtCircleIntroduction"
+                    android:layout_width="match_parent"
+                    android:layout_height="120dp"
+                    android:layout_weight="1"
+                    android:layout_marginTop="@dimen/margin_padding_small"
+                    android:paddingHorizontal="@dimen/margin_padding_large"
+                    android:paddingVertical="10dp"
+                    android:gravity="top"
+                    android:maxLength="1000"
+                    android:maxLines="6"
+                    android:hint="@string/hint_post_content"
+                    android:textColor="@color/grey_9"
+                    android:textColorHint="@color/grey_5"
+                    android:textSize="@dimen/text_size_default"
+                    android:translationY="-1.06sp"
                     android:background="@drawable/bg_edit_content"/>
 
                 <androidx.appcompat.widget.AppCompatTextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="@dimen/margin_padding_xx_large"
-                    android:text="@string/text_recruitment_date"
-                    android:textSize="@dimen/text_size_small"
-                    android:textColor="@color/grey_9"
                     android:lineSpacingExtra="2sp"
+                    android:text="@string/text_circle_introduction_image"
+                    android:textColor="@color/grey_9"
+                    android:textSize="@dimen/text_size_small"
                     android:translationY="-0.91sp" />
-                
-                <androidx.appcompat.widget.LinearLayoutCompat
+
+                <FrameLayout
+                    android:layout_width="80dp"
+                    android:layout_height="80dp">
+
+                    <androidx.appcompat.widget.AppCompatImageView
+                        android:id="@+id/btnAddCircleIntroductionImage"
+                        android:layout_width="76dp"
+                        android:layout_height="76dp"
+                        android:layout_gravity="start|bottom"
+                        android:src="@drawable/ic_add"
+                        android:scaleType="center"
+                        android:clipToOutline="true"
+                        android:background="@drawable/bg_dotted_rounded_rectangle" />
+
+                    <androidx.appcompat.widget.AppCompatImageView
+                        android:id="@+id/btnRemoveCircleIntroductionImage"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="top|end"
+                        android:src="@drawable/ic_cancel_2"
+                        android:visibility="gone"/>
+
+                </FrameLayout>
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/margin_padding_xx_large"
+                    android:lineSpacingExtra="2sp"
+                    android:text="@string/text_circle_category"
+                    android:textColor="@color/grey_9"
+                    android:textSize="@dimen/text_size_small"
+                    android:translationY="-0.91sp" />
+
+                <LinearLayout
+                    android:id="@+id/llCircleCategory"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="@dimen/margin_padding_small"
-                    android:weightSum="1">
-
-
-                </androidx.appcompat.widget.LinearLayoutCompat>
+                    android:orientation="horizontal">
+                </LinearLayout>
 
             </androidx.appcompat.widget.LinearLayoutCompat>
 

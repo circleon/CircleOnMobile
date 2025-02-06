@@ -52,7 +52,7 @@ class UploadPostFragment : Fragment() {
                 binding.btnAddPostImage.setBackgroundDrawable(
                     ContextCompat.getDrawable(
                         requireContext(),
-                        R.drawable.bg_small_rounded_rectangle,
+                        R.drawable.bg_rounded_rectangle,
                     ),
                 )
             }
