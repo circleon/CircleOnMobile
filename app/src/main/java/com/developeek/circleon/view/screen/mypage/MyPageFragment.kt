@@ -8,6 +8,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import com.developeek.circleon.data.source.manager.TokenManager
+import com.developeek.circleon.data.source.manager.UserManager
 import com.developeek.circleon.databinding.FragmentMyPageBinding
 import com.developeek.circleon.view.screen.login.LoginActivity
 import dagger.hilt.android.AndroidEntryPoint
@@ -19,6 +20,9 @@ class MyPageFragment : Fragment() {
 
     @Inject
     lateinit var tokenManager: TokenManager
+
+    @Inject
+    lateinit var userManager: UserManager
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -40,6 +44,7 @@ class MyPageFragment : Fragment() {
         binding.btnLogOut.setOnClickListener {
             tokenManager.deleteAccessToken()
             tokenManager.deleteRefreshToken()
+            userManager.deleteUser()
             sendUserToLoginScreen(requireActivity())
         }
     }

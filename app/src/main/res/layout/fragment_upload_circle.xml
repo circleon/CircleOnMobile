@@ -239,7 +239,7 @@
                         android:textColorHint="@color/grey_5"
                         android:textSize="@dimen/text_size_default"
                         android:translationY="-1.06sp"
-                        android:background="null"/>
+                        android:background="@null"/>
 
                     <androidx.appcompat.widget.LinearLayoutCompat
                         android:layout_width="wrap_content"

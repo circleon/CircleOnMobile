@@ -66,7 +66,6 @@ class HomeFragment : Fragment() {
 
     private fun initView(activity: Activity) {
         initRecyclerView(activity)
-        loadUserInfo()
     }
 
     private fun initRecyclerView(activity: Activity) {
@@ -96,13 +95,6 @@ class HomeFragment : Fragment() {
         binding.rvCircle.itemAnimator = null
     }
 
-    private fun loadUserInfo() {
-        userManager.getUser()?.let {
-            binding.txtUnivName.text = it.univ.univName()
-            binding.txtContentTitleCircle.text = String.format(CONTENT_TITLE_CIRCLE, it.name)
-        }
-    }
-
     private fun initObserver(activity: Activity) {
         viewModel.state.observe(
             viewLifecycleOwner,
@@ -129,14 +121,12 @@ class HomeFragment : Fragment() {
                         toggleView(binding.txtNoCircle)
                     } else {
                         toggleView(binding.rvCircle)
+                        loadUserInfo()
                         loadCircles()
                     }
                 }
                 UiState.AuthenticationError -> {
                     sendUserToLoginScreen(activity)
-                    if (ErrorToast.previousFinished()) {
-                        ErrorToast(activity, viewModel.error).show()
-                    }
                 }
                 UiState.ServiceError -> {
                     toggleView(binding.llServiceError)
@@ -146,6 +136,11 @@ class HomeFragment : Fragment() {
                 }
             }
         }
+
+    private fun loadUserInfo() {
+        binding.txtUnivName.text = viewModel.user.univ.univName()
+        binding.txtContentTitleCircle.text = String.format(CONTENT_TITLE_CIRCLE, viewModel.user.name)
+    }
 
     private fun loadCircles() {
         binding.rvCircle.adapter?.let {
