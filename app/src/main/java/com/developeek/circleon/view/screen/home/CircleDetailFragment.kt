@@ -25,6 +25,7 @@ import com.developeek.circleon.view.screen.login.LoginActivity
 import com.developeek.circleon.view.viewmodel.CircleDetailViewModel
 import com.developeek.circleon.view.viewmodelimpl.CircleDetailViewModelImpl
 import com.developeek.circleon.view.widget.ErrorToast
+import com.google.android.material.progressindicator.CircularProgressIndicator
 import com.google.android.material.tabs.TabLayout
 import dagger.hilt.android.AndroidEntryPoint
 import dagger.hilt.android.lifecycle.withCreationCallback
@@ -113,24 +114,25 @@ class CircleDetailFragment : Fragment() {
 
     private fun stateObserver(activity: Activity) =
         Observer<UiState> {
+            val loadingIndicator = activity.findViewById<CircularProgressIndicator>(R.id.pgbLoading)
             when (it) {
                 UiState.Loading -> {
-                    binding.pgbContentLoading.isVisible = true
+                    loadingIndicator.isVisible = true
                 }
                 UiState.Success -> {
-                    binding.pgbContentLoading.isVisible = false
+                    loadingIndicator.isVisible = false
                     toggleView(binding.flCircleDetail)
                     loadCircleDetail(activity)
                 }
                 UiState.AuthenticationError -> {
-                    binding.pgbContentLoading.isVisible = false
+                    loadingIndicator.isVisible = false
                     sendUserToLoginScreen(activity)
                     if (ErrorToast.previousFinished()) {
                         ErrorToast(activity, viewModel.error).show()
                     }
                 }
                 UiState.ServiceError -> {
-                    binding.pgbContentLoading.isVisible = false
+                    loadingIndicator.isVisible = false
                     toggleView(binding.llServiceError)
                     if (ErrorToast.previousFinished()) {
                         ErrorToast(activity, viewModel.error).show()

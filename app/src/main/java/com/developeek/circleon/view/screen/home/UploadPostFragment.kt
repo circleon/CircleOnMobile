@@ -30,6 +30,7 @@ import com.developeek.circleon.view.viewmodelimpl.UploadPostViewModelImpl
 import com.developeek.circleon.view.widget.ErrorAlertDialog
 import com.developeek.circleon.view.widget.ErrorToast
 import com.google.android.material.bottomnavigation.BottomNavigationView
+import com.google.android.material.progressindicator.CircularProgressIndicator
 import dagger.hilt.android.AndroidEntryPoint
 import dagger.hilt.android.lifecycle.withCreationCallback
 import javax.inject.Inject
@@ -168,24 +169,25 @@ class UploadPostFragment : Fragment() {
 
     private fun stateObserver(activity: Activity) =
         Observer<UiState> {
+            val loadingIndicator = activity.findViewById<CircularProgressIndicator>(R.id.pgbLoading)
             when (it) {
                 UiState.Loading -> {
-                    binding.pgbContentLoading.isVisible = true
+                    loadingIndicator.isVisible = true
                 }
                 UiState.Success -> {
-                    binding.pgbContentLoading.isVisible = false
+                    loadingIndicator.isVisible = false
                     requestRefreshToPreviousScreen()
                     sendUserToPreviousScreen()
                 }
                 UiState.AuthenticationError -> {
-                    binding.pgbContentLoading.isVisible = false
+                    loadingIndicator.isVisible = false
                     sendUserToLoginScreen(activity)
                     if (ErrorToast.previousFinished()) {
                         ErrorToast(activity, viewModel.error).show()
                     }
                 }
                 UiState.ServiceError -> {
-                    binding.pgbContentLoading.isVisible = false
+                    loadingIndicator.isVisible = false
                     ErrorAlertDialog(activity, viewModel.error).show()
                 }
             }

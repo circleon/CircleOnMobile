@@ -42,6 +42,7 @@ import com.developeek.circleon.view.widget.ErrorAlertDialog
 import com.developeek.circleon.view.widget.ErrorToast
 import com.developeek.circleon.view.widget.TextInputAlertDialog
 import com.google.android.material.bottomnavigation.BottomNavigationView
+import com.google.android.material.progressindicator.CircularProgressIndicator
 import dagger.hilt.android.AndroidEntryPoint
 import dagger.hilt.android.lifecycle.withCreationCallback
 import javax.inject.Inject
@@ -296,22 +297,23 @@ class CircleDetailPostDetailFragment : Fragment() {
 
     private fun stateObserver(activity: Activity) =
         Observer<UiState> {
+            val loadingIndicator = activity.findViewById<CircularProgressIndicator>(R.id.pgbLoading)
             when (it) {
                 UiState.Loading -> {
-                    binding.pgbContentLoading.isVisible = true
+                    loadingIndicator.isVisible = true
                 }
                 UiState.Success -> {
                     toggleView(binding.rvPostDetail)
-                    binding.pgbContentLoading.isVisible = false
+                    loadingIndicator.isVisible = false
                     loadContents()
                 }
                 UiState.AuthenticationError -> {
-                    binding.pgbContentLoading.isVisible = false
+                    loadingIndicator.isVisible = false
                     sendUserToLoginScreen(activity)
                     showErrorToast(activity)
                 }
                 UiState.ServiceError -> {
-                    binding.pgbContentLoading.isVisible = false
+                    loadingIndicator.isVisible = false
                     toggleView(binding.llServiceError)
                     requestRefreshToPreviousScreen()
                     showErrorDialog(activity)
@@ -347,24 +349,25 @@ class CircleDetailPostDetailFragment : Fragment() {
 
     private fun uploadCommentStateObserver(activity: Activity) =
         Observer<UiState> {
+            val loadingIndicator = activity.findViewById<CircularProgressIndicator>(R.id.pgbLoading)
             when (it) {
                 UiState.Loading -> {
-                    binding.pgbContentLoading.isVisible = true
+                    loadingIndicator.isVisible = true
                 }
                 UiState.Success -> {
-                    binding.pgbContentLoading.isVisible = false
+                    loadingIndicator.isVisible = false
                     requestRefreshToPreviousScreen()
                     loadContents()
                     hideSoftInput(activity, binding.edtComment)
                     binding.edtComment.text?.clear()
                 }
                 UiState.AuthenticationError -> {
-                    binding.pgbContentLoading.isVisible = false
+                    loadingIndicator.isVisible = false
                     sendUserToLoginScreen(activity)
                     showErrorToast(activity)
                 }
                 UiState.ServiceError -> {
-                    binding.pgbContentLoading.isVisible = false
+                    loadingIndicator.isVisible = false
                     showErrorDialog(activity)
                 }
             }
@@ -372,22 +375,23 @@ class CircleDetailPostDetailFragment : Fragment() {
 
     private fun editCommentStateObserver(activity: Activity) =
         Observer<UiState> {
+            val loadingIndicator = activity.findViewById<CircularProgressIndicator>(R.id.pgbLoading)
             when (it) {
                 UiState.Loading -> {
-                    binding.pgbContentLoading.isVisible = true
+                    loadingIndicator.isVisible = true
                 }
                 UiState.Success -> {
-                    binding.pgbContentLoading.isVisible = false
+                    loadingIndicator.isVisible = false
                     loadContents()
                     hideSoftInput(activity, binding.edtComment)
                 }
                 UiState.AuthenticationError -> {
-                    binding.pgbContentLoading.isVisible = false
+                    loadingIndicator.isVisible = false
                     sendUserToLoginScreen(activity)
                     showErrorToast(activity)
                 }
                 UiState.ServiceError -> {
-                    binding.pgbContentLoading.isVisible = false
+                    loadingIndicator.isVisible = false
                     showErrorDialog(activity)
                 }
             }
@@ -395,22 +399,23 @@ class CircleDetailPostDetailFragment : Fragment() {
 
     private fun deleteCommentStateObserver(activity: Activity) =
         Observer<UiState> {
+            val loadingIndicator = activity.findViewById<CircularProgressIndicator>(R.id.pgbLoading)
             when (it) {
                 UiState.Loading -> {
-                    binding.pgbContentLoading.isVisible = true
+                    loadingIndicator.isVisible = true
                 }
                 UiState.Success -> {
-                    binding.pgbContentLoading.isVisible = false
+                    loadingIndicator.isVisible = false
                     requestRefreshToPreviousScreen()
                     loadContents()
                 }
                 UiState.AuthenticationError -> {
-                    binding.pgbContentLoading.isVisible = false
+                    loadingIndicator.isVisible = false
                     sendUserToLoginScreen(activity)
                     showErrorToast(activity)
                 }
                 UiState.ServiceError -> {
-                    binding.pgbContentLoading.isVisible = false
+                    loadingIndicator.isVisible = false
                     ErrorAlertDialog(activity, viewModel.error).show()
                 }
             }
@@ -426,22 +431,23 @@ class CircleDetailPostDetailFragment : Fragment() {
 
     private fun deletePostStateObserver(activity: Activity) =
         Observer<UiState> {
+            val loadingIndicator = activity.findViewById<CircularProgressIndicator>(R.id.pgbLoading)
             when (it) {
                 UiState.Loading -> {
-                    binding.pgbContentLoading.isVisible = true
+                    loadingIndicator.isVisible = true
                 }
                 UiState.Success -> {
-                    binding.pgbContentLoading.isVisible = false
+                    loadingIndicator.isVisible = false
                     requestRefreshToPreviousScreen()
                     sendUserToPreviousScreen()
                 }
                 UiState.AuthenticationError -> {
-                    binding.pgbContentLoading.isVisible = false
+                    loadingIndicator.isVisible = false
                     sendUserToLoginScreen(activity)
                     showErrorToast(activity)
                 }
                 UiState.ServiceError -> {
-                    binding.pgbContentLoading.isVisible = false
+                    loadingIndicator.isVisible = false
                     ErrorAlertDialog(activity, viewModel.error).show()
                 }
             }

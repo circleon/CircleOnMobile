@@ -2,9 +2,9 @@
 <set xmlns:android="http://schemas.android.com/apk/res/android">
     <objectAnimator
         android:propertyName="translationX"
-        android:valueFrom="300"
+        android:valueFrom="500"
         android:valueTo="0"
         android:valueType="floatType"
-        android:duration="300"
+        android:duration="400"
         android:interpolator="@android:anim/accelerate_decelerate_interpolator"/>
 </set>

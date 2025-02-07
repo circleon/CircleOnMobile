@@ -261,22 +261,6 @@
 
     </androidx.coordinatorlayout.widget.CoordinatorLayout>
 
-    <com.google.android.material.progressindicator.CircularProgressIndicator
-        android:id="@+id/pgbContentLoading"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:padding="@dimen/margin_padding_large"
-        android:background="@drawable/bg_rounded_rectangle"
-        android:backgroundTint="@color/grey_3"
-        android:layout_gravity="center"
-        app:indicatorColor="@color/purple_5"
-        app:trackColor="@color/grey_3"
-        app:trackThickness="1dp"
-        android:indeterminate="true"
-        android:visibility="gone">
-
-    </com.google.android.material.progressindicator.CircularProgressIndicator>
-
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/fabUploadCircleContent"
         android:layout_width="wrap_content"
