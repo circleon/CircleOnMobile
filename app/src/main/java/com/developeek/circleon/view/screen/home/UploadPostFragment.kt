@@ -39,7 +39,7 @@ import javax.inject.Inject
 class UploadPostFragment : Fragment() {
     private lateinit var binding: FragmentUploadPostBinding
     private var circleId = 0
-    private lateinit var postType: PostType
+    private lateinit var postType: PostType // 편집이 아닌 상황에서는 item 전달이 되지 않기 때문에 post type 을 별도로 수신
     private var editOrNot = false
     private lateinit var post: PostModel
     private val pickMedia: ActivityResultLauncher<PickVisualMediaRequest> =
@@ -170,10 +170,8 @@ class UploadPostFragment : Fragment() {
     private fun stateObserver(activity: Activity) =
         Observer<UiState> {
             val loadingIndicator = activity.findViewById<CircularProgressIndicator>(R.id.pgbLoading)
+            loadingIndicator.isVisible = it is UiState.Loading
             when (it) {
-                UiState.Loading -> {
-                    loadingIndicator.isVisible = true
-                }
                 UiState.Success -> {
                     loadingIndicator.isVisible = false
                     requestRefreshToPreviousScreen()
@@ -190,6 +188,7 @@ class UploadPostFragment : Fragment() {
                     loadingIndicator.isVisible = false
                     ErrorAlertDialog(activity, viewModel.error).show()
                 }
+                else -> {}
             }
         }
 

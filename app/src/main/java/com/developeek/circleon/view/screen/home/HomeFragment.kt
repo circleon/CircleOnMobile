@@ -134,6 +134,7 @@ class HomeFragment : Fragment() {
                         ErrorToast(activity, viewModel.error).show()
                     }
                 }
+                else -> {}
             }
         }
 

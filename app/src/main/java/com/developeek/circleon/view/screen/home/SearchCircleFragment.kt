@@ -145,6 +145,7 @@ class SearchCircleFragment : Fragment() {
                         ErrorToast(activity, viewModel.error).show()
                     }
                 }
+                else -> {}
             }
         }
 

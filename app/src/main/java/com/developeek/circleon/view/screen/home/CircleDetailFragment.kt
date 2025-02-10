@@ -6,6 +6,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.appcompat.widget.Toolbar
 import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
@@ -17,6 +18,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.developeek.circleon.R
 import com.developeek.circleon.databinding.FragmentCircleDetailBinding
 import com.developeek.circleon.domain.enums.PostType
+import com.developeek.circleon.domain.model.CircleDetailModel
 import com.developeek.circleon.domain.state.UiState
 import com.developeek.circleon.domain.utils.Const
 import com.developeek.circleon.domain.utils.Utils
@@ -96,6 +98,14 @@ class CircleDetailFragment : Fragment() {
         )
     }
 
+    private fun sendUserToEditCircleScreen(item: CircleDetailModel) {
+        val bundle = Bundle()
+
+        bundle.putSerializable(Const.TAG_CIRCLE_DETAIL, item)
+        bundle.putBoolean(Const.FLAG_EDIT_OR_NOT, true) // 수정 기능 전용 활성화
+        findNavController().navigate(R.id.action_circleDetailFragment_to_uploadCircleFragment, bundle)
+    }
+
     private fun initAppBar() {
         binding.abCircleDetail.setExpanded(viewModel.currentAppBarExpanded)
     }
@@ -115,14 +125,15 @@ class CircleDetailFragment : Fragment() {
     private fun stateObserver(activity: Activity) =
         Observer<UiState> {
             val loadingIndicator = activity.findViewById<CircularProgressIndicator>(R.id.pgbLoading)
+            loadingIndicator.isVisible = it is UiState.Loading
             when (it) {
-                UiState.Loading -> {
-                    loadingIndicator.isVisible = true
-                }
                 UiState.Success -> {
                     loadingIndicator.isVisible = false
                     toggleView(binding.flCircleDetail)
                     loadCircleDetail(activity)
+                    binding.tbCircleDetail.setOnMenuItemClickListener(
+                        circleOverflowMenuItemClickListener(activity, viewModel.circleDetail),
+                    )
                 }
                 UiState.AuthenticationError -> {
                     loadingIndicator.isVisible = false
@@ -138,6 +149,7 @@ class CircleDetailFragment : Fragment() {
                         ErrorToast(activity, viewModel.error).show()
                     }
                 }
+                else -> {}
             }
         }
 
@@ -154,6 +166,22 @@ class CircleDetailFragment : Fragment() {
         val intent = Intent(activity, LoginActivity::class.java)
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)
         startActivity(intent)
+    }
+
+    private fun circleOverflowMenuItemClickListener(
+        activity: Activity,
+        item: CircleDetailModel,
+    ) = Toolbar.OnMenuItemClickListener {
+        when (it.itemId) {
+            R.id.edit_circle -> {
+                sendUserToEditCircleScreen(item)
+            }
+            R.id.manage_circle -> {
+            }
+            R.id.resign_circle -> {
+            }
+        }
+        true
     }
 
     private fun initListener() {

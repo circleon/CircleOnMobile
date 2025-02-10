@@ -52,8 +52,9 @@ class HomeActivity : AppCompatActivity() {
 
     private fun whenHideBtmNav(destination: NavDestination) =
         destination.id == R.id.searchCircleFragment ||
-            destination.id == R.id.circleDetailPostDetailFragment ||
-            destination.id == R.id.uploadPostFragment
+            destination.id == R.id.uploadCircleFragment ||
+            destination.id == R.id.uploadPostFragment ||
+            destination.id == R.id.circleDetailPostDetailFragment
 
     private fun initFinishWaitingToast() {
         finishWaitingToast =

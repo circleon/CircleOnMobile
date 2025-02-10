@@ -226,6 +226,7 @@ class CircleDetailPostFragment : Fragment() {
                         ErrorToast(activity, viewModel.error).show()
                     }
                 }
+                else -> {}
             }
         }
 

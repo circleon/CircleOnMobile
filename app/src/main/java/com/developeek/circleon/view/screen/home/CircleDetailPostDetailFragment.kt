@@ -89,6 +89,24 @@ class CircleDetailPostDetailFragment : Fragment() {
         return binding.root
     }
 
+    override fun onCreateAnimator(
+        transit: Int,
+        enter: Boolean,
+        nextAnim: Int,
+    ): Animator? {
+        if (nextAnim == R.animator.slide_in_left) {
+            val animator = AnimatorInflater.loadAnimator(context, nextAnim) as AnimatorSet
+            animator.addListener(
+                onEnd = {
+                    viewModel.notifyEnterAnimFinishedAndUpdateUI()
+                },
+            )
+
+            return animator
+        }
+        return super.onCreateAnimator(transit, enter, nextAnim)
+    }
+
     override fun onViewCreated(
         view: View,
         savedInstanceState: Bundle?,
@@ -298,26 +316,22 @@ class CircleDetailPostDetailFragment : Fragment() {
     private fun stateObserver(activity: Activity) =
         Observer<UiState> {
             val loadingIndicator = activity.findViewById<CircularProgressIndicator>(R.id.pgbLoading)
+            loadingIndicator.isVisible = it is UiState.Loading
             when (it) {
-                UiState.Loading -> {
-                    loadingIndicator.isVisible = true
-                }
                 UiState.Success -> {
                     toggleView(binding.rvPostDetail)
-                    loadingIndicator.isVisible = false
                     loadContents()
                 }
                 UiState.AuthenticationError -> {
-                    loadingIndicator.isVisible = false
                     sendUserToLoginScreen(activity)
                     showErrorToast(activity)
                 }
                 UiState.ServiceError -> {
-                    loadingIndicator.isVisible = false
                     toggleView(binding.llServiceError)
                     requestRefreshToPreviousScreen()
                     showErrorDialog(activity)
                 }
+                else -> {}
             }
         }
 
@@ -350,74 +364,62 @@ class CircleDetailPostDetailFragment : Fragment() {
     private fun uploadCommentStateObserver(activity: Activity) =
         Observer<UiState> {
             val loadingIndicator = activity.findViewById<CircularProgressIndicator>(R.id.pgbLoading)
+            loadingIndicator.isVisible = it is UiState.Loading
             when (it) {
-                UiState.Loading -> {
-                    loadingIndicator.isVisible = true
-                }
                 UiState.Success -> {
-                    loadingIndicator.isVisible = false
                     requestRefreshToPreviousScreen()
                     loadContents()
                     hideSoftInput(activity, binding.edtComment)
                     binding.edtComment.text?.clear()
                 }
                 UiState.AuthenticationError -> {
-                    loadingIndicator.isVisible = false
                     sendUserToLoginScreen(activity)
                     showErrorToast(activity)
                 }
                 UiState.ServiceError -> {
-                    loadingIndicator.isVisible = false
                     showErrorDialog(activity)
                 }
+                else -> {}
             }
         }
 
     private fun editCommentStateObserver(activity: Activity) =
         Observer<UiState> {
             val loadingIndicator = activity.findViewById<CircularProgressIndicator>(R.id.pgbLoading)
+            loadingIndicator.isVisible = it is UiState.Loading
             when (it) {
-                UiState.Loading -> {
-                    loadingIndicator.isVisible = true
-                }
                 UiState.Success -> {
-                    loadingIndicator.isVisible = false
                     loadContents()
                     hideSoftInput(activity, binding.edtComment)
                 }
                 UiState.AuthenticationError -> {
-                    loadingIndicator.isVisible = false
                     sendUserToLoginScreen(activity)
                     showErrorToast(activity)
                 }
                 UiState.ServiceError -> {
-                    loadingIndicator.isVisible = false
                     showErrorDialog(activity)
                 }
+                else -> {}
             }
         }
 
     private fun deleteCommentStateObserver(activity: Activity) =
         Observer<UiState> {
             val loadingIndicator = activity.findViewById<CircularProgressIndicator>(R.id.pgbLoading)
+            loadingIndicator.isVisible = it is UiState.Loading
             when (it) {
-                UiState.Loading -> {
-                    loadingIndicator.isVisible = true
-                }
                 UiState.Success -> {
-                    loadingIndicator.isVisible = false
                     requestRefreshToPreviousScreen()
                     loadContents()
                 }
                 UiState.AuthenticationError -> {
-                    loadingIndicator.isVisible = false
                     sendUserToLoginScreen(activity)
                     showErrorToast(activity)
                 }
                 UiState.ServiceError -> {
-                    loadingIndicator.isVisible = false
                     ErrorAlertDialog(activity, viewModel.error).show()
                 }
+                else -> {}
             }
         }
 
@@ -432,24 +434,20 @@ class CircleDetailPostDetailFragment : Fragment() {
     private fun deletePostStateObserver(activity: Activity) =
         Observer<UiState> {
             val loadingIndicator = activity.findViewById<CircularProgressIndicator>(R.id.pgbLoading)
+            loadingIndicator.isVisible = it is UiState.Loading
             when (it) {
-                UiState.Loading -> {
-                    loadingIndicator.isVisible = true
-                }
                 UiState.Success -> {
-                    loadingIndicator.isVisible = false
                     requestRefreshToPreviousScreen()
                     sendUserToPreviousScreen()
                 }
                 UiState.AuthenticationError -> {
-                    loadingIndicator.isVisible = false
                     sendUserToLoginScreen(activity)
                     showErrorToast(activity)
                 }
                 UiState.ServiceError -> {
-                    loadingIndicator.isVisible = false
                     ErrorAlertDialog(activity, viewModel.error).show()
                 }
+                else -> {}
             }
         }
 
@@ -515,21 +513,6 @@ class CircleDetailPostDetailFragment : Fragment() {
         binding.btnRetry.setOnClickListener {
             viewModel.refresh()
         }
-    }
-
-    override fun onCreateAnimator(
-        transit: Int,
-        enter: Boolean,
-        nextAnim: Int,
-    ): Animator? {
-        if (nextAnim == R.animator.slide_end_to_start) {
-            val animator = AnimatorInflater.loadAnimator(context, nextAnim) as AnimatorSet
-            animator.addListener(onEnd = {
-                viewModel.notifyEnterAnimFinishedAndUpdateUI()
-            })
-            return animator
-        }
-        return super.onCreateAnimator(transit, enter, nextAnim)
     }
 
     override fun onDestroyView() {

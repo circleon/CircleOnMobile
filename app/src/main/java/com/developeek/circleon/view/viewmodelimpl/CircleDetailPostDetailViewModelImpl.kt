@@ -114,6 +114,12 @@ class CircleDetailPostDetailViewModelImpl
                             uiState.postValueWhenAnimFinished(UiState.ServiceError)
                         }
                     }
+                }.apply {
+                    invokeOnCompletion {
+                        if (isCancelled) {
+                            uiState.postValue(UiState.Cancellation)
+                        }
+                    }
                 }
         }
 
@@ -146,6 +152,10 @@ class CircleDetailPostDetailViewModelImpl
                         val errorState =
                             if (result.isAuthenticationError()) UiState.AuthenticationError else UiState.ServiceError
                         uiState.postValueWhenAnimFinished(errorState)
+                    }
+                }.apply {
+                    invokeOnCompletion {
+                        if (isCancelled) uiState.postValue(UiState.Cancellation)
                     }
                 }
         }
@@ -180,6 +190,10 @@ class CircleDetailPostDetailViewModelImpl
                             if (result.isAuthenticationError()) UiState.AuthenticationError else UiState.ServiceError
                         commentUploadState.postValueWhenAnimFinished(errorState)
                     }
+                }.apply {
+                    invokeOnCompletion {
+                        if (isCancelled) commentUploadState.postValue(UiState.Cancellation)
+                    }
                 }
         }
 
@@ -208,6 +222,10 @@ class CircleDetailPostDetailViewModelImpl
                             if (result.isAuthenticationError()) UiState.AuthenticationError else UiState.ServiceError
                         commentEditState.postValueWhenAnimFinished(errorState)
                     }
+                }.apply {
+                    invokeOnCompletion {
+                        if (isCancelled) commentEditState.postValue(UiState.Cancellation)
+                    }
                 }
         }
 
@@ -233,6 +251,10 @@ class CircleDetailPostDetailViewModelImpl
                         val errorState =
                             if (result.isAuthenticationError()) UiState.AuthenticationError else UiState.ServiceError
                         commentDeleteState.postValueWhenAnimFinished(errorState)
+                    }
+                }.apply {
+                    invokeOnCompletion {
+                        if (isCancelled) commentDeleteState.postValue(UiState.Cancellation)
                     }
                 }
         }
@@ -290,6 +312,10 @@ class CircleDetailPostDetailViewModelImpl
                         val errorState =
                             if (result.isAuthenticationError()) UiState.AuthenticationError else UiState.ServiceError
                         postDeleteState.postValueWhenAnimFinished(errorState)
+                    }
+                }.apply {
+                    invokeOnCompletion {
+                        if (isCancelled) postDeleteState.postValue(UiState.Cancellation)
                     }
                 }
         }

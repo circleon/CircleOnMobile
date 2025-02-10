@@ -77,6 +77,7 @@
     <string name="hint_circle_single_line_introduction">동아리 한 줄 소개</string>
     <string name="text_circle_introduction">동아리 소개글</string>
     <string name="text_circle_introduction_image">소개글 이미지</string>
+    <string name="tip_circle_introduction_image">동아리 홍보 포스터를 추천드려요</string>
     <string name="text_circle_category">동아리 카테고리</string>
 
     <!--Post Detail-->

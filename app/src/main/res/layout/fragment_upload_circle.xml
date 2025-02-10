@@ -79,7 +79,7 @@
                     android:src="@drawable/ic_add" />
 
                 <androidx.appcompat.widget.AppCompatImageView
-                    android:id="@+id/btnRemovePostImage"
+                    android:id="@+id/btnRemoveCircleThumbnail"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="top|end"
@@ -302,15 +302,43 @@
                 android:translationY="-1.06sp"
                 android:background="@drawable/bg_edit_content"/>
 
-            <androidx.appcompat.widget.AppCompatTextView
-                android:layout_width="wrap_content"
+            <androidx.appcompat.widget.LinearLayoutCompat
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/margin_padding_xx_large"
-                android:lineSpacingExtra="2sp"
-                android:text="@string/text_circle_introduction_image"
-                android:textColor="@color/grey_9"
-                android:textSize="@dimen/text_size_small"
-                android:translationY="-0.91sp" />
+                android:orientation="horizontal">
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:lineSpacingExtra="2sp"
+                    android:text="@string/text_circle_introduction_image"
+                    android:textColor="@color/grey_9"
+                    android:textSize="@dimen/text_size_small"
+                    android:translationY="-0.91sp" />
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="@dimen/margin_padding_small"
+                    android:paddingEnd="@dimen/margin_padding_xx_small"
+                    android:gravity="center"
+                    android:text="*"
+                    android:lineSpacingExtra="2sp"
+                    android:textColor="@color/purple_5"
+                    android:textSize="@dimen/text_size_small"
+                     />
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:lineSpacingExtra="2sp"
+                    android:text="@string/tip_circle_introduction_image"
+                    android:textColor="@color/grey_5"
+                    android:textSize="@dimen/text_size_small"
+                    android:translationY="-0.91sp" />
+
+            </androidx.appcompat.widget.LinearLayoutCompat>
 
             <FrameLayout
                 android:layout_width="80dp"
