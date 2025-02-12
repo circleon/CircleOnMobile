@@ -44,13 +44,16 @@ class HomeActivity : AppCompatActivity() {
     private fun setDestinationChangedListener() {
         navController.addOnDestinationChangedListener { _, destination, _ ->
             onMainFragment = destination.id == R.id.homeFragment
-            if (!whenHideBtmNav(destination) && !binding.btmNav.isVisible) {
+
+            // fragment 가 초기화되기 전에 visibility 를 설정할 경우 뷰 리사이징으로 인해
+            // UX 에 좋지 않기 때문에 btmNav Hide 작업은 각 fragment 내에서 진행
+            if (!hideBtmNavCondition(destination) && !binding.btmNav.isVisible) {
                 binding.btmNav.isVisible = true
             }
         }
     }
 
-    private fun whenHideBtmNav(destination: NavDestination) =
+    private fun hideBtmNavCondition(destination: NavDestination) =
         destination.id == R.id.searchCircleFragment ||
             destination.id == R.id.uploadCircleFragment ||
             destination.id == R.id.uploadPostFragment ||

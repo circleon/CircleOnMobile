@@ -11,4 +11,8 @@ interface UploadCircleViewModel {
     fun setCircleThumbnail(image: File?)
 
     fun setCircleIntroductionImage(image: File?)
+
+    fun removeCircleThumbnail()
+
+    fun removeCircleIntroductionImage()
 }

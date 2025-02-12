@@ -209,7 +209,7 @@ class CircleDetailPostDetailFragment : Fragment() {
         bundle.putInt(Const.TAG_CIRCLE_ID, circleId)
         bundle.putSerializable(Const.TAG_POST_TYPE, item.type)
         bundle.putSerializable(Const.TAG_CIRCLE_POST, item)
-        bundle.putBoolean(Const.FLAG_EDIT_OR_NOT, true) // 수정 기능 전용 활성화
+        bundle.putBoolean(Const.FLAG_IS_EDIT, true) // 수정 기능 전용 활성화
         findNavController().navigate(R.id.action_circleDetailPostDetailFragment_to_uploadPostFragment, bundle)
     }
 

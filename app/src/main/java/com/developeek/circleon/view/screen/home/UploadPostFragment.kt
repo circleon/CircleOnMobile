@@ -40,7 +40,7 @@ class UploadPostFragment : Fragment() {
     private lateinit var binding: FragmentUploadPostBinding
     private var circleId = 0
     private lateinit var postType: PostType // 편집이 아닌 상황에서는 item 전달이 되지 않기 때문에 post type 을 별도로 수신
-    private var editOrNot = false
+    private var isEdit = false
     private lateinit var post: PostModel
     private val pickMedia: ActivityResultLauncher<PickVisualMediaRequest> =
         registerForActivityResult(ActivityResultContracts.PickVisualMedia()) {
@@ -76,8 +76,8 @@ class UploadPostFragment : Fragment() {
         arguments?.let {
             circleId = it.getInt(Const.TAG_CIRCLE_ID)
             postType = it.getSerializable(Const.TAG_POST_TYPE) as PostType
-            editOrNot =
-                it.getBoolean(Const.FLAG_EDIT_OR_NOT).also { isEdit ->
+            isEdit =
+                it.getBoolean(Const.FLAG_IS_EDIT).also { isEdit ->
                     if (isEdit) {
                         post = it.getSerializable(Const.TAG_CIRCLE_POST) as PostModel
                     }
@@ -109,31 +109,31 @@ class UploadPostFragment : Fragment() {
 
     private fun initView(activity: Activity) {
         initToolbar()
-        loadContentWhenEdit(activity)
         hideBtmNav(activity)
+        loadPostContentWhenIsEdit(activity)
     }
 
     private fun initToolbar() {
         var title = Const.EMPTY_TEXT
 
-        if (postType.isNotice() && editOrNot) {
+        if (postType.isNotice() && isEdit) {
             title = TITLE_NOTICE_EDIT
         }
-        if (postType.isNotice() && !editOrNot) {
+        if (postType.isNotice() && !isEdit) {
             title = TITLE_NOTICE
         }
-        if (postType.isPost() && editOrNot) {
+        if (postType.isPost() && isEdit) {
             title = TITLE_POST_EDIT
         }
-        if (postType.isPost() && !editOrNot) {
+        if (postType.isPost() && !isEdit) {
             title = TITLE_POST
         }
 
         binding.txtTbTitle.text = title
     }
 
-    private fun loadContentWhenEdit(activity: Activity) {
-        if (editOrNot) {
+    private fun loadPostContentWhenIsEdit(activity: Activity) {
+        if (isEdit) {
             binding.edtPostContent.setText(post.content)
             if (post.imgUrl == null) {
                 // 이미지 추가 레이아웃 비활성화
@@ -149,7 +149,7 @@ class UploadPostFragment : Fragment() {
                 binding.btnAddPostImage.setBackgroundDrawable(
                     ContextCompat.getDrawable(
                         activity,
-                        R.drawable.bg_small_rounded_rectangle,
+                        R.drawable.bg_rounded_rectangle,
                     ),
                 )
             }
@@ -221,7 +221,7 @@ class UploadPostFragment : Fragment() {
 
     private fun setBtnUploadListener() {
         binding.btnUpload.setOnClickListener {
-            if (editOrNot) {
+            if (isEdit) {
                 viewModel.edit(post.id, binding.edtPostContent.text.toString())
             } else {
                 viewModel.upload(binding.edtPostContent.text.toString())
@@ -232,7 +232,7 @@ class UploadPostFragment : Fragment() {
     private fun setBtnAddPostImageListener() {
         binding.btnAddPostImage.setOnClickListener {
             // 편집 화면에서는 이미지 수정 기능 비활성화
-            if (!editOrNot) {
+            if (!isEdit) {
                 val mimeType = "image/jpeg"
                 pickMedia.launch(
                     PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.SingleMimeType(mimeType)),

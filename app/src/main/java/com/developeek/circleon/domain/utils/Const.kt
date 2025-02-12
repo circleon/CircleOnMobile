@@ -10,5 +10,5 @@ object Const {
     const val TAG_POST_TYPE = "post_type"
 
     const val FLAG_DATA_CHANGED = "data_changed"
-    const val FLAG_EDIT_OR_NOT = "edit_or_not"
+    const val FLAG_IS_EDIT = "is_edit"
 }

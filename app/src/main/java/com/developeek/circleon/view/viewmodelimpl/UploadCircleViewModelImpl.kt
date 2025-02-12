@@ -32,4 +32,12 @@ class UploadCircleViewModelImpl
         override fun setCircleIntroductionImage(image: File?) {
             this.introductionImage = image
         }
+
+        override fun removeCircleThumbnail() {
+            this.thumbnail = null
+        }
+
+        override fun removeCircleIntroductionImage() {
+            this.introductionImage = null
+        }
     }
