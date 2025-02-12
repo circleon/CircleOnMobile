@@ -79,23 +79,14 @@ class CircleDetailFragment : Fragment() {
     ) {
         super.onViewCreated(view, savedInstanceState)
 
-        initView(requireActivity())
+        initView()
         initObserver(requireActivity())
         initListener()
     }
 
-    private fun initView(activity: Activity) {
+    private fun initView() {
         initAppBar()
-        initOverflowMenu(activity)
         loadCircleDetailContent()
-    }
-
-    private fun initOverflowMenu(activity: Activity) {
-        binding.tbCircleDetail.inflateMenu(R.menu.menu_circle_settings)
-        Utils.changeMenuItemTextColor(
-            binding.tbCircleDetail.menu.findItem(R.id.resign_circle),
-            ContextCompat.getColor(activity, R.color.error),
-        )
     }
 
     private fun sendUserToEditCircleScreen(item: CircleDetailModel) {
@@ -131,9 +122,7 @@ class CircleDetailFragment : Fragment() {
                     loadingIndicator.isVisible = false
                     toggleView(binding.flCircleDetail)
                     loadCircleDetail(activity)
-                    binding.tbCircleDetail.setOnMenuItemClickListener(
-                        circleOverflowMenuItemClickListener(activity, viewModel.circleDetail),
-                    )
+                    loadOverflowMenu(activity)
                 }
                 UiState.AuthenticationError -> {
                     loadingIndicator.isVisible = false
@@ -166,6 +155,25 @@ class CircleDetailFragment : Fragment() {
         val intent = Intent(activity, LoginActivity::class.java)
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)
         startActivity(intent)
+    }
+
+    private fun loadOverflowMenu(activity: Activity) {
+        if (viewModel.circleDetail.isExecutive()) {
+            binding.tbCircleDetail.inflateMenu(R.menu.menu_executive_circle_settings)
+        } else if (viewModel.circleDetail.isMember()) {
+            binding.tbCircleDetail.inflateMenu(R.menu.menu_member_circle_settings)
+        }
+
+        if (viewModel.circleDetail.isExecutive() || viewModel.circleDetail.isMember()) {
+            Utils.changeMenuItemTextColor(
+                binding.tbCircleDetail.menu.findItem(R.id.resign_circle),
+                ContextCompat.getColor(activity, R.color.error),
+            )
+        }
+
+        binding.tbCircleDetail.setOnMenuItemClickListener(
+            circleOverflowMenuItemClickListener(activity, viewModel.circleDetail),
+        )
     }
 
     private fun circleOverflowMenuItemClickListener(
