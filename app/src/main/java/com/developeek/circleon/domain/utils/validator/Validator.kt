@@ -1,5 +1,6 @@
 package com.developeek.circleon.domain.utils.validator
 
+import com.developeek.circleon.domain.model.CircleDetailModel
 import com.developeek.circleon.domain.vo.Password
 import com.developeek.circleon.domain.vo.UserEmail
 import com.developeek.circleon.domain.vo.UserName
@@ -54,19 +55,12 @@ object Validator {
         }
     }
 
-    fun checkComment(data: String): InputValidationResult<String> {
-        checkEmpty(data)
+    fun checkCircle(data: CircleDetailModel): InputValidationResult<CircleDetailModel> {
+        checkEmpty(data.name)
+        checkEmpty(data.singleLineIntroduction)
+        checkEmpty(data.introduction)
 
-        return try {
-            require(data.length <= MAX_COMMENT_SIZE)
-            InputValidationResult.valid(data)
-        } catch (e: IllegalArgumentException) {
-            InputValidationResult.invalid(
-                IOException(
-                    String.format(ValidatorExceptionMessage.MESSAGE_OVER_SIZE_COMMENT, MAX_COMMENT_SIZE),
-                ),
-            )
-        }
+        return InputValidationResult.valid(data)
     }
 
     fun checkPost(data: String): InputValidationResult<String> {
@@ -79,6 +73,21 @@ object Validator {
             InputValidationResult.invalid(
                 IOException(
                     String.format(ValidatorExceptionMessage.MESSAGE_OVER_SIZE_POST, MAX_POST_SIZE),
+                ),
+            )
+        }
+    }
+
+    fun checkComment(data: String): InputValidationResult<String> {
+        checkEmpty(data)
+
+        return try {
+            require(data.length <= MAX_COMMENT_SIZE)
+            InputValidationResult.valid(data)
+        } catch (e: IllegalArgumentException) {
+            InputValidationResult.invalid(
+                IOException(
+                    String.format(ValidatorExceptionMessage.MESSAGE_OVER_SIZE_COMMENT, MAX_COMMENT_SIZE),
                 ),
             )
         }

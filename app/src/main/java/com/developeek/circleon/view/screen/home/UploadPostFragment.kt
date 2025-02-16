@@ -173,19 +173,16 @@ class UploadPostFragment : Fragment() {
             loadingIndicator.isVisible = it is UiState.Loading
             when (it) {
                 UiState.Success -> {
-                    loadingIndicator.isVisible = false
                     requestRefreshToPreviousScreen()
                     sendUserToPreviousScreen()
                 }
                 UiState.AuthenticationError -> {
-                    loadingIndicator.isVisible = false
                     sendUserToLoginScreen(activity)
                     if (ErrorToast.previousFinished()) {
                         ErrorToast(activity, viewModel.error).show()
                     }
                 }
                 UiState.ServiceError -> {
-                    loadingIndicator.isVisible = false
                     ErrorAlertDialog(activity, viewModel.error).show()
                 }
                 else -> {}

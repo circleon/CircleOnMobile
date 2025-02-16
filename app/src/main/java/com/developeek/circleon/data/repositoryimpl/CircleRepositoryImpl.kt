@@ -1,7 +1,7 @@
 package com.developeek.circleon.data.repositoryimpl
 
 import com.developeek.circleon.data.dto.home.Pin
-import com.developeek.circleon.data.dto.home.RequestBodyComment
+import com.developeek.circleon.data.dto.home.RequestBodyEditComment
 import com.developeek.circleon.data.dto.home.RequestBodyEditPost
 import com.developeek.circleon.data.exception.ServiceException
 import com.developeek.circleon.data.repository.CircleRepository
@@ -180,7 +180,7 @@ class CircleRepositoryImpl(
     ): Result<Unit> {
         return try {
             withContext(dispatcher) {
-                service.postCircleComment(circleId, postId, RequestBodyComment(comment))
+                service.postCircleComment(circleId, postId, RequestBodyEditComment(comment))
                 Result.success(Unit)
             }
         } catch (e: IOException) {
@@ -196,6 +196,17 @@ class CircleRepositoryImpl(
         return try {
             withContext(dispatcher) {
                 service.putPostPin(circleId, postId, Pin(isPinned))
+                Result.success(Unit)
+            }
+        } catch (e: IOException) {
+            Result.error(e)
+        }
+    }
+
+    override suspend fun putCircle(circleDetailModel: CircleDetailModel): Result<Unit> {
+        return try {
+            withContext(dispatcher) {
+                service.putCircle(circleDetailModel.id, circleDetailModel.toRequestBodyForEdit())
                 Result.success(Unit)
             }
         } catch (e: IOException) {
@@ -227,7 +238,7 @@ class CircleRepositoryImpl(
     ): Result<Unit> {
         return try {
             withContext(dispatcher) {
-                service.putCircleComment(circleId, postId, commentId, RequestBodyComment(content))
+                service.putCircleComment(circleId, postId, commentId, RequestBodyEditComment(content))
                 Result.success(Unit)
             }
         } catch (e: IOException) {

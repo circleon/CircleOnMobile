@@ -7,7 +7,8 @@ import com.developeek.circleon.data.dto.home.Comment
 import com.developeek.circleon.data.dto.home.Paging
 import com.developeek.circleon.data.dto.home.Pin
 import com.developeek.circleon.data.dto.home.Post
-import com.developeek.circleon.data.dto.home.RequestBodyComment
+import com.developeek.circleon.data.dto.home.RequestBodyEditCircleDetail
+import com.developeek.circleon.data.dto.home.RequestBodyEditComment
 import com.developeek.circleon.data.dto.home.RequestBodyEditPost
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
@@ -77,7 +78,7 @@ interface CircleService {
     suspend fun postCircleComment(
         @Path("circleId") circleId: Int,
         @Path("postId") postId: Int,
-        @Body data: RequestBodyComment,
+        @Body data: RequestBodyEditComment,
     )
 
     // PUT
@@ -86,6 +87,12 @@ interface CircleService {
         @Path("circleId") circleId: Int,
         @Path("postId") postId: Int,
         @Body data: Pin,
+    )
+
+    @PUT("circles/{circleId}")
+    suspend fun putCircle(
+        @Path("circleId") circleId: Int,
+        @Body data: RequestBodyEditCircleDetail,
     )
 
     @PUT("circles/{circleId}/posts/{postId}")
@@ -100,7 +107,7 @@ interface CircleService {
         @Path("circleId") circleId: Int,
         @Path("postId") postId: Int,
         @Path("commentId") commentId: Int,
-        @Body data: RequestBodyComment,
+        @Body data: RequestBodyEditComment,
     )
 
     // DELETE
