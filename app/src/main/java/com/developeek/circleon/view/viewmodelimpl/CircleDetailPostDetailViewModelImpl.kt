@@ -209,7 +209,6 @@ class CircleDetailPostDetailViewModelImpl
 
             editCommentJob =
                 viewModelScope.launch {
-                    // TODO: respository.editCircleComment 로 수정
                     val result = repository.putCircleComment(circleId, post.id, commentId, content)
                     delay(remainedLoadingTime())
 

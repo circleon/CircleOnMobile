@@ -6,7 +6,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.developeek.circleon.data.repository.CircleRepository
 import com.developeek.circleon.data.source.Error
-import com.developeek.circleon.data.source.Success
 import com.developeek.circleon.domain.enums.Category
 import com.developeek.circleon.domain.model.CircleDetailModel
 import com.developeek.circleon.domain.state.UiState
@@ -14,7 +13,9 @@ import com.developeek.circleon.domain.utils.validator.Invalid
 import com.developeek.circleon.domain.utils.validator.Validator
 import com.developeek.circleon.view.viewmodel.UploadCircleViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.cancel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import java.io.File
@@ -33,11 +34,20 @@ class UploadCircleViewModelImpl
 
         override lateinit var origin: CircleDetailModel
         private var temp: CircleDetailModel = CircleDetailModel.empty()
-        private var uploadCircleJob: Job? = null
+        private var uploadJob: Job? = null
 
         // 썸네일, 소개글 이미지 등 이미지 처리 api 는 별도
         private var thumbnail: File? = null
         private var introductionImage: File? = null
+
+        /**
+         * 이미지 파일이 null 인 경우 -> 1. 기존 이미지 유지 2. 기존 이미지 삭제
+         *
+         * 1. 이미지 null && !hasChanged == 기존 이미지 유지
+         * 2. 이미지 null && hasChanged == 기존 이미지 삭제
+         */
+        private var hasThumbnailChanged = false
+        private var hasIntroductionImageChanged = false
 
         private var loadingStartTime = 0L
         override lateinit var error: String
@@ -45,27 +55,88 @@ class UploadCircleViewModelImpl
         override fun edit() {
             val circle = if (origin == temp) origin else temp
             if (!isCircleFormat(circle)) return
+            initUploadCircleImageJob()
 
-            uploadCircleJob?.cancel()
-            uiState.postValue(UiState.Loading)
-            saveLoadingStartTime()
-
-            uploadCircleJob =
+            uploadJob =
                 viewModelScope.launch {
-                    val result = repository.putCircle(circle)
-                    delay(remainedLoadingTime())
-
-                    if (result is Success) {
-                        uiState.postValue(UiState.Success)
-                    } else {
-                        error = (result as Error).message()
-                        if (result.isAuthenticationError()) {
-                            uiState.postValue(UiState.AuthenticationError)
-                        } else {
-                            uiState.postValue(UiState.ServiceError)
+                    launch {
+                        editCircle(this, circle)
+                    }
+                    launch {
+                        if (isAnyImageEdited()) {
+                            editCircleImage(this, circle)
+                        }
+                    }
+                    launch {
+                        if (isAnyImageRemoved()) {
+                            deleteCircleImage(this, circle)
+                        }
+                    }
+                }.apply {
+                    invokeOnCompletion {
+                        if (!isCancelled) {
+                            uiState.postValue(UiState.Success)
                         }
                     }
                 }
+        }
+
+        private fun initUploadCircleImageJob() {
+            uploadJob?.cancel()
+            uiState.postValue(UiState.Loading)
+            saveLoadingStartTime()
+        }
+
+        private suspend fun editCircle(
+            scope: CoroutineScope,
+            circle: CircleDetailModel,
+        ) {
+            val result = repository.putCircle(circle)
+            delay(remainedLoadingTime())
+
+            if (result is Error) {
+                error = result.message()
+                if (result.isAuthenticationError()) {
+                    uiState.postValue(UiState.AuthenticationError)
+                } else {
+                    uiState.postValue(UiState.ServiceError)
+                }
+                scope.cancel()
+            }
+        }
+
+        private suspend fun editCircleImage(
+            scope: CoroutineScope,
+            circle: CircleDetailModel,
+        ) {
+            val result = repository.putCircleImage(circle.id, thumbnail, introductionImage)
+
+            if (result is Error) {
+                error = result.message()
+                if (result.isAuthenticationError()) {
+                    uiState.postValue(UiState.AuthenticationError)
+                } else {
+                    uiState.postValue(UiState.ServiceError)
+                }
+                scope.cancel()
+            }
+        }
+
+        private suspend fun deleteCircleImage(
+            scope: CoroutineScope,
+            circle: CircleDetailModel,
+        ) {
+            val result = repository.deleteCircleImage(circle.id, isThumbnailRemoved(), isIntroductionImageRemoved())
+
+            if (result is Error) {
+                error = result.message()
+                if (result.isAuthenticationError()) {
+                    uiState.postValue(UiState.AuthenticationError)
+                } else {
+                    uiState.postValue(UiState.ServiceError)
+                }
+                scope.cancel()
+            }
         }
 
         private fun isCircleFormat(circle: CircleDetailModel): Boolean {
@@ -119,11 +190,21 @@ class UploadCircleViewModelImpl
 
         override fun removeCircleThumbnail() {
             this.thumbnail = null
+            hasThumbnailChanged = true
         }
 
         override fun removeCircleIntroductionImage() {
             this.introductionImage = null
+            hasIntroductionImageChanged = true
         }
+
+        private fun isAnyImageEdited() = thumbnail != null || introductionImage != null
+
+        private fun isAnyImageRemoved() = isThumbnailRemoved() || isIntroductionImageRemoved()
+
+        private fun isThumbnailRemoved() = thumbnail == null && hasThumbnailChanged
+
+        private fun isIntroductionImageRemoved() = introductionImage == null && hasIntroductionImageChanged
 
         private fun saveLoadingStartTime() {
             this.loadingStartTime = System.currentTimeMillis()

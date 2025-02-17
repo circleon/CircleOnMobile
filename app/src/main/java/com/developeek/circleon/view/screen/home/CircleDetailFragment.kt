@@ -106,14 +106,6 @@ class CircleDetailFragment : Fragment() {
             viewLifecycleOwner,
             stateObserver(activity),
         )
-        // 정보 수정 여부 감지
-        findNavController()
-            .currentBackStackEntry
-            ?.savedStateHandle
-            ?.getLiveData<Boolean>(Const.FLAG_DATA_CHANGED)
-            ?.observe(viewLifecycleOwner) {
-                if (it) viewModel.refresh()
-            }
     }
 
     private fun stateObserver(activity: Activity) =

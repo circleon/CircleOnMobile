@@ -95,6 +95,14 @@ interface CircleService {
         @Body data: RequestBodyEditCircleDetail,
     )
 
+    @Multipart
+    @PUT("circles/{circleId}/images")
+    suspend fun putCircleImage(
+        @Path("circleId") circleId: Int,
+        @Part thumbnail: MultipartBody.Part?,
+        @Part introductionImage: MultipartBody.Part?,
+    )
+
     @PUT("circles/{circleId}/posts/{postId}")
     suspend fun putCirclePost(
         @Path("circleId") circleId: Int,
@@ -111,6 +119,13 @@ interface CircleService {
     )
 
     // DELETE
+    @DELETE("circles/{circleId}/images")
+    suspend fun deleteCircleImage(
+        @Path("circleId") circleId: Int,
+        @Query("deleteProfileImg") deleteProfileImg: Boolean,
+        @Query("deleteIntroImg") deleteIntroImg: Boolean,
+    )
+
     @DELETE("circles/{circleId}/posts/{postId}")
     suspend fun deleteCirclePost(
         @Path("circleId") circleId: Int,

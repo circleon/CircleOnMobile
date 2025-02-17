@@ -214,6 +214,41 @@ class CircleRepositoryImpl(
         }
     }
 
+    override suspend fun putCircleImage(
+        circleId: Int,
+        circleThumbnail: File?,
+        circleIntroductionImage: File?,
+    ): Result<Unit> {
+        return try {
+            withContext(dispatcher) {
+                var imageRequestBody: RequestBody
+                val thumbnail =
+                    if (circleThumbnail == null) {
+                        null
+                    } else {
+                        imageRequestBody = RequestBody.create(MediaType.parse("image/jpeg"), circleThumbnail)
+                        MultipartBody.Part.createFormData("profileImg", circleThumbnail.name, imageRequestBody)
+                    }
+                val introductionImage =
+                    if (circleIntroductionImage == null) {
+                        null
+                    } else {
+                        imageRequestBody =
+                            RequestBody.create(MediaType.parse("image/jpeg"), circleIntroductionImage)
+                        MultipartBody.Part.createFormData(
+                            "introImg",
+                            circleIntroductionImage.name,
+                            imageRequestBody,
+                        )
+                    }
+                service.putCircleImage(circleId, thumbnail, introductionImage)
+                Result.success(Unit)
+            }
+        } catch (e: IOException) {
+            Result.error(e)
+        }
+    }
+
     override suspend fun putCirclePost(
         circleId: Int,
         postId: Int,
@@ -239,6 +274,21 @@ class CircleRepositoryImpl(
         return try {
             withContext(dispatcher) {
                 service.putCircleComment(circleId, postId, commentId, RequestBodyEditComment(content))
+                Result.success(Unit)
+            }
+        } catch (e: IOException) {
+            Result.error(e)
+        }
+    }
+
+    override suspend fun deleteCircleImage(
+        circleId: Int,
+        deleteThumbnail: Boolean,
+        deleteIntroductionImage: Boolean,
+    ): Result<Unit> {
+        return try {
+            withContext(dispatcher) {
+                service.deleteCircleImage(circleId, deleteThumbnail, deleteIntroductionImage)
                 Result.success(Unit)
             }
         } catch (e: IOException) {

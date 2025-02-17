@@ -64,6 +64,12 @@ interface CircleRepository {
 
     suspend fun putCircle(circleDetailModel: CircleDetailModel): Result<Unit>
 
+    suspend fun putCircleImage(
+        circleId: Int,
+        circleThumbnail: File?,
+        circleIntroductionImage: File?,
+    ): Result<Unit>
+
     suspend fun putCirclePost(
         circleId: Int,
         postId: Int,
@@ -79,6 +85,12 @@ interface CircleRepository {
     ): Result<Unit>
 
     // DELETE
+    suspend fun deleteCircleImage(
+        circleId: Int,
+        deleteThumbnail: Boolean,
+        deleteIntroductionImage: Boolean,
+    ): Result<Unit>
+
     suspend fun deleteCirclePost(
         circleId: Int,
         postId: Int,
