@@ -63,8 +63,9 @@ class CircleDetailPostViewModelImpl
             page: Int,
             size: Int,
         ) {
-            fetchPostJob?.cancel()
-            scrollOverPostJob?.cancel()
+            fetchPostJob?.let {
+                if (!it.isCompleted) return
+            }
 
             fetchPostJob =
                 viewModelScope.launch {
@@ -89,7 +90,9 @@ class CircleDetailPostViewModelImpl
         }
 
         override fun scrollOver() {
-            scrollOverPostJob?.cancel()
+            scrollOverPostJob?.let {
+                if (!it.isCompleted) return
+            }
 
             scrollOverPostJob =
                 viewModelScope.launch {
@@ -124,7 +127,9 @@ class CircleDetailPostViewModelImpl
         }
 
         override fun deleteAndRefresh(postId: Int) {
-            deletePostJob?.cancel()
+            deletePostJob?.let {
+                if (!it.isCompleted) return
+            }
 
             deletePostJob =
                 viewModelScope.launch {
@@ -149,7 +154,7 @@ class CircleDetailPostViewModelImpl
         override fun removePinAndRefresh(postId: Int) {}
 
         companion object {
-            private const val SIZE_BY_PAGE = 10
+            private const val SIZE_BY_PAGE = 20
             private const val DEFAULT_PAGE = 0
         }
     }

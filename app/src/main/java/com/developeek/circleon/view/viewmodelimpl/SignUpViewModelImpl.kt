@@ -48,24 +48,27 @@ class SignUpViewModelImpl
         private var passwordMatched: Boolean = false
         private var emailAuthenticated: Boolean = false
         private lateinit var authenticateEmailJob: Job
-        private lateinit var signUpJob: Job
+        private var signUpJob: Job? = null
 
         override lateinit var error: String
 
         override fun signUp() {
-            if ((!::signUpJob.isInitialized || signUpJob.isCompleted) && signUpCondition()) {
-                signUpJob =
-                    viewModelScope.launch {
-                        val result = repository.signUp(email!!, name!!, password!!)
-
-                        if (result is Success) {
-                            validationMessage.postValue(SIGN_UP_COMPLETED)
-                        } else {
-                            error = (result as Error).message()
-                            uiState.postValue(UiState.ServiceError)
-                        }
-                    }
+            if (!signUpCondition()) return
+            signUpJob?.let {
+                if (!it.isCompleted) return
             }
+
+            signUpJob =
+                viewModelScope.launch {
+                    val result = repository.signUp(email!!, name!!, password!!)
+
+                    if (result is Success) {
+                        validationMessage.postValue(SIGN_UP_COMPLETED)
+                    } else {
+                        error = (result as Error).message()
+                        uiState.postValue(UiState.ServiceError)
+                    }
+                }
         }
 
         private fun signUpCondition() =

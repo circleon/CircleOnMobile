@@ -23,8 +23,7 @@ class LoginViewModelImpl
         override val state: LiveData<UiState>
             get() = uiState
         private val uiState = MutableLiveData<UiState>()
-
-        private lateinit var loginJob: Job
+        private var loginJob: Job? = null
 
         override lateinit var error: String
 
@@ -32,19 +31,22 @@ class LoginViewModelImpl
             email: String,
             password: String,
         ) {
-            if ((!::loginJob.isInitialized || loginJob.isCompleted) && isEmailFormat(email)) {
-                loginJob =
-                    viewModelScope.launch {
-                        val result = repository.login(email, password)
-
-                        if (result is Success) {
-                            uiState.postValue(UiState.Success)
-                        } else {
-                            error = (result as Error).message()
-                            uiState.postValue(UiState.ServiceError)
-                        }
-                    }
+            if (!isEmailFormat(email)) return
+            loginJob?.let {
+                if (!it.isCompleted) return
             }
+
+            loginJob =
+                viewModelScope.launch {
+                    val result = repository.login(email, password)
+
+                    if (result is Success) {
+                        uiState.postValue(UiState.Success)
+                    } else {
+                        error = (result as Error).message()
+                        uiState.postValue(UiState.ServiceError)
+                    }
+                }
         }
 
         private fun isEmailFormat(email: String): Boolean {

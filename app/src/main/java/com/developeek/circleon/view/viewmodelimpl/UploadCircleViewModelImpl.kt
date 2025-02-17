@@ -55,7 +55,11 @@ class UploadCircleViewModelImpl
         override fun edit() {
             val circle = if (origin == temp) origin else temp
             if (!isCircleFormat(circle)) return
-            initUploadCircleImageJob()
+            uploadJob?.let {
+                if (!it.isCompleted) return
+            }
+            uiState.postValue(UiState.Loading)
+            saveLoadingStartTime()
 
             uploadJob =
                 viewModelScope.launch {
@@ -79,12 +83,6 @@ class UploadCircleViewModelImpl
                         }
                     }
                 }
-        }
-
-        private fun initUploadCircleImageJob() {
-            uploadJob?.cancel()
-            uiState.postValue(UiState.Loading)
-            saveLoadingStartTime()
         }
 
         private suspend fun editCircle(

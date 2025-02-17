@@ -64,8 +64,9 @@ class CircleDetailNoticeViewModelImpl
             page: Int,
             size: Int,
         ) {
-            fetchNoticeJob?.cancel()
-            scrollOverNoticeJob?.cancel()
+            fetchNoticeJob?.let {
+                if (!it.isCompleted) return
+            }
 
             fetchNoticeJob =
                 viewModelScope.launch {
@@ -92,7 +93,9 @@ class CircleDetailNoticeViewModelImpl
         }
 
         override fun scrollOver() {
-            scrollOverNoticeJob?.cancel()
+            scrollOverNoticeJob?.let {
+                if (!it.isCompleted) return
+            }
 
             scrollOverNoticeJob =
                 viewModelScope.launch {
@@ -138,7 +141,9 @@ class CircleDetailNoticeViewModelImpl
             postId: Int,
             isPinned: Boolean,
         ) {
-            pinNoticeJob?.cancel()
+            pinNoticeJob?.let {
+                if (!it.isCompleted) return
+            }
 
             pinNoticeJob =
                 viewModelScope.launch {
@@ -158,7 +163,9 @@ class CircleDetailNoticeViewModelImpl
         }
 
         override fun deleteAndRefresh(postId: Int) {
-            deleteNoticeJob?.cancel()
+            deleteNoticeJob?.let {
+                if (!it.isCompleted) return
+            }
 
             deleteNoticeJob =
                 viewModelScope.launch {
@@ -178,7 +185,7 @@ class CircleDetailNoticeViewModelImpl
         }
 
         companion object {
-            private const val SIZE_BY_PAGE = 10
+            private const val SIZE_BY_PAGE = 20
             private const val DEFAULT_PAGE = 0
         }
     }

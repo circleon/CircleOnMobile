@@ -94,7 +94,9 @@ class HomeViewModelImpl
         }
 
         override fun scrollOver() {
-            scrollOverCircleJob?.cancel()
+            scrollOverCircleJob?.let {
+                if (!it.isCompleted) return
+            }
 
             scrollOverCircleJob =
                 viewModelScope.launch {
@@ -145,7 +147,7 @@ class HomeViewModelImpl
         }
 
         companion object {
-            private const val SIZE_BY_PAGE = 10
+            private const val SIZE_BY_PAGE = 20
             private const val DEFAULT_PAGE = 0
         }
     }
