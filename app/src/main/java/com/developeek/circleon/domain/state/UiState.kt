@@ -8,6 +8,4 @@ sealed class UiState {
     object ServiceError : UiState()
 
     object AuthenticationError : UiState()
-
-    object Cancellation : UiState()
 }
