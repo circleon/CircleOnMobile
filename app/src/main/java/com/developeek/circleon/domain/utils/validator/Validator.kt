@@ -56,15 +56,23 @@ object Validator {
     }
 
     fun checkCircle(data: CircleDetailModel): InputValidationResult<CircleDetailModel> {
-        checkEmpty(data.name)
-        checkEmpty(data.singleLineIntroduction)
-        checkEmpty(data.introduction)
+        checkEmpty(data.name).also {
+            if (it is Invalid) return InputValidationResult.invalid(IOException(it.message()))
+        }
+        checkEmpty(data.singleLineIntroduction).also {
+            if (it is Invalid) return InputValidationResult.invalid(IOException(it.message()))
+        }
+        checkEmpty(data.introduction).also {
+            if (it is Invalid) return InputValidationResult.invalid(IOException(it.message()))
+        }
 
         return InputValidationResult.valid(data)
     }
 
     fun checkPost(data: String): InputValidationResult<String> {
-        checkEmpty(data)
+        checkEmpty(data).also {
+            if (it is Invalid) return it
+        }
 
         return try {
             require(data.length <= MAX_POST_SIZE)
@@ -79,7 +87,9 @@ object Validator {
     }
 
     fun checkComment(data: String): InputValidationResult<String> {
-        checkEmpty(data)
+        checkEmpty(data).also {
+            if (it is Invalid) return it
+        }
 
         return try {
             require(data.length <= MAX_COMMENT_SIZE)
