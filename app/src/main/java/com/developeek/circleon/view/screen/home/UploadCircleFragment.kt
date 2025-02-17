@@ -47,12 +47,7 @@ class UploadCircleFragment : Fragment() {
                 glideProvider.loadImage(it, requireActivity(), binding.btnAddCircleThumbnail)
                 viewModel.setCircleThumbnail(it.toJPEG(requireActivity()))
                 binding.btnRemoveCircleThumbnail.isVisible = true
-                binding.btnAddCircleThumbnail.setBackgroundDrawable(
-                    ContextCompat.getDrawable(
-                        requireContext(),
-                        R.drawable.bg_circle,
-                    ),
-                )
+                binding.btnAddCircleThumbnail.background = null
             }
         }
     private val circleIntroductionImagePickMedia: ActivityResultLauncher<PickVisualMediaRequest> =
@@ -62,12 +57,7 @@ class UploadCircleFragment : Fragment() {
                 glideProvider.loadImage(it, requireActivity(), binding.btnAddCircleIntroductionImage)
                 viewModel.setCircleIntroductionImage(it.toJPEG(requireActivity()))
                 binding.btnRemoveCircleIntroductionImage.isVisible = true
-                binding.btnAddCircleIntroductionImage.setBackgroundDrawable(
-                    ContextCompat.getDrawable(
-                        requireContext(),
-                        R.drawable.bg_rounded_rectangle,
-                    ),
-                )
+                binding.btnAddCircleIntroductionImage.background = null
             }
         }
 
@@ -142,12 +132,7 @@ class UploadCircleFragment : Fragment() {
                 activity,
                 binding.btnAddCircleThumbnail,
             )
-            binding.btnAddCircleThumbnail.setBackgroundDrawable(
-                ContextCompat.getDrawable(
-                    activity,
-                    R.drawable.bg_circle,
-                ),
-            )
+            binding.btnAddCircleThumbnail.background = null
             binding.btnRemoveCircleThumbnail.isVisible = true
         }
     }
@@ -159,12 +144,7 @@ class UploadCircleFragment : Fragment() {
                 activity,
                 binding.btnAddCircleIntroductionImage,
             )
-            binding.btnAddCircleIntroductionImage.setBackgroundDrawable(
-                ContextCompat.getDrawable(
-                    activity,
-                    R.drawable.bg_rounded_rectangle,
-                ),
-            )
+            binding.btnAddCircleIntroductionImage.background = null
             binding.btnRemoveCircleIntroductionImage.isVisible = true
         }
     }

@@ -160,7 +160,7 @@ class PostDetailAdapter(
                         }
                     }
                 binding.btnPostOverflow.setOnClickListener(overflowClickListener)
-                binding.imgPost.isVisible = viewType == VIEW_TYPE_POST_CONTENT_WITH_IMAGE.typeValue
+                binding.cvPostImage.isVisible = viewType == VIEW_TYPE_POST_CONTENT_WITH_IMAGE.typeValue
                 PostContentAdapterItemViewHolder(binding, overflowClickListener)
             }
             VIEW_TYPE_POST_COMMENT -> {

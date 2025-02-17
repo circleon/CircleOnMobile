@@ -42,15 +42,19 @@
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintBottom_toBottomOf="parent">
 
-                        <androidx.appcompat.widget.AppCompatImageView
-                            android:id="@+id/imgCircleThumbnail"
+                        <androidx.cardview.widget.CardView
                             android:layout_width="48dp"
                             android:layout_height="48dp"
-                            android:background="@drawable/bg_image_circle"
-                            android:src="@drawable/ic_circle_thumbnail_placeholder"
-                            android:scaleType="fitXY"
-                            android:adjustViewBounds="true"
-                            android:clipToOutline="true"/>
+                            app:cardCornerRadius="24dp"
+                            app:cardElevation="0dp">
+
+                            <androidx.appcompat.widget.AppCompatImageView
+                                android:id="@+id/imgCircleThumbnail"
+                                android:layout_width="match_parent"
+                                android:layout_height="match_parent"
+                                android:src="@drawable/ic_circle_thumbnail_placeholder" />
+
+                        </androidx.cardview.widget.CardView>
 
                         <androidx.appcompat.widget.LinearLayoutCompat
                             android:layout_width="wrap_content"

@@ -31,12 +31,18 @@
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintBottom_toTopOf="@id/txtComment">
 
-            <androidx.appcompat.widget.AppCompatImageView
-                android:id="@+id/imgAuthorProfile"
+            <androidx.cardview.widget.CardView
                 android:layout_width="24dp"
                 android:layout_height="24dp"
-                android:background="@drawable/bg_image_circle"
-                android:clipToOutline="true" />
+                app:cardCornerRadius="@dimen/round_default"
+                app:cardElevation="0dp">
+
+                <androidx.appcompat.widget.AppCompatImageView
+                    android:id="@+id/imgAuthorProfile"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent" />
+
+            </androidx.cardview.widget.CardView>
 
             <androidx.appcompat.widget.AppCompatTextView
                 android:id="@+id/txtAuthorName"

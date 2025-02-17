@@ -26,12 +26,18 @@
             android:orientation="horizontal"
             android:paddingStart="@dimen/margin_padding_large">
 
-            <androidx.appcompat.widget.AppCompatImageView
-                android:id="@+id/imgAuthorProfile"
+            <androidx.cardview.widget.CardView
                 android:layout_width="40dp"
                 android:layout_height="40dp"
-                android:background="@drawable/bg_image_circle"
-                android:clipToOutline="true" />
+                app:cardCornerRadius="20dp"
+                app:cardElevation="0dp">
+
+                <androidx.appcompat.widget.AppCompatImageView
+                    android:id="@+id/imgAuthorProfile"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent" />
+
+            </androidx.cardview.widget.CardView>
 
             <androidx.appcompat.widget.LinearLayoutCompat
                 android:layout_width="wrap_content"
@@ -77,17 +83,21 @@
             android:translationY="-1.06sp"
             tools:text="게시글 컨텐츠"/>
 
-        <androidx.appcompat.widget.AppCompatImageView
-            android:id="@+id/imgPost"
+        <androidx.cardview.widget.CardView
+            android:id="@+id/cvPostImage"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/margin_padding_large"
             android:layout_marginHorizontal="@dimen/margin_padding_large"
-            android:background="@drawable/bg_rounded_rectangle"
-            android:backgroundTint="@color/white"
-            android:clipToOutline="true"
-            android:adjustViewBounds="true"
-            android:visibility="gone" />
+            app:cardCornerRadius="@dimen/round_default"
+            app:cardElevation="0dp">
+
+            <androidx.appcompat.widget.AppCompatImageView
+                android:id="@+id/imgPost"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+
+        </androidx.cardview.widget.CardView>
 
     </androidx.appcompat.widget.LinearLayoutCompat>
 

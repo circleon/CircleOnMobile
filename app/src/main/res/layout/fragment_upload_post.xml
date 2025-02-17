@@ -84,15 +84,22 @@
             android:layout_width="60dp"
             android:layout_height="60dp">
 
-            <androidx.appcompat.widget.AppCompatImageView
-                android:id="@+id/btnAddPostImage"
+            <androidx.cardview.widget.CardView
                 android:layout_width="56dp"
                 android:layout_height="56dp"
                 android:layout_gravity="start|bottom"
-                android:src="@drawable/ic_add"
-                android:scaleType="center"
-                android:clipToOutline="true"
-                android:background="@drawable/bg_dotted_rounded_rectangle" />
+                app:cardCornerRadius="@dimen/round_default"
+                app:cardElevation="0dp">
+
+                <androidx.appcompat.widget.AppCompatImageView
+                    android:id="@+id/btnAddPostImage"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:src="@drawable/ic_add"
+                    android:scaleType="center"
+                    android:background="@drawable/bg_dotted_rounded_rectangle"/>
+
+            </androidx.cardview.widget.CardView>
 
             <androidx.appcompat.widget.AppCompatImageView
                 android:id="@+id/btnRemovePostImage"

@@ -156,7 +156,7 @@ class CirclePostAdapter(
                 }
             }
         binding.clItemCirclePost.setOnClickListener(itemClickListener)
-        binding.imgPost.isVisible = viewType == VIEW_TYPE_ITEM_WITH_IMAGE
+        binding.cvPostImage.isVisible = viewType == VIEW_TYPE_ITEM_WITH_IMAGE
         return CirclePostAdapterItemViewHolder(binding, overflowClickListener, itemClickListener)
     }
 

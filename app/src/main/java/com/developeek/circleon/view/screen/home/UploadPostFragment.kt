@@ -50,12 +50,7 @@ class UploadPostFragment : Fragment() {
                 viewModel.setPostImage(it.toJPEG(requireActivity()))
                 binding.btnRemovePostImage.isVisible = true
                 binding.txtAddPostImage.isVisible = false
-                binding.btnAddPostImage.setBackgroundDrawable(
-                    ContextCompat.getDrawable(
-                        requireContext(),
-                        R.drawable.bg_rounded_rectangle,
-                    ),
-                )
+                binding.btnAddPostImage.background = null
             }
         }
     private val viewModel: UploadPostViewModel by viewModels<UploadPostViewModelImpl>(
@@ -146,12 +141,7 @@ class UploadPostFragment : Fragment() {
                     binding.btnAddPostImage,
                 )
                 binding.txtAddPostImage.isVisible = false
-                binding.btnAddPostImage.setBackgroundDrawable(
-                    ContextCompat.getDrawable(
-                        activity,
-                        R.drawable.bg_rounded_rectangle,
-                    ),
-                )
+                binding.btnAddPostImage.background = null
             }
         }
     }
@@ -244,9 +234,8 @@ class UploadPostFragment : Fragment() {
             binding.btnAddPostImage.setImageResource(R.drawable.ic_add)
             binding.btnRemovePostImage.isVisible = false
             binding.txtAddPostImage.isVisible = true
-            binding.btnAddPostImage.setBackgroundDrawable(
-                ContextCompat.getDrawable(activity, R.drawable.bg_dotted_rounded_rectangle),
-            )
+            binding.btnAddPostImage.background =
+                ContextCompat.getDrawable(activity, R.drawable.bg_dotted_rounded_rectangle)
         }
     }
 
