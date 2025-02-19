@@ -304,7 +304,7 @@ class CircleDetailPostDetailFragment : Fragment() {
         findNavController()
             .currentBackStackEntry
             ?.savedStateHandle
-            ?.getLiveData<Boolean>(Const.FLAG_DATA_CHANGED)
+            ?.getLiveData<Boolean>(Const.FLAG_CIRCLE_POST_DATA_CHANGED)
             ?.observe(viewLifecycleOwner) {
                 if (it) {
                     requestRefreshToPreviousScreen()
@@ -328,7 +328,6 @@ class CircleDetailPostDetailFragment : Fragment() {
                 }
                 UiState.ServiceError -> {
                     toggleView(binding.llServiceError)
-                    requestRefreshToPreviousScreen()
                     showErrorDialog(activity)
                 }
                 else -> {}
@@ -463,7 +462,7 @@ class CircleDetailPostDetailFragment : Fragment() {
         }
 
     private fun requestRefreshToPreviousScreen() {
-        findNavController().previousBackStackEntry?.savedStateHandle?.set(Const.FLAG_DATA_CHANGED, true)
+        findNavController().previousBackStackEntry?.savedStateHandle?.set(Const.FLAG_CIRCLE_POST_DATA_CHANGED, true)
     }
 
     private fun initListener(activity: Activity) {

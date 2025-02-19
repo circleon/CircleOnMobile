@@ -211,9 +211,14 @@ class CircleDetailNoticeFragment : Fragment() {
         findNavController()
             .currentBackStackEntry
             ?.savedStateHandle
-            ?.getLiveData<Boolean>(Const.FLAG_DATA_CHANGED)
-            ?.observe(viewLifecycleOwner) {
-                if (it) viewModel.refresh()
+            ?.let {
+                it.getLiveData<Boolean>(Const.FLAG_CIRCLE_POST_DATA_CHANGED)
+                    .observe(viewLifecycleOwner) { dataChanged ->
+                        if (dataChanged) {
+                            viewModel.refresh()
+                            it[Const.FLAG_CIRCLE_POST_DATA_CHANGED] = false
+                        }
+                    }
             }
     }
 

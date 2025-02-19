@@ -171,6 +171,7 @@ class UploadCircleFragment : Fragment() {
             loadingIndicator.isVisible = it is UiState.Loading
             when (it) {
                 UiState.Success -> {
+                    requestRefreshToPreviousScreen()
                     sendUserToPreviousScreen()
                 }
                 UiState.AuthenticationError -> {
@@ -185,6 +186,10 @@ class UploadCircleFragment : Fragment() {
                 else -> {}
             }
         }
+
+    private fun requestRefreshToPreviousScreen() {
+        findNavController().previousBackStackEntry?.savedStateHandle?.set(Const.FLAG_CIRCLE_DATA_CHANGED, true)
+    }
 
     private fun initListener(activity: Activity) {
         setBtnCancelListener()

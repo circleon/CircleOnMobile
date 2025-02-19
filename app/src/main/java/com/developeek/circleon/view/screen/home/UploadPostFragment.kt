@@ -180,7 +180,7 @@ class UploadPostFragment : Fragment() {
         }
 
     private fun requestRefreshToPreviousScreen() {
-        findNavController().previousBackStackEntry?.savedStateHandle?.set(Const.FLAG_DATA_CHANGED, true)
+        findNavController().previousBackStackEntry?.savedStateHandle?.set(Const.FLAG_CIRCLE_POST_DATA_CHANGED, true)
     }
 
     private fun sendUserToPreviousScreen() {
