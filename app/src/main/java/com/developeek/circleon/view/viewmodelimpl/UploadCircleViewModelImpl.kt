@@ -6,6 +6,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.developeek.circleon.data.repository.CircleRepository
 import com.developeek.circleon.data.source.Error
+import com.developeek.circleon.data.source.Success
 import com.developeek.circleon.domain.enums.Category
 import com.developeek.circleon.domain.model.CircleDetailModel
 import com.developeek.circleon.domain.state.UiState
@@ -16,8 +17,10 @@ import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -66,86 +69,81 @@ class UploadCircleViewModelImpl
         }
 
         override fun edit() {
-            if (!isCircleFormat(this.circle)) return
+            if (!isCircleFormat(circle)) return
             uploadJob?.let {
                 if (!it.isCompleted) return
             }
             uiState.postValue(UiState.Loading)
             saveLoadingStartTime()
 
+            var tmpState: UiState = UiState.Success
             uploadJob =
                 viewModelScope.launch {
-                    launch {
-                        editCircle(this, this@UploadCircleViewModelImpl.circle)
-                    }
-                    launch {
-                        if (isAnyImageEdited()) {
-                            editCircleImage(this, this@UploadCircleViewModelImpl.circle)
+                    val editCircleJob =
+                        async {
+                            return@async editCircle(circle)
+                        }
+
+                    val editCircleImageJob =
+                        async {
+                            return@async if (isAnyImageEdited()) editCircleImage(circle) else UiState.Success
+                        }
+
+                    val deleteCircleImageJob =
+                        async {
+                            return@async if (isAnyImageRemoved()) deleteCircleImage(circle) else UiState.Success
+                        }
+
+                    val jobs: List<Deferred<UiState>> = listOf(editCircleJob, editCircleImageJob, deleteCircleImageJob)
+                    jobs.map { job ->
+                        job.invokeOnCompletion {
+                            if (job.isCancelled) {
+                                this.cancel() // Error State 가 발생한 경우 부모 코루틴 캔슬
+                            }
                         }
                     }
-                    launch {
-                        if (isAnyImageRemoved()) {
-                            deleteCircleImage(this, this@UploadCircleViewModelImpl.circle)
-                        }
+                    // 코루틴별 invokeOnCompletion 등록 이후에 await() 을 해야 자식 코루틴 캔슬이 부모 코루틴에게 즉시 전파됨
+                    jobs.awaitAll().map {
+                        if (it !is UiState.Success) tmpState = it
                     }
                 }.apply {
                     invokeOnCompletion {
-                        if (!isCancelled) {
-                            uiState.postValue(UiState.Success)
-                        }
+                        uiState.postValue(tmpState)
                     }
                 }
         }
 
-        private suspend fun editCircle(
-            scope: CoroutineScope,
-            circle: CircleDetailModel,
-        ) {
+        private suspend fun editCircle(circle: CircleDetailModel): UiState {
             val result = repository.putCircle(circle)
             delay(remainedLoadingTime())
 
-            if (result is Error) {
-                error = result.message()
-                if (result.isAuthenticationError()) {
-                    uiState.postValue(UiState.AuthenticationError)
-                } else {
-                    uiState.postValue(UiState.ServiceError)
-                }
-                scope.cancel()
+            if (result is Success) {
+                return UiState.Success
+            } else {
+                error = (result as Error).message()
+                return if (result.isAuthenticationError()) UiState.AuthenticationError else UiState.ServiceError
             }
         }
 
-        private suspend fun editCircleImage(
-            scope: CoroutineScope,
-            circle: CircleDetailModel,
-        ) {
+        private suspend fun editCircleImage(circle: CircleDetailModel): UiState {
             val result = repository.putCircleImage(circle.id, thumbnail, introductionImage)
 
-            if (result is Error) {
-                error = result.message()
-                if (result.isAuthenticationError()) {
-                    uiState.postValue(UiState.AuthenticationError)
-                } else {
-                    uiState.postValue(UiState.ServiceError)
-                }
-                scope.cancel()
+            if (result is Success) {
+                return UiState.Success
+            } else {
+                error = (result as Error).message()
+                return if (result.isAuthenticationError()) UiState.AuthenticationError else UiState.ServiceError
             }
         }
 
-        private suspend fun deleteCircleImage(
-            scope: CoroutineScope,
-            circle: CircleDetailModel,
-        ) {
+        private suspend fun deleteCircleImage(circle: CircleDetailModel): UiState {
             val result = repository.deleteCircleImage(circle.id, isThumbnailRemoved(), isIntroductionImageRemoved())
 
-            if (result is Error) {
-                error = result.message()
-                if (result.isAuthenticationError()) {
-                    uiState.postValue(UiState.AuthenticationError)
-                } else {
-                    uiState.postValue(UiState.ServiceError)
-                }
-                scope.cancel()
+            if (result is Success) {
+                return UiState.Success
+            } else {
+                error = (result as Error).message()
+                return if (result.isAuthenticationError()) UiState.AuthenticationError else UiState.ServiceError
             }
         }
 
