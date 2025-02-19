@@ -12,6 +12,9 @@ import com.developeek.circleon.domain.state.UiState
 import com.developeek.circleon.domain.utils.validator.Invalid
 import com.developeek.circleon.domain.utils.validator.Validator
 import com.developeek.circleon.view.viewmodel.UploadCircleViewModel
+import dagger.assisted.Assisted
+import dagger.assisted.AssistedFactory
+import dagger.assisted.AssistedInject
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
@@ -20,21 +23,26 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import java.io.File
 import java.time.LocalDateTime
-import javax.inject.Inject
 
-@HiltViewModel
+@HiltViewModel(assistedFactory = UploadCircleViewModelImpl.UploadCircleViewModelFactory::class)
 class UploadCircleViewModelImpl
-    @Inject
+    @AssistedInject
     constructor(
+        @Assisted("origin") private val origin: CircleDetailModel?,
         private val repository: CircleRepository,
     ) : UploadCircleViewModel, ViewModel() {
+        @AssistedFactory
+        interface UploadCircleViewModelFactory {
+            fun create(
+                @Assisted("origin") origin: CircleDetailModel?,
+            ): UploadCircleViewModelImpl
+        }
+
         override val state: LiveData<UiState>
             get() = uiState
         private val uiState = MutableLiveData<UiState>()
 
-        override val origin: CircleDetailModel
-            get() = temp
-        private var temp: CircleDetailModel = CircleDetailModel.empty()
+        override lateinit var circle: CircleDetailModel
         private var uploadJob: Job? = null
 
         // 썸네일, 소개글 이미지 등 이미지 처리 api 는 별도
@@ -53,8 +61,12 @@ class UploadCircleViewModelImpl
         private var loadingStartTime = 0L
         override lateinit var error: String
 
+        init {
+            this.circle = origin ?: CircleDetailModel.empty()
+        }
+
         override fun edit() {
-            if (!isCircleFormat(temp)) return
+            if (!isCircleFormat(this.circle)) return
             uploadJob?.let {
                 if (!it.isCompleted) return
             }
@@ -64,16 +76,16 @@ class UploadCircleViewModelImpl
             uploadJob =
                 viewModelScope.launch {
                     launch {
-                        editCircle(this, temp)
+                        editCircle(this, this@UploadCircleViewModelImpl.circle)
                     }
                     launch {
                         if (isAnyImageEdited()) {
-                            editCircleImage(this, temp)
+                            editCircleImage(this, this@UploadCircleViewModelImpl.circle)
                         }
                     }
                     launch {
                         if (isAnyImageRemoved()) {
-                            deleteCircleImage(this, temp)
+                            deleteCircleImage(this, this@UploadCircleViewModelImpl.circle)
                         }
                     }
                 }.apply {
@@ -149,10 +161,6 @@ class UploadCircleViewModelImpl
             }
         }
 
-        override fun setOrigin(circle: CircleDetailModel) {
-            this.temp = circle
-        }
-
         override fun setCircleThumbnail(image: File?) {
             this.thumbnail = image
         }
@@ -162,27 +170,27 @@ class UploadCircleViewModelImpl
         }
 
         override fun setCircleName(name: String) {
-            this.temp = temp.fold(name = name)
+            this.circle = this.circle.fold(name = name)
         }
 
         override fun setRecruitmentStartDate(date: LocalDateTime) {
-            this.temp = temp.fold(recruitmentStartDate = date)
+            this.circle = this.circle.fold(recruitmentStartDate = date)
         }
 
         override fun setRecruitmentEndDate(date: LocalDateTime) {
-            this.temp = temp.fold(recruitmentEndDate = date)
+            this.circle = this.circle.fold(recruitmentEndDate = date)
         }
 
         override fun setSingleLineIntroduction(content: String) {
-            this.temp = temp.fold(singleLineIntroduction = content)
+            this.circle = this.circle.fold(singleLineIntroduction = content)
         }
 
         override fun setIntroduction(content: String) {
-            this.temp = temp.fold(introduction = content)
+            this.circle = this.circle.fold(introduction = content)
         }
 
         override fun setCategory(category: Category) {
-            this.temp = temp.fold(category = category)
+            this.circle = this.circle.fold(category = category)
         }
 
         override fun removeCircleThumbnail() {

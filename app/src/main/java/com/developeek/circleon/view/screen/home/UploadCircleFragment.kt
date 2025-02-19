@@ -34,6 +34,7 @@ import com.developeek.circleon.view.widget.ErrorToast
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.progressindicator.CircularProgressIndicator
 import dagger.hilt.android.AndroidEntryPoint
+import dagger.hilt.android.lifecycle.withCreationCallback
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 import javax.inject.Inject
@@ -42,8 +43,15 @@ import javax.inject.Inject
 class UploadCircleFragment : Fragment() {
     private lateinit var binding: FragmentUploadCircleBinding
     private var isEdit = false
-    private lateinit var circle: CircleDetailModel
-    private val viewModel: UploadCircleViewModel by viewModels<UploadCircleViewModelImpl>()
+    private var origin: CircleDetailModel? = null
+    private val viewModel: UploadCircleViewModel by viewModels<UploadCircleViewModelImpl>(
+        extrasProducer = {
+            defaultViewModelCreationExtras
+                .withCreationCallback<UploadCircleViewModelImpl.UploadCircleViewModelFactory> {
+                    it.create(origin)
+                }
+        },
+    )
     private val circleThumbnailPickMedia: ActivityResultLauncher<PickVisualMediaRequest> =
         registerForActivityResult(ActivityResultContracts.PickVisualMedia()) {
                 uri ->
@@ -75,8 +83,7 @@ class UploadCircleFragment : Fragment() {
             isEdit =
                 it.getBoolean(Const.FLAG_IS_EDIT).also { isEdit ->
                     if (isEdit) {
-                        circle = it.getSerializable(Const.TAG_CIRCLE_DETAIL) as CircleDetailModel
-                        viewModel.setOrigin(circle)
+                        origin = it.getSerializable(Const.TAG_CIRCLE_DETAIL) as CircleDetailModel
                     }
                 }
         }
@@ -106,32 +113,29 @@ class UploadCircleFragment : Fragment() {
 
     private fun initView(activity: Activity) {
         hideBtmNav(activity)
-
-        if (isEdit) {
-            loadOriginalContentWhenIsEdit(activity)
-        }
+        loadOriginalContentWhenIsEdit(activity)
     }
 
     private fun loadOriginalContentWhenIsEdit(activity: Activity) {
         if (isEdit) {
-            binding.edtCircleName.setText(viewModel.origin.name)
-            viewModel.origin.recruitmentStartDate?.let {
+            binding.edtCircleName.setText(viewModel.circle.name)
+            viewModel.circle.recruitmentStartDate?.let {
                 binding.txtRecruitmentStartDate.text = it.format(DateTimeFormatter.ofPattern(RECRUITMENT_DATE_FORMAT))
             }
-            viewModel.origin.recruitmentEndDate?.let {
+            viewModel.circle.recruitmentEndDate?.let {
                 binding.txtRecruitmentEndDate.text = it.format(DateTimeFormatter.ofPattern(RECRUITMENT_DATE_FORMAT))
             }
-            binding.edtCircleSingleLineIntroduction.setText(viewModel.origin.singleLineIntroduction)
+            binding.edtCircleSingleLineIntroduction.setText(viewModel.circle.singleLineIntroduction)
             binding.txtCurrentCircleSingleIntroductionSize.text =
-                viewModel.origin.singleLineIntroduction.length.toString()
-            binding.edtCircleIntroduction.setText(viewModel.origin.introduction)
+                viewModel.circle.singleLineIntroduction.length.toString()
+            binding.edtCircleIntroduction.setText(viewModel.circle.introduction)
             loadOriginalThumbnailWhenIsNotNull(activity)
             loadOriginalIntroductionImageWhenIsNotNull(activity)
         }
     }
 
     private fun loadOriginalThumbnailWhenIsNotNull(activity: Activity) {
-        viewModel.origin.thumbnailUrl?.let {
+        viewModel.circle.thumbnailUrl?.let {
             glideProvider.fetchImage(
                 it,
                 activity,
@@ -143,7 +147,7 @@ class UploadCircleFragment : Fragment() {
     }
 
     private fun loadOriginalIntroductionImageWhenIsNotNull(activity: Activity) {
-        viewModel.origin.introImgUrl?.let {
+        viewModel.circle.introImgUrl?.let {
             glideProvider.fetchImage(
                 it,
                 activity,
@@ -243,17 +247,10 @@ class UploadCircleFragment : Fragment() {
             DatePickerDialog.OnDateSetListener { _, y, m, d ->
                 viewModel.setRecruitmentStartDate(LocalDateTime.of(y, m + 1, d, 0, 0))
                 binding.txtRecruitmentStartDate.text =
-                    viewModel.origin.recruitmentStartDate!!.format(DateTimeFormatter.ofPattern(RECRUITMENT_DATE_FORMAT))
+                    viewModel.circle.recruitmentStartDate!!.format(DateTimeFormatter.ofPattern(RECRUITMENT_DATE_FORMAT))
             }
-
-        if (isEdit) {
-            binding.btnEditRecruitmentStartDate.setOnClickListener {
-                showDatePickerDialog(context, onDataSetListener, viewModel.origin.recruitmentStartDate)
-            }
-        } else {
-            binding.btnEditRecruitmentStartDate.setOnClickListener {
-                showDatePickerDialog(context, onDataSetListener)
-            }
+        binding.btnEditRecruitmentStartDate.setOnClickListener {
+            showDatePickerDialog(context, onDataSetListener, viewModel.circle.recruitmentStartDate)
         }
     }
 
@@ -262,17 +259,10 @@ class UploadCircleFragment : Fragment() {
             DatePickerDialog.OnDateSetListener { _, y, m, d ->
                 viewModel.setRecruitmentEndDate(LocalDateTime.of(y, m + 1, d, 0, 0))
                 binding.txtRecruitmentEndDate.text =
-                    viewModel.origin.recruitmentEndDate!!.format(DateTimeFormatter.ofPattern(RECRUITMENT_DATE_FORMAT))
+                    viewModel.circle.recruitmentEndDate!!.format(DateTimeFormatter.ofPattern(RECRUITMENT_DATE_FORMAT))
             }
-
-        if (isEdit) {
-            binding.btnEditRecruitmentEndDate.setOnClickListener {
-                showDatePickerDialog(context, onDataSetListener, viewModel.origin.recruitmentEndDate)
-            }
-        } else {
-            binding.btnEditRecruitmentEndDate.setOnClickListener {
-                showDatePickerDialog(context, onDataSetListener)
-            }
+        binding.btnEditRecruitmentEndDate.setOnClickListener {
+            showDatePickerDialog(context, onDataSetListener, viewModel.circle.recruitmentEndDate)
         }
     }
 

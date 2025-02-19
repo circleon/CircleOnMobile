@@ -9,12 +9,10 @@ import java.time.LocalDateTime
 
 interface UploadCircleViewModel {
     val state: LiveData<UiState>
-    val origin: CircleDetailModel
+    val circle: CircleDetailModel
     val error: String
 
     fun edit()
-
-    fun setOrigin(circle: CircleDetailModel)
 
     fun setCircleThumbnail(image: File?)
 
