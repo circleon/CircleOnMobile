@@ -43,7 +43,7 @@
                 android:textColor="@color/grey_9"
                 android:textColorHint="@color/grey_5"
                 android:maxLines="1"
-                android:background="@null"/>
+                android:background="@null" />
 
             <androidx.appcompat.widget.AppCompatImageView
                 android:id="@+id/btnClear"
