@@ -1,6 +1,7 @@
 package com.developeek.circleon.view.screen.home
 
 import android.app.Activity
+import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -59,19 +60,19 @@ class HomeFragment : Fragment() {
     ) {
         super.onViewCreated(view, savedInstanceState)
 
-        initView(requireActivity())
-        initObserver(requireActivity())
+        initView(requireContext())
+        initObserver(requireActivity(), requireContext())
         initListener()
     }
 
-    private fun initView(activity: Activity) {
-        initRecyclerView(activity)
+    private fun initView(context: Context) {
+        initRecyclerView(context)
     }
 
-    private fun initRecyclerView(activity: Activity) {
+    private fun initRecyclerView(context: Context) {
         binding.rvCircle.adapter =
             CircleAdapter(
-                activity,
+                context,
                 glideProvider,
                 object : ItemListenerInitializer<CircleModel> {
                     override fun initialize(item: CircleModel) {
@@ -91,18 +92,21 @@ class HomeFragment : Fragment() {
                     ) {}
                 },
             )
-        binding.rvCircle.layoutManager = LinearLayoutManager(activity)
+        binding.rvCircle.layoutManager = LinearLayoutManager(context)
         binding.rvCircle.itemAnimator = null
     }
 
-    private fun initObserver(activity: Activity) {
+    private fun initObserver(
+        parentActivity: Activity,
+        context: Context,
+    ) {
         viewModel.state.observe(
             viewLifecycleOwner,
-            stateObserver(activity),
+            stateObserver(parentActivity, context),
         )
         viewModel.selectedCategory.observe(
             viewLifecycleOwner,
-            selectedCategoryObserver(activity),
+            selectedCategoryObserver(context),
         )
         viewModel.scrollOver.observe(
             viewLifecycleOwner,
@@ -110,33 +114,35 @@ class HomeFragment : Fragment() {
         )
     }
 
-    private fun stateObserver(activity: Activity) =
-        Observer<UiState> {
-            when (it) {
-                UiState.Loading -> {
-                    toggleView(binding.pgbLoading)
-                }
-                UiState.Success -> {
-                    if (viewModel.circles.isEmpty()) {
-                        toggleView(binding.txtNoCircle)
-                    } else {
-                        toggleView(binding.rvCircle)
-                        loadUserInfo()
-                        loadCircles()
-                    }
-                }
-                UiState.AuthenticationError -> {
-                    sendUserToLoginScreen(activity)
-                }
-                UiState.ServiceError -> {
-                    toggleView(binding.llServiceError)
-                    if (ErrorToast.previousFinished()) {
-                        ErrorToast(activity, viewModel.error).show()
-                    }
-                }
-                else -> {}
+    private fun stateObserver(
+        parentActivity: Activity,
+        context: Context,
+    ) = Observer<UiState> {
+        when (it) {
+            UiState.Loading -> {
+                toggleView(binding.pgbLoading)
             }
+            UiState.Success -> {
+                if (viewModel.circles.isEmpty()) {
+                    toggleView(binding.txtNoCircle)
+                } else {
+                    toggleView(binding.rvCircle)
+                    loadUserInfo()
+                    loadCircles()
+                }
+            }
+            UiState.AuthenticationError -> {
+                sendUserToLoginScreen(parentActivity)
+            }
+            UiState.ServiceError -> {
+                toggleView(binding.llServiceError)
+                if (ErrorToast.previousFinished()) {
+                    ErrorToast(context, viewModel.error).show()
+                }
+            }
+            else -> {}
         }
+    }
 
     private fun loadUserInfo() {
         binding.txtUnivName.text = viewModel.user.univ.univName()
@@ -160,12 +166,13 @@ class HomeFragment : Fragment() {
         startActivity(intent)
     }
 
-    private fun selectedCategoryObserver(activity: Activity) =
+    private fun selectedCategoryObserver(context: Context) =
         Observer<Category> {
             val scrollState = binding.rvCircleCategory.layoutManager?.onSaveInstanceState()
             binding.rvCircleCategory.adapter =
                 CircleCategoryAdapter(
                     viewModel,
+                    context,
                     object : ItemListenerInitializer<Category> {
                         override fun initialize(item: Category) {
                             if (viewModel.selectedCategory.value!!.isSame(item)) {
@@ -180,10 +187,9 @@ class HomeFragment : Fragment() {
                             view: View?,
                         ) {}
                     },
-                    activity,
                 )
             binding.rvCircleCategory.layoutManager =
-                LinearLayoutManager(activity, LinearLayoutManager.HORIZONTAL, false)
+                LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false)
             binding.rvCircleCategory.layoutManager?.onRestoreInstanceState(scrollState)
         }
 

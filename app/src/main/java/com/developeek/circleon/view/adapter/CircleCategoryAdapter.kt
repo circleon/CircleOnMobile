@@ -15,8 +15,8 @@ import com.developeek.circleon.view.viewmodel.HomeViewModel
 
 class CircleCategoryAdapter(
     private val viewModel: HomeViewModel,
-    private val itemListenerInitializer: ItemListenerInitializer<Category>,
     private val context: Context,
+    private val itemListenerInitializer: ItemListenerInitializer<Category>,
 ) : RecyclerView.Adapter<CircleCategoryAdapter.CircleCategoryAdapterViewHolder>() {
     inner class CircleCategoryAdapterViewHolder(
         private val binding: ItemTagCircleCategoryBinding,

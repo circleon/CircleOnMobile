@@ -1,13 +1,13 @@
 package com.developeek.circleon.view.listener
 
-import android.app.Activity
+import android.content.Context
 import android.view.inputmethod.InputMethodManager
 import androidx.recyclerview.widget.RecyclerView
 
 class RecyclerViewHideSoftInputListener(
-    private val activity: Activity,
+    private val context: Context,
 ) : RecyclerView.OnScrollListener() {
-    private val imm: InputMethodManager = activity.getSystemService(InputMethodManager::class.java)
+    private val imm: InputMethodManager = context.getSystemService(InputMethodManager::class.java)
 
     override fun onScrollStateChanged(
         recyclerView: RecyclerView,
@@ -16,7 +16,6 @@ class RecyclerViewHideSoftInputListener(
         super.onScrollStateChanged(recyclerView, newState)
         if (isSoftInputActive(recyclerView)) {
             hideSoftInput(recyclerView)
-            removeFocus()
         }
     }
 
@@ -34,9 +33,5 @@ class RecyclerViewHideSoftInputListener(
 
     private fun hideSoftInput(recyclerView: RecyclerView) {
         imm.hideSoftInputFromWindow(recyclerView.windowToken, 0)
-    }
-
-    private fun removeFocus() {
-        activity.currentFocus?.clearFocus()
     }
 }

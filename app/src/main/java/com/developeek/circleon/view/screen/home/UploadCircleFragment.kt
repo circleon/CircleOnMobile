@@ -106,17 +106,20 @@ class UploadCircleFragment : Fragment() {
     ) {
         super.onViewCreated(view, savedInstanceState)
 
-        initView(requireActivity())
-        initObserver(requireActivity())
-        initListener(requireActivity())
+        initView(requireActivity(), requireContext())
+        initObserver(requireActivity(), requireContext())
+        initListener(requireContext())
     }
 
-    private fun initView(activity: Activity) {
-        hideBtmNav(activity)
-        loadOriginalContentWhenIsEdit(activity)
+    private fun initView(
+        parentActivity: Activity,
+        context: Context,
+    ) {
+        hideBtmNav(parentActivity)
+        loadOriginalContentWhenIsEdit(context)
     }
 
-    private fun loadOriginalContentWhenIsEdit(activity: Activity) {
+    private fun loadOriginalContentWhenIsEdit(context: Context) {
         if (isEdit) {
             binding.edtCircleName.setText(viewModel.circle.name)
             viewModel.circle.recruitmentStartDate?.let {
@@ -129,16 +132,16 @@ class UploadCircleFragment : Fragment() {
             binding.txtCurrentCircleSingleIntroductionSize.text =
                 viewModel.circle.singleLineIntroduction.length.toString()
             binding.edtCircleIntroduction.setText(viewModel.circle.introduction)
-            loadOriginalThumbnailWhenIsNotNull(activity)
-            loadOriginalIntroductionImageWhenIsNotNull(activity)
+            loadOriginalThumbnailWhenIsNotNull(context)
+            loadOriginalIntroductionImageWhenIsNotNull(context)
         }
     }
 
-    private fun loadOriginalThumbnailWhenIsNotNull(activity: Activity) {
+    private fun loadOriginalThumbnailWhenIsNotNull(context: Context) {
         viewModel.circle.thumbnailUrl?.let {
             glideProvider.fetchImage(
                 it,
-                activity,
+                context,
                 binding.btnAddCircleThumbnail,
             )
             binding.btnAddCircleThumbnail.background = null
@@ -146,11 +149,11 @@ class UploadCircleFragment : Fragment() {
         }
     }
 
-    private fun loadOriginalIntroductionImageWhenIsNotNull(activity: Activity) {
+    private fun loadOriginalIntroductionImageWhenIsNotNull(context: Context) {
         viewModel.circle.introImgUrl?.let {
             glideProvider.fetchImage(
                 it,
-                activity,
+                context,
                 binding.btnAddCircleIntroductionImage,
             )
             binding.btnAddCircleIntroductionImage.background = null
@@ -162,48 +165,53 @@ class UploadCircleFragment : Fragment() {
         activity.findViewById<BottomNavigationView>(R.id.btmNav).isVisible = false
     }
 
-    private fun initObserver(activity: Activity) {
+    private fun initObserver(
+        parentActivity: Activity,
+        context: Context,
+    ) {
         viewModel.state.observe(
             viewLifecycleOwner,
-            stateObserver(activity),
+            stateObserver(parentActivity, context),
         )
     }
 
-    private fun stateObserver(activity: Activity) =
-        Observer<UiState> {
-            val loadingIndicator = activity.findViewById<CircularProgressIndicator>(R.id.pgbLoading)
-            loadingIndicator.isVisible = it is UiState.Loading
-            when (it) {
-                UiState.Success -> {
-                    requestRefreshToPreviousScreen()
-                    sendUserToPreviousScreen()
-                }
-                UiState.AuthenticationError -> {
-                    sendUserToLoginScreen(activity)
-                    if (ErrorToast.previousFinished()) {
-                        ErrorToast(activity, viewModel.error).show()
-                    }
-                }
-                UiState.ServiceError -> {
-                    ErrorAlertDialog(activity, viewModel.error).show()
-                }
-                else -> {}
+    private fun stateObserver(
+        parentActivity: Activity,
+        context: Context,
+    ) = Observer<UiState> {
+        val loadingIndicator = parentActivity.findViewById<CircularProgressIndicator>(R.id.pgbLoading)
+        loadingIndicator.isVisible = it is UiState.Loading
+        when (it) {
+            UiState.Success -> {
+                requestRefreshToPreviousScreen()
+                sendUserToPreviousScreen()
             }
+            UiState.AuthenticationError -> {
+                sendUserToLoginScreen(parentActivity)
+                if (ErrorToast.previousFinished()) {
+                    ErrorToast(context, viewModel.error).show()
+                }
+            }
+            UiState.ServiceError -> {
+                ErrorAlertDialog(context, viewModel.error).show()
+            }
+            else -> {}
         }
+    }
 
     private fun requestRefreshToPreviousScreen() {
         findNavController().previousBackStackEntry?.savedStateHandle?.set(Const.FLAG_CIRCLE_DATA_CHANGED, true)
     }
 
-    private fun initListener(activity: Activity) {
+    private fun initListener(context: Context) {
         setBtnCancelListener()
         setBtnUploadListener()
         setBtnAddCircleThumbnailListener()
         setBtnAddCircleIntroductionImageListener()
         setBtnEditRecruitmentDate(requireContext())
         setBtnEdtCircleContentListener()
-        setBtnRemoveCircleThumbnailListener(activity)
-        setBtnRemoveCircleIntroductionImageListener(activity)
+        setBtnRemoveCircleThumbnailListener(context)
+        setBtnRemoveCircleIntroductionImageListener(context)
         setEdtSingleLineIntroductionListener()
     }
 
@@ -312,24 +320,24 @@ class UploadCircleFragment : Fragment() {
         }
     }
 
-    private fun setBtnRemoveCircleThumbnailListener(activity: Activity) {
+    private fun setBtnRemoveCircleThumbnailListener(context: Context) {
         binding.btnRemoveCircleThumbnail.setOnClickListener {
             viewModel.removeCircleThumbnail()
             binding.btnAddCircleThumbnail.setImageResource(R.drawable.ic_add)
             binding.btnRemoveCircleThumbnail.isVisible = false
             binding.btnAddCircleThumbnail.setBackgroundDrawable(
-                ContextCompat.getDrawable(activity, R.drawable.bg_dotted_circle),
+                ContextCompat.getDrawable(context, R.drawable.bg_dotted_circle),
             )
         }
     }
 
-    private fun setBtnRemoveCircleIntroductionImageListener(activity: Activity) {
+    private fun setBtnRemoveCircleIntroductionImageListener(context: Context) {
         binding.btnRemoveCircleIntroductionImage.setOnClickListener {
             viewModel.removeCircleIntroductionImage()
             binding.btnAddCircleIntroductionImage.setImageResource(R.drawable.ic_add)
             binding.btnRemoveCircleIntroductionImage.isVisible = false
             binding.btnAddCircleIntroductionImage.setBackgroundDrawable(
-                ContextCompat.getDrawable(activity, R.drawable.bg_dotted_rounded_rectangle),
+                ContextCompat.getDrawable(context, R.drawable.bg_dotted_rounded_rectangle),
             )
         }
     }

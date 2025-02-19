@@ -1,10 +1,10 @@
 package com.developeek.circleon.view.widget
 
-import android.app.Activity
 import android.app.AlertDialog
+import android.content.Context
 
 class ContentDeleteAlertDialog(
-    private val activity: Activity,
+    private val context: Context,
     private val message: String,
     private val positiveListener: Runnable,
 ) {
@@ -12,7 +12,7 @@ class ContentDeleteAlertDialog(
 
     init {
         dialog =
-            AlertDialog.Builder(activity).apply {
+            AlertDialog.Builder(context).apply {
                 setMessage(message)
                 setPositiveButton(POSITIVE_BUTTON) { dialog, _ ->
                     positiveListener.run()

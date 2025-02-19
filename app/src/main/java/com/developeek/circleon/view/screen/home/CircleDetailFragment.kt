@@ -1,6 +1,7 @@
 package com.developeek.circleon.view.screen.home
 
 import android.app.Activity
+import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -81,7 +82,7 @@ class CircleDetailFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         initView()
-        initObserver(requireActivity())
+        initObserver(requireActivity(), requireContext())
         initListener()
     }
 
@@ -93,10 +94,13 @@ class CircleDetailFragment : Fragment() {
         binding.abCircleDetail.setExpanded(viewModel.currentAppBarExpanded)
     }
 
-    private fun initObserver(activity: Activity) {
+    private fun initObserver(
+        parentActivity: Activity,
+        context: Context,
+    ) {
         viewModel.state.observe(
             viewLifecycleOwner,
-            stateObserver(activity),
+            stateObserver(parentActivity, context),
         )
         // 정보 수정 여부 감지
         findNavController()
@@ -113,39 +117,41 @@ class CircleDetailFragment : Fragment() {
             }
     }
 
-    private fun stateObserver(activity: Activity) =
-        Observer<UiState> {
-            val loadingIndicator = activity.findViewById<CircularProgressIndicator>(R.id.pgbLoading)
-            loadingIndicator.isVisible = it is UiState.Loading
-            when (it) {
-                UiState.Success -> {
-                    toggleView(binding.flCircleDetail)
-                    loadCircleDetail(activity)
-                    inflateOverflowMenu(activity)
-                    setOverflowMenuItemListener(activity)
-                }
-                UiState.AuthenticationError -> {
-                    sendUserToLoginScreen(activity)
-                    if (ErrorToast.previousFinished()) {
-                        ErrorToast(activity, viewModel.error).show()
-                    }
-                }
-                UiState.ServiceError -> {
-                    toggleView(binding.llServiceError)
-                    if (ErrorToast.previousFinished()) {
-                        ErrorToast(activity, viewModel.error).show()
-                    }
-                }
-                else -> {}
+    private fun stateObserver(
+        parentActivity: Activity,
+        context: Context,
+    ) = Observer<UiState> {
+        val loadingIndicator = parentActivity.findViewById<CircularProgressIndicator>(R.id.pgbLoading)
+        loadingIndicator.isVisible = it is UiState.Loading
+        when (it) {
+            UiState.Success -> {
+                toggleView(binding.flCircleDetail)
+                loadCircleDetail(context)
+                inflateOverflowMenu(context)
+                setOverflowMenuItemListener(context)
             }
+            UiState.AuthenticationError -> {
+                sendUserToLoginScreen(parentActivity)
+                if (ErrorToast.previousFinished()) {
+                    ErrorToast(context, viewModel.error).show()
+                }
+            }
+            UiState.ServiceError -> {
+                toggleView(binding.llServiceError)
+                if (ErrorToast.previousFinished()) {
+                    ErrorToast(context, viewModel.error).show()
+                }
+            }
+            else -> {}
         }
+    }
 
-    private fun loadCircleDetail(activity: Activity) {
+    private fun loadCircleDetail(context: Context) {
         binding.txtTbCircleName.text = viewModel.circleDetail.name
         binding.txtCircleName.text = viewModel.circleDetail.name
         binding.tlCircleDetail.getTabAt(viewModel.currentTabPosition)?.select() // 탭 복원
         viewModel.circleDetail.thumbnailUrl?.let {
-            glideProvider.fetchImage(it, activity, binding.imgCircleThumbnail)
+            glideProvider.fetchImage(it, context, binding.imgCircleThumbnail)
         } ?: binding.imgCircleThumbnail.setImageResource(R.drawable.ic_circle_thumbnail_placeholder)
         binding.txtCircleCategory.text = viewModel.circleDetail.category.categoryName()
         binding.txtCircleMemberCount.text = String.format(MEMBER_COUNT_UNIT, viewModel.circleDetail.memberCount)
@@ -157,7 +163,7 @@ class CircleDetailFragment : Fragment() {
         startActivity(intent)
     }
 
-    private fun inflateOverflowMenu(activity: Activity) {
+    private fun inflateOverflowMenu(context: Context) {
         if (binding.tbCircleDetail.menu.isEmpty()) {
             if (viewModel.circleDetail.isExecutive()) {
                 binding.tbCircleDetail.inflateMenu(R.menu.menu_executive_circle_settings)
@@ -168,20 +174,20 @@ class CircleDetailFragment : Fragment() {
             if (viewModel.circleDetail.isExecutive() || viewModel.circleDetail.isMember()) {
                 Utils.changeMenuItemTextColor(
                     binding.tbCircleDetail.menu.findItem(R.id.resign_circle),
-                    ContextCompat.getColor(activity, R.color.error),
+                    ContextCompat.getColor(context, R.color.error),
                 )
             }
         }
     }
 
-    private fun setOverflowMenuItemListener(activity: Activity) {
+    private fun setOverflowMenuItemListener(context: Context) {
         binding.tbCircleDetail.setOnMenuItemClickListener(
-            circleOverflowMenuItemClickListener(activity, viewModel.circleDetail),
+            circleOverflowMenuItemClickListener(context, viewModel.circleDetail),
         )
     }
 
     private fun circleOverflowMenuItemClickListener(
-        activity: Activity,
+        context: Context,
         item: CircleDetailModel,
     ) = Toolbar.OnMenuItemClickListener {
         when (it.itemId) {

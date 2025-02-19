@@ -9,7 +9,6 @@ import android.view.inputmethod.InputMethodManager
 import androidx.core.widget.doOnTextChanged
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
-import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.Observer
 import com.developeek.circleon.databinding.FragmentSignUpEmailAuthenticationBinding
 import com.developeek.circleon.view.viewmodel.SignUpViewModel
@@ -26,15 +25,15 @@ class SignUpEmailAuthenticationFragment : Fragment() {
     ): View {
         binding = FragmentSignUpEmailAuthenticationBinding.inflate(layoutInflater)
 
-        initObserver(requireActivity())
+        initObserver()
         initListener()
 
         return binding.root
     }
 
-    private fun initObserver(activity: Activity) {
+    private fun initObserver() {
         viewModel.emailAuthenticationTimer.observe(
-            activity as LifecycleOwner,
+            viewLifecycleOwner,
             emailAuthenticationTimerObserver(),
         )
     }

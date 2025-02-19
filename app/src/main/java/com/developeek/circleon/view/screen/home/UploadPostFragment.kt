@@ -1,6 +1,7 @@
 package com.developeek.circleon.view.screen.home
 
 import android.app.Activity
+import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -97,15 +98,18 @@ class UploadPostFragment : Fragment() {
     ) {
         super.onViewCreated(view, savedInstanceState)
 
-        initView(requireActivity())
-        initObserver(requireActivity())
-        initListener(requireActivity())
+        initView(requireActivity(), requireContext())
+        initObserver(requireActivity(), requireContext())
+        initListener(requireContext())
     }
 
-    private fun initView(activity: Activity) {
+    private fun initView(
+        parentActivity: Activity,
+        context: Context,
+    ) {
         initToolbar()
-        hideBtmNav(activity)
-        loadPostContentWhenIsEdit(activity)
+        hideBtmNav(parentActivity)
+        loadPostContentWhenIsEdit(context)
     }
 
     private fun initToolbar() {
@@ -127,7 +131,7 @@ class UploadPostFragment : Fragment() {
         binding.txtTbTitle.text = title
     }
 
-    private fun loadPostContentWhenIsEdit(activity: Activity) {
+    private fun loadPostContentWhenIsEdit(context: Context) {
         if (isEdit) {
             binding.edtPostContent.setText(post.content)
             if (post.imgUrl == null) {
@@ -137,7 +141,7 @@ class UploadPostFragment : Fragment() {
                 // 편집 화면에서 이미지 수정 기능 비활성화
                 glideProvider.fetchImage(
                     post.imgUrl!!,
-                    activity,
+                    context,
                     binding.btnAddPostImage,
                 )
                 binding.txtAddPostImage.isVisible = false
@@ -150,34 +154,39 @@ class UploadPostFragment : Fragment() {
         activity.findViewById<BottomNavigationView>(R.id.btmNav).isVisible = false
     }
 
-    private fun initObserver(activity: Activity) {
+    private fun initObserver(
+        parentActivity: Activity,
+        context: Context,
+    ) {
         viewModel.state.observe(
             viewLifecycleOwner,
-            stateObserver(activity),
+            stateObserver(parentActivity, context),
         )
     }
 
-    private fun stateObserver(activity: Activity) =
-        Observer<UiState> {
-            val loadingIndicator = activity.findViewById<CircularProgressIndicator>(R.id.pgbLoading)
-            loadingIndicator.isVisible = it is UiState.Loading
-            when (it) {
-                UiState.Success -> {
-                    requestRefreshToPreviousScreen()
-                    sendUserToPreviousScreen()
-                }
-                UiState.AuthenticationError -> {
-                    sendUserToLoginScreen(activity)
-                    if (ErrorToast.previousFinished()) {
-                        ErrorToast(activity, viewModel.error).show()
-                    }
-                }
-                UiState.ServiceError -> {
-                    ErrorAlertDialog(activity, viewModel.error).show()
-                }
-                else -> {}
+    private fun stateObserver(
+        parentActivity: Activity,
+        context: Context,
+    ) = Observer<UiState> {
+        val loadingIndicator = parentActivity.findViewById<CircularProgressIndicator>(R.id.pgbLoading)
+        loadingIndicator.isVisible = it is UiState.Loading
+        when (it) {
+            UiState.Success -> {
+                requestRefreshToPreviousScreen()
+                sendUserToPreviousScreen()
             }
+            UiState.AuthenticationError -> {
+                sendUserToLoginScreen(parentActivity)
+                if (ErrorToast.previousFinished()) {
+                    ErrorToast(context, viewModel.error).show()
+                }
+            }
+            UiState.ServiceError -> {
+                ErrorAlertDialog(context, viewModel.error).show()
+            }
+            else -> {}
         }
+    }
 
     private fun requestRefreshToPreviousScreen() {
         findNavController().previousBackStackEntry?.savedStateHandle?.set(Const.FLAG_CIRCLE_POST_DATA_CHANGED, true)
@@ -193,11 +202,11 @@ class UploadPostFragment : Fragment() {
         startActivity(intent)
     }
 
-    private fun initListener(activity: Activity) {
+    private fun initListener(context: Context) {
         setBtnCancelListener()
         setBtnUploadListener()
         setBtnAddPostImageListener()
-        setBtnRemovePostImageListener(activity)
+        setBtnRemovePostImageListener(context)
     }
 
     private fun setBtnCancelListener() {
@@ -228,14 +237,14 @@ class UploadPostFragment : Fragment() {
         }
     }
 
-    private fun setBtnRemovePostImageListener(activity: Activity) {
+    private fun setBtnRemovePostImageListener(context: Context) {
         binding.btnRemovePostImage.setOnClickListener {
             viewModel.removePostImage()
             binding.btnAddPostImage.setImageResource(R.drawable.ic_add)
             binding.btnRemovePostImage.isVisible = false
             binding.txtAddPostImage.isVisible = true
             binding.btnAddPostImage.background =
-                ContextCompat.getDrawable(activity, R.drawable.bg_dotted_rounded_rectangle)
+                ContextCompat.getDrawable(context, R.drawable.bg_dotted_rounded_rectangle)
         }
     }
 

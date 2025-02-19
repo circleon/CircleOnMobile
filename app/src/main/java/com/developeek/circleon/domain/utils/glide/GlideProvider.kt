@@ -16,7 +16,7 @@ class GlideProvider
     constructor(private val tokenManager: TokenManager) {
         fun fetchImage(
             url: String,
-            parent: Context,
+            context: Context,
             view: ImageView,
         ) {
             var glideUrl: GlideUrl? = null
@@ -32,7 +32,7 @@ class GlideProvider
             }
 
             glideUrl?.let {
-                Glide.with(parent)
+                Glide.with(context)
                     .load(it)
                     .into(view)
             }
@@ -40,10 +40,10 @@ class GlideProvider
 
         fun loadImage(
             uri: Uri,
-            parent: Context,
+            context: Context,
             view: ImageView,
         ) {
-            Glide.with(parent)
+            Glide.with(context)
                 .load(uri)
                 .into(view)
         }
