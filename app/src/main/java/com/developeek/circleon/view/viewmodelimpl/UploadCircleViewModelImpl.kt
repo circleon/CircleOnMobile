@@ -32,7 +32,8 @@ class UploadCircleViewModelImpl
             get() = uiState
         private val uiState = MutableLiveData<UiState>()
 
-        override lateinit var origin: CircleDetailModel
+        override val origin: CircleDetailModel
+            get() = temp
         private var temp: CircleDetailModel = CircleDetailModel.empty()
         private var uploadJob: Job? = null
 
@@ -53,8 +54,7 @@ class UploadCircleViewModelImpl
         override lateinit var error: String
 
         override fun edit() {
-            val circle = if (origin == temp) origin else temp
-            if (!isCircleFormat(circle)) return
+            if (!isCircleFormat(temp)) return
             uploadJob?.let {
                 if (!it.isCompleted) return
             }
@@ -64,16 +64,16 @@ class UploadCircleViewModelImpl
             uploadJob =
                 viewModelScope.launch {
                     launch {
-                        editCircle(this, circle)
+                        editCircle(this, temp)
                     }
                     launch {
                         if (isAnyImageEdited()) {
-                            editCircleImage(this, circle)
+                            editCircleImage(this, temp)
                         }
                     }
                     launch {
                         if (isAnyImageRemoved()) {
-                            deleteCircleImage(this, circle)
+                            deleteCircleImage(this, temp)
                         }
                     }
                 }.apply {
@@ -149,9 +149,8 @@ class UploadCircleViewModelImpl
             }
         }
 
-        override fun origin(circle: CircleDetailModel) {
-            this.origin = circle
-            this.temp = origin
+        override fun setOrigin(circle: CircleDetailModel) {
+            this.temp = circle
         }
 
         override fun setCircleThumbnail(image: File?) {

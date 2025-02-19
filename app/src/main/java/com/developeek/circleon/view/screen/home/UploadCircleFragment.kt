@@ -1,6 +1,8 @@
 package com.developeek.circleon.view.screen.home
 
 import android.app.Activity
+import android.app.DatePickerDialog
+import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -32,6 +34,7 @@ import com.developeek.circleon.view.widget.ErrorToast
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.progressindicator.CircularProgressIndicator
 import dagger.hilt.android.AndroidEntryPoint
+import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 import javax.inject.Inject
 
@@ -73,7 +76,7 @@ class UploadCircleFragment : Fragment() {
                 it.getBoolean(Const.FLAG_IS_EDIT).also { isEdit ->
                     if (isEdit) {
                         circle = it.getSerializable(Const.TAG_CIRCLE_DETAIL) as CircleDetailModel
-                        viewModel.origin(circle)
+                        viewModel.setOrigin(circle)
                     }
                 }
         }
@@ -188,9 +191,8 @@ class UploadCircleFragment : Fragment() {
         setBtnUploadListener()
         setBtnAddCircleThumbnailListener()
         setBtnAddCircleIntroductionImageListener()
-        setBtnEdtCircleNameListener()
-        setBtnEdtSingleLineIntroductionListener()
-        setBtnEdtCircleIntroductionListener()
+        setBtnEditRecruitmentDate(requireContext())
+        setBtnEdtCircleContentListener()
         setBtnRemoveCircleThumbnailListener(activity)
         setBtnRemoveCircleIntroductionImageListener(activity)
         setEdtSingleLineIntroductionListener()
@@ -224,6 +226,71 @@ class UploadCircleFragment : Fragment() {
                 PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.SingleMimeType(mimeType)),
             )
         }
+    }
+
+    private fun setBtnEditRecruitmentDate(context: Context) {
+        setBtnEditRecruitmentStartDate(context)
+        setBtnEditRecruitmentEndDate(context)
+    }
+
+    private fun setBtnEditRecruitmentStartDate(context: Context) {
+        val onDataSetListener =
+            DatePickerDialog.OnDateSetListener { _, y, m, d ->
+                viewModel.setRecruitmentStartDate(LocalDateTime.of(y, m + 1, d, 0, 0))
+                binding.txtRecruitmentStartDate.text =
+                    viewModel.origin.recruitmentStartDate!!.format(DateTimeFormatter.ofPattern(RECRUITMENT_DATE_FORMAT))
+            }
+
+        if (isEdit) {
+            binding.btnEditRecruitmentStartDate.setOnClickListener {
+                showDatePickerDialog(context, onDataSetListener, viewModel.origin.recruitmentStartDate)
+            }
+        } else {
+            binding.btnEditRecruitmentStartDate.setOnClickListener {
+                showDatePickerDialog(context, onDataSetListener)
+            }
+        }
+    }
+
+    private fun setBtnEditRecruitmentEndDate(context: Context) {
+        val onDataSetListener =
+            DatePickerDialog.OnDateSetListener { _, y, m, d ->
+                viewModel.setRecruitmentEndDate(LocalDateTime.of(y, m + 1, d, 0, 0))
+                binding.txtRecruitmentEndDate.text =
+                    viewModel.origin.recruitmentEndDate!!.format(DateTimeFormatter.ofPattern(RECRUITMENT_DATE_FORMAT))
+            }
+
+        if (isEdit) {
+            binding.btnEditRecruitmentEndDate.setOnClickListener {
+                showDatePickerDialog(context, onDataSetListener, viewModel.origin.recruitmentEndDate)
+            }
+        } else {
+            binding.btnEditRecruitmentEndDate.setOnClickListener {
+                showDatePickerDialog(context, onDataSetListener)
+            }
+        }
+    }
+
+    private fun showDatePickerDialog(
+        context: Context,
+        onDataSetListener: DatePickerDialog.OnDateSetListener,
+        currentDate: LocalDateTime? = LocalDateTime.now(),
+    ) {
+        val date = currentDate ?: LocalDateTime.now()
+
+        DatePickerDialog(
+            context,
+            onDataSetListener,
+            date.year,
+            date.monthValue - 1,
+            date.dayOfMonth,
+        ).show()
+    }
+
+    private fun setBtnEdtCircleContentListener() {
+        setBtnEdtCircleNameListener()
+        setBtnEdtSingleLineIntroductionListener()
+        setBtnEdtCircleIntroductionListener()
     }
 
     private fun setBtnEdtCircleNameListener() {

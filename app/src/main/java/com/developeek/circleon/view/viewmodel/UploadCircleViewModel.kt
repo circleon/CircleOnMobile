@@ -14,7 +14,7 @@ interface UploadCircleViewModel {
 
     fun edit()
 
-    fun origin(circle: CircleDetailModel)
+    fun setOrigin(circle: CircleDetailModel)
 
     fun setCircleThumbnail(image: File?)
 
