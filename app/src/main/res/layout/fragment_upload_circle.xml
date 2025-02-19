@@ -96,14 +96,30 @@
 
             </FrameLayout>
 
-            <androidx.appcompat.widget.AppCompatTextView
+            <androidx.appcompat.widget.LinearLayoutCompat
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:lineSpacingExtra="2sp"
-                android:text="@string/text_circle_name"
-                android:textColor="@color/grey_9"
-                android:textSize="@dimen/text_size_small"
-                android:translationY="-0.91sp" />
+                android:orientation="horizontal">
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:lineSpacingExtra="2sp"
+                    android:text="@string/text_circle_name"
+                    android:textColor="@color/grey_9"
+                    android:textSize="@dimen/text_size_small"
+                    android:translationY="-0.91sp" />
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginHorizontal="@dimen/margin_padding_x_small"
+                    android:lineSpacingExtra="2sp"
+                    android:text="*"
+                    android:textColor="@color/error"
+                    android:textSize="@dimen/text_size_small" />
+
+            </androidx.appcompat.widget.LinearLayoutCompat>
 
             <androidx.appcompat.widget.AppCompatEditText
                 android:id="@+id/edtCircleName"
@@ -213,15 +229,31 @@
 
             </androidx.appcompat.widget.LinearLayoutCompat>
 
-            <androidx.appcompat.widget.AppCompatTextView
+            <androidx.appcompat.widget.LinearLayoutCompat
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/margin_padding_xx_large"
-                android:lineSpacingExtra="2sp"
-                android:text="@string/text_circle_single_line_introduction"
-                android:textColor="@color/grey_9"
-                android:textSize="@dimen/text_size_small"
-                android:translationY="-0.91sp" />
+                android:orientation="horizontal"
+                android:layout_marginTop="@dimen/margin_padding_xx_large">
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:lineSpacingExtra="2sp"
+                    android:text="@string/text_circle_single_line_introduction"
+                    android:textColor="@color/grey_9"
+                    android:textSize="@dimen/text_size_small"
+                    android:translationY="-0.91sp" />
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginHorizontal="@dimen/margin_padding_x_small"
+                    android:lineSpacingExtra="2sp"
+                    android:text="*"
+                    android:textColor="@color/error"
+                    android:textSize="@dimen/text_size_small" />
+
+            </androidx.appcompat.widget.LinearLayoutCompat>
 
             <androidx.appcompat.widget.LinearLayoutCompat
                 android:layout_width="match_parent"
@@ -284,15 +316,31 @@
 
             </androidx.appcompat.widget.LinearLayoutCompat>
 
-            <androidx.appcompat.widget.AppCompatTextView
+            <androidx.appcompat.widget.LinearLayoutCompat
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/margin_padding_xx_large"
-                android:lineSpacingExtra="2sp"
-                android:text="@string/text_circle_introduction"
-                android:textColor="@color/grey_9"
-                android:textSize="@dimen/text_size_small"
-                android:translationY="-0.91sp" />
+                android:orientation="horizontal">
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:lineSpacingExtra="2sp"
+                    android:text="@string/text_circle_introduction"
+                    android:textColor="@color/grey_9"
+                    android:textSize="@dimen/text_size_small"
+                    android:translationY="-0.91sp" />
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginHorizontal="@dimen/margin_padding_x_small"
+                    android:lineSpacingExtra="2sp"
+                    android:text="*"
+                    android:textColor="@color/error"
+                    android:textSize="@dimen/text_size_small" />
+
+            </androidx.appcompat.widget.LinearLayoutCompat>
 
             <androidx.appcompat.widget.AppCompatEditText
                 android:id="@+id/edtCircleIntroduction"
@@ -327,17 +375,13 @@
                     android:textSize="@dimen/text_size_small"
                     android:translationY="-0.91sp" />
 
-                <androidx.appcompat.widget.AppCompatTextView
+                <androidx.appcompat.widget.AppCompatImageView
                     android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
+                    android:layout_height="match_parent"
                     android:layout_marginStart="@dimen/margin_padding_small"
-                    android:paddingEnd="@dimen/margin_padding_xx_small"
-                    android:gravity="center"
-                    android:text="*"
-                    android:lineSpacingExtra="2sp"
-                    android:textColor="@color/purple_5"
-                    android:textSize="@dimen/text_size_small"
-                     />
+                    android:layout_marginEnd="@dimen/margin_padding_xx_small"
+                    android:src="@drawable/ic_info"
+                    app:tint="@color/purple_5"/>
 
                 <androidx.appcompat.widget.AppCompatTextView
                     android:layout_width="wrap_content"
