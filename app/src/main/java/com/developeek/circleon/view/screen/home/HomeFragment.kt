@@ -17,13 +17,13 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.developeek.circleon.R
 import com.developeek.circleon.data.source.manager.UserManager
 import com.developeek.circleon.databinding.FragmentHomeBinding
-import com.developeek.circleon.domain.enums.Category
+import com.developeek.circleon.domain.model.CategoryModel
 import com.developeek.circleon.domain.model.CircleModel
 import com.developeek.circleon.domain.state.UiState
 import com.developeek.circleon.domain.utils.Const
 import com.developeek.circleon.domain.utils.glide.GlideProvider
+import com.developeek.circleon.view.adapter.CategoryAdapter
 import com.developeek.circleon.view.adapter.CircleAdapter
-import com.developeek.circleon.view.adapter.CircleCategoryAdapter
 import com.developeek.circleon.view.listener.ItemListenerInitializer
 import com.developeek.circleon.view.listener.RecyclerViewInfiniteScrollListener
 import com.developeek.circleon.view.screen.login.LoginActivity
@@ -66,10 +66,35 @@ class HomeFragment : Fragment() {
     }
 
     private fun initView(context: Context) {
-        initRecyclerView(context)
+        initCategoryRecyclerView(context)
+        initCircleRecyclerView(context)
     }
 
-    private fun initRecyclerView(context: Context) {
+    private fun initCategoryRecyclerView(context: Context) {
+        binding.rvCircleCategory.adapter =
+            CategoryAdapter(
+                context,
+                object : ItemListenerInitializer<CategoryModel> {
+                    override fun initialize(item: CategoryModel) {
+                        if (item.isSelected) {
+                            binding.rvCircle.scrollToPosition(0)
+                        } else {
+                            viewModel.setFilterAndFetch(item.category)
+                        }
+                    }
+
+                    override fun initialize(
+                        item: CategoryModel,
+                        view: View?,
+                    ) {}
+                },
+            )
+        binding.rvCircleCategory.layoutManager =
+            LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false)
+        binding.rvCircleCategory.itemAnimator = null
+    }
+
+    private fun initCircleRecyclerView(context: Context) {
         binding.rvCircle.adapter =
             CircleAdapter(
                 context,
@@ -103,10 +128,6 @@ class HomeFragment : Fragment() {
         viewModel.state.observe(
             viewLifecycleOwner,
             stateObserver(parentActivity, context),
-        )
-        viewModel.selectedCategory.observe(
-            viewLifecycleOwner,
-            selectedCategoryObserver(context),
         )
         viewModel.scrollOver.observe(
             viewLifecycleOwner,
@@ -150,6 +171,9 @@ class HomeFragment : Fragment() {
     }
 
     private fun loadCircles() {
+        binding.rvCircleCategory.adapter?.let {
+            (it as CategoryAdapter).update(viewModel.categories) {}
+        }
         binding.rvCircle.adapter?.let {
             (it as CircleAdapter).update(viewModel.circles) {
                 viewModel.currentScrollState?.let {
@@ -165,33 +189,6 @@ class HomeFragment : Fragment() {
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)
         startActivity(intent)
     }
-
-    private fun selectedCategoryObserver(context: Context) =
-        Observer<Category> {
-            val scrollState = binding.rvCircleCategory.layoutManager?.onSaveInstanceState()
-            binding.rvCircleCategory.adapter =
-                CircleCategoryAdapter(
-                    viewModel,
-                    context,
-                    object : ItemListenerInitializer<Category> {
-                        override fun initialize(item: Category) {
-                            if (viewModel.selectedCategory.value!!.isSame(item)) {
-                                binding.rvCircle.scrollToPosition(0)
-                            } else {
-                                viewModel.setFilterAndFetch(item)
-                            }
-                        }
-
-                        override fun initialize(
-                            item: Category,
-                            view: View?,
-                        ) {}
-                    },
-                )
-            binding.rvCircleCategory.layoutManager =
-                LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false)
-            binding.rvCircleCategory.layoutManager?.onRestoreInstanceState(scrollState)
-        }
 
     private fun scrollOverObserver() =
         Observer<Boolean> { completed ->

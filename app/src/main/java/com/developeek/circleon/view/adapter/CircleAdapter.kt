@@ -46,27 +46,29 @@ class CircleAdapter(
         private val itemClickListener: ItemClickListener<CircleModel>,
     ) : RecyclerView.ViewHolder(binding.root) {
         fun bind(position: Int) {
-            loadCircle(position)
-            notifyListenerItemChanged(position)
+            val circle = diffUtil.currentList[position]
+
+            loadCircle(circle)
+            notifyListenerItemChanged(circle)
         }
 
-        private fun loadCircle(position: Int) {
-            binding.txtCircleName.text = diffUtil.currentList[position].name
-            binding.txtCircleCategory.text = diffUtil.currentList[position].category.categoryName()
-            binding.txtCircleComment.text = diffUtil.currentList[position].comment
+        private fun loadCircle(circle: CircleModel) {
+            binding.txtCircleName.text = circle.name
+            binding.txtCircleCategory.text = circle.category.categoryName()
+            binding.txtCircleComment.text = circle.comment
             binding.txtCircleMemberCount.text =
                 String.format(
-                    MEMBER_COUNT_UNIT, diffUtil.currentList[position].memberCount,
+                    MEMBER_COUNT_UNIT, circle.memberCount,
                 )
             // ?.let ?: 구조인 경우 ?: 뒤에 블록 형태로 코드를 작성하면 실행이 안 되는데
             // 싱글 라인인 경우에는 작동
-            diffUtil.currentList[position].thumbnailUrl?.let {
+            circle.thumbnailUrl?.let {
                 glideProvider.fetchImage(it, context, binding.imgCircleThumbnail)
             } ?: binding.imgCircleThumbnail.setImageResource(R.drawable.ic_circle_thumbnail_placeholder)
         }
 
-        private fun notifyListenerItemChanged(position: Int) {
-            itemClickListener.item = diffUtil.currentList[position]
+        private fun notifyListenerItemChanged(circle: CircleModel) {
+            itemClickListener.item = circle
         }
     }
 

@@ -25,6 +25,6 @@ enum class Category(
     companion object {
         private val default = ETC
 
-        fun findOrDefault(code: String) = Category.entries.find { it.code == code } ?: default
+        fun findOrDefault(code: String) = entries.find { it.code == code } ?: default
     }
 }
