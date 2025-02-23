@@ -1,6 +1,7 @@
 package com.developeek.circleon.view.screen.home
 
 import android.app.Activity
+import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -53,15 +54,18 @@ class SearchCircleFragment : Fragment() {
     ) {
         super.onViewCreated(view, savedInstanceState)
 
-        initView(requireActivity())
-        initObserver(requireActivity())
-        initListener(requireActivity())
+        initView(requireActivity(), requireContext())
+        initObserver(requireActivity(), requireContext())
+        initListener(requireContext())
     }
 
-    private fun initView(activity: Activity) {
+    private fun initView(
+        parentActivity: Activity,
+        context: Context,
+    ) {
         initRecyclerView()
-        initSoftKeyboard(activity)
-        hideBtmNav(activity)
+        initSoftKeyboard(context)
+        hideBtmNav(parentActivity)
     }
 
     private fun initRecyclerView() {
@@ -105,18 +109,21 @@ class SearchCircleFragment : Fragment() {
             )
     }
 
-    private fun initSoftKeyboard(activity: Activity) {
-        showSoftInput(binding.edtSearchCircle, activity)
+    private fun initSoftKeyboard(context: Context) {
+        showSoftInput(binding.edtSearchCircle, context)
     }
 
-    private fun hideBtmNav(activity: Activity) {
-        activity.findViewById<BottomNavigationView>(R.id.btmNav).isVisible = false
+    private fun hideBtmNav(parentActivity: Activity) {
+        parentActivity.findViewById<BottomNavigationView>(R.id.btmNav).isVisible = false
     }
 
-    private fun initObserver(activity: Activity) {
+    private fun initObserver(
+        parentActivity: Activity,
+        context: Context,
+    ) {
         viewModel.state.observe(
             viewLifecycleOwner,
-            stateObserver(activity),
+            stateObserver(parentActivity, context),
         )
         viewModel.circles.observe(
             viewLifecycleOwner,
@@ -124,29 +131,32 @@ class SearchCircleFragment : Fragment() {
         )
     }
 
-    private fun stateObserver(activity: Activity) =
-        Observer<UiState> {
-            when (it) {
-                UiState.Loading -> {
-                    toggleView(binding.pgbLoading)
-                }
-                UiState.Success -> {
-                    viewModel.setKeywordAndFind(binding.edtSearchCircle.text.toString())
-                }
-                UiState.AuthenticationError -> {
-                    sendUserToLoginScreen(activity)
-                    if (ErrorToast.previousFinished()) {
-                        ErrorToast(activity, viewModel.error).show()
-                    }
-                }
-                UiState.ServiceError -> {
-                    toggleView(binding.llServiceError)
-                    if (ErrorToast.previousFinished()) {
-                        ErrorToast(activity, viewModel.error).show()
-                    }
+    private fun stateObserver(
+        parentActivity: Activity,
+        context: Context,
+    ) = Observer<UiState> {
+        when (it) {
+            UiState.Loading -> {
+                toggleView(binding.pgbLoading)
+            }
+            UiState.Success -> {
+                viewModel.setKeywordAndFind(binding.edtSearchCircle.text.toString())
+            }
+            UiState.AuthenticationError -> {
+                sendUserToLoginScreen(parentActivity)
+                if (ErrorToast.previousFinished()) {
+                    ErrorToast(context, viewModel.error).show()
                 }
             }
+            UiState.ServiceError -> {
+                toggleView(binding.llServiceError)
+                if (ErrorToast.previousFinished()) {
+                    ErrorToast(context, viewModel.error).show()
+                }
+            }
+            else -> {}
         }
+    }
 
     private fun sendUserToLoginScreen(activity: Activity) {
         val intent = Intent(activity, LoginActivity::class.java)
@@ -165,10 +175,10 @@ class SearchCircleFragment : Fragment() {
             }
         }
 
-    private fun initListener(activity: Activity) {
+    private fun initListener(context: Context) {
         setEdtSearchCircleListener()
-        setRvCircleListener(activity)
-        setBtnClearListener(activity)
+        setRvCircleListener(context)
+        setBtnClearListener(context)
         setBtnCancelListener()
         setBtnRetryListener()
     }
@@ -179,24 +189,24 @@ class SearchCircleFragment : Fragment() {
         }
     }
 
-    private fun setRvCircleListener(activity: Activity) {
-        binding.rvCircle.addOnScrollListener(RecyclerViewHideSoftInputListener(activity))
+    private fun setRvCircleListener(context: Context) {
+        binding.rvCircle.addOnScrollListener(RecyclerViewHideSoftInputListener(context))
     }
 
-    private fun setBtnClearListener(activity: Activity) {
+    private fun setBtnClearListener(context: Context) {
         binding.btnClear.setOnClickListener {
             viewModel.clearKeyword()
             binding.edtSearchCircle.setText(Const.EMPTY_TEXT)
-            showSoftInput(binding.edtSearchCircle, activity)
+            showSoftInput(binding.edtSearchCircle, context)
         }
     }
 
     private fun showSoftInput(
         view: View,
-        activity: Activity,
+        context: Context,
     ) {
         if (view.requestFocus()) {
-            val imm = activity.getSystemService(InputMethodManager::class.java)
+            val imm = context.getSystemService(InputMethodManager::class.java)
             imm.showSoftInput(view, InputMethodManager.SHOW_IMPLICIT)
         }
     }

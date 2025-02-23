@@ -1,17 +1,17 @@
 package com.developeek.circleon.view.widget
 
-import android.app.Activity
 import android.app.AlertDialog
+import android.content.Context
 
 class ErrorAlertDialog(
-    private val activity: Activity,
+    private val context: Context,
     private val message: String,
 ) {
     private lateinit var dialog: AlertDialog
 
     init {
         dialog =
-            AlertDialog.Builder(activity).apply {
+            AlertDialog.Builder(context).apply {
                 setMessage(message)
                 setPositiveButton(POSITIVE_BUTTON) { dialog, _ ->
                     dialog.dismiss()

@@ -1,5 +1,6 @@
 package com.developeek.circleon.domain.utils.validator
 
+import com.developeek.circleon.domain.model.CircleDetailModel
 import com.developeek.circleon.domain.vo.Password
 import com.developeek.circleon.domain.vo.UserEmail
 import com.developeek.circleon.domain.vo.UserName
@@ -54,23 +55,24 @@ object Validator {
         }
     }
 
-    fun checkComment(data: String): InputValidationResult<String> {
-        checkEmpty(data)
-
-        return try {
-            require(data.length <= MAX_COMMENT_SIZE)
-            InputValidationResult.valid(data)
-        } catch (e: IllegalArgumentException) {
-            InputValidationResult.invalid(
-                IOException(
-                    String.format(ValidatorExceptionMessage.MESSAGE_OVER_SIZE_COMMENT, MAX_COMMENT_SIZE),
-                ),
-            )
+    fun checkCircle(data: CircleDetailModel): InputValidationResult<CircleDetailModel> {
+        checkEmpty(data.name).also {
+            if (it is Invalid) return InputValidationResult.invalid(IOException(it.message()))
         }
+        checkEmpty(data.singleLineIntroduction).also {
+            if (it is Invalid) return InputValidationResult.invalid(IOException(it.message()))
+        }
+        checkEmpty(data.introduction).also {
+            if (it is Invalid) return InputValidationResult.invalid(IOException(it.message()))
+        }
+
+        return InputValidationResult.valid(data)
     }
 
     fun checkPost(data: String): InputValidationResult<String> {
-        checkEmpty(data)
+        checkEmpty(data).also {
+            if (it is Invalid) return it
+        }
 
         return try {
             require(data.length <= MAX_POST_SIZE)
@@ -79,6 +81,23 @@ object Validator {
             InputValidationResult.invalid(
                 IOException(
                     String.format(ValidatorExceptionMessage.MESSAGE_OVER_SIZE_POST, MAX_POST_SIZE),
+                ),
+            )
+        }
+    }
+
+    fun checkComment(data: String): InputValidationResult<String> {
+        checkEmpty(data).also {
+            if (it is Invalid) return it
+        }
+
+        return try {
+            require(data.length <= MAX_COMMENT_SIZE)
+            InputValidationResult.valid(data)
+        } catch (e: IllegalArgumentException) {
+            InputValidationResult.invalid(
+                IOException(
+                    String.format(ValidatorExceptionMessage.MESSAGE_OVER_SIZE_COMMENT, MAX_COMMENT_SIZE),
                 ),
             )
         }

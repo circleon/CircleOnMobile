@@ -94,8 +94,9 @@ class CircleDetailPostDetailViewModelImpl
             page: Int,
             size: Int,
         ) {
-            fetchCommentJob?.cancel()
-            scrollOverCommentJob?.cancel()
+            fetchCommentJob?.let {
+                if (!it.isCompleted) return
+            }
 
             fetchCommentJob =
                 viewModelScope.launch {
@@ -122,7 +123,9 @@ class CircleDetailPostDetailViewModelImpl
         }
 
         override fun scrollOver() {
-            scrollOverCommentJob?.cancel()
+            scrollOverCommentJob?.let {
+                if (!it.isCompleted) return
+            }
 
             scrollOverCommentJob =
                 viewModelScope.launch {
@@ -161,8 +164,10 @@ class CircleDetailPostDetailViewModelImpl
 
         override fun uploadComment(content: String) {
             if (!isCommentFormat(content)) return
+            uploadCommentJob?.let {
+                if (!it.isCompleted) return
+            }
 
-            uploadCommentJob?.cancel()
             commentUploadState.postValueWhenAnimFinished(UiState.Loading)
             saveLoadingStartTime()
 
@@ -188,14 +193,15 @@ class CircleDetailPostDetailViewModelImpl
             content: String,
         ) {
             if (!isCommentFormat(content)) return
+            editCommentJob?.let {
+                if (!it.isCompleted) return
+            }
 
-            editCommentJob?.cancel()
             commentEditState.postValueWhenAnimFinished(UiState.Loading)
             saveLoadingStartTime()
 
             editCommentJob =
                 viewModelScope.launch {
-                    // TODO: respository.editCircleComment 로 수정
                     val result = repository.putCircleComment(circleId, post.id, commentId, content)
                     delay(remainedLoadingTime())
 
@@ -212,7 +218,10 @@ class CircleDetailPostDetailViewModelImpl
         }
 
         override fun deleteComment(commentId: Int) {
-            deleteCommentJob?.cancel()
+            deleteCommentJob?.let {
+                if (!it.isCompleted) return
+            }
+
             commentDeleteState.postValueWhenAnimFinished(UiState.Loading)
             saveLoadingStartTime()
 
@@ -267,14 +276,11 @@ class CircleDetailPostDetailViewModelImpl
             }
         }
 
-        private fun MutableLiveData<Boolean>.postValueWhenAnimFinished(data: Boolean) {
-            if (enterAnimFinished) {
-                this.postValue(data)
-            }
-        }
-
         override fun delete() {
-            deletePostJob?.cancel()
+            deletePostJob?.let {
+                if (!it.isCompleted) return
+            }
+
             postDeleteState.postValue(UiState.Loading)
             saveLoadingStartTime()
 
@@ -310,7 +316,7 @@ class CircleDetailPostDetailViewModelImpl
         }
 
         companion object {
-            private const val SIZE_BY_PAGE = 10
+            private const val SIZE_BY_PAGE = 20
             private const val DEFAULT_PAGE = 0
             private const val MAX_DEFAULT_ANIM_TIME_MILLIS = 200L
         }

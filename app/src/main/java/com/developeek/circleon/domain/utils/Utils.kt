@@ -9,7 +9,6 @@ import android.net.Uri
 import android.text.Spannable
 import android.text.SpannableString
 import android.text.style.ForegroundColorSpan
-import android.util.Log
 import android.util.TimeFormatException
 import android.view.MenuItem
 import com.developeek.circleon.BuildConfig
@@ -102,7 +101,6 @@ object Utils {
         options.inSampleSize = scaleFactor
 
         val bitMap = BitmapFactory.decodeFile(file.absolutePath, options) ?: return null
-        Log.d("bitMap", "${bitMap.width}, ${bitMap.height}")
 
         val matrix = Matrix()
         val exif = ExifInterface(file)

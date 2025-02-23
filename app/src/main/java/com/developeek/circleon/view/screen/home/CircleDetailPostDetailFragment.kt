@@ -4,6 +4,7 @@ import android.animation.Animator
 import android.animation.AnimatorInflater
 import android.animation.AnimatorSet
 import android.app.Activity
+import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -42,6 +43,7 @@ import com.developeek.circleon.view.widget.ErrorAlertDialog
 import com.developeek.circleon.view.widget.ErrorToast
 import com.developeek.circleon.view.widget.TextInputAlertDialog
 import com.google.android.material.bottomnavigation.BottomNavigationView
+import com.google.android.material.progressindicator.CircularProgressIndicator
 import dagger.hilt.android.AndroidEntryPoint
 import dagger.hilt.android.lifecycle.withCreationCallback
 import javax.inject.Inject
@@ -88,21 +90,42 @@ class CircleDetailPostDetailFragment : Fragment() {
         return binding.root
     }
 
+    override fun onCreateAnimator(
+        transit: Int,
+        enter: Boolean,
+        nextAnim: Int,
+    ): Animator? {
+        if (nextAnim == R.animator.slide_in_left) {
+            val animator = AnimatorInflater.loadAnimator(context, nextAnim) as AnimatorSet
+            animator.addListener(
+                onEnd = {
+                    viewModel.notifyEnterAnimFinishedAndUpdateUI()
+                },
+            )
+
+            return animator
+        }
+        return super.onCreateAnimator(transit, enter, nextAnim)
+    }
+
     override fun onViewCreated(
         view: View,
         savedInstanceState: Bundle?,
     ) {
         super.onViewCreated(view, savedInstanceState)
 
-        initView(requireActivity())
-        initObserver(requireActivity())
-        initListener(requireActivity())
+        initView(requireActivity(), requireContext())
+        initObserver(requireActivity(), requireContext())
+        initListener(requireContext())
     }
 
-    private fun initView(activity: Activity) {
+    private fun initView(
+        parentActivity: Activity,
+        context: Context,
+    ) {
         initToolbar()
-        initRecyclerView(activity)
-        hideBtmNav(activity)
+        initRecyclerView(context)
+        hideBtmNav(parentActivity)
     }
 
     private fun initToolbar() {
@@ -113,10 +136,10 @@ class CircleDetailPostDetailFragment : Fragment() {
         }
     }
 
-    private fun initRecyclerView(activity: Activity) {
+    private fun initRecyclerView(context: Context) {
         binding.rvPostDetail.adapter =
             PostDetailAdapter(
-                activity,
+                context,
                 glideProvider,
                 postOverflowListenerInitializer =
                     object : ItemListenerInitializer<PostModel> {
@@ -126,7 +149,7 @@ class CircleDetailPostDetailFragment : Fragment() {
                             item: PostModel,
                             view: View?,
                         ) {
-                            initPostOverflowMenuAndShow(activity, item, view!!)
+                            initPostOverflowMenuAndShow(context, item, view!!)
                         }
                     },
                 commentOverflowListenerInitializer =
@@ -137,32 +160,32 @@ class CircleDetailPostDetailFragment : Fragment() {
                             item: CommentModel,
                             view: View?,
                         ) {
-                            initCommentOverflowMenuAndShow(activity, item, view!!)
+                            initCommentOverflowMenuAndShow(context, item, view!!)
                         }
                     },
                 userId = userManager.getUser()?.id,
             )
-        binding.rvPostDetail.layoutManager = LinearLayoutManager(activity)
+        binding.rvPostDetail.layoutManager = LinearLayoutManager(context)
     }
 
     private fun initPostOverflowMenuAndShow(
-        activity: Activity,
+        context: Context,
         post: PostModel,
         view: View,
     ) {
-        val popupMenu = object : PopupMenu(activity, view) {}
+        val popupMenu = object : PopupMenu(context, view) {}
         popupMenu.inflate(R.menu.menu_post_settings)
-        popupMenu.setOnMenuItemClickListener(postOverflowMenuItemClickListener(activity, post))
+        popupMenu.setOnMenuItemClickListener(postOverflowMenuItemClickListener(context, post))
         Utils.changeMenuItemTextColor(
             popupMenu.menu.findItem(R.id.delete_post),
-            ContextCompat.getColor(activity, R.color.error),
+            ContextCompat.getColor(context, R.color.error),
         )
 
         popupMenu.show()
     }
 
     private fun postOverflowMenuItemClickListener(
-        activity: Activity,
+        context: Context,
         item: PostModel,
     ) = PopupMenu.OnMenuItemClickListener {
         when (it.itemId) {
@@ -171,7 +194,7 @@ class CircleDetailPostDetailFragment : Fragment() {
             }
             R.id.delete_post -> {
                 ContentDeleteAlertDialog(
-                    activity,
+                    context,
                     if (item.isNotice()) MESSAGE_DELETE_NOTICE else MESSAGE_DELETE_POST,
                 ) {
                     viewModel.delete()
@@ -190,35 +213,35 @@ class CircleDetailPostDetailFragment : Fragment() {
         bundle.putInt(Const.TAG_CIRCLE_ID, circleId)
         bundle.putSerializable(Const.TAG_POST_TYPE, item.type)
         bundle.putSerializable(Const.TAG_CIRCLE_POST, item)
-        bundle.putBoolean(Const.FLAG_EDIT_OR_NOT, true) // 수정 기능 전용 활성화
+        bundle.putBoolean(Const.FLAG_IS_EDIT, true) // 수정 기능 전용 활성화
         findNavController().navigate(R.id.action_circleDetailPostDetailFragment_to_uploadPostFragment, bundle)
     }
 
     private fun initCommentOverflowMenuAndShow(
-        activity: Activity,
+        context: Context,
         comment: CommentModel,
         view: View,
     ) {
-        val popupMenu = object : PopupMenu(activity, view) {}
+        val popupMenu = object : PopupMenu(context, view) {}
         popupMenu.inflate(R.menu.menu_comment_settings)
-        popupMenu.setOnMenuItemClickListener(commentOverflowMenuItemClickListener(activity, comment))
+        popupMenu.setOnMenuItemClickListener(commentOverflowMenuItemClickListener(context, comment))
         Utils.changeMenuItemTextColor(
             popupMenu.menu.findItem(R.id.delete_comment),
-            ContextCompat.getColor(activity, R.color.error),
+            ContextCompat.getColor(context, R.color.error),
         )
 
         popupMenu.show()
     }
 
     private fun commentOverflowMenuItemClickListener(
-        activity: Activity,
+        context: Context,
         comment: CommentModel,
     ) = PopupMenu.OnMenuItemClickListener {
         viewModel.saveScrollState(binding.rvPostDetail.layoutManager?.onSaveInstanceState())
         when (it.itemId) {
             R.id.edit_comment -> {
                 TextInputAlertDialog(
-                    activity,
+                    context,
                     comment.content,
                     object : ItemListenerInitializer<String> {
                         override fun initialize(item: String) {
@@ -233,7 +256,7 @@ class CircleDetailPostDetailFragment : Fragment() {
                 ).show()
             }
             R.id.delete_comment -> {
-                ContentDeleteAlertDialog(activity, MESSAGE_DELETE_COMMENT) {
+                ContentDeleteAlertDialog(context, MESSAGE_DELETE_COMMENT) {
                     // 삭제 버튼 클릭 시
                     viewModel.deleteComment(comment.id)
                 }.show()
@@ -252,30 +275,33 @@ class CircleDetailPostDetailFragment : Fragment() {
         }
     }
 
-    private fun hideBtmNav(activity: Activity) {
-        activity.findViewById<BottomNavigationView>(R.id.btmNav).isVisible = false
+    private fun hideBtmNav(parentActivity: Activity) {
+        parentActivity.findViewById<BottomNavigationView>(R.id.btmNav).isVisible = false
     }
 
-    private fun initObserver(activity: Activity) {
+    private fun initObserver(
+        parentActivity: Activity,
+        context: Context,
+    ) {
         viewModel.state.observe(
             viewLifecycleOwner,
-            stateObserver(activity),
+            stateObserver(parentActivity, context),
         )
         viewModel.uploadCommentState.observe(
             viewLifecycleOwner,
-            uploadCommentStateObserver(activity),
+            uploadCommentStateObserver(parentActivity, context),
         )
         viewModel.editCommentState.observe(
             viewLifecycleOwner,
-            editCommentStateObserver(activity),
+            editCommentStateObserver(parentActivity, context),
         )
         viewModel.deleteCommentState.observe(
             viewLifecycleOwner,
-            deleteCommentStateObserver(activity),
+            deleteCommentStateObserver(parentActivity, context),
         )
         viewModel.deletePostState.observe(
             viewLifecycleOwner,
-            deletePostStateObserver(activity),
+            deletePostStateObserver(parentActivity, context),
         )
         viewModel.scrollOver.observe(
             viewLifecycleOwner,
@@ -285,7 +311,7 @@ class CircleDetailPostDetailFragment : Fragment() {
         findNavController()
             .currentBackStackEntry
             ?.savedStateHandle
-            ?.getLiveData<Boolean>(Const.FLAG_DATA_CHANGED)
+            ?.getLiveData<Boolean>(Const.FLAG_CIRCLE_POST_DATA_CHANGED)
             ?.observe(viewLifecycleOwner) {
                 if (it) {
                     requestRefreshToPreviousScreen()
@@ -294,39 +320,37 @@ class CircleDetailPostDetailFragment : Fragment() {
             }
     }
 
-    private fun stateObserver(activity: Activity) =
-        Observer<UiState> {
-            when (it) {
-                UiState.Loading -> {
-                    binding.pgbContentLoading.isVisible = true
-                }
-                UiState.Success -> {
-                    toggleView(binding.rvPostDetail)
-                    binding.pgbContentLoading.isVisible = false
-                    loadContents()
-                }
-                UiState.AuthenticationError -> {
-                    binding.pgbContentLoading.isVisible = false
-                    sendUserToLoginScreen(activity)
-                    showErrorToast(activity)
-                }
-                UiState.ServiceError -> {
-                    binding.pgbContentLoading.isVisible = false
-                    toggleView(binding.llServiceError)
-                    requestRefreshToPreviousScreen()
-                    showErrorDialog(activity)
-                }
+    private fun stateObserver(
+        parentActivity: Activity,
+        context: Context,
+    ) = Observer<UiState> {
+        val loadingIndicator = parentActivity.findViewById<CircularProgressIndicator>(R.id.pgbLoading)
+        loadingIndicator.isVisible = it is UiState.Loading
+        when (it) {
+            UiState.Success -> {
+                toggleView(binding.rvPostDetail)
+                loadContents()
             }
-        }
-
-    private fun showErrorToast(activity: Activity) {
-        if (ErrorToast.previousFinished()) {
-            ErrorToast(activity, viewModel.error).show()
+            UiState.AuthenticationError -> {
+                sendUserToLoginScreen(parentActivity)
+                showErrorToast(context)
+            }
+            UiState.ServiceError -> {
+                toggleView(binding.llServiceError)
+                showErrorDialog(context)
+            }
+            else -> {}
         }
     }
 
-    private fun showErrorDialog(activity: Activity) {
-        ErrorAlertDialog(activity, viewModel.error).show()
+    private fun showErrorToast(context: Context) {
+        if (ErrorToast.previousFinished()) {
+            ErrorToast(context, viewModel.error).show()
+        }
+    }
+
+    private fun showErrorDialog(context: Context) {
+        ErrorAlertDialog(context, viewModel.error).show()
     }
 
     private fun sendUserToLoginScreen(activity: Activity) {
@@ -345,107 +369,103 @@ class CircleDetailPostDetailFragment : Fragment() {
         }
     }
 
-    private fun uploadCommentStateObserver(activity: Activity) =
-        Observer<UiState> {
-            when (it) {
-                UiState.Loading -> {
-                    binding.pgbContentLoading.isVisible = true
-                }
-                UiState.Success -> {
-                    binding.pgbContentLoading.isVisible = false
-                    requestRefreshToPreviousScreen()
-                    loadContents()
-                    hideSoftInput(activity, binding.edtComment)
-                    binding.edtComment.text?.clear()
-                }
-                UiState.AuthenticationError -> {
-                    binding.pgbContentLoading.isVisible = false
-                    sendUserToLoginScreen(activity)
-                    showErrorToast(activity)
-                }
-                UiState.ServiceError -> {
-                    binding.pgbContentLoading.isVisible = false
-                    showErrorDialog(activity)
-                }
+    private fun uploadCommentStateObserver(
+        parentActivity: Activity,
+        context: Context,
+    ) = Observer<UiState> {
+        val loadingIndicator = parentActivity.findViewById<CircularProgressIndicator>(R.id.pgbLoading)
+        loadingIndicator.isVisible = it is UiState.Loading
+        when (it) {
+            UiState.Success -> {
+                requestRefreshToPreviousScreen()
+                loadContents()
+                hideSoftInput(context, binding.edtComment)
+                binding.edtComment.text?.clear()
             }
+            UiState.AuthenticationError -> {
+                sendUserToLoginScreen(parentActivity)
+                showErrorToast(context)
+            }
+            UiState.ServiceError -> {
+                showErrorDialog(context)
+            }
+            else -> {}
         }
+    }
 
-    private fun editCommentStateObserver(activity: Activity) =
-        Observer<UiState> {
-            when (it) {
-                UiState.Loading -> {
-                    binding.pgbContentLoading.isVisible = true
-                }
-                UiState.Success -> {
-                    binding.pgbContentLoading.isVisible = false
-                    loadContents()
-                    hideSoftInput(activity, binding.edtComment)
-                }
-                UiState.AuthenticationError -> {
-                    binding.pgbContentLoading.isVisible = false
-                    sendUserToLoginScreen(activity)
-                    showErrorToast(activity)
-                }
-                UiState.ServiceError -> {
-                    binding.pgbContentLoading.isVisible = false
-                    showErrorDialog(activity)
-                }
+    private fun editCommentStateObserver(
+        parentActivity: Activity,
+        context: Context,
+    ) = Observer<UiState> {
+        val loadingIndicator = parentActivity.findViewById<CircularProgressIndicator>(R.id.pgbLoading)
+        loadingIndicator.isVisible = it is UiState.Loading
+        when (it) {
+            UiState.Success -> {
+                loadContents()
+                hideSoftInput(context, binding.edtComment)
             }
+            UiState.AuthenticationError -> {
+                sendUserToLoginScreen(parentActivity)
+                showErrorToast(context)
+            }
+            UiState.ServiceError -> {
+                showErrorDialog(context)
+            }
+            else -> {}
         }
+    }
 
-    private fun deleteCommentStateObserver(activity: Activity) =
-        Observer<UiState> {
-            when (it) {
-                UiState.Loading -> {
-                    binding.pgbContentLoading.isVisible = true
-                }
-                UiState.Success -> {
-                    binding.pgbContentLoading.isVisible = false
-                    requestRefreshToPreviousScreen()
-                    loadContents()
-                }
-                UiState.AuthenticationError -> {
-                    binding.pgbContentLoading.isVisible = false
-                    sendUserToLoginScreen(activity)
-                    showErrorToast(activity)
-                }
-                UiState.ServiceError -> {
-                    binding.pgbContentLoading.isVisible = false
-                    ErrorAlertDialog(activity, viewModel.error).show()
-                }
+    private fun deleteCommentStateObserver(
+        parentActivity: Activity,
+        context: Context,
+    ) = Observer<UiState> {
+        val loadingIndicator = parentActivity.findViewById<CircularProgressIndicator>(R.id.pgbLoading)
+        loadingIndicator.isVisible = it is UiState.Loading
+        when (it) {
+            UiState.Success -> {
+                requestRefreshToPreviousScreen()
+                loadContents()
             }
+            UiState.AuthenticationError -> {
+                sendUserToLoginScreen(parentActivity)
+                showErrorToast(context)
+            }
+            UiState.ServiceError -> {
+                ErrorAlertDialog(context, viewModel.error).show()
+            }
+            else -> {}
         }
+    }
 
     private fun hideSoftInput(
-        activity: Activity,
+        context: Context,
         view: EditText,
     ) {
-        val imm = activity.getSystemService(InputMethodManager::class.java)
+        val imm = context.getSystemService(InputMethodManager::class.java)
         imm.hideSoftInputFromWindow(view.windowToken, 0)
     }
 
-    private fun deletePostStateObserver(activity: Activity) =
-        Observer<UiState> {
-            when (it) {
-                UiState.Loading -> {
-                    binding.pgbContentLoading.isVisible = true
-                }
-                UiState.Success -> {
-                    binding.pgbContentLoading.isVisible = false
-                    requestRefreshToPreviousScreen()
-                    sendUserToPreviousScreen()
-                }
-                UiState.AuthenticationError -> {
-                    binding.pgbContentLoading.isVisible = false
-                    sendUserToLoginScreen(activity)
-                    showErrorToast(activity)
-                }
-                UiState.ServiceError -> {
-                    binding.pgbContentLoading.isVisible = false
-                    ErrorAlertDialog(activity, viewModel.error).show()
-                }
+    private fun deletePostStateObserver(
+        parentActivity: Activity,
+        context: Context,
+    ) = Observer<UiState> {
+        val loadingIndicator = parentActivity.findViewById<CircularProgressIndicator>(R.id.pgbLoading)
+        loadingIndicator.isVisible = it is UiState.Loading
+        when (it) {
+            UiState.Success -> {
+                requestRefreshToPreviousScreen()
+                sendUserToPreviousScreen()
             }
+            UiState.AuthenticationError -> {
+                sendUserToLoginScreen(parentActivity)
+                showErrorToast(context)
+            }
+            UiState.ServiceError -> {
+                ErrorAlertDialog(context, viewModel.error).show()
+            }
+            else -> {}
         }
+    }
 
     private fun scrollOverObserver() =
         Observer<Boolean> { completed ->
@@ -459,19 +479,19 @@ class CircleDetailPostDetailFragment : Fragment() {
         }
 
     private fun requestRefreshToPreviousScreen() {
-        findNavController().previousBackStackEntry?.savedStateHandle?.set(Const.FLAG_DATA_CHANGED, true)
+        findNavController().previousBackStackEntry?.savedStateHandle?.set(Const.FLAG_CIRCLE_POST_DATA_CHANGED, true)
     }
 
-    private fun initListener(activity: Activity) {
-        setRvCircleCommentListener(activity)
+    private fun initListener(context: Context) {
+        setRvCircleCommentListener(context)
         setBtnBackListener()
         setBtnRegisterCommentListener()
         setBtnRetryListener()
     }
 
-    private fun setRvCircleCommentListener(activity: Activity) {
+    private fun setRvCircleCommentListener(context: Context) {
         binding.rvPostDetail.addOnScrollListener(viewModel.scrollListener)
-        binding.rvPostDetail.addOnScrollListener(RecyclerViewHideSoftInputListener(activity))
+        binding.rvPostDetail.addOnScrollListener(RecyclerViewHideSoftInputListener(context))
         (viewModel.scrollListener as RecyclerViewInfiniteScrollListener).setScrollEndListener {
             if (!viewModel.comments.isLastPage()) {
                 addScrollLoadingItemAndLoad()
@@ -509,21 +529,6 @@ class CircleDetailPostDetailFragment : Fragment() {
         binding.btnRetry.setOnClickListener {
             viewModel.refresh()
         }
-    }
-
-    override fun onCreateAnimator(
-        transit: Int,
-        enter: Boolean,
-        nextAnim: Int,
-    ): Animator? {
-        if (nextAnim == R.animator.slide_end_to_start) {
-            val animator = AnimatorInflater.loadAnimator(context, nextAnim) as AnimatorSet
-            animator.addListener(onEnd = {
-                viewModel.notifyEnterAnimFinishedAndUpdateUI()
-            })
-            return animator
-        }
-        return super.onCreateAnimator(transit, enter, nextAnim)
     }
 
     override fun onDestroyView() {

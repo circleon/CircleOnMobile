@@ -55,7 +55,10 @@ class CircleDetailViewModelImpl
         }
 
         private fun fetchCircleDetail() {
-            fetchCircleDetailJob?.cancel()
+            fetchCircleDetailJob?.let {
+                if (!it.isCompleted) return
+            }
+
             uiState.postValue(UiState.Loading)
             saveLoadingStartTime()
 

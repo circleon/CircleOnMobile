@@ -5,13 +5,13 @@
         android:valueFrom="0.9"
         android:valueTo="1"
         android:valueType="floatType"
-        android:duration="180"
-        android:interpolator="@android:anim/decelerate_interpolator"/>
+        android:duration="200"
+        android:interpolator="@android:anim/accelerate_decelerate_interpolator"/>
     <objectAnimator
         android:propertyName="scaleY"
         android:valueFrom="0.9"
         android:valueTo="1"
         android:valueType="floatType"
-        android:duration="180"
-        android:interpolator="@android:anim/decelerate_interpolator"/>
+        android:duration="200"
+        android:interpolator="@android:anim/accelerate_decelerate_interpolator"/>
 </set>

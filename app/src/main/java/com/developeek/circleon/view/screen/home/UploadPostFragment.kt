@@ -1,6 +1,7 @@
 package com.developeek.circleon.view.screen.home
 
 import android.app.Activity
+import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -30,6 +31,7 @@ import com.developeek.circleon.view.viewmodelimpl.UploadPostViewModelImpl
 import com.developeek.circleon.view.widget.ErrorAlertDialog
 import com.developeek.circleon.view.widget.ErrorToast
 import com.google.android.material.bottomnavigation.BottomNavigationView
+import com.google.android.material.progressindicator.CircularProgressIndicator
 import dagger.hilt.android.AndroidEntryPoint
 import dagger.hilt.android.lifecycle.withCreationCallback
 import javax.inject.Inject
@@ -38,8 +40,8 @@ import javax.inject.Inject
 class UploadPostFragment : Fragment() {
     private lateinit var binding: FragmentUploadPostBinding
     private var circleId = 0
-    private lateinit var postType: PostType
-    private var editOrNot = false
+    private lateinit var postType: PostType // 편집이 아닌 상황에서는 item 전달이 되지 않기 때문에 post type 을 별도로 수신
+    private var isEdit = false
     private lateinit var post: PostModel
     private val pickMedia: ActivityResultLauncher<PickVisualMediaRequest> =
         registerForActivityResult(ActivityResultContracts.PickVisualMedia()) {
@@ -49,12 +51,7 @@ class UploadPostFragment : Fragment() {
                 viewModel.setPostImage(it.toJPEG(requireActivity()))
                 binding.btnRemovePostImage.isVisible = true
                 binding.txtAddPostImage.isVisible = false
-                binding.btnAddPostImage.setBackgroundDrawable(
-                    ContextCompat.getDrawable(
-                        requireContext(),
-                        R.drawable.bg_small_rounded_rectangle,
-                    ),
-                )
+                binding.btnAddPostImage.background = null
             }
         }
     private val viewModel: UploadPostViewModel by viewModels<UploadPostViewModelImpl>(
@@ -75,8 +72,8 @@ class UploadPostFragment : Fragment() {
         arguments?.let {
             circleId = it.getInt(Const.TAG_CIRCLE_ID)
             postType = it.getSerializable(Const.TAG_POST_TYPE) as PostType
-            editOrNot =
-                it.getBoolean(Const.FLAG_EDIT_OR_NOT).also { isEdit ->
+            isEdit =
+                it.getBoolean(Const.FLAG_IS_EDIT).also { isEdit ->
                     if (isEdit) {
                         post = it.getSerializable(Const.TAG_CIRCLE_POST) as PostModel
                     }
@@ -101,38 +98,41 @@ class UploadPostFragment : Fragment() {
     ) {
         super.onViewCreated(view, savedInstanceState)
 
-        initView(requireActivity())
-        initObserver(requireActivity())
-        initListener(requireActivity())
+        initView(requireActivity(), requireContext())
+        initObserver(requireActivity(), requireContext())
+        initListener(requireContext())
     }
 
-    private fun initView(activity: Activity) {
+    private fun initView(
+        parentActivity: Activity,
+        context: Context,
+    ) {
         initToolbar()
-        loadContentWhenEdit(activity)
-        hideBtmNav(activity)
+        hideBtmNav(parentActivity)
+        loadPostContentWhenIsEdit(context)
     }
 
     private fun initToolbar() {
         var title = Const.EMPTY_TEXT
 
-        if (postType.isNotice() && editOrNot) {
+        if (postType.isNotice() && isEdit) {
             title = TITLE_NOTICE_EDIT
         }
-        if (postType.isNotice() && !editOrNot) {
+        if (postType.isNotice() && !isEdit) {
             title = TITLE_NOTICE
         }
-        if (postType.isPost() && editOrNot) {
+        if (postType.isPost() && isEdit) {
             title = TITLE_POST_EDIT
         }
-        if (postType.isPost() && !editOrNot) {
+        if (postType.isPost() && !isEdit) {
             title = TITLE_POST
         }
 
         binding.txtTbTitle.text = title
     }
 
-    private fun loadContentWhenEdit(activity: Activity) {
-        if (editOrNot) {
+    private fun loadPostContentWhenIsEdit(context: Context) {
+        if (isEdit) {
             binding.edtPostContent.setText(post.content)
             if (post.imgUrl == null) {
                 // 이미지 추가 레이아웃 비활성화
@@ -141,16 +141,11 @@ class UploadPostFragment : Fragment() {
                 // 편집 화면에서 이미지 수정 기능 비활성화
                 glideProvider.fetchImage(
                     post.imgUrl!!,
-                    activity,
+                    context,
                     binding.btnAddPostImage,
                 )
                 binding.txtAddPostImage.isVisible = false
-                binding.btnAddPostImage.setBackgroundDrawable(
-                    ContextCompat.getDrawable(
-                        activity,
-                        R.drawable.bg_small_rounded_rectangle,
-                    ),
-                )
+                binding.btnAddPostImage.background = null
             }
         }
     }
@@ -159,40 +154,42 @@ class UploadPostFragment : Fragment() {
         activity.findViewById<BottomNavigationView>(R.id.btmNav).isVisible = false
     }
 
-    private fun initObserver(activity: Activity) {
+    private fun initObserver(
+        parentActivity: Activity,
+        context: Context,
+    ) {
         viewModel.state.observe(
             viewLifecycleOwner,
-            stateObserver(activity),
+            stateObserver(parentActivity, context),
         )
     }
 
-    private fun stateObserver(activity: Activity) =
-        Observer<UiState> {
-            when (it) {
-                UiState.Loading -> {
-                    binding.pgbContentLoading.isVisible = true
-                }
-                UiState.Success -> {
-                    binding.pgbContentLoading.isVisible = false
-                    requestRefreshToPreviousScreen()
-                    sendUserToPreviousScreen()
-                }
-                UiState.AuthenticationError -> {
-                    binding.pgbContentLoading.isVisible = false
-                    sendUserToLoginScreen(activity)
-                    if (ErrorToast.previousFinished()) {
-                        ErrorToast(activity, viewModel.error).show()
-                    }
-                }
-                UiState.ServiceError -> {
-                    binding.pgbContentLoading.isVisible = false
-                    ErrorAlertDialog(activity, viewModel.error).show()
+    private fun stateObserver(
+        parentActivity: Activity,
+        context: Context,
+    ) = Observer<UiState> {
+        val loadingIndicator = parentActivity.findViewById<CircularProgressIndicator>(R.id.pgbLoading)
+        loadingIndicator.isVisible = it is UiState.Loading
+        when (it) {
+            UiState.Success -> {
+                requestRefreshToPreviousScreen()
+                sendUserToPreviousScreen()
+            }
+            UiState.AuthenticationError -> {
+                sendUserToLoginScreen(parentActivity)
+                if (ErrorToast.previousFinished()) {
+                    ErrorToast(context, viewModel.error).show()
                 }
             }
+            UiState.ServiceError -> {
+                ErrorAlertDialog(context, viewModel.error).show()
+            }
+            else -> {}
         }
+    }
 
     private fun requestRefreshToPreviousScreen() {
-        findNavController().previousBackStackEntry?.savedStateHandle?.set(Const.FLAG_DATA_CHANGED, true)
+        findNavController().previousBackStackEntry?.savedStateHandle?.set(Const.FLAG_CIRCLE_POST_DATA_CHANGED, true)
     }
 
     private fun sendUserToPreviousScreen() {
@@ -205,11 +202,11 @@ class UploadPostFragment : Fragment() {
         startActivity(intent)
     }
 
-    private fun initListener(activity: Activity) {
+    private fun initListener(context: Context) {
         setBtnCancelListener()
         setBtnUploadListener()
         setBtnAddPostImageListener()
-        setBtnRemovePostImageListener(activity)
+        setBtnRemovePostImageListener(context)
     }
 
     private fun setBtnCancelListener() {
@@ -220,7 +217,7 @@ class UploadPostFragment : Fragment() {
 
     private fun setBtnUploadListener() {
         binding.btnUpload.setOnClickListener {
-            if (editOrNot) {
+            if (isEdit) {
                 viewModel.edit(post.id, binding.edtPostContent.text.toString())
             } else {
                 viewModel.upload(binding.edtPostContent.text.toString())
@@ -231,7 +228,7 @@ class UploadPostFragment : Fragment() {
     private fun setBtnAddPostImageListener() {
         binding.btnAddPostImage.setOnClickListener {
             // 편집 화면에서는 이미지 수정 기능 비활성화
-            if (!editOrNot) {
+            if (!isEdit) {
                 val mimeType = "image/jpeg"
                 pickMedia.launch(
                     PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.SingleMimeType(mimeType)),
@@ -240,15 +237,14 @@ class UploadPostFragment : Fragment() {
         }
     }
 
-    private fun setBtnRemovePostImageListener(activity: Activity) {
+    private fun setBtnRemovePostImageListener(context: Context) {
         binding.btnRemovePostImage.setOnClickListener {
             viewModel.removePostImage()
             binding.btnAddPostImage.setImageResource(R.drawable.ic_add)
             binding.btnRemovePostImage.isVisible = false
             binding.txtAddPostImage.isVisible = true
-            binding.btnAddPostImage.setBackgroundDrawable(
-                ContextCompat.getDrawable(activity, R.drawable.bg_dotted_rounded_rectangle),
-            )
+            binding.btnAddPostImage.background =
+                ContextCompat.getDrawable(context, R.drawable.bg_dotted_rounded_rectangle)
         }
     }
 

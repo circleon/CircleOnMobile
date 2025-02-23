@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/main"
@@ -8,31 +8,54 @@
     android:background="@color/grey_1"
     tools:context=".view.screen.HomeActivity">
 
-    <androidx.fragment.app.FragmentContainerView
-        android:id="@+id/containerHome"
-        android:name="androidx.navigation.fragment.NavHostFragment"
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
-        android:layout_height="0dp"
-        app:navGraph="@navigation/nav_graph"
-        app:defaultNavHost="true"
-        app:layout_constraintBottom_toTopOf="@+id/btmNav"
-        app:layout_constraintTop_toTopOf="parent" />
+        android:layout_height="match_parent"
+        android:background="@color/grey_1">
 
-    <com.google.android.material.bottomnavigation.BottomNavigationView
-        android:id="@+id/btmNav"
+        <androidx.fragment.app.FragmentContainerView
+            android:id="@+id/containerHome"
+            android:name="androidx.navigation.fragment.NavHostFragment"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            app:navGraph="@navigation/nav_graph"
+            app:defaultNavHost="true"
+            app:layout_constraintBottom_toTopOf="@+id/btmNav"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <com.google.android.material.bottomnavigation.BottomNavigationView
+            android:id="@+id/btmNav"
+            android:layout_width="match_parent"
+            android:layout_height="68dp"
+            app:itemTextColor="@drawable/selector_bottom_nav"
+            app:itemTextAppearanceActive="@style/bottom_nav_title"
+            app:itemTextAppearanceInactive="@style/bottom_nav_title"
+            app:itemIconTint="@drawable/selector_bottom_nav"
+            app:itemActiveIndicatorStyle="@null"
+            app:itemRippleColor="@null"
+            app:itemTextAppearanceActiveBoldEnabled="false"
+            android:background="@color/white"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:labelVisibilityMode="labeled"
+            app:menu="@menu/menu_bottom_navigation"/>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <com.google.android.material.progressindicator.CircularProgressIndicator
+        android:id="@+id/pgbLoading"
         android:layout_width="match_parent"
-        android:layout_height="68dp"
-        app:itemTextColor="@drawable/selector_bottom_nav"
-        app:itemTextAppearanceActive="@style/bottom_nav_title"
-        app:itemTextAppearanceInactive="@style/bottom_nav_title"
-        app:itemIconTint="@drawable/selector_bottom_nav"
-        app:itemActiveIndicatorStyle="@null"
-        app:itemRippleColor="@null"
-        app:itemTextAppearanceActiveBoldEnabled="false"
-        android:background="@color/white"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:labelVisibilityMode="labeled"
-        app:menu="@menu/menu_bottom_navigation"/>
+        android:layout_height="match_parent"
+        android:padding="@dimen/margin_padding_large"
+        android:background="@drawable/bg_rounded_rectangle"
+        android:backgroundTint="@color/grey_7"
+        android:layout_gravity="center"
+        app:indicatorColor="@color/white"
+        app:trackColor="@color/grey_3"
+        app:trackThickness="4dp"
+        android:indeterminate="true"
+        android:visibility="gone">
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+    </com.google.android.material.progressindicator.CircularProgressIndicator>
+
+</FrameLayout>

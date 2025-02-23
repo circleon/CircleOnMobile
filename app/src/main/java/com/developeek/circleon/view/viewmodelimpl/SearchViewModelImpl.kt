@@ -39,7 +39,9 @@ class SearchViewModelImpl
         }
 
         private fun fetchCircleSummaries() {
-            fetchCircleSummaryJob?.cancel()
+            fetchCircleSummaryJob?.let {
+                if (!it.isCompleted) return
+            }
 
             fetchCircleSummaryJob =
                 viewModelScope.launch {

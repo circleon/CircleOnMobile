@@ -44,7 +44,8 @@
         android:hint="@string/hint_password"
         android:textColorHint="@color/grey_5"
         android:textColor="@color/grey_7"
-        android:textSize="@dimen/text_size_default"/>
+        android:textSize="@dimen/text_size_default"
+        android:imeOptions="actionDone"/>
 
     <androidx.appcompat.widget.AppCompatTextView
         android:id="@+id/btnLogin"

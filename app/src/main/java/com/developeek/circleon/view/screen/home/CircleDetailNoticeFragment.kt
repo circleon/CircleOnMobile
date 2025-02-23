@@ -1,6 +1,7 @@
 package com.developeek.circleon.view.screen.home
 
 import android.app.Activity
+import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -85,19 +86,19 @@ class CircleDetailNoticeFragment : Fragment() {
     ) {
         super.onViewCreated(view, savedInstanceState)
 
-        initView(requireActivity())
-        initObserver(requireActivity())
+        initView(requireContext())
+        initObserver(requireActivity(), requireContext())
         initListener()
     }
 
-    private fun initView(activity: Activity) {
-        initRecyclerView(activity)
+    private fun initView(context: Context) {
+        initRecyclerView(context)
     }
 
-    private fun initRecyclerView(activity: Activity) {
+    private fun initRecyclerView(context: Context) {
         binding.rvCircleNotice.adapter =
             CirclePostAdapter(
-                activity,
+                context,
                 glideProvider,
                 itemListenerInitializer =
                     object : ItemListenerInitializer<PostModel> {
@@ -118,12 +119,12 @@ class CircleDetailNoticeFragment : Fragment() {
                             item: PostModel,
                             view: View?,
                         ) {
-                            initNoticeOverflowMenuAndShow(activity, item, view!!)
+                            initNoticeOverflowMenuAndShow(context, item, view!!)
                         }
                     },
                 role = role,
             )
-        binding.rvCircleNotice.layoutManager = LinearLayoutManager(activity)
+        binding.rvCircleNotice.layoutManager = LinearLayoutManager(context)
     }
 
     private fun sendUserToNoticeDetailScreen(item: PostModel) {
@@ -138,28 +139,28 @@ class CircleDetailNoticeFragment : Fragment() {
     }
 
     private fun initNoticeOverflowMenuAndShow(
-        activity: Activity,
+        context: Context,
         item: PostModel,
         view: View,
     ) {
-        val popupMenu = object : PopupMenu(activity, view) {}
+        val popupMenu = object : PopupMenu(context, view) {}
         if (item.isPinned) {
             popupMenu.inflate(R.menu.menu_pinned_notice_settings)
         } else {
             popupMenu.inflate(R.menu.menu_notice_settings)
         }
 
-        popupMenu.setOnMenuItemClickListener(noticeOverflowMenuItemClickListener(activity, item))
+        popupMenu.setOnMenuItemClickListener(noticeOverflowMenuItemClickListener(context, item))
         Utils.changeMenuItemTextColor(
             popupMenu.menu.findItem(R.id.delete_post),
-            ContextCompat.getColor(activity, R.color.error),
+            ContextCompat.getColor(context, R.color.error),
         )
 
         popupMenu.show()
     }
 
     private fun noticeOverflowMenuItemClickListener(
-        activity: Activity,
+        context: Context,
         item: PostModel,
     ) = PopupMenu.OnMenuItemClickListener {
         viewModel.saveScrollState(binding.rvCircleNotice.layoutManager?.onSaveInstanceState())
@@ -177,7 +178,7 @@ class CircleDetailNoticeFragment : Fragment() {
             }
 
             R.id.delete_post -> {
-                ContentDeleteAlertDialog(activity, MESSAGE_DELETE_NOTICE) {
+                ContentDeleteAlertDialog(context, MESSAGE_DELETE_NOTICE) {
                     viewModel.deleteAndRefresh(item.id)
                 }.show()
             }
@@ -194,14 +195,17 @@ class CircleDetailNoticeFragment : Fragment() {
         bundle.putInt(Const.TAG_CIRCLE_ID, circleId)
         bundle.putSerializable(Const.TAG_POST_TYPE, PostType.NOTICE)
         bundle.putSerializable(Const.TAG_CIRCLE_POST, item)
-        bundle.putBoolean(Const.FLAG_EDIT_OR_NOT, true) // 수정 기능 전용 활성화
+        bundle.putBoolean(Const.FLAG_IS_EDIT, true) // 수정 기능 전용 활성화
         findNavController().navigate(R.id.action_circleDetailFragment_to_uploadPostFragment, bundle)
     }
 
-    private fun initObserver(activity: Activity) {
+    private fun initObserver(
+        parentActivity: Activity,
+        context: Context,
+    ) {
         viewModel.state.observe(
             viewLifecycleOwner,
-            stateObserver(activity),
+            stateObserver(parentActivity, context),
         )
         viewModel.scrollOver.observe(
             viewLifecycleOwner,
@@ -211,40 +215,48 @@ class CircleDetailNoticeFragment : Fragment() {
         findNavController()
             .currentBackStackEntry
             ?.savedStateHandle
-            ?.getLiveData<Boolean>(Const.FLAG_DATA_CHANGED)
-            ?.observe(viewLifecycleOwner) {
-                if (it) viewModel.refresh()
+            ?.let {
+                it.getLiveData<Boolean>(Const.FLAG_CIRCLE_POST_DATA_CHANGED)
+                    .observe(viewLifecycleOwner) { dataChanged ->
+                        if (dataChanged) {
+                            viewModel.refresh()
+                            it[Const.FLAG_CIRCLE_POST_DATA_CHANGED] = false
+                        }
+                    }
             }
     }
 
-    private fun stateObserver(activity: Activity) =
-        Observer<UiState> {
-            when (it) {
-                UiState.Loading -> {
-                    toggleView(binding.pgbLoading)
-                }
-                UiState.Success -> {
-                    if (viewModel.posts.isEmpty()) {
-                        toggleView(binding.txtNoNotice)
-                    } else {
-                        toggleView(binding.rvCircleNotice)
-                        loadCircleNotices()
-                    }
-                }
-                UiState.AuthenticationError -> {
-                    sendUserToLoginScreen(activity)
-                    if (ErrorToast.previousFinished()) {
-                        ErrorToast(activity, viewModel.error).show()
-                    }
-                }
-                UiState.ServiceError -> {
-                    toggleView(binding.llServiceError)
-                    if (ErrorToast.previousFinished()) {
-                        ErrorToast(activity, viewModel.error).show()
-                    }
+    private fun stateObserver(
+        parentActivity: Activity,
+        context: Context,
+    ) = Observer<UiState> {
+        when (it) {
+            UiState.Loading -> {
+                toggleView(binding.pgbLoading)
+            }
+            UiState.Success -> {
+                if (viewModel.posts.isEmpty()) {
+                    toggleView(binding.txtNoNotice)
+                } else {
+                    toggleView(binding.rvCircleNotice)
+                    loadCircleNotices()
                 }
             }
+            UiState.AuthenticationError -> {
+                sendUserToLoginScreen(parentActivity)
+                if (ErrorToast.previousFinished()) {
+                    ErrorToast(context, viewModel.error).show()
+                }
+            }
+            UiState.ServiceError -> {
+                toggleView(binding.llServiceError)
+                if (ErrorToast.previousFinished()) {
+                    ErrorToast(context, viewModel.error).show()
+                }
+            }
+            else -> {}
         }
+    }
 
     private fun loadCircleNotices() {
         binding.rvCircleNotice.adapter?.let {

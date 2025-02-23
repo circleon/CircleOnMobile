@@ -14,6 +14,7 @@ class UserManager
         @UserSharedPreferences private val preferences: SharedPreferences,
     ) {
         private var user: UserModel? = null
+        private val editor = preferences.edit()
 
         fun getUser(): UserModel? {
             val id = preferences.getInt(USER_ID_KEY, 0)
@@ -32,11 +33,14 @@ class UserManager
             name: String,
             univCode: String,
         ) {
-            val editor = preferences.edit()
-
             editor.putInt(USER_ID_KEY, id)
             editor.putString(USER_NAME_KEY, name)
             editor.putString(USER_UNIV_KEY, univCode)
+            editor.apply()
+        }
+
+        fun deleteUser() {
+            editor.clear()
             editor.apply()
         }
 

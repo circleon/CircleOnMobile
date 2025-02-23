@@ -49,8 +49,9 @@ class UploadPostViewModelImpl
 
         override fun upload(content: String) {
             if (!isPostFormat(content)) return
-
-            uploadPostJob?.cancel()
+            uploadPostJob?.let {
+                if (!it.isCompleted) return
+            }
             uiState.postValue(UiState.Loading)
             saveLoadingStartTime()
 
@@ -77,8 +78,9 @@ class UploadPostViewModelImpl
             content: String,
         ) {
             if (!isPostFormat(content)) return
-
-            uploadPostJob?.cancel()
+            uploadPostJob?.let {
+                if (!it.isCompleted) return
+            }
             uiState.postValue(UiState.Loading)
             saveLoadingStartTime()
 

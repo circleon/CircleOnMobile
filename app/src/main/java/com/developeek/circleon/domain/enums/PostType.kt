@@ -17,6 +17,6 @@ enum class PostType(
     companion object {
         private val default = POST
 
-        fun findOrDefault(code: String?) = PostType.entries.find { it.code == code } ?: default
+        fun findOrDefault(code: String?) = entries.find { it.code == code } ?: default
     }
 }

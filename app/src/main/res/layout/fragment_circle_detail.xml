@@ -42,15 +42,18 @@
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintBottom_toBottomOf="parent">
 
-                        <androidx.appcompat.widget.AppCompatImageView
-                            android:id="@+id/imgCircleThumbnail"
+                        <androidx.cardview.widget.CardView
                             android:layout_width="48dp"
                             android:layout_height="48dp"
-                            android:background="@drawable/bg_image_circle"
-                            android:src="@drawable/ic_circle_thumbnail_placeholder"
-                            android:scaleType="fitXY"
-                            android:adjustViewBounds="true"
-                            android:clipToOutline="true"/>
+                            app:cardCornerRadius="24dp"
+                            app:cardElevation="0dp">
+
+                            <androidx.appcompat.widget.AppCompatImageView
+                                android:id="@+id/imgCircleThumbnail"
+                                android:layout_width="match_parent"
+                                android:layout_height="match_parent" />
+
+                        </androidx.cardview.widget.CardView>
 
                         <androidx.appcompat.widget.LinearLayoutCompat
                             android:layout_width="wrap_content"
@@ -260,22 +263,6 @@
         </FrameLayout>
 
     </androidx.coordinatorlayout.widget.CoordinatorLayout>
-
-    <com.google.android.material.progressindicator.CircularProgressIndicator
-        android:id="@+id/pgbContentLoading"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:padding="@dimen/margin_padding_large"
-        android:background="@drawable/bg_rounded_rectangle"
-        android:backgroundTint="@color/grey_3"
-        android:layout_gravity="center"
-        app:indicatorColor="@color/purple_5"
-        app:trackColor="@color/grey_3"
-        app:trackThickness="1dp"
-        android:indeterminate="true"
-        android:visibility="gone">
-
-    </com.google.android.material.progressindicator.CircularProgressIndicator>
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/fabUploadCircleContent"

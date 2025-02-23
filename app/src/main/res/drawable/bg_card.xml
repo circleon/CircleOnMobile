@@ -1,22 +1,20 @@
 <?xml version="1.0" encoding="utf-8"?>
 <layer-list xmlns:android="http://schemas.android.com/apk/res/android">
-    <!-- Background Layer -->
     <item>
         <shape android:shape="rectangle">
-            <solid android:color="#80EBEBEB" /> <!-- Background color -->
-            <corners android:radius="@dimen/round_tag" /> <!-- Border radius -->
+            <solid android:color="@color/grey_3" />
+            <corners android:radius="@dimen/round_tag" />
         </shape>
     </item>
 
-    <!-- Shadow Layer -->
     <item
         android:top="1dp"
         android:bottom="1dp"
         android:start="1dp"
         android:end="1dp">
         <shape android:shape="rectangle">
-            <solid android:color="@color/white" /> <!-- Shadow color -->
-            <corners android:radius="@dimen/round_tag" /> <!-- Match background corner radius -->
+            <solid android:color="@color/white" />
+            <corners android:radius="@dimen/round_tag" />
         </shape>
     </item>
 </layer-list>

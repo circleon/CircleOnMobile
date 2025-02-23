@@ -1,6 +1,7 @@
 package com.developeek.circleon.view.screen.login
 
 import android.app.Activity
+import android.content.Context
 import android.content.res.ColorStateList
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -11,7 +12,6 @@ import androidx.core.content.ContextCompat
 import androidx.core.widget.doOnTextChanged
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
-import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.Observer
 import com.developeek.circleon.R
 import com.developeek.circleon.databinding.FragmentSignUpNameBinding
@@ -30,50 +30,50 @@ class SignUpNameFragment : Fragment() {
     ): View {
         binding = FragmentSignUpNameBinding.inflate(layoutInflater)
 
-        initObserver(requireActivity())
+        initObserver(requireContext())
         initListener()
 
         return binding.root
     }
 
-    private fun initObserver(activity: Activity) {
+    private fun initObserver(context: Context) {
         viewModel.validation.observe(
-            activity as LifecycleOwner,
-            validationObserver(activity),
+            viewLifecycleOwner,
+            validationObserver(context),
         )
     }
 
-    private fun validationObserver(activity: Activity) =
+    private fun validationObserver(context: Context) =
         Observer<String> {
             if (binding.edtName.hasFocus()) {
                 binding.txtNameValidation.text = it
                 if (it == NAME_VALIDATED) {
-                    whenNameValidated(activity)
+                    whenNameValidated(context)
                 } else {
-                    whenNameNotValidated(activity)
+                    whenNameNotValidated(context)
                 }
             }
         }
 
-    private fun whenNameValidated(activity: Activity) {
+    private fun whenNameValidated(context: Context) {
         binding.txtNameValidation.text = Const.EMPTY_TEXT
         binding.edtName.backgroundTintList =
             ColorStateList(
                 arrayOf(intArrayOf(android.R.attr.state_focused), intArrayOf()),
                 intArrayOf(
-                    ContextCompat.getColor(activity, R.color.purple_5),
-                    ContextCompat.getColor(activity, R.color.grey_3),
+                    ContextCompat.getColor(context, R.color.purple_5),
+                    ContextCompat.getColor(context, R.color.grey_3),
                 ),
             )
     }
 
-    private fun whenNameNotValidated(activity: Activity) {
+    private fun whenNameNotValidated(context: Context) {
         binding.edtName.backgroundTintList =
             ColorStateList(
                 arrayOf(intArrayOf(android.R.attr.state_focused), intArrayOf()),
                 intArrayOf(
-                    ContextCompat.getColor(activity, R.color.error),
-                    ContextCompat.getColor(activity, R.color.grey_3),
+                    ContextCompat.getColor(context, R.color.error),
+                    ContextCompat.getColor(context, R.color.grey_3),
                 ),
             )
     }

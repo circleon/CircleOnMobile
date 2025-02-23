@@ -21,6 +21,6 @@ enum class Role(
     companion object {
         private val default = NONE
 
-        fun findOrDefault(code: String?) = Role.entries.find { it.code == code } ?: default
+        fun findOrDefault(code: String?) = entries.find { it.code == code } ?: default
     }
 }

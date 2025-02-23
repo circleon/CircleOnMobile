@@ -1,6 +1,6 @@
 package com.developeek.circleon.view.adapter
 
-import android.app.Activity
+import android.content.Context
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -21,7 +21,7 @@ import java.time.format.DateTimeFormatter
 import java.util.Locale
 
 class CirclePostAdapter(
-    private val activity: Activity,
+    private val context: Context,
     private val glideProvider: GlideProvider,
     private val itemListenerInitializer: ItemListenerInitializer<PostModel>,
     private val overflowListenerInitializer: ItemListenerInitializer<PostModel>,
@@ -74,7 +74,7 @@ class CirclePostAdapter(
         private fun loadAuthor(post: PostModel) {
             binding.txtAuthorName.text = post.author.name
             post.author.profileUrl?.let {
-                glideProvider.fetchImage(it, activity, binding.imgAuthorProfile)
+                glideProvider.fetchImage(it, context, binding.imgAuthorProfile)
             } ?: binding.imgAuthorProfile.setImageResource(R.drawable.ic_author_placeholder)
             binding.txtCreated.text =
                 post.createdAt.format(
@@ -92,7 +92,7 @@ class CirclePostAdapter(
                     post.commentCount,
                 )
             post.imgUrl?.let {
-                glideProvider.fetchImage(it, activity, binding.imgPost)
+                glideProvider.fetchImage(it, context, binding.imgPost)
             }
             binding.imgNoticePin.isVisible = post.isPinned
         }
@@ -156,7 +156,7 @@ class CirclePostAdapter(
                 }
             }
         binding.clItemCirclePost.setOnClickListener(itemClickListener)
-        binding.imgPost.isVisible = viewType == VIEW_TYPE_ITEM_WITH_IMAGE
+        binding.cvPostImage.isVisible = viewType == VIEW_TYPE_ITEM_WITH_IMAGE
         return CirclePostAdapterItemViewHolder(binding, overflowClickListener, itemClickListener)
     }
 

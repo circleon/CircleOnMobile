@@ -3,8 +3,10 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:background="@color/grey_1"
     android:orientation="vertical"
+    android:overScrollMode="never"
     tools:context=".view.screen.home.CircleDetailIntroductionFragment">
 
     <androidx.appcompat.widget.LinearLayoutCompat
@@ -52,7 +54,7 @@
             android:orientation="vertical"
             android:background="@color/white">
 
-            <TextView
+            <androidx.appcompat.widget.AppCompatTextView
                 android:id="@+id/txtCircleIntroductionContent"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -61,14 +63,20 @@
                 android:textColor="@color/grey_9"
                 android:text="소개글 영역"/>
 
-            <androidx.appcompat.widget.AppCompatImageView
-                android:id="@+id/imgCircleIntroduction"
+            <androidx.cardview.widget.CardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginHorizontal="@dimen/margin_padding_large"
-                android:background="@drawable/bg_rounded_rectangle"
-                android:backgroundTint="@color/white"
-                android:clipToOutline="true" />
+                android:layout_marginBottom="@dimen/margin_padding_large"
+                app:cardCornerRadius="@dimen/round_default"
+                app:cardElevation="0dp">
+
+                <androidx.appcompat.widget.AppCompatImageView
+                    android:id="@+id/imgCircleIntroduction"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content" />
+
+            </androidx.cardview.widget.CardView>
 
         </androidx.appcompat.widget.LinearLayoutCompat>
 

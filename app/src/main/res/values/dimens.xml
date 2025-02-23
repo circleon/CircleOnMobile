@@ -1,10 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <dimen name="margin_padding_xx_small">2dp</dimen>
     <dimen name="margin_padding_x_small">4dp</dimen>
     <dimen name="margin_padding_small">8dp</dimen>
     <dimen name="margin_padding_default">12dp</dimen>
     <dimen name="margin_padding_large">16dp</dimen>
     <dimen name="margin_padding_x_large">20dp</dimen>
+    <dimen name="margin_padding_xx_large">24dp</dimen>
 
     <dimen name="round_small">4dp</dimen>
     <dimen name="round_default">8dp</dimen>

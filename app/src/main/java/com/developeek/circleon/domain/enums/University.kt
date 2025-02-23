@@ -9,6 +9,6 @@ enum class University(
     fun univName() = univName
 
     companion object {
-        fun findOrNull(code: String) = University.entries.find { it.code == code }
+        fun findOrNull(code: String) = entries.find { it.code == code }
     }
 }

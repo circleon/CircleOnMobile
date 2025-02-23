@@ -3,6 +3,7 @@ package com.developeek.circleon.view.screen.login
 import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
+import android.view.inputmethod.EditorInfo
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.LifecycleOwner
@@ -59,14 +60,12 @@ class LoginActivity : AppCompatActivity() {
     private fun initListener(activity: Activity) {
         setBtnLoginListener()
         setBtnSignUpListener(activity)
+        setEdtPasswordListener()
     }
 
     private fun setBtnLoginListener() {
         binding.btnLogin.setOnClickListener {
-            viewModel.login(
-                binding.edtEmail.text.toString(),
-                binding.edtPassword.text.toString(),
-            )
+            login()
         }
     }
 
@@ -74,6 +73,22 @@ class LoginActivity : AppCompatActivity() {
         binding.btnSignUp.setOnClickListener {
             sendUserToSignUpScreen(activity)
         }
+    }
+
+    private fun setEdtPasswordListener() {
+        binding.edtPassword.setOnEditorActionListener { _, id, _ ->
+            if (id == EditorInfo.IME_ACTION_DONE) {
+                login()
+            }
+            true
+        }
+    }
+
+    private fun login() {
+        viewModel.login(
+            binding.edtEmail.text.toString(),
+            binding.edtPassword.text.toString(),
+        )
     }
 
     private fun sendUserToSignUpScreen(activity: Activity) {

@@ -17,7 +17,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toStartOf="@id/imgCircleThumbnail"
+        app:layout_constraintEnd_toStartOf="@id/cvCircleThumbnail"
         app:layout_constraintHorizontal_bias="0"
         app:layout_constrainedWidth="true"
         >
@@ -95,17 +95,23 @@
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
-    <androidx.appcompat.widget.AppCompatImageView
-        android:id="@+id/imgCircleThumbnail"
+    <androidx.cardview.widget.CardView
+        android:id="@+id/cvCircleThumbnail"
         android:layout_width="64dp"
         android:layout_height="64dp"
         android:layout_marginStart="40dp"
-        android:background="@drawable/bg_rounded_rectangle"
-        android:backgroundTint="@color/white"
-        android:scaleType="fitXY"
-        android:clipToOutline="true"
+        app:cardCornerRadius="@dimen/round_default"
+        app:cardElevation="0dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintStart_toEndOf="@id/clCircleInfo"/>
+        app:layout_constraintStart_toEndOf="@id/clCircleInfo"
+        app:layout_constraintHorizontal_bias="1">
+
+        <androidx.appcompat.widget.AppCompatImageView
+            android:id="@+id/imgCircleThumbnail"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+
+    </androidx.cardview.widget.CardView>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

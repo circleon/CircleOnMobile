@@ -1,6 +1,6 @@
 package com.developeek.circleon.view.adapter
 
-import android.app.Activity
+import android.content.Context
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -24,7 +24,7 @@ import java.time.format.DateTimeFormatter
 import java.util.Locale
 
 class PostDetailAdapter(
-    private val activity: Activity,
+    private val context: Context,
     private val glideProvider: GlideProvider,
     private val postOverflowListenerInitializer: ItemListenerInitializer<PostModel>,
     private val commentOverflowListenerInitializer: ItemListenerInitializer<CommentModel>,
@@ -66,14 +66,14 @@ class PostDetailAdapter(
         private fun loadAuthor(author: AuthorModel) {
             binding.txtAuthorName.text = author.name
             author.profileUrl?.let {
-                glideProvider.fetchImage(it, activity, binding.imgAuthorProfile)
+                glideProvider.fetchImage(it, context, binding.imgAuthorProfile)
             } ?: binding.imgAuthorProfile.setImageResource(R.drawable.ic_author_placeholder)
         }
 
         private fun loadContent(post: PostModel) {
             binding.txtPostContent.text = post.content
             post.imgUrl?.let {
-                glideProvider.fetchImage(it, activity, binding.imgPost)
+                glideProvider.fetchImage(it, context, binding.imgPost)
             }
             binding.txtCreated.text =
                 post.createdAt.format(
@@ -110,7 +110,7 @@ class PostDetailAdapter(
         private fun loadAuthor(author: AuthorModel) {
             binding.txtAuthorName.text = author.name
             author.profileUrl?.let {
-                glideProvider.fetchImage(it, activity, binding.imgAuthorProfile)
+                glideProvider.fetchImage(it, context, binding.imgAuthorProfile)
             } ?: binding.imgAuthorProfile.setImageResource(R.drawable.ic_author_placeholder)
         }
 
@@ -160,7 +160,7 @@ class PostDetailAdapter(
                         }
                     }
                 binding.btnPostOverflow.setOnClickListener(overflowClickListener)
-                binding.imgPost.isVisible = viewType == VIEW_TYPE_POST_CONTENT_WITH_IMAGE.typeValue
+                binding.cvPostImage.isVisible = viewType == VIEW_TYPE_POST_CONTENT_WITH_IMAGE.typeValue
                 PostContentAdapterItemViewHolder(binding, overflowClickListener)
             }
             VIEW_TYPE_POST_COMMENT -> {

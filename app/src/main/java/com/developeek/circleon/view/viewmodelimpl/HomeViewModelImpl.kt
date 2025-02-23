@@ -8,8 +8,11 @@ import androidx.lifecycle.viewModelScope
 import com.developeek.circleon.data.repository.CircleRepository
 import com.developeek.circleon.data.source.Error
 import com.developeek.circleon.data.source.Success
+import com.developeek.circleon.data.source.manager.UserManager
 import com.developeek.circleon.domain.enums.Category
+import com.developeek.circleon.domain.model.CategoryModels
 import com.developeek.circleon.domain.model.CircleModels
+import com.developeek.circleon.domain.model.UserModel
 import com.developeek.circleon.domain.state.UiState
 import com.developeek.circleon.view.listener.RecyclerViewInfiniteScrollListener
 import com.developeek.circleon.view.viewmodel.HomeViewModel
@@ -21,15 +24,16 @@ import javax.inject.Inject
 @HiltViewModel
 class HomeViewModelImpl
     @Inject
-    constructor(private val repository: CircleRepository) : HomeViewModel, ViewModel() {
+    constructor(
+        private val userManager: UserManager,
+        private val repository: CircleRepository,
+    ) : HomeViewModel, ViewModel() {
         override val state: LiveData<UiState>
             get() = uiState
         private val uiState = MutableLiveData<UiState>()
+        override lateinit var user: UserModel
 
-        override val category: List<Category> = Category.entries
-        override val selectedCategory: LiveData<Category>
-            get() = categoryFilter
-        private val categoryFilter = MutableLiveData<Category>()
+        override lateinit var categories: CategoryModels
 
         override lateinit var circles: CircleModels
         private var fetchCircleJob: Job? = null
@@ -47,15 +51,35 @@ class HomeViewModelImpl
         override lateinit var error: String
 
         init {
-            setFilterAndFetch(Category.ALL)
+            val user = userManager.getUser()
+
+            if (user == null) {
+                uiState.postValue(UiState.AuthenticationError)
+            } else {
+                this.user = user
+                setFilterAndFetch(Category.ALL)
+            }
+        }
+
+        override fun refresh() {
+            fetchCircles()
         }
 
         override fun setFilterAndFetch(category: Category) {
-            initCategoryFiltering(category)
+            categories = CategoryModels.selectAndGet(category)
+            fetchCircles()
+        }
+
+        private fun fetchCircles() {
+            fetchCircleJob?.let {
+                if (!it.isCompleted) return
+            }
+            uiState.postValue(UiState.Loading)
+            currentPage = DEFAULT_PAGE
 
             fetchCircleJob =
                 viewModelScope.launch {
-                    val result = repository.getCircles(currentPage, SIZE_BY_PAGE, category)
+                    val result = repository.getCircles(currentPage, SIZE_BY_PAGE, categories.selectedOrFirst().category)
 
                     if (result is Success) {
                         circles = result.data
@@ -71,20 +95,17 @@ class HomeViewModelImpl
                 }
         }
 
-        private fun initCategoryFiltering(category: Category) {
-            fetchCircleJob?.cancel()
-            scrollOverCircleJob?.cancel()
-            categoryFilter.postValue(category)
-            uiState.postValue(UiState.Loading)
-            currentPage = DEFAULT_PAGE
-        }
-
         override fun scrollOver() {
-            scrollOverCircleJob?.cancel()
+            scrollOverCircleJob?.let {
+                if (!it.isCompleted) return
+            }
 
             scrollOverCircleJob =
                 viewModelScope.launch {
-                    val result = repository.getCircles(currentPage + 1, SIZE_BY_PAGE, categoryFilter.value!!)
+                    val result =
+                        repository.getCircles(
+                            currentPage + 1, SIZE_BY_PAGE, categories.selectedOrFirst().category,
+                        )
 
                     if (result is Success) {
                         circles =
@@ -114,24 +135,8 @@ class HomeViewModelImpl
             this.scrollState = null
         }
 
-        override fun refresh() {
-            fetchOrNotByUiState()
-        }
-
-        private fun fetchOrNotByUiState() {
-            if (uiState.value == UiState.Success) {
-                categoryFilter.postValue(categoryFilter.value)
-            } else {
-                if (categoryFilter.value == null) {
-                    setFilterAndFetch(Category.ALL)
-                } else {
-                    setFilterAndFetch(categoryFilter.value!!)
-                }
-            }
-        }
-
         companion object {
-            private const val SIZE_BY_PAGE = 10
+            private const val SIZE_BY_PAGE = 20
             private const val DEFAULT_PAGE = 0
         }
     }
