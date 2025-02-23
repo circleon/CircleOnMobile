@@ -121,8 +121,9 @@ class UploadCircleFragment : Fragment() {
         parentActivity: Activity,
         context: Context,
     ) {
-        hideBtmNav(parentActivity)
         initCategoryRecyclerView(context)
+        initToolbar()
+        hideBtmNav(parentActivity)
         loadCircleContent()
         loadCircleThumbnailWhenIsNotNull(context)
         loadCircleIntroductionImageWhenIsNotNull(context)
@@ -130,6 +131,12 @@ class UploadCircleFragment : Fragment() {
 
     private fun hideBtmNav(activity: Activity) {
         activity.findViewById<BottomNavigationView>(R.id.btmNav).isVisible = false
+    }
+
+    private fun initToolbar() {
+        val title = if (isEdit) TITLE_CIRCLE_EDIT else TITLE_CIRCLE_NEW
+
+        binding.txtTbTitle.text = title
     }
 
     private fun initCategoryRecyclerView(context: Context) {
@@ -405,5 +412,7 @@ class UploadCircleFragment : Fragment() {
 
     companion object {
         private const val RECRUITMENT_DATE_FORMAT = "yyyy.MM.dd"
+        private const val TITLE_CIRCLE_NEW = "동아리 생성"
+        private const val TITLE_CIRCLE_EDIT = "동아리 수정"
     }
 }
