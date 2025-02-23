@@ -8,6 +8,7 @@ import com.developeek.circleon.data.repository.CircleRepository
 import com.developeek.circleon.data.source.Error
 import com.developeek.circleon.data.source.Success
 import com.developeek.circleon.domain.enums.Category
+import com.developeek.circleon.domain.model.CategoryModels
 import com.developeek.circleon.domain.model.CircleDetailModel
 import com.developeek.circleon.domain.state.UiState
 import com.developeek.circleon.domain.utils.validator.Invalid
@@ -47,6 +48,12 @@ class UploadCircleViewModelImpl
 
         override lateinit var circle: CircleDetailModel
         private var uploadJob: Job? = null
+        override val categories: LiveData<CategoryModels>
+            get() = circleCategories
+        private var circleCategories =
+            MutableLiveData(
+                CategoryModels.selectAndRemoveAndGet(origin?.category ?: Category.ETC, Category.ALL),
+            )
 
         // 썸네일, 소개글 이미지 등 이미지 처리 api 는 별도
         private var thumbnail: File? = null
@@ -189,6 +196,7 @@ class UploadCircleViewModelImpl
 
         override fun setCategory(category: Category) {
             this.circle = this.circle.fold(category = category)
+            circleCategories.postValue(CategoryModels.selectAndRemoveAndGet(category, Category.ALL))
         }
 
         override fun removeCircleThumbnail() {

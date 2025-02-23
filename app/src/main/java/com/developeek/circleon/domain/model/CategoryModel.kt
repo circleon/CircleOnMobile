@@ -5,9 +5,9 @@ import com.developeek.circleon.domain.enums.Category
 data class CategoryModels(private val models: List<CategoryModel>) {
     fun get() = models
 
-    fun size() = models.size
-
     fun selectedOrFirst() = models.find { it.isSelected } ?: models.first()
+
+    fun minus(category: CategoryModel) = CategoryModels(models - category)
 
     companion object {
         fun selectAndGet(target: Category) =
@@ -18,6 +18,11 @@ data class CategoryModels(private val models: List<CategoryModel>) {
                     }
                 },
             )
+
+        fun selectAndRemoveAndGet(
+            selectionTarget: Category,
+            removeTarget: Category,
+        ) = selectAndGet(selectionTarget).minus(CategoryModel(removeTarget))
     }
 }
 

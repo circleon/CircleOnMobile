@@ -21,16 +21,22 @@ import androidx.lifecycle.Observer
 import androidx.navigation.fragment.findNavController
 import com.developeek.circleon.R
 import com.developeek.circleon.databinding.FragmentUploadCircleBinding
+import com.developeek.circleon.domain.model.CategoryModel
+import com.developeek.circleon.domain.model.CategoryModels
 import com.developeek.circleon.domain.model.CircleDetailModel
 import com.developeek.circleon.domain.state.UiState
 import com.developeek.circleon.domain.utils.Const
 import com.developeek.circleon.domain.utils.Utils.toJPEG
 import com.developeek.circleon.domain.utils.glide.GlideProvider
+import com.developeek.circleon.view.adapter.CategoryAdapter
+import com.developeek.circleon.view.listener.ItemListenerInitializer
 import com.developeek.circleon.view.screen.login.LoginActivity
 import com.developeek.circleon.view.viewmodel.UploadCircleViewModel
 import com.developeek.circleon.view.viewmodelimpl.UploadCircleViewModelImpl
 import com.developeek.circleon.view.widget.ErrorAlertDialog
 import com.developeek.circleon.view.widget.ErrorToast
+import com.google.android.flexbox.FlexDirection
+import com.google.android.flexbox.FlexboxLayoutManager
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.progressindicator.CircularProgressIndicator
 import dagger.hilt.android.AndroidEntryPoint
@@ -116,28 +122,50 @@ class UploadCircleFragment : Fragment() {
         context: Context,
     ) {
         hideBtmNav(parentActivity)
-        loadOriginalContentWhenIsEdit(context)
+        initCategoryRecyclerView(context)
+        loadCircleContent()
+        loadCircleThumbnailWhenIsNotNull(context)
+        loadCircleIntroductionImageWhenIsNotNull(context)
     }
 
-    private fun loadOriginalContentWhenIsEdit(context: Context) {
-        if (isEdit) {
-            binding.edtCircleName.setText(viewModel.circle.name)
-            viewModel.circle.recruitmentStartDate?.let {
-                binding.txtRecruitmentStartDate.text = it.format(DateTimeFormatter.ofPattern(RECRUITMENT_DATE_FORMAT))
-            }
-            viewModel.circle.recruitmentEndDate?.let {
-                binding.txtRecruitmentEndDate.text = it.format(DateTimeFormatter.ofPattern(RECRUITMENT_DATE_FORMAT))
-            }
-            binding.edtCircleSingleLineIntroduction.setText(viewModel.circle.singleLineIntroduction)
-            binding.txtCurrentCircleSingleIntroductionSize.text =
-                viewModel.circle.singleLineIntroduction.length.toString()
-            binding.edtCircleIntroduction.setText(viewModel.circle.introduction)
-            loadOriginalThumbnailWhenIsNotNull(context)
-            loadOriginalIntroductionImageWhenIsNotNull(context)
+    private fun hideBtmNav(activity: Activity) {
+        activity.findViewById<BottomNavigationView>(R.id.btmNav).isVisible = false
+    }
+
+    private fun initCategoryRecyclerView(context: Context) {
+        binding.rvCircleCategory.adapter =
+            CategoryAdapter(
+                context,
+                object : ItemListenerInitializer<CategoryModel> {
+                    override fun initialize(item: CategoryModel) {
+                        viewModel.setCategory(item.category)
+                    }
+
+                    override fun initialize(
+                        item: CategoryModel,
+                        view: View?,
+                    ) {}
+                },
+            )
+        binding.rvCircleCategory.layoutManager = FlexboxLayoutManager(context, FlexDirection.ROW)
+        binding.rvCircleCategory.itemAnimator = null
+    }
+
+    private fun loadCircleContent() {
+        binding.edtCircleName.setText(viewModel.circle.name)
+        viewModel.circle.recruitmentStartDate?.let {
+            binding.txtRecruitmentStartDate.text = it.format(DateTimeFormatter.ofPattern(RECRUITMENT_DATE_FORMAT))
         }
+        viewModel.circle.recruitmentEndDate?.let {
+            binding.txtRecruitmentEndDate.text = it.format(DateTimeFormatter.ofPattern(RECRUITMENT_DATE_FORMAT))
+        }
+        binding.edtCircleSingleLineIntroduction.setText(viewModel.circle.singleLineIntroduction)
+        binding.txtCurrentCircleSingleIntroductionSize.text =
+            viewModel.circle.singleLineIntroduction.length.toString()
+        binding.edtCircleIntroduction.setText(viewModel.circle.introduction)
     }
 
-    private fun loadOriginalThumbnailWhenIsNotNull(context: Context) {
+    private fun loadCircleThumbnailWhenIsNotNull(context: Context) {
         viewModel.circle.thumbnailUrl?.let {
             glideProvider.fetchImage(
                 it,
@@ -149,7 +177,7 @@ class UploadCircleFragment : Fragment() {
         }
     }
 
-    private fun loadOriginalIntroductionImageWhenIsNotNull(context: Context) {
+    private fun loadCircleIntroductionImageWhenIsNotNull(context: Context) {
         viewModel.circle.introImgUrl?.let {
             glideProvider.fetchImage(
                 it,
@@ -161,10 +189,6 @@ class UploadCircleFragment : Fragment() {
         }
     }
 
-    private fun hideBtmNav(activity: Activity) {
-        activity.findViewById<BottomNavigationView>(R.id.btmNav).isVisible = false
-    }
-
     private fun initObserver(
         parentActivity: Activity,
         context: Context,
@@ -172,6 +196,10 @@ class UploadCircleFragment : Fragment() {
         viewModel.state.observe(
             viewLifecycleOwner,
             stateObserver(parentActivity, context),
+        )
+        viewModel.categories.observe(
+            viewLifecycleOwner,
+            categoriesObserver(),
         )
     }
 
@@ -198,6 +226,13 @@ class UploadCircleFragment : Fragment() {
             else -> {}
         }
     }
+
+    private fun categoriesObserver() =
+        Observer<CategoryModels> { categories ->
+            binding.rvCircleCategory.adapter?.let {
+                (it as CategoryAdapter).update(categories) {}
+            }
+        }
 
     private fun requestRefreshToPreviousScreen() {
         findNavController().previousBackStackEntry?.savedStateHandle?.set(Const.FLAG_CIRCLE_DATA_CHANGED, true)

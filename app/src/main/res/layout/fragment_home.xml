@@ -57,7 +57,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:overScrollMode="never"
-        android:paddingVertical="@dimen/margin_padding_default" />
+        android:paddingVertical="@dimen/margin_padding_x_small" />
 
     <androidx.appcompat.widget.AppCompatTextView
         android:id="@+id/txtContentTitleCircle"

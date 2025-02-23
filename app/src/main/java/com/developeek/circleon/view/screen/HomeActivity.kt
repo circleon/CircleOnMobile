@@ -83,6 +83,9 @@ class HomeActivity : AppCompatActivity() {
         event: KeyEvent?,
     ): Boolean {
         if (keyCode == KeyEvent.KEYCODE_BACK) {
+            if (binding.pgbLoading.isVisible) {
+                binding.pgbLoading.isVisible = false
+            }
             if (onMainFragment) {
                 if (backClicked) {
                     finish()
