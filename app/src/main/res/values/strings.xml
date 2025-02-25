@@ -1,6 +1,9 @@
 <resources>
     <string name="app_name">CircleOn</string>
 
+    <!--Screnn Title-->
+    <string name="screen_title_manage_circle">동아리 관리</string>
+
     <!--Login-->
     <string name="hint_email">학교 이메일</string>
     <string name="hint_password">비밀번호</string>
@@ -70,7 +73,7 @@
     <string name="menu_post_settings_modify">수정하기</string>
     <string name="menu_post_settings_delete">삭제하기</string>
 
-    <!--New Circle-->
+    <!--Upload Circle-->
     <string name="text_circle_name">이름</string>
     <string name="hint_circle_name">동아리 이름</string>
     <string name="text_circle_single_line_introduction">한 줄 소개</string>
@@ -79,11 +82,16 @@
     <string name="text_circle_introduction_image">소개글 이미지</string>
     <string name="tip_circle_introduction_image">동아리 홍보 포스터를 추천드려요</string>
     <string name="text_circle_category">동아리 카테고리</string>
+    
+    <!--Manage Circle-->
+    <string name="manage_circle_content_title_circle_member">동아리 멤버</string>
+    <string name="manage_circle_content_title_approve_circle_sign_up">동아리 가입 승인</string>
+    <string name="manage_circle_content_title_approve_circle_resign">동아리 탈퇴 승인</string>
 
     <!--Post Detail-->
     <string name="hint_comment">댓글을 입력해주세요.</string>
 
-    <!--New Post-->
+    <!--Upload Post-->
     <string name="btn_finish">완료</string>
     <string name="hint_post_content">내용을 입력하세요.</string>
     <string name="add_image">사진 추가하기</string>

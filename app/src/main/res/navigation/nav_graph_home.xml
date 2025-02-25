@@ -45,6 +45,10 @@
             android:id="@+id/action_circleDetailFragment_to_uploadCircleFragment"
             app:destination="@id/uploadCircleFragment"
             app:enterAnim="@animator/scale_up"/>
+        <action
+            android:id="@+id/action_circleDetailFragment_to_manageCircleFragment"
+            app:destination="@id/manageCircleFragment"
+            app:enterAnim="@animator/scale_up"/>
     </fragment>
     <fragment
         android:id="@+id/circleDetailPostDetailFragment"
@@ -66,4 +70,9 @@
         android:name="com.developeek.circleon.view.screen.home.UploadCircleFragment"
         android:label="fragment_upload_circle"
         tools:layout="@layout/fragment_upload_circle" />
+    <fragment
+        android:id="@+id/manageCircleFragment"
+        android:name="com.developeek.circleon.view.screen.home.ManageCircleFragment"
+        android:label="fragment_manage_circle"
+        tools:layout="@layout/fragment_manage_circle" />
 </navigation>

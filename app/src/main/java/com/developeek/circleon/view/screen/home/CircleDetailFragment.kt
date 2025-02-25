@@ -195,6 +195,7 @@ class CircleDetailFragment : Fragment() {
                 sendUserToEditCircleScreen(item)
             }
             R.id.manage_circle -> {
+                sendUserToManageCircleScreen(item)
             }
             R.id.resign_circle -> {
             }
@@ -208,6 +209,13 @@ class CircleDetailFragment : Fragment() {
         bundle.putSerializable(Const.TAG_CIRCLE_DETAIL, item)
         bundle.putBoolean(Const.FLAG_IS_EDIT, true) // 수정 기능 전용 활성화
         findNavController().navigate(R.id.action_circleDetailFragment_to_uploadCircleFragment, bundle)
+    }
+
+    private fun sendUserToManageCircleScreen(item: CircleDetailModel) {
+        val bundle = Bundle()
+
+        bundle.putSerializable(Const.TAG_CIRCLE_DETAIL, item)
+        findNavController().navigate(R.id.action_circleDetailFragment_to_manageCircleFragment, bundle)
     }
 
     private fun initListener() {

@@ -96,7 +96,7 @@
             android:paddingHorizontal="@dimen/margin_padding_small"
             android:orientation="horizontal"
             android:gravity="center_vertical"
-            android:background="@drawable/bg_large_rounded_rectangle"
+            android:background="@drawable/bg_x_large_rounded_rectangle"
             android:backgroundTint="@color/grey_2">
 
             <androidx.appcompat.widget.AppCompatEditText
