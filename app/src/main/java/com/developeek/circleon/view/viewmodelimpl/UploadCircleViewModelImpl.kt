@@ -96,12 +96,7 @@ class UploadCircleViewModelImpl
                             return@async if (isAnyImageEdited()) editCircleImage(circle) else UiState.Success
                         }
 
-                    val deleteCircleImageJob =
-                        async {
-                            return@async if (isAnyImageRemoved()) deleteCircleImage(circle) else UiState.Success
-                        }
-
-                    val jobs: List<Deferred<UiState>> = listOf(editCircleJob, editCircleImageJob, deleteCircleImageJob)
+                    val jobs: List<Deferred<UiState>> = listOf(editCircleJob, editCircleImageJob)
                     jobs.map { job ->
                         job.invokeOnCompletion {
                             if (job.isCancelled) {
@@ -136,7 +131,8 @@ class UploadCircleViewModelImpl
             val result = repository.putCircleImage(circle.id, thumbnail, introductionImage)
 
             if (result is Success) {
-                return UiState.Success
+                // TODO: 서버 설계 문제로 이미지 편집과 삭제 작업은 동기 통신 방식으로 진행
+                return if (isAnyImageRemoved()) deleteCircleImage(circle) else UiState.Success
             } else {
                 error = (result as Error).message()
                 return if (result.isAuthenticationError()) UiState.AuthenticationError else UiState.ServiceError
