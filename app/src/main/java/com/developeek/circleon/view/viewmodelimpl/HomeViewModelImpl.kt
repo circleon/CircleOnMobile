@@ -36,7 +36,7 @@ class HomeViewModelImpl
         override lateinit var categories: CategoryModels
 
         override lateinit var circles: CircleModels
-        private var fetchCircleJob: Job? = null
+        private var fetchCirclesJob: Job? = null
         private var currentPage = DEFAULT_PAGE
 
         override val scrollOver: LiveData<Boolean>
@@ -71,13 +71,13 @@ class HomeViewModelImpl
         }
 
         private fun fetchCircles() {
-            fetchCircleJob?.let {
+            fetchCirclesJob?.let {
                 if (!it.isCompleted) return
             }
             uiState.postValue(UiState.Loading)
             currentPage = DEFAULT_PAGE // 카테고리를 선택할 때는 circles 를 재사용하지 않기 때문에 currentPage 도 초기화
 
-            fetchCircleJob =
+            fetchCirclesJob =
                 viewModelScope.launch {
                     val result = repository.getCircles(currentPage, SIZE_BY_PAGE, categories.selectedOrFirst().category)
 

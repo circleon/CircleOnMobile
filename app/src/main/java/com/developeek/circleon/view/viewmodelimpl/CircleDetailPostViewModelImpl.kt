@@ -36,7 +36,7 @@ class CircleDetailPostViewModelImpl
         private val uiState = MutableLiveData<UiState>()
 
         override lateinit var posts: PostModels
-        private var fetchPostJob: Job? = null
+        private var fetchPostsJob: Job? = null
         private var deletePostJob: Job? = null
         private var currentPage = DEFAULT_PAGE
 
@@ -62,13 +62,13 @@ class CircleDetailPostViewModelImpl
             page: Int,
             size: Int,
         ) {
-            fetchPostJob?.let {
+            fetchPostsJob?.let {
                 if (!it.isCompleted) return
             }
 
             uiState.postValue(UiState.Loading)
 
-            fetchPostJob =
+            fetchPostsJob =
                 viewModelScope.launch {
                     val result = repository.getCirclePosts(circleId, page, size)
 

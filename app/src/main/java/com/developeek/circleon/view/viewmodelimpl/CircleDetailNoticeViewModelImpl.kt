@@ -36,7 +36,7 @@ class CircleDetailNoticeViewModelImpl
         private val uiState = MutableLiveData<UiState>()
 
         override lateinit var posts: PostModels
-        private var fetchNoticeJob: Job? = null
+        private var fetchNoticesJob: Job? = null
         private var pinNoticeJob: Job? = null
         private var deleteNoticeJob: Job? = null
         private var currentPage = DEFAULT_PAGE
@@ -63,13 +63,13 @@ class CircleDetailNoticeViewModelImpl
             page: Int,
             size: Int,
         ) {
-            fetchNoticeJob?.let {
+            fetchNoticesJob?.let {
                 if (!it.isCompleted) return
             }
 
             uiState.postValue(UiState.Loading)
 
-            fetchNoticeJob =
+            fetchNoticesJob =
                 viewModelScope.launch {
                     val result = repository.getCircleNotices(circleId, page, size)
 

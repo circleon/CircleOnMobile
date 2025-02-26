@@ -67,7 +67,7 @@ class CircleDetailPostDetailViewModelImpl
 
         override lateinit var contents: List<Identifiable>
         override lateinit var comments: CommentModels
-        private var fetchCommentJob: Job? = null
+        private var fetchCommentsJob: Job? = null
         private var currentPage = DEFAULT_PAGE
 
         override val scrollOver: LiveData<Boolean>
@@ -92,14 +92,14 @@ class CircleDetailPostDetailViewModelImpl
             page: Int,
             size: Int,
         ) {
-            fetchCommentJob?.let {
+            fetchCommentsJob?.let {
                 if (!it.isCompleted) return
             }
 
             uiState.postValue(UiState.Loading)
             saveLoadingStartTime()
 
-            fetchCommentJob =
+            fetchCommentsJob =
                 viewModelScope.launch {
                     val result = repository.getPostComments(circleId, post.id, page, size)
                     delay(remainedLoadingTime())
