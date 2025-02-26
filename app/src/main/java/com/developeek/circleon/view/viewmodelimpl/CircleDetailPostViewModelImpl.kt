@@ -55,7 +55,6 @@ class CircleDetailPostViewModelImpl
         override lateinit var error: String
 
         init {
-            uiState.postValue(UiState.Loading)
             fetchPosts(currentPage, SIZE_BY_PAGE)
         }
 
@@ -66,6 +65,8 @@ class CircleDetailPostViewModelImpl
             fetchPostJob?.let {
                 if (!it.isCompleted) return
             }
+
+            uiState.postValue(UiState.Loading)
 
             fetchPostJob =
                 viewModelScope.launch {

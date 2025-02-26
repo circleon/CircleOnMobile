@@ -75,7 +75,7 @@ class HomeViewModelImpl
                 if (!it.isCompleted) return
             }
             uiState.postValue(UiState.Loading)
-            currentPage = DEFAULT_PAGE
+            currentPage = DEFAULT_PAGE // 카테고리를 선택할 때는 circles 를 재사용하지 않기 때문에 currentPage 도 초기화
 
             fetchCircleJob =
                 viewModelScope.launch {

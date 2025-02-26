@@ -225,6 +225,6 @@ class UploadCircleViewModelImpl
         }
 
         companion object {
-            private const val MAX_DEFAULT_ANIM_TIME_MILLIS = 200L
+            private const val MAX_DEFAULT_ANIM_TIME_MILLIS = 250L
         }
     }

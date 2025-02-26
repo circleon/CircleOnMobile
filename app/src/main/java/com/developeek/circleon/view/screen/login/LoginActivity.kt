@@ -6,6 +6,7 @@ import android.os.Bundle
 import android.view.inputmethod.EditorInfo
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.view.isVisible
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.Observer
 import com.developeek.circleon.databinding.ActivityLoginBinding
@@ -39,6 +40,8 @@ class LoginActivity : AppCompatActivity() {
 
     private fun stateObserver(activity: Activity) =
         Observer<UiState> {
+            binding.pgbLoading.isVisible = it is UiState.Loading
+            binding.btnLogin.isVisible = it !is UiState.Loading
             when (it) {
                 UiState.Success -> sendUserToHomeScreen(activity)
                 UiState.ServiceError ->

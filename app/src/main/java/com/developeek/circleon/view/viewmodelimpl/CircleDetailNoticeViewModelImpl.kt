@@ -56,7 +56,6 @@ class CircleDetailNoticeViewModelImpl
         override lateinit var error: String
 
         init {
-            uiState.postValue(UiState.Loading)
             fetchNotices(currentPage, SIZE_BY_PAGE)
         }
 
@@ -67,6 +66,8 @@ class CircleDetailNoticeViewModelImpl
             fetchNoticeJob?.let {
                 if (!it.isCompleted) return
             }
+
+            uiState.postValue(UiState.Loading)
 
             fetchNoticeJob =
                 viewModelScope.launch {

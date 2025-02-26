@@ -85,8 +85,6 @@ class CircleDetailPostDetailViewModelImpl
         override lateinit var error: String
 
         init {
-            uiState.postValue(UiState.Loading)
-            saveLoadingStartTime()
             fetchComments(currentPage, SIZE_BY_PAGE)
         }
 
@@ -97,6 +95,9 @@ class CircleDetailPostDetailViewModelImpl
             fetchCommentJob?.let {
                 if (!it.isCompleted) return
             }
+
+            uiState.postValue(UiState.Loading)
+            saveLoadingStartTime()
 
             fetchCommentJob =
                 viewModelScope.launch {
@@ -318,6 +319,6 @@ class CircleDetailPostDetailViewModelImpl
         companion object {
             private const val SIZE_BY_PAGE = 20
             private const val DEFAULT_PAGE = 0
-            private const val MAX_DEFAULT_ANIM_TIME_MILLIS = 200L
+            private const val MAX_DEFAULT_ANIM_TIME_MILLIS = 250L
         }
     }
