@@ -9,4 +9,5 @@ interface ManageCircleViewModel {
     val circleMembers: MemberModels
     val joinRequestedMembers: MemberModels
     val leaveRequestedMembers: MemberModels
+    val error: String
 }

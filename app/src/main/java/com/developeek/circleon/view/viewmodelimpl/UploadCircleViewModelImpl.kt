@@ -105,7 +105,7 @@ class UploadCircleViewModelImpl
                             }
                         }
                     }
-                    // 코루틴별 invokeOnCompletion 등록 이후에 await() 을 해야 자식 코루틴 캔슬이 부모 코루틴에게 즉시 전파됨
+                    // 코루틴별 invokeOnCompletion 을 전부 등록해준 이후에 await() 을 해야 자식 코루틴 캔슬이 부모 코루틴에게 즉시 전파됨
                     jobs.awaitAll().map {
                         if (it !is UiState.Success) tmpState = it
                     }
