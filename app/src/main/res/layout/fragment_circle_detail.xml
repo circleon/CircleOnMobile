@@ -113,14 +113,14 @@
                     </androidx.appcompat.widget.LinearLayoutCompat>
 
                     <androidx.appcompat.widget.AppCompatTextView
-                        android:id="@+id/btnSignUpCircle"
+                        android:id="@+id/btnJoinCircle"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:paddingHorizontal="@dimen/margin_padding_default"
                         android:paddingVertical="6dp"
                         android:textColor="@color/white"
                         android:translationY="-1.06sp"
-                        android:text="@string/btn_sign_up_circle"
+                        android:text="@string/btn_join_circle"
                         android:background="@drawable/bg_button"
                         app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintBottom_toBottomOf="parent"/>

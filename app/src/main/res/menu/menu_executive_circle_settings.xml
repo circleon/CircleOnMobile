@@ -7,6 +7,6 @@
         android:id="@+id/manage_circle"
         android:title="@string/menu_circle_settings_manage"/>
     <item
-        android:id="@+id/resign_circle"
-        android:title="@string/menu_circle_settings_resign"/>
+        android:id="@+id/leave_circle"
+        android:title="@string/menu_circle_settings_leave"/>
 </menu>

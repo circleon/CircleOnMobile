@@ -65,7 +65,7 @@ class PostDetailAdapter(
 
         private fun loadAuthor(author: AuthorModel) {
             binding.txtAuthorName.text = author.name
-            author.profileUrl?.let {
+            author.profileImgUrl?.let {
                 glideProvider.fetchImage(it, context, binding.imgAuthorProfile)
             } ?: binding.imgAuthorProfile.setImageResource(R.drawable.ic_author_placeholder)
         }
@@ -109,7 +109,7 @@ class PostDetailAdapter(
 
         private fun loadAuthor(author: AuthorModel) {
             binding.txtAuthorName.text = author.name
-            author.profileUrl?.let {
+            author.profileImgUrl?.let {
                 glideProvider.fetchImage(it, context, binding.imgAuthorProfile)
             } ?: binding.imgAuthorProfile.setImageResource(R.drawable.ic_author_placeholder)
         }

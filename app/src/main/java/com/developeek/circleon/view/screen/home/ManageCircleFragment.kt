@@ -8,15 +8,34 @@ import android.view.ViewGroup
 import android.view.WindowManager
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
 import com.developeek.circleon.R
 import com.developeek.circleon.databinding.FragmentManageCircleBinding
+import com.developeek.circleon.domain.model.CircleDetailModel
+import com.developeek.circleon.domain.utils.Const
+import com.developeek.circleon.view.viewmodel.ManageCircleViewModel
+import com.developeek.circleon.view.viewmodelimpl.ManageCircleViewModelImpl
 import com.google.android.material.bottomnavigation.BottomNavigationView
+import dagger.hilt.android.lifecycle.withCreationCallback
 
 class ManageCircleFragment : Fragment() {
     private lateinit var binding: FragmentManageCircleBinding
+    private lateinit var circle: CircleDetailModel
+    private val viewModel: ManageCircleViewModel by viewModels<ManageCircleViewModelImpl>(
+        extrasProducer = {
+            defaultViewModelCreationExtras
+                .withCreationCallback<ManageCircleViewModelImpl.ManageCircleViewModelFactory> {
+                    it.create(circle)
+                }
+        },
+    )
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        arguments?.let {
+            circle = it.getSerializable(Const.TAG_CIRCLE_DETAIL) as CircleDetailModel
+        }
 
         activity?.window?.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE)
     }

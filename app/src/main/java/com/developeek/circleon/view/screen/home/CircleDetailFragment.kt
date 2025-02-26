@@ -173,7 +173,7 @@ class CircleDetailFragment : Fragment() {
 
             if (viewModel.circleDetail.isExecutive() || viewModel.circleDetail.isMember()) {
                 Utils.changeMenuItemTextColor(
-                    binding.tbCircleDetail.menu.findItem(R.id.resign_circle),
+                    binding.tbCircleDetail.menu.findItem(R.id.leave_circle),
                     ContextCompat.getColor(context, R.color.error),
                 )
             }
@@ -197,7 +197,7 @@ class CircleDetailFragment : Fragment() {
             R.id.manage_circle -> {
                 sendUserToManageCircleScreen(item)
             }
-            R.id.resign_circle -> {
+            R.id.leave_circle -> {
             }
         }
         true

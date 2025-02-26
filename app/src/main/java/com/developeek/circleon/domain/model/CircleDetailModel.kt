@@ -71,7 +71,7 @@ data class CircleDetailModel(
             CircleDetailModel(
                 0,
                 Const.EMPTY_TEXT,
-                Role.NONE,
+                Role.NONE_MEMBER,
                 0,
                 null,
                 null,

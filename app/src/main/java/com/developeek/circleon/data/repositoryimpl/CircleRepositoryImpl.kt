@@ -8,11 +8,13 @@ import com.developeek.circleon.data.repository.CircleRepository
 import com.developeek.circleon.data.source.Result
 import com.developeek.circleon.data.source.remote.retrofit.service.CircleService
 import com.developeek.circleon.domain.enums.Category
+import com.developeek.circleon.domain.enums.MembershipStatus
 import com.developeek.circleon.domain.enums.PostType
 import com.developeek.circleon.domain.model.CircleDetailModel
 import com.developeek.circleon.domain.model.CircleModels
 import com.developeek.circleon.domain.model.CircleSummaryModels
 import com.developeek.circleon.domain.model.CommentModels
+import com.developeek.circleon.domain.model.MemberModels
 import com.developeek.circleon.domain.model.PostModels
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
@@ -35,9 +37,9 @@ class CircleRepositoryImpl(
             withContext(dispatcher) {
                 val response =
                     if (category == Category.ALL) {
-                        service.getAllCircles(page, size, SORT_LATEST)
+                        service.getAllCircles(page, size, SORT_CIRCLE_OLDEST)
                     } else {
-                        service.getCircleScrollContents(page, size, SORT_LATEST, category.codeName())
+                        service.getCircleScrollContents(page, size, SORT_CIRCLE_OLDEST, category.codeName())
                     }
                 Result.success(
                     CircleModels(response.content.map { it.toCircleModel() }).apply {
@@ -72,6 +74,72 @@ class CircleRepositoryImpl(
             withContext(dispatcher) {
                 val response = service.getCircleDetail(circleId)
                 Result.success(response.toCircleDetailModel())
+            }
+        } catch (e: IOException) {
+            Result.error(e)
+        }
+    }
+
+    override suspend fun getCircleMembers(
+        circleId: Int,
+        page: Int,
+        size: Int,
+    ): Result<MemberModels> {
+        return try {
+            withContext(dispatcher) {
+                val response =
+                    service.getMembers(
+                        circleId,
+                        page,
+                        size,
+                        SORT_MEMBER_BY_NAME,
+                        MembershipStatus.JOINED.codeName(),
+                    )
+                Result.success(MemberModels(response.content.map { it.toMemberModel() }))
+            }
+        } catch (e: IOException) {
+            Result.error(e)
+        }
+    }
+
+    override suspend fun getCircleJoinRequestedMembers(
+        circleId: Int,
+        page: Int,
+        size: Int,
+    ): Result<MemberModels> {
+        return try {
+            withContext(dispatcher) {
+                val response =
+                    service.getMembers(
+                        circleId,
+                        page,
+                        size,
+                        SORT_MEMBER_BY_NAME,
+                        MembershipStatus.JOIN_REQUESTED.codeName(),
+                    )
+                Result.success(MemberModels(response.content.map { it.toMemberModel() }))
+            }
+        } catch (e: IOException) {
+            Result.error(e)
+        }
+    }
+
+    override suspend fun getCircleLeaveRequestedMembers(
+        circleId: Int,
+        page: Int,
+        size: Int,
+    ): Result<MemberModels> {
+        return try {
+            withContext(dispatcher) {
+                val response =
+                    service.getMembers(
+                        circleId,
+                        page,
+                        size,
+                        SORT_MEMBER_BY_NAME,
+                        MembershipStatus.LEAVE_REQUESTED.codeName(),
+                    )
+                Result.success(MemberModels(response.content.map { it.toMemberModel() }))
             }
         } catch (e: IOException) {
             Result.error(e)
@@ -326,7 +394,9 @@ class CircleRepositoryImpl(
     }
 
     companion object {
-        private const val SORT_LATEST = "createdAt,desc"
+        private const val SORT_CIRCLE_OLDEST = "createdAt,asc"
+        private const val SORT_CIRCLE_LATEST = "createdAt,desc"
+        private const val SORT_MEMBER_BY_NAME = "username,asc"
         private const val TYPE_POST = "POST"
         private const val TYPE_NOTICE = "NOTICE"
     }

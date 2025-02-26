@@ -18,12 +18,12 @@
         app:layout_constraintBottom_toTopOf="@id/llManageCircle">
 
         <androidx.appcompat.widget.AppCompatImageView
-            android:id="@+id/btnBack"
+            android:id="@+id/btnCancel"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
             android:paddingStart="@dimen/margin_padding_large"
             android:paddingEnd="@dimen/margin_padding_small"
-            android:src="@drawable/ic_back" />
+            android:src="@drawable/ic_cancel" />
 
         <androidx.appcompat.widget.AppCompatTextView
             android:layout_width="wrap_content"
@@ -94,24 +94,24 @@
             android:paddingVertical="@dimen/margin_padding_large">
 
             <androidx.appcompat.widget.AppCompatTextView
-                android:id="@+id/txtContentTitleApproveCircleSignUp"
+                android:id="@+id/txtContentTitleApproveCircleJoin"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/manage_circle_content_title_approve_circle_sign_up"
+                android:text="@string/manage_circle_content_title_approve_circle_join"
                 android:textAppearance="@style/default_bold_text"
                 android:textColor="@color/grey_9"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
 
             <androidx.appcompat.widget.AppCompatTextView
-                android:id="@+id/txtContentApproveCircleSignUp"
+                android:id="@+id/txtContentApproveCircleJoin"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/margin_padding_x_small"
                 android:textColor="@color/grey_6"
                 android:textSize="@dimen/text_size_small"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/txtContentTitleApproveCircleSignUp"
+                app:layout_constraintTop_toBottomOf="@id/txtContentTitleApproveCircleJoin"
                 tools:text="content" />
 
             <androidx.appcompat.widget.AppCompatImageView
@@ -135,24 +135,24 @@
             android:paddingVertical="@dimen/margin_padding_large">
 
             <androidx.appcompat.widget.AppCompatTextView
-                android:id="@+id/txtContentTitleApproveCircleResign"
+                android:id="@+id/txtContentTitleApproveCircleLeave"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/manage_circle_content_title_approve_circle_resign"
+                android:text="@string/manage_circle_content_title_approve_circle_leave"
                 android:textAppearance="@style/default_bold_text"
                 android:textColor="@color/grey_9"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
 
             <androidx.appcompat.widget.AppCompatTextView
-                android:id="@+id/txtContentApproveCircleResign"
+                android:id="@+id/txtContentApproveCircleLeave"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/margin_padding_x_small"
                 android:textColor="@color/grey_6"
                 android:textSize="@dimen/text_size_small"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/txtContentTitleApproveCircleResign"
+                app:layout_constraintTop_toBottomOf="@id/txtContentTitleApproveCircleLeave"
                 tools:text="content" />
 
             <androidx.appcompat.widget.AppCompatImageView

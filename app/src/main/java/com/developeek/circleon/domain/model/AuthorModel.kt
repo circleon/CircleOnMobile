@@ -6,7 +6,7 @@ import java.io.Serializable
 data class AuthorModel(
     val id: Int,
     val name: String,
-    val profileUrl: String?,
+    val profileImgUrl: String?,
 ) : Serializable {
     fun isSame(authorModel: AuthorModel) = this.id == authorModel.id
 

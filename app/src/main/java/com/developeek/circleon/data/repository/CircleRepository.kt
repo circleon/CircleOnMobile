@@ -7,6 +7,7 @@ import com.developeek.circleon.domain.model.CircleDetailModel
 import com.developeek.circleon.domain.model.CircleModels
 import com.developeek.circleon.domain.model.CircleSummaryModels
 import com.developeek.circleon.domain.model.CommentModels
+import com.developeek.circleon.domain.model.MemberModels
 import com.developeek.circleon.domain.model.PostModels
 import java.io.File
 
@@ -21,6 +22,24 @@ interface CircleRepository {
     suspend fun getCircleSummaries(): Result<CircleSummaryModels>
 
     suspend fun getCircleDetail(circleId: Int): Result<CircleDetailModel>
+
+    suspend fun getCircleMembers(
+        circleId: Int,
+        page: Int,
+        size: Int,
+    ): Result<MemberModels>
+
+    suspend fun getCircleJoinRequestedMembers(
+        circleId: Int,
+        page: Int,
+        size: Int,
+    ): Result<MemberModels>
+
+    suspend fun getCircleLeaveRequestedMembers(
+        circleId: Int,
+        page: Int,
+        size: Int,
+    ): Result<MemberModels>
 
     suspend fun getCirclePosts(
         circleId: Int,

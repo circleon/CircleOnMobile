@@ -4,6 +4,7 @@ import com.developeek.circleon.data.dto.home.Circle
 import com.developeek.circleon.data.dto.home.CircleDetail
 import com.developeek.circleon.data.dto.home.CircleSummaries
 import com.developeek.circleon.data.dto.home.Comment
+import com.developeek.circleon.data.dto.home.Member
 import com.developeek.circleon.data.dto.home.Paging
 import com.developeek.circleon.data.dto.home.Pin
 import com.developeek.circleon.data.dto.home.Post
@@ -47,6 +48,15 @@ interface CircleService {
     suspend fun getCircleDetail(
         @Path("circleId") circleId: Int,
     ): CircleDetail
+
+    @GET("circles/{circleId}/members")
+    suspend fun getMembers(
+        @Path("circleId") circleId: Int,
+        @Query("page") page: Int,
+        @Query("size") size: Int,
+        @Query("sort") sort: String,
+        @Query("membershipStatus") membershipStatus: String,
+    ): Paging<Member>
 
     @GET("circles/{circleId}/posts")
     suspend fun getCirclePosts(

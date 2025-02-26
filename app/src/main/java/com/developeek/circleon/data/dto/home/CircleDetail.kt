@@ -20,14 +20,14 @@ data class CircleDetail(
     val introduction: String,
     val recruitmentStartDate: String?,
     val recruitmentEndDate: String?,
-    @SerializedName("circleRole") val memberRole: String?,
+    @SerializedName("circleRole") val role: String?,
     val memberId: Int?,
 ) {
     fun toCircleDetailModel() =
         CircleDetailModel(
             id,
             name,
-            Role.findOrDefault(memberRole),
+            Role.findOrDefault(role),
             memberId(memberId),
             Utils.getCircleImageUrlOrNull(profileImgUrl),
             Utils.getCircleImageUrlOrNull(thumbnailUrl),

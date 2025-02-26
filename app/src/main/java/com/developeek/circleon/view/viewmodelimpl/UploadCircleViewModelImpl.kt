@@ -48,6 +48,7 @@ class UploadCircleViewModelImpl
 
         override lateinit var circle: CircleDetailModel
         private var uploadJob: Job? = null
+        private var editJob: Job? = null
         override val categories: LiveData<CategoryModels>
             get() = circleCategories
         private var circleCategories =
@@ -77,14 +78,14 @@ class UploadCircleViewModelImpl
 
         override fun edit() {
             if (!isCircleFormat(circle)) return
-            uploadJob?.let {
+            editJob?.let {
                 if (!it.isCompleted) return
             }
             uiState.postValue(UiState.Loading)
             saveLoadingStartTime()
 
             var tmpState: UiState = UiState.Success
-            uploadJob =
+            editJob =
                 viewModelScope.launch {
                     val editCircleJob =
                         async {

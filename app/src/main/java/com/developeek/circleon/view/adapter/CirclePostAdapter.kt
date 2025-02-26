@@ -26,7 +26,7 @@ class CirclePostAdapter(
     private val itemListenerInitializer: ItemListenerInitializer<PostModel>,
     private val overflowListenerInitializer: ItemListenerInitializer<PostModel>,
     private val userId: Int? = null,
-    private val role: Role = Role.NONE,
+    private val role: Role = Role.NONE_MEMBER,
 ) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
     private val diffUtil =
         AsyncListDiffer(
@@ -73,7 +73,7 @@ class CirclePostAdapter(
 
         private fun loadAuthor(post: PostModel) {
             binding.txtAuthorName.text = post.author.name
-            post.author.profileUrl?.let {
+            post.author.profileImgUrl?.let {
                 glideProvider.fetchImage(it, context, binding.imgAuthorProfile)
             } ?: binding.imgAuthorProfile.setImageResource(R.drawable.ic_author_placeholder)
             binding.txtCreated.text =

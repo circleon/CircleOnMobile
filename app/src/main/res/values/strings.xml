@@ -52,10 +52,10 @@
     <string name="btn_cancel">취소</string>
 
     <!--Circle Detail-->
-    <string name="btn_sign_up_circle">가입신청</string>
+    <string name="btn_join_circle">가입신청</string>
     <string name="menu_circle_settings_modify">수정하기</string>
     <string name="menu_circle_settings_manage">관리하기</string>
-    <string name="menu_circle_settings_resign">탈퇴하기</string>
+    <string name="menu_circle_settings_leave">탈퇴하기</string>
     <string name="tab_name_introduction">소개글</string>
     <string name="tab_name_notice">공지사항</string>
     <string name="tab_name_post">게시글</string>
@@ -85,8 +85,8 @@
     
     <!--Manage Circle-->
     <string name="manage_circle_content_title_circle_member">동아리 멤버</string>
-    <string name="manage_circle_content_title_approve_circle_sign_up">동아리 가입 승인</string>
-    <string name="manage_circle_content_title_approve_circle_resign">동아리 탈퇴 승인</string>
+    <string name="manage_circle_content_title_approve_circle_join">동아리 가입 승인</string>
+    <string name="manage_circle_content_title_approve_circle_leave">동아리 탈퇴 승인</string>
 
     <!--Post Detail-->
     <string name="hint_comment">댓글을 입력해주세요.</string>
