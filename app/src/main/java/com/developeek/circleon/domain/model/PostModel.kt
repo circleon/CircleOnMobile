@@ -27,7 +27,7 @@ data class PostModels(private val models: List<PostModel>) {
     fun isLastPage() = isLastPage
 
     companion object {
-        fun emptyInstance() = PostModels(listOf())
+        fun emptyInstance() = PostModels(emptyList())
     }
 }
 

@@ -60,7 +60,13 @@ class ManageCircleFragment : Fragment() {
     }
 
     private fun initView(parentActivity: Activity) {
+        initCircleMemberView()
         hideBtmNav(parentActivity)
+    }
+
+    private fun initCircleMemberView() {
+        binding.txtContentCircleMember.text =
+            String.format(UNIT_CIRCLE_MEMBER, circle.members.size())
     }
 
     private fun hideBtmNav(activity: Activity) {
@@ -71,5 +77,9 @@ class ManageCircleFragment : Fragment() {
         super.onDestroyView()
 
         activity?.window?.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_PAN) // softInputMode 복원
+    }
+
+    companion object {
+        private const val UNIT_CIRCLE_MEMBER = "멤버 %d명"
     }
 }

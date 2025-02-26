@@ -17,6 +17,7 @@ import com.developeek.circleon.domain.model.CommentModels
 import com.developeek.circleon.domain.model.MemberModels
 import com.developeek.circleon.domain.model.PostModels
 import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.async
 import kotlinx.coroutines.withContext
 import okhttp3.MediaType
 import okhttp3.MultipartBody
@@ -72,8 +73,26 @@ class CircleRepositoryImpl(
     override suspend fun getCircleDetail(circleId: Int): Result<CircleDetailModel> {
         return try {
             withContext(dispatcher) {
-                val response = service.getCircleDetail(circleId)
-                Result.success(response.toCircleDetailModel())
+                val getCircleDetailJob =
+                    async {
+                        return@async service.getCircleDetail(circleId)
+                    }
+                val getMembersJob =
+                    async {
+                        return@async service.getMembers(
+                            circleId,
+                            0,
+                            200,
+                            SORT_MEMBER_BY_NAME,
+                            MembershipStatus.JOINED.codeName(),
+                        )
+                    }
+
+                Result.success(
+                    getCircleDetailJob.await().toCircleDetailModel(
+                        MemberModels(getMembersJob.await().content.map { it.toMemberModel() }),
+                    ),
+                )
             }
         } catch (e: IOException) {
             Result.error(e)
