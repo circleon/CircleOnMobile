@@ -152,7 +152,7 @@ class CircleDetailFragment : Fragment() {
         binding.tlCircleDetail.getTabAt(viewModel.currentTabPosition)?.select() // 탭 복원
         viewModel.circleDetail.thumbnailUrl?.let {
             glideProvider.fetchImage(it, context, binding.imgCircleThumbnail)
-        } ?: binding.imgCircleThumbnail.setImageResource(R.drawable.ic_circle_thumbnail_placeholder)
+        } ?: binding.imgCircleThumbnail.setImageResource(R.drawable.ic_circle_thumbnail_default)
         binding.txtCircleCategory.text = viewModel.circleDetail.category.categoryName()
         binding.txtCircleMemberCount.text = String.format(MEMBER_COUNT_UNIT, viewModel.circleDetail.memberCount)
     }
@@ -207,7 +207,7 @@ class CircleDetailFragment : Fragment() {
         val bundle = Bundle()
 
         bundle.putSerializable(Const.TAG_CIRCLE_DETAIL, item)
-        bundle.putBoolean(Const.FLAG_IS_EDIT, true) // 수정 기능 전용 활성화
+        bundle.putBoolean(Const.FLAG_EDIT_SCREEN, true) // 수정 기능 전용 활성화
         findNavController().navigate(R.id.action_circleDetailFragment_to_uploadCircleFragment, bundle)
     }
 
@@ -363,7 +363,7 @@ class CircleDetailFragment : Fragment() {
     ) {
         bundle.putInt(Const.TAG_CIRCLE_ID, circleId)
         bundle.putSerializable(Const.TAG_POST_TYPE, postType)
-        bundle.putBoolean(Const.FLAG_IS_EDIT, false) // 신규 작성 전용 기능 활성화
+        bundle.putBoolean(Const.FLAG_EDIT_SCREEN, false) // 신규 작성 전용 기능 활성화
         findNavController().navigate(R.id.action_circleDetailFragment_to_uploadPostFragment, bundle)
     }
 

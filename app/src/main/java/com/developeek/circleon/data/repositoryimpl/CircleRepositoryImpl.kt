@@ -51,7 +51,7 @@ class CircleRepositoryImpl(
                 )
             }
         } catch (e: ServiceException.NoResultException) {
-            Result.success(CircleModels.emptyInstance())
+            Result.success(CircleModels.empty())
         } catch (e: IOException) {
             Result.error(e)
         }
@@ -64,7 +64,7 @@ class CircleRepositoryImpl(
                 Result.success(CircleSummaryModels(response.content.map { it.toCircleSummaryModel() }))
             }
         } catch (e: ServiceException.NoResultException) {
-            Result.success(CircleSummaryModels.emptyInstance())
+            Result.success(CircleSummaryModels.empty())
         } catch (e: IOException) {
             Result.error(e)
         }
@@ -182,7 +182,7 @@ class CircleRepositoryImpl(
                 )
             }
         } catch (e: ServiceException.NoResultException) {
-            Result.success(PostModels.emptyInstance())
+            Result.success(PostModels.empty())
         } catch (e: IOException) {
             Result.error(e)
         }
@@ -205,7 +205,7 @@ class CircleRepositoryImpl(
                 )
             }
         } catch (e: ServiceException.NoResultException) {
-            Result.success(PostModels.emptyInstance())
+            Result.success(PostModels.empty())
         } catch (e: IOException) {
             Result.error(e)
         }

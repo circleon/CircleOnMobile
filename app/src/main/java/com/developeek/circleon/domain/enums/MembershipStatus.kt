@@ -14,4 +14,10 @@ enum class MembershipStatus(
     fun codeName() = codeName
 
     fun statusName() = statusName
+
+    companion object {
+        private val default = NOT_JOINED
+
+        fun findOrDefault(status: String) = entries.find { it.codeName == status } ?: default
+    }
 }

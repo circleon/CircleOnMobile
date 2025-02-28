@@ -87,7 +87,7 @@ class UploadCircleFragment : Fragment() {
 
         arguments?.let {
             isEdit =
-                it.getBoolean(Const.FLAG_IS_EDIT).also { isEdit ->
+                it.getBoolean(Const.FLAG_EDIT_SCREEN).also { isEdit ->
                     if (isEdit) {
                         origin = it.getSerializable(Const.TAG_CIRCLE_DETAIL) as CircleDetailModel
                     }

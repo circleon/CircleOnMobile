@@ -35,7 +35,9 @@ class CircleDetailPostViewModelImpl
             get() = uiState
         private val uiState = MutableLiveData<UiState>()
 
-        override lateinit var posts: PostModels
+        override val posts: PostModels
+            get() = postModels
+        private var postModels = PostModels.empty()
         private var fetchPostsJob: Job? = null
         private var deletePostJob: Job? = null
         private var currentPage = DEFAULT_PAGE
@@ -73,7 +75,7 @@ class CircleDetailPostViewModelImpl
                     val result = repository.getCirclePosts(circleId, page, size)
 
                     if (result is Success) {
-                        posts = result.data
+                        postModels = result.data
                         uiState.postValue(UiState.Success)
                     } else {
                         error = (result as Error).message()
@@ -100,8 +102,8 @@ class CircleDetailPostViewModelImpl
                     val result = repository.getCirclePosts(circleId, currentPage + 1, SIZE_BY_PAGE)
 
                     if (result is Success) {
-                        posts =
-                            posts.addAll(result.data).also {
+                        postModels =
+                            postModels.addAll(result.data).also {
                                 if (result.data.isLastPage()) {
                                     it.setAsLast()
                                 }

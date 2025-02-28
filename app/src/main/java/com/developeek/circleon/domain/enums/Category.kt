@@ -16,7 +16,7 @@ enum class Category(
     LANGUAGE("LANGUAGE", "어학"),
     ETC("ETC", "기타"), ;
 
-    fun isSame(category: Category) = this.codeName == category.codeName
+    fun isSame(category: Category) = this == category
 
     fun codeName() = codeName
 

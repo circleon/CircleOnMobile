@@ -41,8 +41,12 @@ class ManageCircleViewModelImpl
         private val uiState = MutableLiveData<UiState>()
 
         override val circleMembers: MemberModels = circle.members
-        override lateinit var joinRequestedMembers: MemberModels
-        override lateinit var leaveRequestedMembers: MemberModels
+        override val joinRequestedMembers: MemberModels
+            get() = joinRequestedMemberModels
+        private var joinRequestedMemberModels = MemberModels.empty()
+        override val leaveRequestedMembers: MemberModels
+            get() = leaveRequestedMemberModels
+        private var leaveRequestedMemberModels = MemberModels.empty()
         private var fetchMembersJob: Job? = null
         private var currentPage = DEFAULT_PAGE
 
@@ -104,7 +108,7 @@ class ManageCircleViewModelImpl
             delay(remainedLoadingTime())
 
             if (result is Success) {
-                joinRequestedMembers = result.data
+                joinRequestedMemberModels = result.data
                 return UiState.Success
             } else {
                 error = (result as Error).message()
@@ -119,7 +123,7 @@ class ManageCircleViewModelImpl
             val result = repository.getCircleLeaveRequestedMembers(circle.id, page, size)
 
             if (result is Success) {
-                leaveRequestedMembers = result.data
+                leaveRequestedMemberModels = result.data
                 return UiState.Success
             } else {
                 error = (result as Error).message()

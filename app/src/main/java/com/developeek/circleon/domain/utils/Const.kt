@@ -8,8 +8,10 @@ object Const {
     const val TAG_CIRCLE_POST = "circle_post"
     const val TAG_USER_ROLE = "user_role"
     const val TAG_POST_TYPE = "post_type"
+    const val TAG_MEMBERS = "members"
+    const val TAG_MEMBERSHIP_STATUS = "membership_status"
 
     const val FLAG_CIRCLE_DATA_CHANGED = "circle_data_changed"
     const val FLAG_CIRCLE_POST_DATA_CHANGED = "circle_post_data_changed"
-    const val FLAG_IS_EDIT = "is_edit"
+    const val FLAG_EDIT_SCREEN = "edit_screen"
 }

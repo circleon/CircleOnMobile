@@ -16,6 +16,7 @@ import androidx.lifecycle.Observer
 import androidx.navigation.fragment.findNavController
 import com.developeek.circleon.R
 import com.developeek.circleon.databinding.FragmentManageCircleBinding
+import com.developeek.circleon.domain.enums.MembershipStatus
 import com.developeek.circleon.domain.model.CircleDetailModel
 import com.developeek.circleon.domain.model.MemberModels
 import com.developeek.circleon.domain.state.UiState
@@ -71,6 +72,7 @@ class ManageCircleFragment : Fragment() {
 
         initView(requireActivity())
         initObserver(requireActivity(), requireContext())
+        initListener()
     }
 
     private fun initView(parentActivity: Activity) {
@@ -153,6 +155,29 @@ class ManageCircleFragment : Fragment() {
             )
     }
 
+    private fun initListener() {
+        setBtnCancelListener()
+        setMemberCardListener()
+    }
+
+    private fun setBtnCancelListener() {
+        binding.btnCancel.setOnClickListener {
+            sendUserToPreviousScreen()
+        }
+    }
+
+    private fun setMemberCardListener() {
+        binding.clCircleMember.setOnClickListener {
+            sendUserToMemberListScreen(viewModel.circleMembers, MembershipStatus.JOINED)
+        }
+        binding.clApproveCircleJoin.setOnClickListener {
+            sendUserToMemberListScreen(viewModel.joinRequestedMembers, MembershipStatus.JOIN_REQUESTED)
+        }
+        binding.clApproveCircleLeave.setOnClickListener {
+            sendUserToMemberListScreen(viewModel.leaveRequestedMembers, MembershipStatus.LEAVE_REQUESTED)
+        }
+    }
+
     private fun sendUserToPreviousScreen() {
         findNavController().navigateUp()
     }
@@ -163,13 +188,20 @@ class ManageCircleFragment : Fragment() {
         startActivity(intent)
     }
 
+    private fun sendUserToMemberListScreen(
+        members: MemberModels,
+        membershipStatus: MembershipStatus,
+    ) {
+        val bundle = Bundle()
+
+        bundle.putSerializable(Const.TAG_MEMBERS, members)
+        bundle.putSerializable(Const.TAG_MEMBERSHIP_STATUS, membershipStatus)
+        findNavController().navigate(R.id.action_manageCircleFragment_to_manageCircleMemberFragment, bundle)
+    }
+
     override fun onDestroyView() {
         super.onDestroyView()
 
         activity?.window?.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_PAN) // softInputMode 복원
-    }
-
-    companion object {
-        private const val UNIT_CIRCLE_MEMBER = "멤버 %d명"
     }
 }

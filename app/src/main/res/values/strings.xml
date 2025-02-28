@@ -84,15 +84,17 @@
     <string name="text_circle_category">동아리 카테고리</string>
 
     <!--Manage Circle-->
-    <string name="manage_circle_content_title_circle_member">동아리 멤버</string>
-    <string name="manage_circle_content_title_approve_circle_join">동아리 가입 승인</string>
-    <string name="manage_circle_content_title_approve_circle_leave">동아리 탈퇴 승인</string>
+    <string name="manage_circle_title_circle_member">동아리 멤버</string>
+    <string name="manage_circle_title_approve_circle_join">동아리 가입 승인</string>
+    <string name="manage_circle_title_approve_circle_leave">동아리 탈퇴 승인</string>
     <string name="manage_circle_content_circle_member_default">멤버 0명</string>
     <string name="manage_circle_content_circle_member">멤버 %d명</string>
     <string name="manage_circle_content_join_requested_member_default">대기중인 멤버 0명</string>
     <string name="manage_circle_content_join_requested_member">대기중인 멤버 %d명</string>
     <string name="manage_circle_content_leave_requested_member_default">대기중인 멤버 0명</string>
     <string name="manage_circle_content_leave_requested_member">대기중인 멤버 %d명</string>
+    <string name="message_no_circle_member">등록된 멤버가 없어요</string>
+    <string name="message_no_member_request">처리할 요청이 없어요</string>
 
     <!--Post Detail-->
     <string name="hint_comment">댓글을 입력해주세요.</string>

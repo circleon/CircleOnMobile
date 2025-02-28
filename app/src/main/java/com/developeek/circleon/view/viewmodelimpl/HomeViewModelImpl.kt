@@ -35,7 +35,9 @@ class HomeViewModelImpl
 
         override lateinit var categories: CategoryModels
 
-        override lateinit var circles: CircleModels
+        override val circles: CircleModels
+            get() = circleModels
+        private var circleModels = CircleModels.empty()
         private var fetchCirclesJob: Job? = null
         private var currentPage = DEFAULT_PAGE
 
@@ -82,7 +84,7 @@ class HomeViewModelImpl
                     val result = repository.getCircles(currentPage, SIZE_BY_PAGE, categories.selectedOrFirst().category)
 
                     if (result is Success) {
-                        circles = result.data
+                        circleModels = result.data
                         uiState.postValue(UiState.Success)
                     } else {
                         error = (result as Error).message()
@@ -108,8 +110,8 @@ class HomeViewModelImpl
                         )
 
                     if (result is Success) {
-                        circles =
-                            circles.addAll(result.data).also {
+                        circleModels =
+                            circleModels.addAll(result.data).also {
                                 if (result.data.isLastPage()) {
                                     it.setAsLast()
                                 }

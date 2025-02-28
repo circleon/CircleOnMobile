@@ -67,7 +67,7 @@ class PostDetailAdapter(
             binding.txtAuthorName.text = author.name
             author.profileImgUrl?.let {
                 glideProvider.fetchImage(it, context, binding.imgAuthorProfile)
-            } ?: binding.imgAuthorProfile.setImageResource(R.drawable.ic_author_placeholder)
+            } ?: binding.imgAuthorProfile.setImageResource(R.drawable.ic_user_profile_default)
         }
 
         private fun loadContent(post: PostModel) {
@@ -111,7 +111,7 @@ class PostDetailAdapter(
             binding.txtAuthorName.text = author.name
             author.profileImgUrl?.let {
                 glideProvider.fetchImage(it, context, binding.imgAuthorProfile)
-            } ?: binding.imgAuthorProfile.setImageResource(R.drawable.ic_author_placeholder)
+            } ?: binding.imgAuthorProfile.setImageResource(R.drawable.ic_user_profile_default)
         }
 
         private fun loadComment(comment: CommentModel) {

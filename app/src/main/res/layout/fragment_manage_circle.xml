@@ -56,11 +56,12 @@
                 android:id="@+id/txtContentTitleCircleMember"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/manage_circle_content_title_circle_member"
+                android:text="@string/manage_circle_title_circle_member"
                 android:textAppearance="@style/default_bold_text"
                 android:textColor="@color/grey_9"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toTopOf="@id/txtCircleMember"/>
 
             <androidx.appcompat.widget.AppCompatTextView
                 android:id="@+id/txtCircleMember"
@@ -71,7 +72,8 @@
                 android:textSize="@dimen/text_size_small"
                 android:text="@string/manage_circle_content_circle_member_default"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/txtContentTitleCircleMember" />
+                app:layout_constraintTop_toBottomOf="@id/txtContentTitleCircleMember"
+                app:layout_constraintBottom_toBottomOf="parent"/>
 
             <androidx.appcompat.widget.AppCompatImageView
                 android:layout_width="wrap_content"
@@ -84,7 +86,7 @@
         </androidx.constraintlayout.widget.ConstraintLayout>
 
         <androidx.constraintlayout.widget.ConstraintLayout
-            android:id="@+id/clApproveCircleSignUp"
+            android:id="@+id/clApproveCircleJoin"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/margin_padding_small"
@@ -97,20 +99,22 @@
                 android:id="@+id/txtContentTitleApproveCircleJoin"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/manage_circle_content_title_approve_circle_join"
+                android:text="@string/manage_circle_title_approve_circle_join"
                 android:textAppearance="@style/default_bold_text"
                 android:textColor="@color/grey_9"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toTopOf="@id/txtJoinRequestedMember"/>
 
             <androidx.appcompat.widget.AppCompatTextView
                 android:id="@+id/txtJoinRequestedMember"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/margin_padding_x_small"
+                android:text="@string/manage_circle_content_join_requested_member_default"
                 android:textColor="@color/grey_6"
                 android:textSize="@dimen/text_size_small"
-                android:text="@string/manage_circle_content_join_requested_member_default"
+                app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/txtContentTitleApproveCircleJoin" />
 
@@ -125,7 +129,7 @@
         </androidx.constraintlayout.widget.ConstraintLayout>
 
         <androidx.constraintlayout.widget.ConstraintLayout
-            android:id="@+id/clApproveCircleResign"
+            android:id="@+id/clApproveCircleLeave"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/margin_padding_small"
@@ -138,11 +142,12 @@
                 android:id="@+id/txtContentTitleApproveCircleLeave"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/manage_circle_content_title_approve_circle_leave"
+                android:text="@string/manage_circle_title_approve_circle_leave"
                 android:textAppearance="@style/default_bold_text"
                 android:textColor="@color/grey_9"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toTopOf="@id/txtLeaveRequestedMember"/>
 
             <androidx.appcompat.widget.AppCompatTextView
                 android:id="@+id/txtLeaveRequestedMember"
@@ -153,7 +158,8 @@
                 android:textSize="@dimen/text_size_small"
                 android:text="@string/manage_circle_content_leave_requested_member_default"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/txtContentTitleApproveCircleLeave" />
+                app:layout_constraintTop_toBottomOf="@id/txtContentTitleApproveCircleLeave"
+                app:layout_constraintBottom_toBottomOf="parent"/>
 
             <androidx.appcompat.widget.AppCompatImageView
                 android:layout_width="wrap_content"

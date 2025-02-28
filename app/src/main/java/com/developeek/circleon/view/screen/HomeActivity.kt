@@ -57,6 +57,7 @@ class HomeActivity : AppCompatActivity() {
         destination.id == R.id.searchCircleFragment ||
             destination.id == R.id.uploadCircleFragment ||
             destination.id == R.id.manageCircleFragment ||
+            destination.id == R.id.manageCircleMemberFragment ||
             destination.id == R.id.uploadPostFragment ||
             destination.id == R.id.circleDetailPostDetailFragment
 

@@ -26,7 +26,7 @@ data class CircleModels(private val models: List<CircleModel>) {
     fun isLastPage() = isLastPage
 
     companion object {
-        fun emptyInstance() = CircleModels(emptyList())
+        fun empty() = CircleModels(emptyList())
     }
 }
 

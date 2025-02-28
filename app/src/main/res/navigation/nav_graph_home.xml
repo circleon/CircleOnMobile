@@ -74,5 +74,14 @@
         android:id="@+id/manageCircleFragment"
         android:name="com.developeek.circleon.view.screen.home.ManageCircleFragment"
         android:label="fragment_manage_circle"
-        tools:layout="@layout/fragment_manage_circle" />
+        tools:layout="@layout/fragment_manage_circle" >
+        <action
+            android:id="@+id/action_manageCircleFragment_to_manageCircleMemberFragment"
+            app:destination="@id/manageCircleMemberFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/manageCircleMemberFragment"
+        android:name="com.developeek.circleon.view.screen.home.ManageCircleMemberFragment"
+        android:label="fragment_manage_circle_member"
+        tools:layout="@layout/fragment_manage_circle_member" />
 </navigation>

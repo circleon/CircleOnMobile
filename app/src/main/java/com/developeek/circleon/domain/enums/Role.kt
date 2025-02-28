@@ -10,9 +10,9 @@ enum class Role(
     PRESIDENT("PRESIDENT", "회장"),
     ;
 
-    fun isMember() = this.codeName != NONE_MEMBER.codeName
+    fun isMember() = this != NONE_MEMBER
 
-    fun isExecutive() = this.codeName == EXECUTIVE.codeName || this.codeName == PRESIDENT.codeName
+    fun isExecutive() = this == EXECUTIVE || this == PRESIDENT
 
     fun codeName() = codeName
 

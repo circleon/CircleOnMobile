@@ -46,6 +46,7 @@
             tools:text="Name"/>
 
         <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/txtMemberRole"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textColor="@color/grey_6"

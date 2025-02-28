@@ -73,7 +73,7 @@ class UploadPostFragment : Fragment() {
             circleId = it.getInt(Const.TAG_CIRCLE_ID)
             postType = it.getSerializable(Const.TAG_POST_TYPE) as PostType
             isEdit =
-                it.getBoolean(Const.FLAG_IS_EDIT).also { isEdit ->
+                it.getBoolean(Const.FLAG_EDIT_SCREEN).also { isEdit ->
                     if (isEdit) {
                         post = it.getSerializable(Const.TAG_CIRCLE_POST) as PostModel
                     }

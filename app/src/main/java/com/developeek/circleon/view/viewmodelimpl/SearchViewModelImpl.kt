@@ -79,12 +79,12 @@ class SearchViewModelImpl
         override fun clearKeyword() {
             this.keyword = Const.EMPTY_TEXT
 
-            searchResult.postValue(CircleSummaryModels.emptyInstance())
+            searchResult.postValue(CircleSummaryModels.empty())
         }
 
         private fun notifySearchResultByKeyword() {
             if (keyword == Const.EMPTY_TEXT) {
-                searchResult.postValue(CircleSummaryModels.emptyInstance())
+                searchResult.postValue(CircleSummaryModels.empty())
             } else {
                 searchResult.postValue(circleSummaryModels.find(keyword))
             }
