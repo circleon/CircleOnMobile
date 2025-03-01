@@ -18,6 +18,7 @@ import com.developeek.circleon.view.listener.RecyclerViewInfiniteScrollListener
 import com.developeek.circleon.view.viewmodel.HomeViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -76,7 +77,9 @@ class HomeViewModelImpl
             fetchCirclesJob?.let {
                 if (!it.isCompleted) return
             }
+
             uiState.postValue(UiState.Loading)
+            scrollOverCircleJob?.cancel()
             currentPage = DEFAULT_PAGE // 카테고리를 선택할 때는 circles 를 재사용하지 않기 때문에 currentPage 도 초기화
 
             fetchCirclesJob =
@@ -109,6 +112,7 @@ class HomeViewModelImpl
                             currentPage + 1, SIZE_BY_PAGE, categories.selectedOrFirst().category,
                         )
 
+                    if (!isActive) return@launch
                     if (result is Success) {
                         circleModels =
                             circleModels.addAll(result.data).also {
