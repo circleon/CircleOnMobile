@@ -20,7 +20,6 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.cancel
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 @HiltViewModel(assistedFactory = ManageCircleViewModelImpl.ManageCircleViewModelFactory::class)
@@ -50,7 +49,6 @@ class ManageCircleViewModelImpl
         private var fetchMembersJob: Job? = null
         private var currentPage = DEFAULT_PAGE
 
-        private var loadingStartTime = 0L
         override lateinit var error: String
 
         init {
@@ -66,7 +64,6 @@ class ManageCircleViewModelImpl
             }
 
             uiState.postValue(UiState.Loading)
-            saveLoadingStartTime()
 
             var tmpState: UiState = UiState.Success
             fetchMembersJob =
@@ -105,7 +102,6 @@ class ManageCircleViewModelImpl
             size: Int,
         ): UiState {
             val result = repository.getCircleJoinRequestedMembers(circle.id, page, size)
-            delay(remainedLoadingTime())
 
             if (result is Success) {
                 joinRequestedMemberModels = result.data
@@ -131,19 +127,8 @@ class ManageCircleViewModelImpl
             }
         }
 
-        private fun saveLoadingStartTime() {
-            this.loadingStartTime = System.currentTimeMillis()
-        }
-
-        private fun remainedLoadingTime(): Long {
-            val remainTime = MAX_DEFAULT_ANIM_TIME_MILLIS - (System.currentTimeMillis() - loadingStartTime)
-
-            return if (remainTime > 0) remainTime else 0
-        }
-
         companion object {
             private const val SIZE_BY_PAGE = 200 // 멤버 데이터 일괄 호출
             private const val DEFAULT_PAGE = 0
-            private const val MAX_DEFAULT_ANIM_TIME_MILLIS = 250L
         }
     }

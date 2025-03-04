@@ -21,7 +21,6 @@ import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 @HiltViewModel(assistedFactory = CircleDetailPostDetailViewModelImpl.CircleDetailPostDetailViewModelFactory::class)
@@ -79,9 +78,6 @@ class CircleDetailPostDetailViewModelImpl
             get() = scrollState
         private var scrollState: Parcelable? = null
 
-        private var enterAnimFinished = false
-        private var loadingStartTime = 0L
-
         override lateinit var error: String
 
         init {
@@ -97,23 +93,21 @@ class CircleDetailPostDetailViewModelImpl
             }
 
             uiState.postValue(UiState.Loading)
-            saveLoadingStartTime()
 
             fetchCommentsJob =
                 viewModelScope.launch {
                     val result = repository.getPostComments(circleId, post.id, page, size)
-                    delay(remainedLoadingTime())
 
                     if (result is Success) {
                         comments = result.data
                         contents = listOf(post) + comments.get()
-                        uiState.postValueWhenAnimFinished(UiState.Success)
+                        uiState.postValue(UiState.Success)
                     } else {
                         error = (result as Error).message()
                         if (result.isAuthenticationError()) {
-                            uiState.postValueWhenAnimFinished(UiState.AuthenticationError)
+                            uiState.postValue(UiState.AuthenticationError)
                         } else {
-                            uiState.postValueWhenAnimFinished(UiState.ServiceError)
+                            uiState.postValue(UiState.ServiceError)
                         }
                     }
                 }
@@ -149,7 +143,7 @@ class CircleDetailPostDetailViewModelImpl
                         error = (result as Error).message()
                         val errorState =
                             if (result.isAuthenticationError()) UiState.AuthenticationError else UiState.ServiceError
-                        uiState.postValueWhenAnimFinished(errorState)
+                        uiState.postValue(errorState)
                     }
                 }
         }
@@ -158,33 +152,26 @@ class CircleDetailPostDetailViewModelImpl
             this.scrollState = scrollState
         }
 
-        override fun notifyEnterAnimFinishedAndUpdateUI() {
-            enterAnimFinished = true
-            if (::tmpState.isInitialized) uiState.postValue(tmpState)
-        }
-
         override fun uploadComment(content: String) {
             if (!isCommentFormat(content)) return
             uploadCommentJob?.let {
                 if (!it.isCompleted) return
             }
 
-            commentUploadState.postValueWhenAnimFinished(UiState.Loading)
-            saveLoadingStartTime()
+            commentUploadState.postValue(UiState.Loading)
 
             uploadCommentJob =
                 viewModelScope.launch {
                     val result = repository.postCircleComment(circleId, post.id, content)
-                    delay(remainedLoadingTime())
 
                     if (result is Success) {
                         refresh()
-                        commentUploadState.postValueWhenAnimFinished(UiState.Success)
+                        commentUploadState.postValue(UiState.Success)
                     } else {
                         error = (result as Error).message()
                         val errorState =
                             if (result.isAuthenticationError()) UiState.AuthenticationError else UiState.ServiceError
-                        commentUploadState.postValueWhenAnimFinished(errorState)
+                        commentUploadState.postValue(errorState)
                     }
                 }
         }
@@ -198,22 +185,20 @@ class CircleDetailPostDetailViewModelImpl
                 if (!it.isCompleted) return
             }
 
-            commentEditState.postValueWhenAnimFinished(UiState.Loading)
-            saveLoadingStartTime()
+            commentEditState.postValue(UiState.Loading)
 
             editCommentJob =
                 viewModelScope.launch {
                     val result = repository.putCircleComment(circleId, post.id, commentId, content)
-                    delay(remainedLoadingTime())
 
                     if (result is Success) {
                         refresh()
-                        commentEditState.postValueWhenAnimFinished(UiState.Success)
+                        commentEditState.postValue(UiState.Success)
                     } else {
                         error = (result as Error).message()
                         val errorState =
                             if (result.isAuthenticationError()) UiState.AuthenticationError else UiState.ServiceError
-                        commentEditState.postValueWhenAnimFinished(errorState)
+                        commentEditState.postValue(errorState)
                     }
                 }
         }
@@ -223,13 +208,11 @@ class CircleDetailPostDetailViewModelImpl
                 if (!it.isCompleted) return
             }
 
-            commentDeleteState.postValueWhenAnimFinished(UiState.Loading)
-            saveLoadingStartTime()
+            commentDeleteState.postValue(UiState.Loading)
 
             deleteCommentJob =
                 viewModelScope.launch {
                     val result = repository.deletePostComment(circleId, post.id, commentId)
-                    delay(remainedLoadingTime())
 
                     if (result is Success) {
                         comments =
@@ -237,12 +220,12 @@ class CircleDetailPostDetailViewModelImpl
                                 if (comments.isLastPage()) it.setAsLast()
                             }
                         contents = listOf(post) + comments.get()
-                        commentDeleteState.postValueWhenAnimFinished(UiState.Success)
+                        commentDeleteState.postValue(UiState.Success)
                     } else {
                         error = (result as Error).message()
                         val errorState =
                             if (result.isAuthenticationError()) UiState.AuthenticationError else UiState.ServiceError
-                        commentDeleteState.postValueWhenAnimFinished(errorState)
+                        commentDeleteState.postValue(errorState)
                     }
                 }
         }
@@ -252,28 +235,10 @@ class CircleDetailPostDetailViewModelImpl
 
             return if (validation is Invalid) {
                 error = validation.message()
-                commentUploadState.postValueWhenAnimFinished(UiState.ServiceError)
+                commentUploadState.postValue(UiState.ServiceError)
                 false
             } else {
                 true
-            }
-        }
-
-        /**
-         * MutableLiveData.postValue()
-         *
-         * - UiState
-         * enterAnim 이 종료되지 않은 경우 tmpState 에 저장
-         * enterAnim 이 종료된 경우 postValue
-         *
-         * - Boolean(registerComment)
-         * enterAnim 이 종료된 경우에만 postValue
-         */
-        private fun MutableLiveData<UiState>.postValueWhenAnimFinished(data: UiState) {
-            if (enterAnimFinished) {
-                this.postValue(data)
-            } else {
-                tmpState = data
             }
         }
 
@@ -283,42 +248,24 @@ class CircleDetailPostDetailViewModelImpl
             }
 
             postDeleteState.postValue(UiState.Loading)
-            saveLoadingStartTime()
 
             deletePostJob =
                 viewModelScope.launch {
                     val result = repository.deleteCirclePost(circleId, post.id)
-                    delay(remainedLoadingTime())
 
                     if (result is Success) {
-                        postDeleteState.postValueWhenAnimFinished(UiState.Success)
+                        postDeleteState.postValue(UiState.Success)
                     } else {
                         error = (result as Error).message()
                         val errorState =
                             if (result.isAuthenticationError()) UiState.AuthenticationError else UiState.ServiceError
-                        postDeleteState.postValueWhenAnimFinished(errorState)
+                        postDeleteState.postValue(errorState)
                     }
                 }
-        }
-
-        private fun saveLoadingStartTime() {
-            this.loadingStartTime = System.currentTimeMillis()
-        }
-
-        /**
-         * remainedLoadingTime()
-         *
-         * 코루틴 수행 시 LoadingState 에 머무르는 최소 시간을 계산하여 보장
-         */
-        private fun remainedLoadingTime(): Long {
-            val remainTime = MAX_DEFAULT_ANIM_TIME_MILLIS - (System.currentTimeMillis() - loadingStartTime)
-
-            return if (remainTime > 0) remainTime else 0
         }
 
         companion object {
             private const val SIZE_BY_PAGE = 20
             private const val DEFAULT_PAGE = 0
-            private const val MAX_DEFAULT_ANIM_TIME_MILLIS = 250L
         }
     }

@@ -23,7 +23,6 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.cancel
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import java.io.File
 import java.time.LocalDateTime
@@ -69,7 +68,6 @@ class UploadCircleViewModelImpl
         private var hasThumbnailChanged = false
         private var hasIntroductionImageChanged = false
 
-        private var loadingStartTime = 0L
         override lateinit var error: String
 
         init {
@@ -82,7 +80,6 @@ class UploadCircleViewModelImpl
                 if (!it.isCompleted) return
             }
             uiState.postValue(UiState.Loading)
-            saveLoadingStartTime()
 
             var tmpState: UiState = UiState.Success
             editJob =
@@ -118,7 +115,6 @@ class UploadCircleViewModelImpl
 
         private suspend fun editCircle(circle: CircleDetailModel): UiState {
             val result = repository.putCircle(circle)
-            delay(remainedLoadingTime())
 
             if (result is Success) {
                 return UiState.Success
@@ -213,18 +209,4 @@ class UploadCircleViewModelImpl
         private fun isThumbnailRemoved() = thumbnail == null && hasThumbnailChanged
 
         private fun isIntroductionImageRemoved() = introductionImage == null && hasIntroductionImageChanged
-
-        private fun saveLoadingStartTime() {
-            this.loadingStartTime = System.currentTimeMillis()
-        }
-
-        private fun remainedLoadingTime(): Long {
-            val remainTime = MAX_DEFAULT_ANIM_TIME_MILLIS - (System.currentTimeMillis() - loadingStartTime)
-
-            return if (remainTime > 0) remainTime else 0
-        }
-
-        companion object {
-            private const val MAX_DEFAULT_ANIM_TIME_MILLIS = 250L
-        }
     }

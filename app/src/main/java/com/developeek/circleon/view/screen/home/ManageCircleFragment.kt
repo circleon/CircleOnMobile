@@ -102,6 +102,7 @@ class ManageCircleFragment : Fragment() {
         when (it) {
             UiState.Success -> {
                 loadMembers(context)
+                setMemberCardListener()
             }
             UiState.AuthenticationError -> {
                 sendUserToLoginScreen(parentActivity)
@@ -157,7 +158,6 @@ class ManageCircleFragment : Fragment() {
 
     private fun initListener() {
         setBtnCancelListener()
-        setMemberCardListener()
     }
 
     private fun setBtnCancelListener() {
