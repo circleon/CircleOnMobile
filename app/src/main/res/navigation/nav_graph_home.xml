@@ -34,9 +34,10 @@
         <action
             android:id="@+id/action_circleDetailFragment_to_circleDetailPostDetailFragment"
             app:destination="@id/circleDetailPostDetailFragment"
-            app:enterAnim="@animator/slide_in_left"
+            app:enterAnim="@animator/slide_in_right"
             app:exitAnim="@animator/slide_out_left"
-            />
+            app:popExitAnim="@animator/slide_out_right"
+            app:popEnterAnim="@animator/slide_in_left"/>
         <action
             android:id="@+id/action_circleDetailFragment_to_uploadPostFragment"
             app:destination="@id/uploadPostFragment"
