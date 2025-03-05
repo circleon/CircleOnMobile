@@ -5,7 +5,7 @@
         android:title="@string/menu_post_settings_pin"/>
     <item
         android:id="@+id/edit_post"
-        android:title="@string/menu_post_settings_modify"/>
+        android:title="@string/menu_post_settings_edit"/>
     <item
         android:id="@+id/delete_post"
         android:title="@string/menu_post_settings_delete"/>

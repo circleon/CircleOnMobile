@@ -194,6 +194,7 @@ class ManageCircleFragment : Fragment() {
     ) {
         val bundle = Bundle()
 
+        bundle.putSerializable(Const.TAG_CIRCLE_DETAIL, circle)
         bundle.putSerializable(Const.TAG_MEMBERS, members)
         bundle.putSerializable(Const.TAG_MEMBERSHIP_STATUS, membershipStatus)
         findNavController().navigate(R.id.action_manageCircleFragment_to_manageCircleMemberFragment, bundle)

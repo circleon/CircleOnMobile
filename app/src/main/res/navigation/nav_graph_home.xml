@@ -50,6 +50,10 @@
             android:id="@+id/action_circleDetailFragment_to_manageCircleFragment"
             app:destination="@id/manageCircleFragment"
             app:enterAnim="@animator/scale_up"/>
+        <action
+            android:id="@+id/action_circleDetailFragment_to_manageCircleMemberFragment"
+            app:destination="@id/manageCircleMemberFragment"
+            app:enterAnim="@animator/scale_up"/>
     </fragment>
     <fragment
         android:id="@+id/circleDetailPostDetailFragment"

@@ -4,11 +4,13 @@ import android.content.Context
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.view.isVisible
 import androidx.recyclerview.widget.AsyncListDiffer
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.developeek.circleon.R
 import com.developeek.circleon.databinding.ItemCircleMemberBinding
+import com.developeek.circleon.domain.enums.Role
 import com.developeek.circleon.domain.model.MemberModel
 import com.developeek.circleon.domain.model.MemberModels
 import com.developeek.circleon.domain.utils.glide.GlideProvider
@@ -18,6 +20,8 @@ import com.developeek.circleon.view.listener.ItemListenerInitializer
 class CircleMemberAdapter(
     private val context: Context,
     private val glideProvider: GlideProvider,
+    private val userRole: Role,
+    private val userMemberId: Int? = null,
     private val overflowListenerInitializer: ItemListenerInitializer<MemberModel>,
 ) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
     private val diffUtil =
@@ -48,6 +52,7 @@ class CircleMemberAdapter(
             val member = diffUtil.currentList[position]
 
             load(member)
+            hideOverflowOrNot(member)
         }
 
         private fun load(member: MemberModel) {
@@ -56,6 +61,10 @@ class CircleMemberAdapter(
             member.profileImgUrl?.let {
                 glideProvider.fetchImage(it, context, binding.imgMemberProfile)
             } ?: binding.imgMemberProfile.setImageResource(R.drawable.ic_user_profile_default)
+        }
+
+        private fun hideOverflowOrNot(member: MemberModel) {
+            binding.btnProfileOverflow.isVisible = userRole.isExecutive() && userMemberId != member.id
         }
     }
 

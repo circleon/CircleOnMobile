@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/edit_member_role"
+        android:title="@string/menu_circle_member_settings_edit_role"/>
+    <item
+        android:id="@+id/ban_member"
+        android:title="@string/menu_circle_member_settings_ban"/>
+</menu>

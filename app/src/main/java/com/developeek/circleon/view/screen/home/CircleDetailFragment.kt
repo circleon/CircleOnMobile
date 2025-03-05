@@ -4,6 +4,7 @@ import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.text.Html
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -19,6 +20,7 @@ import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.RecyclerView
 import com.developeek.circleon.R
 import com.developeek.circleon.databinding.FragmentCircleDetailBinding
+import com.developeek.circleon.domain.enums.MembershipStatus
 import com.developeek.circleon.domain.enums.PostType
 import com.developeek.circleon.domain.model.CircleDetailModel
 import com.developeek.circleon.domain.state.UiState
@@ -128,6 +130,7 @@ class CircleDetailFragment : Fragment() {
                 toggleView(binding.flCircleDetail)
                 loadCircleDetail(context)
                 inflateOverflowMenu(context)
+                setMemberCountListener()
                 setOverflowMenuItemListener(context)
             }
             UiState.AuthenticationError -> {
@@ -154,7 +157,13 @@ class CircleDetailFragment : Fragment() {
             glideProvider.fetchImage(it, context, binding.imgCircleThumbnail)
         } ?: binding.imgCircleThumbnail.setImageResource(R.drawable.ic_circle_thumbnail_default)
         binding.txtCircleCategory.text = viewModel.circleDetail.category.categoryName()
-        binding.txtCircleMemberCount.text = String.format(MEMBER_COUNT_UNIT, viewModel.circleDetail.memberCount)
+        binding.txtCircleMemberCount.text =
+            Html.fromHtml(
+                String.format(
+                    ContextCompat.getString(context, R.string.underlined_number), viewModel.circleDetail.memberCount,
+                ),
+                Html.FROM_HTML_MODE_LEGACY,
+            )
     }
 
     private fun sendUserToLoginScreen(activity: Activity) {
@@ -178,6 +187,21 @@ class CircleDetailFragment : Fragment() {
                 )
             }
         }
+    }
+
+    private fun setMemberCountListener() {
+        binding.txtCircleMemberCount.setOnClickListener {
+            sendUserToCircleMemberScreen()
+        }
+    }
+
+    private fun sendUserToCircleMemberScreen() {
+        val bundle = Bundle()
+
+        bundle.putSerializable(Const.TAG_CIRCLE_DETAIL, viewModel.circleDetail)
+        bundle.putSerializable(Const.TAG_MEMBERS, viewModel.circleDetail.members)
+        bundle.putSerializable(Const.TAG_MEMBERSHIP_STATUS, MembershipStatus.JOINED)
+        findNavController().navigate(R.id.action_circleDetailFragment_to_manageCircleMemberFragment, bundle)
     }
 
     private fun setOverflowMenuItemListener(context: Context) {
@@ -418,9 +442,5 @@ class CircleDetailFragment : Fragment() {
         if (binding.llNotMember.isVisible) {
             binding.llNotMember.isVisible = false
         }
-    }
-
-    companion object {
-        private const val MEMBER_COUNT_UNIT = "멤버 %d명"
     }
 }

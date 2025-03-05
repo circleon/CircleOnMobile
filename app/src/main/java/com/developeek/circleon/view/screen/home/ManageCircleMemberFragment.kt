@@ -6,6 +6,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.appcompat.widget.PopupMenu
 import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
@@ -13,9 +14,11 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.developeek.circleon.R
 import com.developeek.circleon.databinding.FragmentManageCircleMemberBinding
 import com.developeek.circleon.domain.enums.MembershipStatus
+import com.developeek.circleon.domain.model.CircleDetailModel
 import com.developeek.circleon.domain.model.MemberModel
 import com.developeek.circleon.domain.model.MemberModels
 import com.developeek.circleon.domain.utils.Const
+import com.developeek.circleon.domain.utils.Utils
 import com.developeek.circleon.domain.utils.glide.GlideProvider
 import com.developeek.circleon.view.adapter.CircleMemberAdapter
 import com.developeek.circleon.view.listener.ItemListenerInitializer
@@ -26,6 +29,7 @@ import javax.inject.Inject
 @AndroidEntryPoint
 class ManageCircleMemberFragment : Fragment() {
     private lateinit var binding: FragmentManageCircleMemberBinding
+    private lateinit var circle: CircleDetailModel
     private lateinit var members: MemberModels
     private lateinit var membershipStatus: MembershipStatus
 
@@ -36,6 +40,7 @@ class ManageCircleMemberFragment : Fragment() {
         super.onCreate(savedInstanceState)
 
         arguments?.let {
+            circle = it.getSerializable(Const.TAG_CIRCLE_DETAIL) as CircleDetailModel
             members = it.getSerializable(Const.TAG_MEMBERS) as MemberModels
             membershipStatus = it.getSerializable(Const.TAG_MEMBERSHIP_STATUS) as MembershipStatus
         }
@@ -104,6 +109,8 @@ class ManageCircleMemberFragment : Fragment() {
             CircleMemberAdapter(
                 context,
                 glideProvider,
+                circle.role,
+                circle.memberId,
                 overflowListenerInitializer =
                     object : ItemListenerInitializer<MemberModel> {
                         override fun initialize(item: MemberModel) {
@@ -112,10 +119,46 @@ class ManageCircleMemberFragment : Fragment() {
                         override fun initialize(
                             item: MemberModel,
                             view: View?,
-                        ) {}
+                        ) {
+                            initProfileOverflowMenuAndShow(context, item, view!!)
+                        }
                     },
             )
         binding.rvMember.layoutManager = LinearLayoutManager(context)
+    }
+
+    private fun initProfileOverflowMenuAndShow(
+        context: Context,
+        item: MemberModel,
+        view: View,
+    ) {
+        val popupMenu = object : PopupMenu(context, view) {}
+        popupMenu.inflate(R.menu.menu_executive_circle_member_settings)
+
+        popupMenu.setOnMenuItemClickListener(circleMemberOverflowMenuItemClickListener(context, item))
+        Utils.changeMenuItemTextColor(
+            popupMenu.menu.findItem(R.id.ban_member),
+            ContextCompat.getColor(context, R.color.error),
+        )
+
+        popupMenu.show()
+    }
+
+    private fun circleMemberOverflowMenuItemClickListener(
+        context: Context,
+        item: MemberModel,
+    ) = PopupMenu.OnMenuItemClickListener {
+        when (it.itemId) {
+            R.id.edit_member_role -> {
+            }
+
+            R.id.ban_member -> {
+//                ContentDeleteAlertDialog(context, CircleDetailNoticeFragment.MESSAGE_DELETE_NOTICE) {
+//                    viewModel.deleteAndRefresh(item.id)
+//                }.show()
+            }
+        }
+        true
     }
 
     private fun showNoMemberMessage(context: Context) {
@@ -137,6 +180,7 @@ class ManageCircleMemberFragment : Fragment() {
         binding.rvMember.adapter?.let {
             when (membershipStatus) {
                 MembershipStatus.JOINED -> {
+                    // TODO: 추방 기능 이후 뷰모델 members 로 수정
                     (it as CircleMemberAdapter).update(members) {}
                 }
                 else -> {}

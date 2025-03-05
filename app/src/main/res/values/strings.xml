@@ -53,7 +53,7 @@
 
     <!--Circle Detail-->
     <string name="btn_join_circle">가입신청</string>
-    <string name="menu_circle_settings_modify">수정하기</string>
+    <string name="menu_circle_settings_edit">수정하기</string>
     <string name="menu_circle_settings_manage">관리하기</string>
     <string name="menu_circle_settings_leave">탈퇴하기</string>
     <string name="tab_name_introduction">소개글</string>
@@ -63,6 +63,7 @@
     <string name="message_not_member">동아리 멤버에게만\n공개된 컨텐츠입니다.</string>
     <string name="message_no_notice">등록된 공지사항이 없어요</string>
     <string name="message_no_post">등록된 게시글이 없어요</string>
+    <string name="underlined_number">&lt;u>%d&lt;/u></string>
 
     <!--Circle Detail Introduction-->
     <string name="text_recruitment_date">모집기간</string>
@@ -70,7 +71,7 @@
     <!--Circle Detail Notice-->
     <string name="menu_post_settings_pin">고정하기</string>
     <string name="menu_post_settings_remove_pin">고정 해제하기</string>
-    <string name="menu_post_settings_modify">수정하기</string>
+    <string name="menu_post_settings_edit">수정하기</string>
     <string name="menu_post_settings_delete">삭제하기</string>
 
     <!--Upload Circle-->
@@ -95,6 +96,8 @@
     <string name="manage_circle_content_leave_requested_member">대기중인 멤버 %d명</string>
     <string name="message_no_circle_member">등록된 멤버가 없어요</string>
     <string name="message_no_member_request">처리할 요청이 없어요</string>
+    <string name="menu_circle_member_settings_edit_role">역할 수정하기</string>
+    <string name="menu_circle_member_settings_ban">추방하기</string>
 
     <!--Post Detail-->
     <string name="hint_comment">댓글을 입력해주세요.</string>
