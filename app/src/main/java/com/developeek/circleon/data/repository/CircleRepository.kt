@@ -3,6 +3,7 @@ package com.developeek.circleon.data.repository
 import com.developeek.circleon.data.source.Result
 import com.developeek.circleon.domain.enums.Category
 import com.developeek.circleon.domain.enums.PostType
+import com.developeek.circleon.domain.enums.Role
 import com.developeek.circleon.domain.model.CircleDetailModel
 import com.developeek.circleon.domain.model.CircleModels
 import com.developeek.circleon.domain.model.CircleSummaryModels
@@ -101,6 +102,12 @@ interface CircleRepository {
         postId: Int,
         commentId: Int,
         content: String,
+    ): Result<Unit>
+
+    suspend fun putCircleMemberRole(
+        circleId: Int,
+        memberId: Int,
+        role: Role,
     ): Result<Unit>
 
     // DELETE

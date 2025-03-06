@@ -29,3 +29,7 @@ data class Member(
             profileImgUrl,
         )
 }
+
+data class RequestBodyEditMemberRole(
+    @SerializedName("circleRole") val role: String,
+)

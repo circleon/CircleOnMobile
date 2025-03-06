@@ -2,6 +2,7 @@ package com.developeek.circleon.data.repositoryimpl
 
 import com.developeek.circleon.data.dto.home.Pin
 import com.developeek.circleon.data.dto.home.RequestBodyEditComment
+import com.developeek.circleon.data.dto.home.RequestBodyEditMemberRole
 import com.developeek.circleon.data.dto.home.RequestBodyEditPost
 import com.developeek.circleon.data.exception.ServiceException
 import com.developeek.circleon.data.repository.CircleRepository
@@ -10,6 +11,7 @@ import com.developeek.circleon.data.source.remote.retrofit.service.CircleService
 import com.developeek.circleon.domain.enums.Category
 import com.developeek.circleon.domain.enums.MembershipStatus
 import com.developeek.circleon.domain.enums.PostType
+import com.developeek.circleon.domain.enums.Role
 import com.developeek.circleon.domain.model.CircleDetailModel
 import com.developeek.circleon.domain.model.CircleModels
 import com.developeek.circleon.domain.model.CircleSummaryModels
@@ -361,6 +363,21 @@ class CircleRepositoryImpl(
         return try {
             withContext(dispatcher) {
                 service.putCircleComment(circleId, postId, commentId, RequestBodyEditComment(content))
+                Result.success(Unit)
+            }
+        } catch (e: IOException) {
+            Result.error(e)
+        }
+    }
+
+    override suspend fun putCircleMemberRole(
+        circleId: Int,
+        memberId: Int,
+        role: Role,
+    ): Result<Unit> {
+        return try {
+            withContext(dispatcher) {
+                service.putCircleMemberRole(circleId, memberId, RequestBodyEditMemberRole(role.codeName()))
                 Result.success(Unit)
             }
         } catch (e: IOException) {

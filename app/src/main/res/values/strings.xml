@@ -98,6 +98,7 @@
     <string name="message_no_member_request">처리할 요청이 없어요</string>
     <string name="menu_circle_member_settings_edit_role">역할 수정하기</string>
     <string name="menu_circle_member_settings_ban">추방하기</string>
+    <string name="btn_edit_circle_member_role">임명하기</string>
 
     <!--Post Detail-->
     <string name="hint_comment">댓글을 입력해주세요.</string>

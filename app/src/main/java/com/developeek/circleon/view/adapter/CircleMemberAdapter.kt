@@ -53,6 +53,7 @@ class CircleMemberAdapter(
 
             load(member)
             hideOverflowOrNot(member)
+            notifyListenerItemChanged(member)
         }
 
         private fun load(member: MemberModel) {
@@ -65,6 +66,10 @@ class CircleMemberAdapter(
 
         private fun hideOverflowOrNot(member: MemberModel) {
             binding.btnProfileOverflow.isVisible = userRole.isExecutive() && userMemberId != member.id
+        }
+
+        private fun notifyListenerItemChanged(member: MemberModel) {
+            overflowClickListener.item = member
         }
     }
 
@@ -84,10 +89,10 @@ class CircleMemberAdapter(
                 override lateinit var item: MemberModel
 
                 override fun onClick(view: View?) {
-                    overflowListenerInitializer.initialize(item)
+                    overflowListenerInitializer.initialize(item, view)
                 }
             }
-
+        binding.btnProfileOverflow.setOnClickListener(overflowClickListener)
         return CircleMemberAdapterItemViewHolder(binding, overflowClickListener)
     }
 

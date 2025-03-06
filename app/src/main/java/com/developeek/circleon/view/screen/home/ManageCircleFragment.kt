@@ -106,12 +106,10 @@ class ManageCircleFragment : Fragment() {
             }
             UiState.AuthenticationError -> {
                 sendUserToLoginScreen(parentActivity)
-                if (ErrorToast.previousFinished()) {
-                    ErrorToast(context, viewModel.error).show()
-                }
+                showErrorToast(context)
             }
             UiState.ServiceError -> {
-                ErrorAlertDialog(context, viewModel.error).show()
+                showErrorDialog(context)
             }
             else -> {}
         }
@@ -182,10 +180,20 @@ class ManageCircleFragment : Fragment() {
         findNavController().navigateUp()
     }
 
-    private fun sendUserToLoginScreen(activity: Activity) {
-        val intent = Intent(activity, LoginActivity::class.java)
+    private fun sendUserToLoginScreen(parentActivity: Activity) {
+        val intent = Intent(parentActivity, LoginActivity::class.java)
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)
         startActivity(intent)
+    }
+
+    private fun showErrorToast(context: Context) {
+        if (ErrorToast.previousFinished()) {
+            ErrorToast(context, viewModel.error).show()
+        }
+    }
+
+    private fun showErrorDialog(context: Context) {
+        ErrorAlertDialog(context, viewModel.error).show()
     }
 
     private fun sendUserToMemberListScreen(

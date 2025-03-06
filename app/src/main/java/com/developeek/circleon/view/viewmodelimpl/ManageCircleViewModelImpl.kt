@@ -41,8 +41,8 @@ class ManageCircleViewModelImpl
 
         override val circleMembers: MemberModels = circle.members
         override val joinRequestedMembers: MemberModels
-            get() = joinRequestedMemberModels
-        private var joinRequestedMemberModels = MemberModels.empty()
+            get() = joinRequestedMembersModels
+        private var joinRequestedMembersModels = MemberModels.empty()
         override val leaveRequestedMembers: MemberModels
             get() = leaveRequestedMemberModels
         private var leaveRequestedMemberModels = MemberModels.empty()
@@ -104,7 +104,7 @@ class ManageCircleViewModelImpl
             val result = repository.getCircleJoinRequestedMembers(circle.id, page, size)
 
             if (result is Success) {
-                joinRequestedMemberModels = result.data
+                joinRequestedMembersModels = result.data
                 return UiState.Success
             } else {
                 error = (result as Error).message()

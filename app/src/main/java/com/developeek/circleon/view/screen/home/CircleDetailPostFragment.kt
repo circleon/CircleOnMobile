@@ -215,7 +215,7 @@ class CircleDetailPostFragment : Fragment() {
     ) = Observer<UiState> {
         when (it) {
             UiState.Loading -> {
-                toggleView(binding.pgbLoading)
+                toggleView(binding.pgbPostLoading)
             }
             UiState.Success -> {
                 if (viewModel.posts.isEmpty()) {
@@ -227,15 +227,11 @@ class CircleDetailPostFragment : Fragment() {
             }
             UiState.AuthenticationError -> {
                 sendUserToLoginScreen(parentActivity)
-                if (ErrorToast.previousFinished()) {
-                    ErrorToast(context, viewModel.error).show()
-                }
+                showErrorToast(context)
             }
             UiState.ServiceError -> {
                 toggleView(binding.llServiceError)
-                if (ErrorToast.previousFinished()) {
-                    ErrorToast(context, viewModel.error).show()
-                }
+                showErrorToast(context)
             }
             else -> {}
         }
@@ -255,6 +251,12 @@ class CircleDetailPostFragment : Fragment() {
         val intent = Intent(activity, LoginActivity::class.java)
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)
         startActivity(intent)
+    }
+
+    private fun showErrorToast(context: Context) {
+        if (ErrorToast.previousFinished()) {
+            ErrorToast(context, viewModel.error).show()
+        }
     }
 
     private fun scrollOverObserver() =
@@ -304,7 +306,7 @@ class CircleDetailPostFragment : Fragment() {
 
     private fun toggleView(view: View) {
         binding.rvCirclePost.isVisible = view == binding.rvCirclePost
-        binding.pgbLoading.isVisible = view == binding.pgbLoading
+        binding.pgbPostLoading.isVisible = view == binding.pgbPostLoading
         binding.txtNoPost.isVisible = view == binding.txtNoPost
         binding.llServiceError.isVisible = view == binding.llServiceError
     }

@@ -5,6 +5,6 @@
         android:propertyName="translationX"
         android:valueFrom="1100"
         android:valueTo="0"
-        android:duration="300"
+        android:duration="250"
         android:valueType="floatType" />
 </set>

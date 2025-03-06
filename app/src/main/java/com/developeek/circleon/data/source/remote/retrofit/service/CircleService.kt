@@ -10,6 +10,7 @@ import com.developeek.circleon.data.dto.home.Pin
 import com.developeek.circleon.data.dto.home.Post
 import com.developeek.circleon.data.dto.home.RequestBodyEditCircleDetail
 import com.developeek.circleon.data.dto.home.RequestBodyEditComment
+import com.developeek.circleon.data.dto.home.RequestBodyEditMemberRole
 import com.developeek.circleon.data.dto.home.RequestBodyEditPost
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
@@ -126,6 +127,13 @@ interface CircleService {
         @Path("postId") postId: Int,
         @Path("commentId") commentId: Int,
         @Body data: RequestBodyEditComment,
+    )
+
+    @PUT("circles/{circleId}/members/{memberId}/role")
+    suspend fun putCircleMemberRole(
+        @Path("circleId") circleId: Int,
+        @Path("memberId") memberId: Int,
+        @Body data: RequestBodyEditMemberRole,
     )
 
     // DELETE
