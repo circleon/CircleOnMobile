@@ -23,9 +23,11 @@ data class CircleDetailModel(
     val recruitmentStartDate: LocalDateTime?,
     val recruitmentEndDate: LocalDateTime?,
 ) : Serializable {
-    fun isMember() = role.isMember()
+    fun isUserJoined() = role.isMember()
 
-    fun isExecutive() = role.isExecutive()
+    fun isUserExecutive() = role.isExecutive()
+
+    fun isUserPresident() = role.isPresident()
 
     fun fold(
         id: Int = this.id,

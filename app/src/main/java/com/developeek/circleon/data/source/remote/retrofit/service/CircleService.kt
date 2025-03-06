@@ -156,4 +156,10 @@ interface CircleService {
         @Path("postId") postId: Int,
         @Path("commentId") commentId: Int,
     )
+
+    @DELETE("circles/{circleId}/members/{memberId}")
+    suspend fun deleteCircleMember(
+        @Path("circleId") circleId: Int,
+        @Path("memberId") memberId: Int,
+    )
 }

@@ -13,6 +13,7 @@ import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.developeek.circleon.R
 import com.developeek.circleon.databinding.FragmentManageCircleMemberBinding
@@ -30,6 +31,7 @@ import com.developeek.circleon.view.listener.ItemListenerInitializer
 import com.developeek.circleon.view.screen.login.LoginActivity
 import com.developeek.circleon.view.viewmodel.ManageCircleMemberViewModel
 import com.developeek.circleon.view.viewmodelimpl.ManageCircleMemberViewModelImpl
+import com.developeek.circleon.view.widget.ContentDeleteAlertDialog
 import com.developeek.circleon.view.widget.EditCircleMemberRoleAlertDialog
 import com.developeek.circleon.view.widget.ErrorAlertDialog
 import com.developeek.circleon.view.widget.ErrorToast
@@ -150,7 +152,11 @@ class ManageCircleMemberFragment : Fragment() {
         view: View,
     ) {
         val popupMenu = object : PopupMenu(context, view) {}
-        popupMenu.inflate(R.menu.menu_executive_circle_member_settings)
+        if (circle.isUserPresident()) {
+            popupMenu.inflate(R.menu.menu_president_circle_member_settings)
+        } else if (circle.isUserExecutive()) {
+            popupMenu.inflate(R.menu.menu_executive_circle_member_settings)
+        }
 
         popupMenu.setOnMenuItemClickListener(circleMemberOverflowMenuItemClickListener(context, item))
         Utils.changeMenuItemTextColor(
@@ -186,6 +192,9 @@ class ManageCircleMemberFragment : Fragment() {
             }
 
             R.id.ban_member -> {
+                ContentDeleteAlertDialog(context, MESSAGE_BAN_MEMBER, BUTTON_NAME_BAN_MEMBER) {
+                    viewModel.banCircleMember(member)
+                }.show()
             }
         }
         true
@@ -213,6 +222,7 @@ class ManageCircleMemberFragment : Fragment() {
         loadingIndicator.isVisible = it is UiState.Loading
         when (it) {
             UiState.Success -> {
+                requestRefreshToPreviousScreen()
                 load(context, viewModel.members)
             }
             UiState.AuthenticationError -> {
@@ -224,6 +234,10 @@ class ManageCircleMemberFragment : Fragment() {
             }
             else -> {}
         }
+    }
+
+    private fun requestRefreshToPreviousScreen() {
+        findNavController().previousBackStackEntry?.savedStateHandle?.set(Const.FLAG_CIRCLE_DATA_CHANGED, true)
     }
 
     private fun load(
@@ -278,5 +292,10 @@ class ManageCircleMemberFragment : Fragment() {
 
     private fun showErrorDialog(context: Context) {
         ErrorAlertDialog(context, viewModel.error).show()
+    }
+
+    companion object {
+        private const val MESSAGE_BAN_MEMBER = "해당 멤버를 추방할까요?"
+        private const val BUTTON_NAME_BAN_MEMBER = "추방"
     }
 }

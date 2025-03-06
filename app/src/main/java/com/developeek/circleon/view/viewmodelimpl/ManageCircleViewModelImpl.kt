@@ -39,7 +39,9 @@ class ManageCircleViewModelImpl
             get() = uiState
         private val uiState = MutableLiveData<UiState>()
 
-        override val circleMembers: MemberModels = circle.members
+        override val circleMembers: MemberModels
+            get() = circleMemberModels
+        private var circleMemberModels = MemberModels.empty()
         override val joinRequestedMembers: MemberModels
             get() = joinRequestedMembersModels
         private var joinRequestedMembersModels = MemberModels.empty()
@@ -52,6 +54,10 @@ class ManageCircleViewModelImpl
         override lateinit var error: String
 
         init {
+            fetchMembers(currentPage, SIZE_BY_PAGE)
+        }
+
+        override fun refresh() {
             fetchMembers(currentPage, SIZE_BY_PAGE)
         }
 
@@ -68,6 +74,10 @@ class ManageCircleViewModelImpl
             var tmpState: UiState = UiState.Success
             fetchMembersJob =
                 viewModelScope.launch {
+                    val fetchCircleMembersJob =
+                        async {
+                            return@async fetchCircleMembers(page, size)
+                        }
                     val fetchCircleJoinRequestedMembersJob =
                         async {
                             return@async fetchCircleJoinRequestedMembers(page, size)
@@ -95,6 +105,21 @@ class ManageCircleViewModelImpl
                         uiState.postValue(tmpState)
                     }
                 }
+        }
+
+        private suspend fun fetchCircleMembers(
+            page: Int,
+            size: Int,
+        ): UiState {
+            val result = repository.getCircleMembers(circle.id, page, size)
+
+            if (result is Success) {
+                circleMemberModels = result.data
+                return UiState.Success
+            } else {
+                error = (result as Error).message()
+                return if (result.isAuthenticationError()) UiState.AuthenticationError else UiState.ServiceError
+            }
         }
 
         private suspend fun fetchCircleJoinRequestedMembers(

@@ -429,6 +429,20 @@ class CircleRepositoryImpl(
         }
     }
 
+    override suspend fun deleteCircleMember(
+        circleId: Int,
+        memberId: Int,
+    ): Result<Unit> {
+        return try {
+            withContext(dispatcher) {
+                service.deleteCircleMember(circleId, memberId)
+                Result.success(Unit)
+            }
+        } catch (e: IOException) {
+            Result.error(e)
+        }
+    }
+
     companion object {
         private const val SORT_CIRCLE_OLDEST = "createdAt,asc"
         private const val SORT_CIRCLE_LATEST = "createdAt,desc"

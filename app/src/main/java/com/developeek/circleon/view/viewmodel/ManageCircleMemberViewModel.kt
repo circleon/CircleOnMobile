@@ -15,4 +15,6 @@ interface ManageCircleMemberViewModel {
         member: MemberModel,
         role: Role,
     )
+
+    fun banCircleMember(member: MemberModel)
 }

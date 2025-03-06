@@ -91,6 +91,24 @@ class ManageCircleFragment : Fragment() {
             viewLifecycleOwner,
             stateObserver(parentActivity, context),
         )
+        // 정보 수정 여부 감지
+        findNavController()
+            .currentBackStackEntry
+            ?.savedStateHandle
+            ?.let {
+                it.getLiveData<Boolean>(Const.FLAG_CIRCLE_DATA_CHANGED)
+                    .observe(viewLifecycleOwner) { dataChanged ->
+                        if (dataChanged) {
+                            viewModel.refresh()
+                            requestRefreshToPreviousScreen()
+                            it[Const.FLAG_CIRCLE_DATA_CHANGED] = false
+                        }
+                    }
+            }
+    }
+
+    private fun requestRefreshToPreviousScreen() {
+        findNavController().previousBackStackEntry?.savedStateHandle?.set(Const.FLAG_CIRCLE_DATA_CHANGED, true)
     }
 
     private fun stateObserver(

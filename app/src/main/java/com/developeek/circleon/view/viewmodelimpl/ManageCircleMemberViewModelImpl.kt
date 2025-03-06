@@ -46,6 +46,7 @@ class ManageCircleMemberViewModelImpl
             get() = _members
         private var _members = origin
         private var editCircleMemberRoleJob: Job? = null
+        private var banCircleMemberJob: Job? = null
         private var currentPage = DEFAULT_PAGE
 
         override lateinit var error: String
@@ -90,6 +91,30 @@ class ManageCircleMemberViewModelImpl
                 error = (result as Error).message()
                 return if (result.isAuthenticationError()) UiState.AuthenticationError else UiState.ServiceError
             }
+        }
+
+        override fun banCircleMember(member: MemberModel) {
+            banCircleMemberJob?.let {
+                if (!it.isCompleted) return
+            }
+
+            _state.postValue(UiState.Loading)
+
+            banCircleMemberJob =
+                viewModelScope.launch {
+                    val result = repository.deleteCircleMember(circle.id, member.id)
+
+                    if (result is Success) {
+                        _state.postValue(fetchCircleMembers(currentPage, SIZE_BY_PAGE))
+                    } else {
+                        error = (result as Error).message()
+                        if (result.isAuthenticationError()) {
+                            _state.postValue(UiState.AuthenticationError)
+                        } else {
+                            _state.postValue(UiState.ServiceError)
+                        }
+                    }
+                }
         }
 
         companion object {

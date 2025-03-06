@@ -10,4 +10,6 @@ interface ManageCircleViewModel {
     val joinRequestedMembers: MemberModels
     val leaveRequestedMembers: MemberModels
     val error: String
+
+    fun refresh()
 }

@@ -65,7 +65,18 @@ class CircleMemberAdapter(
         }
 
         private fun hideOverflowOrNot(member: MemberModel) {
-            binding.btnProfileOverflow.isVisible = userRole.isExecutive() && userMemberId != member.id
+            if (userMemberId == member.id || !userRole.isExecutive()) {
+                binding.btnProfileOverflow.isVisible = false
+                return
+            }
+
+            if (userRole.isPresident()) {
+                binding.btnProfileOverflow.isVisible = true
+            } else if (userRole.isExecutive() && !member.role.isExecutive()) {
+                binding.btnProfileOverflow.isVisible = true
+            } else {
+                binding.btnProfileOverflow.isVisible = false
+            }
         }
 
         private fun notifyListenerItemChanged(member: MemberModel) {

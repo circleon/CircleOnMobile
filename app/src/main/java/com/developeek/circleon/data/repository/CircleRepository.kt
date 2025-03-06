@@ -127,4 +127,9 @@ interface CircleRepository {
         postId: Int,
         commentId: Int,
     ): Result<Unit>
+
+    suspend fun deleteCircleMember(
+        circleId: Int,
+        memberId: Int,
+    ): Result<Unit>
 }

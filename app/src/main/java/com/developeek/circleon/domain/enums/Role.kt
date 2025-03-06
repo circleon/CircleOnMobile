@@ -14,6 +14,8 @@ enum class Role(
 
     fun isExecutive() = this == EXECUTIVE || this == PRESIDENT
 
+    fun isPresident() = this == PRESIDENT
+
     fun codeName() = codeName
 
     fun roleName() = roleName
@@ -22,8 +24,6 @@ enum class Role(
         private val default = NONE_MEMBER
 
         fun findOrDefault(code: String?) = entries.find { it.codeName == code } ?: default
-
-        fun findOrNull(roleName: String) = entries.find { it.roleName == roleName }
 
         fun getCircleRoles() = entries.filter { it != NONE_MEMBER }
 
