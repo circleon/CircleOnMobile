@@ -47,6 +47,7 @@ class ManageCircleMemberViewModelImpl
         private var _members = origin
         private var editCircleMemberRoleJob: Job? = null
         private var banCircleMemberJob: Job? = null
+        private var editMembershipStatusJob: Job? = null
         private var currentPage = DEFAULT_PAGE
 
         override lateinit var error: String
@@ -115,6 +116,56 @@ class ManageCircleMemberViewModelImpl
                         }
                     }
                 }
+        }
+
+        override fun acceptJoinRequest(member: MemberModel) {
+            editMembershipStatus(member, MembershipStatus.JOINED)
+        }
+
+        override fun rejectJoinRequest(member: MemberModel) {
+            editMembershipStatus(member, MembershipStatus.JOIN_REJECTED)
+        }
+
+        private fun editMembershipStatus(
+            member: MemberModel,
+            status: MembershipStatus,
+        ) {
+            editMembershipStatusJob?.let {
+                if (!it.isCompleted) return
+            }
+
+            _state.postValue(UiState.Loading)
+
+            editMembershipStatusJob =
+                viewModelScope.launch {
+                    val result = repository.putCircleMemberStatus(circle.id, member.id, status)
+
+                    if (result is Success) {
+                        _state.postValue(fetchCircleJoinRequestedMembers(currentPage, SIZE_BY_PAGE))
+                    } else {
+                        error = (result as Error).message()
+                        if (result.isAuthenticationError()) {
+                            _state.postValue(UiState.AuthenticationError)
+                        } else {
+                            _state.postValue(UiState.ServiceError)
+                        }
+                    }
+                }
+        }
+
+        private suspend fun fetchCircleJoinRequestedMembers(
+            page: Int,
+            size: Int,
+        ): UiState {
+            val result = repository.getCircleJoinRequestedMembers(circle.id, page, size)
+
+            if (result is Success) {
+                _members = result.data
+                return UiState.Success
+            } else {
+                error = (result as Error).message()
+                return if (result.isAuthenticationError()) UiState.AuthenticationError else UiState.ServiceError
+            }
         }
 
         companion object {

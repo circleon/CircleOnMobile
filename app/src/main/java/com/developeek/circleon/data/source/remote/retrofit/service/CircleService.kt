@@ -11,6 +11,7 @@ import com.developeek.circleon.data.dto.home.Post
 import com.developeek.circleon.data.dto.home.RequestBodyEditCircleDetail
 import com.developeek.circleon.data.dto.home.RequestBodyEditComment
 import com.developeek.circleon.data.dto.home.RequestBodyEditMemberRole
+import com.developeek.circleon.data.dto.home.RequestBodyEditMemberStatus
 import com.developeek.circleon.data.dto.home.RequestBodyEditPost
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
@@ -134,6 +135,13 @@ interface CircleService {
         @Path("circleId") circleId: Int,
         @Path("memberId") memberId: Int,
         @Body data: RequestBodyEditMemberRole,
+    )
+
+    @PUT("circles/{circleId}/members/{memberId}/status")
+    suspend fun putCircleMemberStatus(
+        @Path("circleId") circleId: Int,
+        @Path("memberId") memberId: Int,
+        @Body data: RequestBodyEditMemberStatus,
     )
 
     // DELETE

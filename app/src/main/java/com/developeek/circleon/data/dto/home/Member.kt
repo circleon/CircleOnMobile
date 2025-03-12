@@ -33,3 +33,7 @@ data class Member(
 data class RequestBodyEditMemberRole(
     @SerializedName("circleRole") val role: String,
 )
+
+data class RequestBodyEditMemberStatus(
+    @SerializedName("membershipStatus") val status: String,
+)

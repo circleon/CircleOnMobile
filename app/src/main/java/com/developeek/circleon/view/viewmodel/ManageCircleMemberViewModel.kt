@@ -17,4 +17,8 @@ interface ManageCircleMemberViewModel {
     )
 
     fun banCircleMember(member: MemberModel)
+
+    fun acceptJoinRequest(member: MemberModel)
+
+    fun rejectJoinRequest(member: MemberModel)
 }

@@ -3,6 +3,7 @@ package com.developeek.circleon.data.repositoryimpl
 import com.developeek.circleon.data.dto.home.Pin
 import com.developeek.circleon.data.dto.home.RequestBodyEditComment
 import com.developeek.circleon.data.dto.home.RequestBodyEditMemberRole
+import com.developeek.circleon.data.dto.home.RequestBodyEditMemberStatus
 import com.developeek.circleon.data.dto.home.RequestBodyEditPost
 import com.developeek.circleon.data.exception.ServiceException
 import com.developeek.circleon.data.repository.CircleRepository
@@ -378,6 +379,21 @@ class CircleRepositoryImpl(
         return try {
             withContext(dispatcher) {
                 service.putCircleMemberRole(circleId, memberId, RequestBodyEditMemberRole(role.codeName()))
+                Result.success(Unit)
+            }
+        } catch (e: IOException) {
+            Result.error(e)
+        }
+    }
+
+    override suspend fun putCircleMemberStatus(
+        circleId: Int,
+        memberId: Int,
+        status: MembershipStatus,
+    ): Result<Unit> {
+        return try {
+            withContext(dispatcher) {
+                service.putCircleMemberStatus(circleId, memberId, RequestBodyEditMemberStatus(status.codeName()))
                 Result.success(Unit)
             }
         } catch (e: IOException) {

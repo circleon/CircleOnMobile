@@ -34,18 +34,46 @@
         android:textColor="@color/grey_9"
         tools:text="Name"
         app:layout_constraintStart_toEndOf="@id/cvMemberProfile"
-        app:layout_constraintEnd_toStartOf="@id/btnProfileOverflow"
+        app:layout_constraintEnd_toStartOf="@id/llPositiveNegative"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"/>
 
-    <androidx.appcompat.widget.AppCompatImageView
-        android:id="@+id/btnProfileOverflow"
+    <LinearLayout
+        android:id="@+id/llPositiveNegative"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:src="@drawable/ic_overflow"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@id/txtMemberName"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent"/>
+        app:layout_constraintBottom_toBottomOf="parent">
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/btnRejectJoinRequest"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingVertical="6dp"
+            android:paddingHorizontal="@dimen/margin_padding_default"
+            android:textColor="@color/grey_6"
+            android:textSize="@dimen/text_size_default"
+            android:text="@string/reject_request"
+            android:background="@drawable/bg_rounded_rectangle"
+            android:backgroundTint="@color/grey_3"/>
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/btnAcceptJoinRequest"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/margin_padding_small"
+            android:paddingVertical="6dp"
+            android:paddingHorizontal="@dimen/margin_padding_default"
+            android:textColor="@color/white"
+            android:textSize="@dimen/text_size_default"
+            android:text="@string/accept_request"
+            android:background="@drawable/bg_rounded_rectangle"
+            android:backgroundTint="@color/purple_5"/>
+
+    </LinearLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

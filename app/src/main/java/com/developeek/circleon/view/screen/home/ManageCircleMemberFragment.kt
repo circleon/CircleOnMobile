@@ -27,6 +27,7 @@ import com.developeek.circleon.domain.utils.Const
 import com.developeek.circleon.domain.utils.Utils
 import com.developeek.circleon.domain.utils.glide.GlideProvider
 import com.developeek.circleon.view.adapter.CircleMemberAdapter
+import com.developeek.circleon.view.adapter.JoinRequestedMemberAdapter
 import com.developeek.circleon.view.listener.ItemListenerInitializer
 import com.developeek.circleon.view.screen.login.LoginActivity
 import com.developeek.circleon.view.viewmodel.ManageCircleMemberViewModel
@@ -119,6 +120,9 @@ class ManageCircleMemberFragment : Fragment() {
             MembershipStatus.JOINED -> {
                 initCircleMemberView(context)
             }
+            MembershipStatus.JOIN_REQUESTED -> {
+                initJoinRequestedMemberView(context)
+            }
             else -> {}
         }
     }
@@ -141,6 +145,37 @@ class ManageCircleMemberFragment : Fragment() {
                         ) {
                             initProfileOverflowMenuAndShow(context, item, view!!)
                         }
+                    },
+            )
+        binding.rvMember.layoutManager = LinearLayoutManager(context)
+    }
+
+    private fun initJoinRequestedMemberView(context: Context) {
+        binding.rvMember.adapter =
+            JoinRequestedMemberAdapter(
+                context,
+                glideProvider,
+                positiveListenerInitializer =
+                    object : ItemListenerInitializer<MemberModel> {
+                        override fun initialize(item: MemberModel) {
+                            viewModel.acceptJoinRequest(item)
+                        }
+
+                        override fun initialize(
+                            item: MemberModel,
+                            view: View?,
+                        ) {}
+                    },
+                negativeListenerInitializer =
+                    object : ItemListenerInitializer<MemberModel> {
+                        override fun initialize(item: MemberModel) {
+                            viewModel.rejectJoinRequest(item)
+                        }
+
+                        override fun initialize(
+                            item: MemberModel,
+                            view: View?,
+                        ) {}
                     },
             )
         binding.rvMember.layoutManager = LinearLayoutManager(context)
@@ -253,6 +288,7 @@ class ManageCircleMemberFragment : Fragment() {
 
     private fun showNoMemberMessage(context: Context) {
         binding.txtNoMember.isVisible = true
+        binding.rvMember.isVisible = false
 
         val messageId =
             if (membershipStatus == MembershipStatus.JOINED) {
@@ -265,14 +301,18 @@ class ManageCircleMemberFragment : Fragment() {
     }
 
     private fun loadMembers(members: MemberModels) {
-        if (!binding.rvMember.isVisible) binding.rvMember.isVisible = true
+        binding.rvMember.isVisible = true
+        binding.txtNoMember.isVisible = false
 
         binding.rvMember.adapter?.let {
             when (membershipStatus) {
                 MembershipStatus.JOINED -> {
                     (it as CircleMemberAdapter).update(members) {}
                 }
-                // TODO: 가입 신청, 탈퇴 신청 adapter
+                MembershipStatus.JOIN_REQUESTED -> {
+                    (it as JoinRequestedMemberAdapter).update(members) {}
+                }
+                // TODO: 탈퇴 신청 adapter
                 else -> {}
             }
         }

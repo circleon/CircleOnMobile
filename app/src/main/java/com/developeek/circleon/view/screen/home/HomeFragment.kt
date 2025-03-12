@@ -60,12 +60,15 @@ class HomeFragment : Fragment() {
     ) {
         super.onViewCreated(view, savedInstanceState)
 
-        initView(requireContext())
+        initView(requireActivity(), requireContext())
         initObserver(requireActivity(), requireContext())
         initListener()
     }
 
-    private fun initView(context: Context) {
+    private fun initView(
+        parentActivity: Activity,
+        context: Context,
+    ) {
         initCategoryRecyclerView(context)
         initCircleRecyclerView(context)
     }
