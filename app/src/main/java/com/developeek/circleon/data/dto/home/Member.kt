@@ -14,7 +14,7 @@ import com.google.gson.annotations.SerializedName
 data class Member(
     @SerializedName("memberId") val id: Int,
     @SerializedName("memberName") val name: String,
-    @SerializedName("membershipStatus") val status: String,
+    @SerializedName("membershipStatus") val status: String?,
     @SerializedName("circleRole") val role: String?,
     // TODO: 회원 수정 기능 제작 이후 프로필 이미지 추가 및 프로필 이미지 전용 url 변환 Utils 에 추가
     @SerializedName("memberProfileUrl") val profileImgUrl: String?,

@@ -4,10 +4,9 @@ enum class MembershipStatus(
     private val codeName: String,
     private val statusName: String,
 ) {
-    NOT_JOINED("NOT_JOINED", "미가입"),
+    NOT_JOINED("INACTIVE", "미가입"),
     JOINED("APPROVED", "가입"),
     JOIN_REQUESTED("PENDING", "가입 요청 중"),
-    JOIN_REJECTED("REJECTED", "가입 거절"),
     LEAVE_REQUESTED("LEAVE_REQUEST", "탈퇴 요청 중"),
     ;
 
@@ -18,6 +17,6 @@ enum class MembershipStatus(
     companion object {
         private val default = NOT_JOINED
 
-        fun findOrDefault(status: String) = entries.find { it.codeName == status } ?: default
+        fun findOrDefault(status: String?) = entries.find { it.codeName == status } ?: default
     }
 }

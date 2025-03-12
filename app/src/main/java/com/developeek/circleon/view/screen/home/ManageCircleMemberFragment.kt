@@ -261,7 +261,7 @@ class ManageCircleMemberFragment : Fragment() {
                                         view: View?,
                                     ) {}
                                 },
-                            )
+                            ).show()
                         }
 
                         override fun initialize(

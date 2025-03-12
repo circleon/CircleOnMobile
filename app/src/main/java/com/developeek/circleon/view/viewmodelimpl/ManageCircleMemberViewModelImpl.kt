@@ -119,20 +119,27 @@ class ManageCircleMemberViewModelImpl
         }
 
         override fun acceptJoinRequest(member: MemberModel) {
-            editMembershipStatus(member, MembershipStatus.JOINED)
+            editMembershipStatus(member, MembershipStatus.JOINED) { page, size ->
+                fetchCircleJoinRequestedMembers(page, size)
+            }
         }
 
         override fun rejectJoinRequest(member: MemberModel) {
-            editMembershipStatus(member, MembershipStatus.JOIN_REJECTED)
+            editMembershipStatus(member, MembershipStatus.NOT_JOINED) { page, size ->
+                fetchCircleJoinRequestedMembers(page, size)
+            }
         }
 
         override fun acceptLeaveRequest(member: MemberModel) {
-            editMembershipStatus(member, MembershipStatus.NOT_JOINED)
+            editMembershipStatus(member, MembershipStatus.NOT_JOINED) { page, size ->
+                fetchCircleLeaveRequestedMembers(page, size)
+            }
         }
 
         private fun editMembershipStatus(
             member: MemberModel,
             status: MembershipStatus,
+            afterFetch: suspend (Int, Int) -> UiState,
         ) {
             editMembershipStatusJob?.let {
                 if (!it.isCompleted) return
@@ -145,7 +152,7 @@ class ManageCircleMemberViewModelImpl
                     val result = repository.putCircleMemberStatus(circle.id, member.id, status)
 
                     if (result is Success) {
-                        _state.postValue(fetchCircleJoinRequestedMembers(currentPage, SIZE_BY_PAGE))
+                        _state.postValue(afterFetch(currentPage, SIZE_BY_PAGE))
                     } else {
                         error = (result as Error).message()
                         if (result.isAuthenticationError()) {
@@ -162,6 +169,21 @@ class ManageCircleMemberViewModelImpl
             size: Int,
         ): UiState {
             val result = repository.getCircleJoinRequestedMembers(circle.id, page, size)
+
+            if (result is Success) {
+                _members = result.data
+                return UiState.Success
+            } else {
+                error = (result as Error).message()
+                return if (result.isAuthenticationError()) UiState.AuthenticationError else UiState.ServiceError
+            }
+        }
+
+        private suspend fun fetchCircleLeaveRequestedMembers(
+            page: Int,
+            size: Int,
+        ): UiState {
+            val result = repository.getCircleLeaveRequestedMembers(circle.id, page, size)
 
             if (result is Success) {
                 _members = result.data
