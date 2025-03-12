@@ -12,10 +12,10 @@
         android:id="@+id/nav_graph_circle"
         android:icon="@drawable/ic_circle"
         android:title="@string/tab_name_circle"/>
-    <item
-        android:id="@+id/nav_graph_direct_message"
-        android:icon="@drawable/ic_direct_message"
-        android:title="@string/tab_name_direct_message"/>
+<!--    <item-->
+<!--        android:id="@+id/nav_graph_direct_message"-->
+<!--        android:icon="@drawable/ic_direct_message"-->
+<!--        android:title="@string/tab_name_direct_message"/>-->
     <item
         android:id="@+id/nav_graph_my_page"
         android:icon="@drawable/ic_my_page"

@@ -27,6 +27,7 @@
             android:id="@+id/btmNav"
             android:layout_width="match_parent"
             android:layout_height="68dp"
+            android:paddingHorizontal="40dp"
             app:itemTextColor="@drawable/selector_bottom_nav"
             app:itemTextAppearanceActive="@style/bottom_nav_title"
             app:itemTextAppearanceInactive="@style/bottom_nav_title"
@@ -38,7 +39,7 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintBottom_toBottomOf="parent"
             app:labelVisibilityMode="labeled"
-            app:menu="@menu/menu_bottom_navigation"/>
+            app:menu="@menu/menu_bottom_navigation" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

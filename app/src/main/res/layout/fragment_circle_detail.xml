@@ -181,6 +181,7 @@
                 android:background="@color/white"
                 app:tabIndicatorColor="@color/purple_5"
                 app:tabMode="fixed"
+                app:tabGravity="fill"
                 app:tabRippleColor="@null"
                 app:tabTextAppearance="@style/small_text"
                 app:tabSelectedTextColor="@color/purple_5"
