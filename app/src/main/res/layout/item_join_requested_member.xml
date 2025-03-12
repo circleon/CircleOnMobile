@@ -57,7 +57,7 @@
             android:paddingHorizontal="@dimen/margin_padding_default"
             android:textColor="@color/grey_6"
             android:textSize="@dimen/text_size_default"
-            android:text="@string/reject_request"
+            android:text="@string/btn_reject_join_request"
             android:background="@drawable/bg_rounded_rectangle"
             android:backgroundTint="@color/grey_3"/>
 
@@ -70,7 +70,7 @@
             android:paddingHorizontal="@dimen/margin_padding_default"
             android:textColor="@color/white"
             android:textSize="@dimen/text_size_default"
-            android:text="@string/accept_request"
+            android:text="@string/btn_accept_join_request"
             android:background="@drawable/bg_rounded_rectangle"
             android:backgroundTint="@color/purple_5"/>
 

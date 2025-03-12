@@ -28,12 +28,14 @@ import com.developeek.circleon.domain.utils.Utils
 import com.developeek.circleon.domain.utils.glide.GlideProvider
 import com.developeek.circleon.view.adapter.CircleMemberAdapter
 import com.developeek.circleon.view.adapter.JoinRequestedMemberAdapter
+import com.developeek.circleon.view.adapter.LeaveRequestedMemberAdapter
 import com.developeek.circleon.view.listener.ItemListenerInitializer
 import com.developeek.circleon.view.screen.login.LoginActivity
 import com.developeek.circleon.view.viewmodel.ManageCircleMemberViewModel
 import com.developeek.circleon.view.viewmodelimpl.ManageCircleMemberViewModelImpl
+import com.developeek.circleon.view.widget.CircleMemberLeaveRequestAcceptAlertDialog
+import com.developeek.circleon.view.widget.CircleMemberRoleEditAlertDialog
 import com.developeek.circleon.view.widget.ContentDeleteAlertDialog
-import com.developeek.circleon.view.widget.EditCircleMemberRoleAlertDialog
 import com.developeek.circleon.view.widget.ErrorAlertDialog
 import com.developeek.circleon.view.widget.ErrorToast
 import com.google.android.material.bottomnavigation.BottomNavigationView
@@ -123,6 +125,9 @@ class ManageCircleMemberFragment : Fragment() {
             MembershipStatus.JOIN_REQUESTED -> {
                 initJoinRequestedMemberView(context)
             }
+            MembershipStatus.LEAVE_REQUESTED -> {
+                initLeaveRequestedMemberView(context)
+            }
             else -> {}
         }
     }
@@ -148,6 +153,60 @@ class ManageCircleMemberFragment : Fragment() {
                     },
             )
         binding.rvMember.layoutManager = LinearLayoutManager(context)
+    }
+
+    private fun initProfileOverflowMenuAndShow(
+        context: Context,
+        item: MemberModel,
+        view: View,
+    ) {
+        val popupMenu = object : PopupMenu(context, view) {}
+        if (circle.isUserPresident()) {
+            popupMenu.inflate(R.menu.menu_president_circle_member_settings)
+        } else if (circle.isUserExecutive()) {
+            popupMenu.inflate(R.menu.menu_executive_circle_member_settings)
+        }
+
+        popupMenu.setOnMenuItemClickListener(circleMemberOverflowMenuItemClickListener(context, item))
+        Utils.changeMenuItemTextColor(
+            popupMenu.menu.findItem(R.id.ban_member),
+            ContextCompat.getColor(context, R.color.error),
+        )
+
+        popupMenu.show()
+    }
+
+    private fun circleMemberOverflowMenuItemClickListener(
+        context: Context,
+        member: MemberModel,
+    ) = PopupMenu.OnMenuItemClickListener {
+        when (it.itemId) {
+            R.id.edit_member_role -> {
+                CircleMemberRoleEditAlertDialog(
+                    context,
+                    glideProvider,
+                    member,
+                    positiveListenerInitializer =
+                        object : ItemListenerInitializer<Role> {
+                            override fun initialize(item: Role) {
+                                viewModel.editCircleMemberRole(member, item)
+                            }
+
+                            override fun initialize(
+                                item: Role,
+                                view: View?,
+                            ) {}
+                        },
+                ).show()
+            }
+
+            R.id.ban_member -> {
+                ContentDeleteAlertDialog(context, MESSAGE_BAN_MEMBER, BUTTON_NAME_BAN_MEMBER) {
+                    viewModel.banCircleMember(member)
+                }.show()
+            }
+        }
+        true
     }
 
     private fun initJoinRequestedMemberView(context: Context) {
@@ -181,58 +240,37 @@ class ManageCircleMemberFragment : Fragment() {
         binding.rvMember.layoutManager = LinearLayoutManager(context)
     }
 
-    private fun initProfileOverflowMenuAndShow(
-        context: Context,
-        item: MemberModel,
-        view: View,
-    ) {
-        val popupMenu = object : PopupMenu(context, view) {}
-        if (circle.isUserPresident()) {
-            popupMenu.inflate(R.menu.menu_president_circle_member_settings)
-        } else if (circle.isUserExecutive()) {
-            popupMenu.inflate(R.menu.menu_executive_circle_member_settings)
-        }
+    private fun initLeaveRequestedMemberView(context: Context) {
+        binding.rvMember.adapter =
+            LeaveRequestedMemberAdapter(
+                context,
+                glideProvider,
+                showMessageListenerInitializer =
+                    object : ItemListenerInitializer<MemberModel> {
+                        override fun initialize(item: MemberModel) {
+                            CircleMemberLeaveRequestAcceptAlertDialog(
+                                context,
+                                item,
+                                object : ItemListenerInitializer<MemberModel> {
+                                    override fun initialize(item: MemberModel) {
+                                        viewModel.acceptLeaveRequest(item)
+                                    }
 
-        popupMenu.setOnMenuItemClickListener(circleMemberOverflowMenuItemClickListener(context, item))
-        Utils.changeMenuItemTextColor(
-            popupMenu.menu.findItem(R.id.ban_member),
-            ContextCompat.getColor(context, R.color.error),
-        )
+                                    override fun initialize(
+                                        item: MemberModel,
+                                        view: View?,
+                                    ) {}
+                                },
+                            )
+                        }
 
-        popupMenu.show()
-    }
-
-    private fun circleMemberOverflowMenuItemClickListener(
-        context: Context,
-        member: MemberModel,
-    ) = PopupMenu.OnMenuItemClickListener {
-        when (it.itemId) {
-            R.id.edit_member_role -> {
-                EditCircleMemberRoleAlertDialog(
-                    context,
-                    glideProvider,
-                    member,
-                    positiveListenerInitializer =
-                        object : ItemListenerInitializer<Role> {
-                            override fun initialize(item: Role) {
-                                viewModel.editCircleMemberRole(member, item)
-                            }
-
-                            override fun initialize(
-                                item: Role,
-                                view: View?,
-                            ) {}
-                        },
-                ).show()
-            }
-
-            R.id.ban_member -> {
-                ContentDeleteAlertDialog(context, MESSAGE_BAN_MEMBER, BUTTON_NAME_BAN_MEMBER) {
-                    viewModel.banCircleMember(member)
-                }.show()
-            }
-        }
-        true
+                        override fun initialize(
+                            item: MemberModel,
+                            view: View?,
+                        ) {}
+                    },
+            )
+        binding.rvMember.layoutManager = LinearLayoutManager(context)
     }
 
     private fun hideBtmNav(parentActivity: Activity) {
@@ -312,7 +350,9 @@ class ManageCircleMemberFragment : Fragment() {
                 MembershipStatus.JOIN_REQUESTED -> {
                     (it as JoinRequestedMemberAdapter).update(members) {}
                 }
-                // TODO: 탈퇴 신청 adapter
+                MembershipStatus.LEAVE_REQUESTED -> {
+                    (it as LeaveRequestedMemberAdapter).update(members) {}
+                }
                 else -> {}
             }
         }

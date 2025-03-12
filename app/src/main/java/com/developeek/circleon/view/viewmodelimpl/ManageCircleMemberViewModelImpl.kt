@@ -126,6 +126,10 @@ class ManageCircleMemberViewModelImpl
             editMembershipStatus(member, MembershipStatus.JOIN_REJECTED)
         }
 
+        override fun acceptLeaveRequest(member: MemberModel) {
+            editMembershipStatus(member, MembershipStatus.NOT_JOINED)
+        }
+
         private fun editMembershipStatus(
             member: MemberModel,
             status: MembershipStatus,

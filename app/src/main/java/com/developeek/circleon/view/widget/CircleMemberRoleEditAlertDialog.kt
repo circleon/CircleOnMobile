@@ -16,7 +16,7 @@ import com.developeek.circleon.domain.utils.glide.GlideProvider
 import com.developeek.circleon.view.listener.ItemClickListener
 import com.developeek.circleon.view.listener.ItemListenerInitializer
 
-class EditCircleMemberRoleAlertDialog(
+class CircleMemberRoleEditAlertDialog(
     private val context: Context,
     private val glideProvider: GlideProvider,
     private val member: MemberModel,

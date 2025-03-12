@@ -21,4 +21,6 @@ interface ManageCircleMemberViewModel {
     fun acceptJoinRequest(member: MemberModel)
 
     fun rejectJoinRequest(member: MemberModel)
+
+    fun acceptLeaveRequest(member: MemberModel)
 }

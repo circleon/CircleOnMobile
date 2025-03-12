@@ -99,9 +99,11 @@
     <string name="menu_circle_member_settings_edit_role">역할 수정하기</string>
     <string name="menu_circle_member_settings_ban">추방하기</string>
     <string name="btn_edit_circle_member_role">임명하기</string>
-    <string name="reject_request">거절</string>
-    <string name="accept_request">수락</string>
+    <string name="btn_reject_join_request">거절</string>
+    <string name="btn_accept_join_request">수락</string>
     <string name="btn_show_member_message">사유 보기</string>
+    <string name="title_member_message_dialog">%s님이 이런 메세지를 남겨주셨어요</string>
+    <string name="btn_accept_leave_request">승인하기</string>
 
     <!--Post Detail-->
     <string name="hint_comment">댓글을 입력해주세요.</string>
