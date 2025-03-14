@@ -55,7 +55,6 @@ class HomeActivity : AppCompatActivity() {
 
     private fun hideBtmNavCondition(destination: NavDestination) =
         destination.id == R.id.searchCircleFragment ||
-            destination.id == R.id.circleDetailFragment ||
             destination.id == R.id.uploadCircleFragment ||
             destination.id == R.id.manageCircleFragment ||
             destination.id == R.id.manageCircleMemberFragment ||

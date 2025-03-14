@@ -6,11 +6,14 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.activity.addCallback
 import androidx.fragment.app.Fragment
+import com.developeek.circleon.R
 import com.developeek.circleon.data.source.manager.TokenManager
 import com.developeek.circleon.data.source.manager.UserManager
 import com.developeek.circleon.databinding.FragmentMyPageBinding
 import com.developeek.circleon.view.screen.login.LoginActivity
+import com.google.android.material.bottomnavigation.BottomNavigationView
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
@@ -23,6 +26,14 @@ class MyPageFragment : Fragment() {
 
     @Inject
     lateinit var userManager: UserManager
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+
+        requireActivity().onBackPressedDispatcher.addCallback(this) {
+            requireActivity().findViewById<BottomNavigationView>(R.id.btmNav).selectedItemId = R.id.nav_graph_home
+        }
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater,

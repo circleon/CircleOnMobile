@@ -31,7 +31,6 @@ import com.developeek.circleon.view.screen.login.LoginActivity
 import com.developeek.circleon.view.viewmodel.CircleDetailViewModel
 import com.developeek.circleon.view.viewmodelimpl.CircleDetailViewModelImpl
 import com.developeek.circleon.view.widget.ErrorToast
-import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.progressindicator.CircularProgressIndicator
 import com.google.android.material.tabs.TabLayout
 import dagger.hilt.android.AndroidEntryPoint
@@ -90,12 +89,7 @@ class CircleDetailFragment : Fragment() {
     }
 
     private fun initView(parentActivity: Activity) {
-        hideBtmNav(parentActivity)
         initAppBar()
-    }
-
-    private fun hideBtmNav(parentActivity: Activity) {
-        parentActivity.findViewById<BottomNavigationView>(R.id.btmNav).isVisible = false
     }
 
     private fun initAppBar() {
