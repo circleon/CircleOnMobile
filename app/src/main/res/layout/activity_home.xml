@@ -21,7 +21,8 @@
             app:navGraph="@navigation/nav_graph"
             app:defaultNavHost="true"
             app:layout_constraintBottom_toTopOf="@+id/btmNav"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constrainedHeight="true"/>
 
         <com.google.android.material.bottomnavigation.BottomNavigationView
             android:id="@+id/btmNav"
@@ -36,8 +37,9 @@
             app:itemRippleColor="@null"
             app:itemTextAppearanceActiveBoldEnabled="false"
             android:background="@color/white"
-            app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/containerHome"
+            app:layout_constrainedHeight="true"
             app:labelVisibilityMode="labeled"
             app:menu="@menu/menu_bottom_navigation" />
 

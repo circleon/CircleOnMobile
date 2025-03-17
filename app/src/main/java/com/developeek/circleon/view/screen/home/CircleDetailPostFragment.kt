@@ -162,7 +162,7 @@ class CircleDetailPostFragment : Fragment() {
             }
             R.id.delete_post -> {
                 ContentDeleteAlertDialog(context, MESSAGE_DELETE_POST) {
-                    viewModel.deleteAndRefresh(item.id)
+                    viewModel.deleteAndFetch(item.id)
                 }.show()
             }
         }

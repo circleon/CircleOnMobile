@@ -34,7 +34,9 @@ class HomeViewModelImpl
         private val uiState = MutableLiveData<UiState>()
         override lateinit var user: UserModel
 
-        override lateinit var categories: CategoryModels
+        override val categories: CategoryModels
+            get() = _categories
+        private var _categories = CategoryModels.selectAndGet(Category.ALL)
 
         override val circles: CircleModels
             get() = circleModels
@@ -65,19 +67,15 @@ class HomeViewModelImpl
         }
 
         override fun refresh() {
-            fetchCircles()
+            setFilterAndFetch(categories.selectedOrFirst().category)
         }
 
         override fun setFilterAndFetch(category: Category) {
-            categories = CategoryModels.selectAndGet(category)
-            fetchCircles()
-        }
-
-        private fun fetchCircles() {
             fetchCirclesJob?.let {
                 if (!it.isCompleted) return
             }
 
+            _categories = CategoryModels.selectAndGet(category)
             uiState.postValue(UiState.Loading)
             scrollOverCircleJob?.cancel()
             currentPage = DEFAULT_PAGE // 카테고리를 선택할 때는 circles 를 재사용하지 않기 때문에 currentPage 도 초기화

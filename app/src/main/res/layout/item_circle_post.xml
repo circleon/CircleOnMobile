@@ -144,7 +144,7 @@
         android:src="@drawable/ic_overflow"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        />
+        android:visibility="gone"/>
 
     <androidx.appcompat.widget.LinearLayoutCompat
         android:id="@+id/llComment"

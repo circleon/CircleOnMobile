@@ -144,18 +144,28 @@ class CircleDetailNoticeFragment : Fragment() {
         view: View,
     ) {
         val popupMenu = object : PopupMenu(context, view) {}
-        if (item.isPinned) {
-            popupMenu.inflate(R.menu.menu_pinned_notice_settings)
-        } else {
-            popupMenu.inflate(R.menu.menu_notice_settings)
+        val userId = userManager.getUser()?.id
+
+        userId?.let {
+            if (it == item.author.id) {
+                if (item.isPinned) {
+                    popupMenu.inflate(R.menu.menu_pinned_author_notice_settings)
+                } else {
+                    popupMenu.inflate(R.menu.menu_author_notice_settings)
+                }
+                Utils.changeMenuItemTextColor(
+                    popupMenu.menu.findItem(R.id.delete_post),
+                    ContextCompat.getColor(context, R.color.error),
+                )
+            } else {
+                if (item.isPinned) {
+                    popupMenu.inflate(R.menu.menu_pinned_notice_settings)
+                } else {
+                    popupMenu.inflate(R.menu.menu_notice_settings)
+                }
+            }
         }
-
         popupMenu.setOnMenuItemClickListener(noticeOverflowMenuItemClickListener(context, item))
-        Utils.changeMenuItemTextColor(
-            popupMenu.menu.findItem(R.id.delete_post),
-            ContextCompat.getColor(context, R.color.error),
-        )
-
         popupMenu.show()
     }
 
@@ -166,11 +176,11 @@ class CircleDetailNoticeFragment : Fragment() {
         viewModel.saveScrollState(binding.rvCircleNotice.layoutManager?.onSaveInstanceState())
         when (it.itemId) {
             R.id.pin_post -> {
-                if (item.isPinned) {
-                    viewModel.removePinAndRefresh(item.id)
-                } else {
-                    viewModel.pinAndRefresh(item.id)
-                }
+                viewModel.pinAndFetch(item.id)
+            }
+
+            R.id.unpin_post -> {
+                viewModel.removePinAndFetch(item.id)
             }
 
             R.id.edit_post -> {
@@ -179,7 +189,7 @@ class CircleDetailNoticeFragment : Fragment() {
 
             R.id.delete_post -> {
                 ContentDeleteAlertDialog(context, MESSAGE_DELETE_NOTICE) {
-                    viewModel.deleteAndRefresh(item.id)
+                    viewModel.deleteAndFetch(item.id)
                 }.show()
             }
         }

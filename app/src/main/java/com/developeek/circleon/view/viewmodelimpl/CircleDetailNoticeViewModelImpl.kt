@@ -58,6 +58,7 @@ class CircleDetailNoticeViewModelImpl
         override lateinit var error: String
 
         init {
+            uiState.postValue(UiState.Loading)
             fetchNotices(currentPage, SIZE_BY_PAGE)
         }
 
@@ -68,8 +69,6 @@ class CircleDetailNoticeViewModelImpl
             fetchNoticesJob?.let {
                 if (!it.isCompleted) return
             }
-
-            uiState.postValue(UiState.Loading)
 
             fetchNoticesJob =
                 viewModelScope.launch {
@@ -92,6 +91,7 @@ class CircleDetailNoticeViewModelImpl
         override fun refresh() {
             // currentPage: 0 == page 1
             // currentPage: 1 == page 2 ...
+            uiState.postValue(UiState.Loading)
             fetchNotices(DEFAULT_PAGE, (currentPage + 1) * SIZE_BY_PAGE)
         }
 
@@ -132,15 +132,15 @@ class CircleDetailNoticeViewModelImpl
             this.isTop = isTop
         }
 
-        override fun pinAndRefresh(postId: Int) {
-            togglePinAndRefresh(postId, true)
+        override fun pinAndFetch(postId: Int) {
+            togglePinAndFetch(postId, true)
         }
 
-        override fun removePinAndRefresh(postId: Int) {
-            togglePinAndRefresh(postId, false)
+        override fun removePinAndFetch(postId: Int) {
+            togglePinAndFetch(postId, false)
         }
 
-        private fun togglePinAndRefresh(
+        private fun togglePinAndFetch(
             postId: Int,
             isPinned: Boolean,
         ) {
@@ -153,7 +153,7 @@ class CircleDetailNoticeViewModelImpl
                     val result = repository.putPostPin(circleId, postId, isPinned)
 
                     if (result is Success) {
-                        refresh()
+                        fetchNotices(DEFAULT_PAGE, (currentPage + 1) * SIZE_BY_PAGE)
                     } else {
                         error = (result as Error).message()
                         if (result.isAuthenticationError()) {
@@ -165,7 +165,7 @@ class CircleDetailNoticeViewModelImpl
                 }
         }
 
-        override fun deleteAndRefresh(postId: Int) {
+        override fun deleteAndFetch(postId: Int) {
             deleteNoticeJob?.let {
                 if (!it.isCompleted) return
             }
@@ -175,7 +175,7 @@ class CircleDetailNoticeViewModelImpl
                     val result = repository.deleteCirclePost(circleId, postId)
 
                     if (result is Success) {
-                        refresh()
+                        fetchNotices(DEFAULT_PAGE, (currentPage + 1) * SIZE_BY_PAGE)
                     } else {
                         error = (result as Error).message()
                         if (result.isAuthenticationError()) {
