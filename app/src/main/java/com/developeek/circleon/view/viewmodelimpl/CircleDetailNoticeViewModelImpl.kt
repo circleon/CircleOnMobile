@@ -35,8 +35,10 @@ class CircleDetailNoticeViewModelImpl
             get() = uiState
         private val uiState = MutableLiveData<UiState>()
 
-        override lateinit var posts: PostModels
-        private var fetchNoticeJob: Job? = null
+        override val posts: PostModels
+            get() = postModels
+        private var postModels = PostModels.empty()
+        private var fetchNoticesJob: Job? = null
         private var pinNoticeJob: Job? = null
         private var deleteNoticeJob: Job? = null
         private var currentPage = DEFAULT_PAGE
@@ -64,16 +66,16 @@ class CircleDetailNoticeViewModelImpl
             page: Int,
             size: Int,
         ) {
-            fetchNoticeJob?.let {
+            fetchNoticesJob?.let {
                 if (!it.isCompleted) return
             }
 
-            fetchNoticeJob =
+            fetchNoticesJob =
                 viewModelScope.launch {
                     val result = repository.getCircleNotices(circleId, page, size)
 
                     if (result is Success) {
-                        posts = result.data
+                        postModels = result.data
                         uiState.postValue(UiState.Success)
                     } else {
                         error = (result as Error).message()
@@ -89,6 +91,7 @@ class CircleDetailNoticeViewModelImpl
         override fun refresh() {
             // currentPage: 0 == page 1
             // currentPage: 1 == page 2 ...
+            uiState.postValue(UiState.Loading)
             fetchNotices(DEFAULT_PAGE, (currentPage + 1) * SIZE_BY_PAGE)
         }
 
@@ -102,8 +105,8 @@ class CircleDetailNoticeViewModelImpl
                     val result = repository.getCircleNotices(circleId, currentPage + 1, SIZE_BY_PAGE)
 
                     if (result is Success) {
-                        posts =
-                            posts.addAll(result.data).also {
+                        postModels =
+                            postModels.addAll(result.data).also {
                                 if (result.data.isLastPage()) {
                                     it.setAsLast()
                                 }
@@ -129,15 +132,15 @@ class CircleDetailNoticeViewModelImpl
             this.isTop = isTop
         }
 
-        override fun pinAndRefresh(postId: Int) {
-            togglePinAndRefresh(postId, true)
+        override fun pinAndFetch(postId: Int) {
+            togglePinAndFetch(postId, true)
         }
 
-        override fun removePinAndRefresh(postId: Int) {
-            togglePinAndRefresh(postId, false)
+        override fun removePinAndFetch(postId: Int) {
+            togglePinAndFetch(postId, false)
         }
 
-        private fun togglePinAndRefresh(
+        private fun togglePinAndFetch(
             postId: Int,
             isPinned: Boolean,
         ) {
@@ -150,7 +153,7 @@ class CircleDetailNoticeViewModelImpl
                     val result = repository.putPostPin(circleId, postId, isPinned)
 
                     if (result is Success) {
-                        refresh()
+                        fetchNotices(DEFAULT_PAGE, (currentPage + 1) * SIZE_BY_PAGE)
                     } else {
                         error = (result as Error).message()
                         if (result.isAuthenticationError()) {
@@ -162,7 +165,7 @@ class CircleDetailNoticeViewModelImpl
                 }
         }
 
-        override fun deleteAndRefresh(postId: Int) {
+        override fun deleteAndFetch(postId: Int) {
             deleteNoticeJob?.let {
                 if (!it.isCompleted) return
             }
@@ -172,7 +175,7 @@ class CircleDetailNoticeViewModelImpl
                     val result = repository.deleteCirclePost(circleId, postId)
 
                     if (result is Success) {
-                        refresh()
+                        fetchNotices(DEFAULT_PAGE, (currentPage + 1) * SIZE_BY_PAGE)
                     } else {
                         error = (result as Error).message()
                         if (result.isAuthenticationError()) {

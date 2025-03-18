@@ -1,11 +1,14 @@
 package com.developeek.circleon.view.screen.login
 
 import android.app.Activity
+import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.view.inputmethod.EditorInfo
+import android.view.inputmethod.InputMethodManager
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.view.isVisible
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.Observer
 import com.developeek.circleon.databinding.ActivityLoginBinding
@@ -39,6 +42,8 @@ class LoginActivity : AppCompatActivity() {
 
     private fun stateObserver(activity: Activity) =
         Observer<UiState> {
+            binding.pgbLoading.isVisible = it is UiState.Loading
+            binding.btnLogin.isVisible = it !is UiState.Loading
             when (it) {
                 UiState.Success -> sendUserToHomeScreen(activity)
                 UiState.ServiceError ->
@@ -60,7 +65,7 @@ class LoginActivity : AppCompatActivity() {
     private fun initListener(activity: Activity) {
         setBtnLoginListener()
         setBtnSignUpListener(activity)
-        setEdtPasswordListener()
+        setEdtPasswordListener(activity)
     }
 
     private fun setBtnLoginListener() {
@@ -75,10 +80,13 @@ class LoginActivity : AppCompatActivity() {
         }
     }
 
-    private fun setEdtPasswordListener() {
+    private fun setEdtPasswordListener(context: Context) {
         binding.edtPassword.setOnEditorActionListener { _, id, _ ->
             if (id == EditorInfo.IME_ACTION_DONE) {
                 login()
+                context.getSystemService(InputMethodManager::class.java).also {
+                    it.hideSoftInputFromWindow(binding.edtPassword.windowToken, 0)
+                }
             }
             true
         }

@@ -8,7 +8,7 @@
     tools:context=".view.screen.home.UploadCircleFragment">
 
     <androidx.appcompat.widget.Toolbar
-        android:id="@+id/tbPostDetail"
+        android:id="@+id/tbUploadCircle"
         android:layout_width="match_parent"
         android:layout_height="56dp"
         android:background="@color/white"
@@ -53,7 +53,7 @@
         android:layout_height="0dp"
         android:overScrollMode="never"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/tbPostDetail">
+        app:layout_constraintTop_toBottomOf="@id/tbUploadCircle">
 
         <androidx.appcompat.widget.LinearLayoutCompat
             android:layout_width="match_parent"

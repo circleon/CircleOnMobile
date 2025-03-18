@@ -17,14 +17,17 @@ data class CircleDetailModel(
     val category: Category,
     val singleLineIntroduction: String,
     val memberCount: Int,
+    val members: MemberModels,
     val introImgUrl: String?,
     val introduction: String,
     val recruitmentStartDate: LocalDateTime?,
     val recruitmentEndDate: LocalDateTime?,
 ) : Serializable {
-    fun isMember() = role.isMember()
+    fun isUserJoined() = role.isMember()
 
-    fun isExecutive() = role.isExecutive()
+    fun isUserExecutive() = role.isExecutive()
+
+    fun isUserPresident() = role.isPresident()
 
     fun fold(
         id: Int = this.id,
@@ -36,6 +39,7 @@ data class CircleDetailModel(
         category: Category = this.category,
         singleLineIntroduction: String = this.singleLineIntroduction,
         memberCount: Int = this.memberCount,
+        members: MemberModels = this.members,
         introImgUrl: String? = this.introImgUrl,
         introduction: String = this.introduction,
         recruitmentStartDate: LocalDateTime? = this.recruitmentStartDate,
@@ -50,6 +54,7 @@ data class CircleDetailModel(
         category,
         singleLineIntroduction,
         memberCount,
+        members,
         introImgUrl,
         introduction,
         recruitmentStartDate,
@@ -71,13 +76,14 @@ data class CircleDetailModel(
             CircleDetailModel(
                 0,
                 Const.EMPTY_TEXT,
-                Role.NONE,
+                Role.NONE_MEMBER,
                 0,
                 null,
                 null,
                 Category.ETC,
                 Const.EMPTY_TEXT,
                 0,
+                MemberModels.empty(),
                 null,
                 Const.EMPTY_TEXT,
                 null,

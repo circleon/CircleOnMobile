@@ -1,7 +1,7 @@
 package com.developeek.circleon.domain.enums
 
 enum class University(
-    private val code: String,
+    private val codeName: String,
     private val univName: String,
 ) {
     AJOU("AJOU", "아주대학교"), ;
@@ -9,6 +9,6 @@ enum class University(
     fun univName() = univName
 
     companion object {
-        fun findOrNull(code: String) = entries.find { it.code == code }
+        fun findOrNull(code: String) = entries.find { it.codeName == code }
     }
 }

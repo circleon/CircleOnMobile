@@ -7,12 +7,12 @@ import com.google.gson.annotations.SerializedName
 data class Author(
     @SerializedName("authorId") val id: Int,
     @SerializedName("authorName") val name: String,
-    @SerializedName("authorProfileUrl") val profileUrl: String?,
+    @SerializedName("authorProfileUrl") val profileImgUrl: String?,
 ) {
     fun toAuthorModel() =
         AuthorModel(
             id,
             name,
-            Utils.getCircleImageUrlOrNull(profileUrl),
+            Utils.getCircleImageUrlOrNull(profileImgUrl),
         )
 }

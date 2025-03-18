@@ -22,7 +22,7 @@ data class CircleSummaryModels(private val models: List<CircleSummaryModel>) {
         )
 
     companion object {
-        fun emptyInstance() = CircleSummaryModels(listOf())
+        fun empty() = CircleSummaryModels(emptyList())
     }
 }
 

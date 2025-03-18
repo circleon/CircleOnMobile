@@ -18,6 +18,7 @@ import com.developeek.circleon.view.listener.RecyclerViewInfiniteScrollListener
 import com.developeek.circleon.view.viewmodel.HomeViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -33,10 +34,14 @@ class HomeViewModelImpl
         private val uiState = MutableLiveData<UiState>()
         override lateinit var user: UserModel
 
-        override lateinit var categories: CategoryModels
+        override val categories: CategoryModels
+            get() = _categories
+        private var _categories = CategoryModels.selectAndGet(Category.ALL)
 
-        override lateinit var circles: CircleModels
-        private var fetchCircleJob: Job? = null
+        override val circles: CircleModels
+            get() = circleModels
+        private var circleModels = CircleModels.empty()
+        private var fetchCirclesJob: Job? = null
         private var currentPage = DEFAULT_PAGE
 
         override val scrollOver: LiveData<Boolean>
@@ -62,27 +67,25 @@ class HomeViewModelImpl
         }
 
         override fun refresh() {
-            fetchCircles()
+            setFilterAndFetch(categories.selectedOrFirst().category)
         }
 
         override fun setFilterAndFetch(category: Category) {
-            categories = CategoryModels.selectAndGet(category)
-            fetchCircles()
-        }
-
-        private fun fetchCircles() {
-            fetchCircleJob?.let {
+            fetchCirclesJob?.let {
                 if (!it.isCompleted) return
             }
-            uiState.postValue(UiState.Loading)
-            currentPage = DEFAULT_PAGE
 
-            fetchCircleJob =
+            _categories = CategoryModels.selectAndGet(category)
+            uiState.postValue(UiState.Loading)
+            scrollOverCircleJob?.cancel()
+            currentPage = DEFAULT_PAGE // 카테고리를 선택할 때는 circles 를 재사용하지 않기 때문에 currentPage 도 초기화
+
+            fetchCirclesJob =
                 viewModelScope.launch {
                     val result = repository.getCircles(currentPage, SIZE_BY_PAGE, categories.selectedOrFirst().category)
 
                     if (result is Success) {
-                        circles = result.data
+                        circleModels = result.data
                         uiState.postValue(UiState.Success)
                     } else {
                         error = (result as Error).message()
@@ -107,9 +110,10 @@ class HomeViewModelImpl
                             currentPage + 1, SIZE_BY_PAGE, categories.selectedOrFirst().category,
                         )
 
+                    if (!isActive) return@launch
                     if (result is Success) {
-                        circles =
-                            circles.addAll(result.data).also {
+                        circleModels =
+                            circleModels.addAll(result.data).also {
                                 if (result.data.isLastPage()) {
                                     it.setAsLast()
                                 }

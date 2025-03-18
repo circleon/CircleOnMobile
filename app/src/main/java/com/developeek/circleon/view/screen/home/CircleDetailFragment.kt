@@ -4,6 +4,7 @@ import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.text.Html
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -19,6 +20,7 @@ import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.RecyclerView
 import com.developeek.circleon.R
 import com.developeek.circleon.databinding.FragmentCircleDetailBinding
+import com.developeek.circleon.domain.enums.MembershipStatus
 import com.developeek.circleon.domain.enums.PostType
 import com.developeek.circleon.domain.model.CircleDetailModel
 import com.developeek.circleon.domain.state.UiState
@@ -81,12 +83,12 @@ class CircleDetailFragment : Fragment() {
     ) {
         super.onViewCreated(view, savedInstanceState)
 
-        initView()
+        initView(requireActivity())
         initObserver(requireActivity(), requireContext())
         initListener()
     }
 
-    private fun initView() {
+    private fun initView(parentActivity: Activity) {
         initAppBar()
     }
 
@@ -128,19 +130,16 @@ class CircleDetailFragment : Fragment() {
                 toggleView(binding.flCircleDetail)
                 loadCircleDetail(context)
                 inflateOverflowMenu(context)
+                setMemberCountListener()
                 setOverflowMenuItemListener(context)
             }
             UiState.AuthenticationError -> {
                 sendUserToLoginScreen(parentActivity)
-                if (ErrorToast.previousFinished()) {
-                    ErrorToast(context, viewModel.error).show()
-                }
+                showErrorToast(context)
             }
             UiState.ServiceError -> {
                 toggleView(binding.llServiceError)
-                if (ErrorToast.previousFinished()) {
-                    ErrorToast(context, viewModel.error).show()
-                }
+                showErrorToast(context)
             }
             else -> {}
         }
@@ -152,9 +151,15 @@ class CircleDetailFragment : Fragment() {
         binding.tlCircleDetail.getTabAt(viewModel.currentTabPosition)?.select() // 탭 복원
         viewModel.circleDetail.thumbnailUrl?.let {
             glideProvider.fetchImage(it, context, binding.imgCircleThumbnail)
-        } ?: binding.imgCircleThumbnail.setImageResource(R.drawable.ic_circle_thumbnail_placeholder)
+        } ?: binding.imgCircleThumbnail.setImageResource(R.drawable.ic_circle_thumbnail_default)
         binding.txtCircleCategory.text = viewModel.circleDetail.category.categoryName()
-        binding.txtCircleMemberCount.text = String.format(MEMBER_COUNT_UNIT, viewModel.circleDetail.memberCount)
+        binding.txtCircleMemberCount.text =
+            Html.fromHtml(
+                String.format(
+                    ContextCompat.getString(context, R.string.underlined_number), viewModel.circleDetail.memberCount,
+                ),
+                Html.FROM_HTML_MODE_LEGACY,
+            )
     }
 
     private fun sendUserToLoginScreen(activity: Activity) {
@@ -163,21 +168,42 @@ class CircleDetailFragment : Fragment() {
         startActivity(intent)
     }
 
+    private fun showErrorToast(context: Context) {
+        if (ErrorToast.previousFinished()) {
+            ErrorToast(context, viewModel.error).show()
+        }
+    }
+
     private fun inflateOverflowMenu(context: Context) {
         if (binding.tbCircleDetail.menu.isEmpty()) {
-            if (viewModel.circleDetail.isExecutive()) {
+            if (viewModel.circleDetail.isUserExecutive()) {
                 binding.tbCircleDetail.inflateMenu(R.menu.menu_executive_circle_settings)
-            } else if (viewModel.circleDetail.isMember()) {
+            } else if (viewModel.circleDetail.isUserJoined()) {
                 binding.tbCircleDetail.inflateMenu(R.menu.menu_member_circle_settings)
             }
 
-            if (viewModel.circleDetail.isExecutive() || viewModel.circleDetail.isMember()) {
+            if (viewModel.circleDetail.isUserExecutive() || viewModel.circleDetail.isUserJoined()) {
                 Utils.changeMenuItemTextColor(
-                    binding.tbCircleDetail.menu.findItem(R.id.resign_circle),
+                    binding.tbCircleDetail.menu.findItem(R.id.leave_circle),
                     ContextCompat.getColor(context, R.color.error),
                 )
             }
         }
+    }
+
+    private fun setMemberCountListener() {
+        binding.txtCircleMemberCount.setOnClickListener {
+            sendUserToCircleMemberScreen()
+        }
+    }
+
+    private fun sendUserToCircleMemberScreen() {
+        val bundle = Bundle()
+
+        bundle.putSerializable(Const.TAG_CIRCLE_DETAIL, viewModel.circleDetail)
+        bundle.putSerializable(Const.TAG_MEMBERS, viewModel.circleDetail.members)
+        bundle.putSerializable(Const.TAG_MEMBERSHIP_STATUS, MembershipStatus.JOINED)
+        findNavController().navigate(R.id.action_circleDetailFragment_to_manageCircleMemberFragment, bundle)
     }
 
     private fun setOverflowMenuItemListener(context: Context) {
@@ -195,8 +221,9 @@ class CircleDetailFragment : Fragment() {
                 sendUserToEditCircleScreen(item)
             }
             R.id.manage_circle -> {
+                sendUserToManageCircleScreen(item)
             }
-            R.id.resign_circle -> {
+            R.id.leave_circle -> {
             }
         }
         true
@@ -206,8 +233,15 @@ class CircleDetailFragment : Fragment() {
         val bundle = Bundle()
 
         bundle.putSerializable(Const.TAG_CIRCLE_DETAIL, item)
-        bundle.putBoolean(Const.FLAG_IS_EDIT, true) // 수정 기능 전용 활성화
+        bundle.putBoolean(Const.FLAG_EDIT_SCREEN, true) // 수정 기능 전용 활성화
         findNavController().navigate(R.id.action_circleDetailFragment_to_uploadCircleFragment, bundle)
+    }
+
+    private fun sendUserToManageCircleScreen(item: CircleDetailModel) {
+        val bundle = Bundle()
+
+        bundle.putSerializable(Const.TAG_CIRCLE_DETAIL, item)
+        findNavController().navigate(R.id.action_circleDetailFragment_to_manageCircleFragment, bundle)
     }
 
     private fun initListener() {
@@ -285,7 +319,7 @@ class CircleDetailFragment : Fragment() {
     }
 
     private fun replaceToNoticeScreen(bundle: Bundle) {
-        if (viewModel.circleDetail.isMember()) {
+        if (viewModel.circleDetail.isUserJoined()) {
             bundle.putInt(Const.TAG_CIRCLE_ID, viewModel.circleDetail.id)
             bundle.putSerializable(Const.TAG_USER_ROLE, viewModel.circleDetail.role)
             replaceTo(CircleDetailNoticeFragment(), bundle)
@@ -295,7 +329,7 @@ class CircleDetailFragment : Fragment() {
     }
 
     private fun replaceToPostScreen(bundle: Bundle) {
-        if (viewModel.circleDetail.isMember()) {
+        if (viewModel.circleDetail.isUserJoined()) {
             bundle.putInt(Const.TAG_CIRCLE_ID, viewModel.circleDetail.id)
             replaceTo(CircleDetailPostFragment(), bundle)
         } else if (!binding.llNotMember.isVisible) {
@@ -330,13 +364,13 @@ class CircleDetailFragment : Fragment() {
                 binding.fabUploadCircleContent.isVisible = false
             }
             1 -> {
-                binding.fabUploadCircleContent.isVisible = viewModel.circleDetail.isExecutive()
+                binding.fabUploadCircleContent.isVisible = viewModel.circleDetail.isUserExecutive()
                 binding.fabUploadCircleContent.setOnClickListener {
                     sendUserToUploadPostScreen(circleId, PostType.NOTICE, bundle)
                 }
             }
             2 -> {
-                binding.fabUploadCircleContent.isVisible = viewModel.circleDetail.isMember()
+                binding.fabUploadCircleContent.isVisible = viewModel.circleDetail.isUserJoined()
                 binding.fabUploadCircleContent.setOnClickListener {
                     sendUserToUploadPostScreen(circleId, PostType.POST, bundle)
                 }
@@ -355,7 +389,7 @@ class CircleDetailFragment : Fragment() {
     ) {
         bundle.putInt(Const.TAG_CIRCLE_ID, circleId)
         bundle.putSerializable(Const.TAG_POST_TYPE, postType)
-        bundle.putBoolean(Const.FLAG_IS_EDIT, false) // 신규 작성 전용 기능 활성화
+        bundle.putBoolean(Const.FLAG_EDIT_SCREEN, false) // 신규 작성 전용 기능 활성화
         findNavController().navigate(R.id.action_circleDetailFragment_to_uploadPostFragment, bundle)
     }
 
@@ -410,9 +444,5 @@ class CircleDetailFragment : Fragment() {
         if (binding.llNotMember.isVisible) {
             binding.llNotMember.isVisible = false
         }
-    }
-
-    companion object {
-        private const val MEMBER_COUNT_UNIT = "멤버 %d명"
     }
 }

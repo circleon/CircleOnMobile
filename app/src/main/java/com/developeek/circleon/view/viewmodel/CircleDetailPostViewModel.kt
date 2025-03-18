@@ -23,9 +23,9 @@ interface CircleDetailPostViewModel {
 
     fun setTopOrNot(isTop: Boolean)
 
-    fun pinAndRefresh(postId: Int)
+    fun pinAndFetch(postId: Int)
 
-    fun removePinAndRefresh(postId: Int)
+    fun removePinAndFetch(postId: Int)
 
-    fun deleteAndRefresh(postId: Int)
+    fun deleteAndFetch(postId: Int)
 }

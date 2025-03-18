@@ -12,6 +12,7 @@ import com.developeek.circleon.R
 import com.developeek.circleon.databinding.ItemCirclePostBinding
 import com.developeek.circleon.databinding.ItemLoadingBinding
 import com.developeek.circleon.domain.enums.Role
+import com.developeek.circleon.domain.model.AuthorModel
 import com.developeek.circleon.domain.model.PostModel
 import com.developeek.circleon.domain.model.PostModels
 import com.developeek.circleon.domain.utils.glide.GlideProvider
@@ -26,7 +27,7 @@ class CirclePostAdapter(
     private val itemListenerInitializer: ItemListenerInitializer<PostModel>,
     private val overflowListenerInitializer: ItemListenerInitializer<PostModel>,
     private val userId: Int? = null,
-    private val role: Role = Role.NONE,
+    private val role: Role = Role.NONE_MEMBER,
 ) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
     private val diffUtil =
         AsyncListDiffer(
@@ -65,31 +66,31 @@ class CirclePostAdapter(
         fun onBind(position: Int) {
             val post = diffUtil.currentList[position]
 
-            loadAuthor(post)
-            loadPost(post)
+            load(post.author)
+            load(post)
             hideOverFlowOrNot(post)
             notifyListenerItemChanged(post)
         }
 
-        private fun loadAuthor(post: PostModel) {
-            binding.txtAuthorName.text = post.author.name
-            post.author.profileUrl?.let {
+        private fun load(author: AuthorModel) {
+            binding.txtAuthorName.text = author.name
+            author.profileImgUrl?.let {
                 glideProvider.fetchImage(it, context, binding.imgAuthorProfile)
-            } ?: binding.imgAuthorProfile.setImageResource(R.drawable.ic_author_placeholder)
-            binding.txtCreated.text =
-                post.createdAt.format(
-                    DateTimeFormatter
-                        .ofPattern(CREATED_DATE_FORMAT)
-                        .withLocale(Locale.KOREAN),
-                )
+            } ?: binding.imgAuthorProfile.setImageResource(R.drawable.ic_user_profile_default)
         }
 
-        private fun loadPost(post: PostModel) {
+        private fun load(post: PostModel) {
             binding.txtPostContent.text = post.content
             binding.txtCommentCount.text =
                 String.format(
                     COMMENT_COUNT_UNIT,
                     post.commentCount,
+                )
+            binding.txtCreated.text =
+                post.createdAt.format(
+                    DateTimeFormatter
+                        .ofPattern(CREATED_DATE_FORMAT)
+                        .withLocale(Locale.KOREAN),
                 )
             post.imgUrl?.let {
                 glideProvider.fetchImage(it, context, binding.imgPost)

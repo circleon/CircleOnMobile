@@ -1,8 +1,5 @@
 package com.developeek.circleon.view.screen.home
 
-import android.animation.Animator
-import android.animation.AnimatorInflater
-import android.animation.AnimatorSet
 import android.app.Activity
 import android.content.Context
 import android.content.Intent
@@ -14,7 +11,6 @@ import android.view.WindowManager
 import android.view.inputmethod.InputMethodManager
 import android.widget.EditText
 import androidx.appcompat.widget.PopupMenu
-import androidx.core.animation.addListener
 import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
@@ -88,24 +84,6 @@ class CircleDetailPostDetailFragment : Fragment() {
         binding = FragmentCircleDetailPostDetailBinding.inflate(layoutInflater)
 
         return binding.root
-    }
-
-    override fun onCreateAnimator(
-        transit: Int,
-        enter: Boolean,
-        nextAnim: Int,
-    ): Animator? {
-        if (nextAnim == R.animator.slide_in_left) {
-            val animator = AnimatorInflater.loadAnimator(context, nextAnim) as AnimatorSet
-            animator.addListener(
-                onEnd = {
-                    viewModel.notifyEnterAnimFinishedAndUpdateUI()
-                },
-            )
-
-            return animator
-        }
-        return super.onCreateAnimator(transit, enter, nextAnim)
     }
 
     override fun onViewCreated(
@@ -213,7 +191,7 @@ class CircleDetailPostDetailFragment : Fragment() {
         bundle.putInt(Const.TAG_CIRCLE_ID, circleId)
         bundle.putSerializable(Const.TAG_POST_TYPE, item.type)
         bundle.putSerializable(Const.TAG_CIRCLE_POST, item)
-        bundle.putBoolean(Const.FLAG_IS_EDIT, true) // 수정 기능 전용 활성화
+        bundle.putBoolean(Const.FLAG_EDIT_SCREEN, true) // 수정 기능 전용 활성화
         findNavController().navigate(R.id.action_circleDetailPostDetailFragment_to_uploadPostFragment, bundle)
     }
 

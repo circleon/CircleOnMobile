@@ -19,6 +19,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
@@ -41,13 +42,13 @@ class SignUpViewModelImpl
 
         private var name: UserName? = null
         private var email: UserEmail? = null
-        private lateinit var requestEmailCodeJob: Job
+        private var requestEmailCodeJob: Job? = null
         private var emailCode: String? = null
-        private lateinit var countEmailCodeExpirationTimeJob: Job
+        private var countEmailCodeExpirationTimeJob: Job? = null
         private var password: Password? = null
         private var passwordMatched: Boolean = false
         private var emailAuthenticated: Boolean = false
-        private lateinit var authenticateEmailJob: Job
+        private var authenticateEmailJob: Job? = null
         private var signUpJob: Job? = null
 
         override lateinit var error: String
@@ -58,11 +59,14 @@ class SignUpViewModelImpl
                 if (!it.isCompleted) return
             }
 
+            uiState.postValue(UiState.Loading)
+
             signUpJob =
                 viewModelScope.launch {
                     val result = repository.signUp(email!!, name!!, password!!)
 
                     if (result is Success) {
+                        uiState.postValue(UiState.Success)
                         validationMessage.postValue(SIGN_UP_COMPLETED)
                     } else {
                         error = (result as Error).message()
@@ -101,32 +105,36 @@ class SignUpViewModelImpl
         }
 
         override fun requestEmailCode() {
-            if ((!::requestEmailCodeJob.isInitialized || requestEmailCodeJob.isCompleted) && email != null) {
-                requestEmailCodeJob =
-                    viewModelScope.launch {
-                        val result = repository.requestEmailAuthenticationCode(email!!)
-
-                        if (result is Success) {
-                            startEmailAuthenticationTimer()
-                            validationMessage.postValue(EMAIL_CODE_REQUESTED)
-                        } else {
-                            error = (result as Error).message()
-                            uiState.postValue(UiState.ServiceError)
-                        }
-                    }
+            requestEmailCodeJob?.let {
+                if (!it.isCompleted) return
             }
+            if (email == null) return
+
+            uiState.postValue(UiState.Loading)
+
+            requestEmailCodeJob =
+                viewModelScope.launch {
+                    val result = repository.requestEmailAuthenticationCode(email!!)
+
+                    if (result is Success) {
+                        startEmailAuthenticationTimer()
+                        uiState.postValue(UiState.Success)
+                        validationMessage.postValue(EMAIL_CODE_REQUESTED)
+                    } else {
+                        error = (result as Error).message()
+                        uiState.postValue(UiState.ServiceError)
+                    }
+                }
         }
 
         private fun startEmailAuthenticationTimer() {
-            if (::countEmailCodeExpirationTimeJob.isInitialized) countEmailCodeExpirationTimeJob.cancel()
-
             countEmailCodeExpirationTimeJob =
                 viewModelScope.launch {
                     withContext(Dispatchers.Default) {
                         timer.postValue(TIMER_INIT)
                         var time = 0L
 
-                        while (time < TIMER_INIT) {
+                        while (isActive && time < TIMER_INIT) {
                             delay(TIMER_INTERVAL)
                             time += TIMER_INTERVAL
                             timer.postValue(TIMER_INIT - time)
@@ -140,24 +148,28 @@ class SignUpViewModelImpl
         }
 
         override fun authenticateEmail() {
-            if ((!::authenticateEmailJob.isInitialized || authenticateEmailJob.isCompleted) &&
-                email != null && emailCode != null
-            ) {
-                authenticateEmailJob =
-                    viewModelScope.launch {
-                        val result = repository.authenticateEmail(email!!, emailCode!!)
-
-                        if (result is Success) {
-                            emailAuthenticated = true
-                            countEmailCodeExpirationTimeJob.cancel()
-                            validationMessage.postValue(EMAIL_AUTHENTICATED)
-                        } else {
-                            emailAuthenticated = false
-                            error = (result as Error).message()
-                            uiState.postValue(UiState.ServiceError)
-                        }
-                    }
+            authenticateEmailJob?.let {
+                if (!it.isCompleted) return
             }
+            if (email == null || emailCode == null) return
+
+            uiState.postValue(UiState.Loading)
+
+            authenticateEmailJob =
+                viewModelScope.launch {
+                    val result = repository.authenticateEmail(email!!, emailCode!!)
+
+                    if (result is Success) {
+                        emailAuthenticated = true
+                        countEmailCodeExpirationTimeJob?.cancel()
+                        uiState.postValue(UiState.Success)
+                        validationMessage.postValue(EMAIL_AUTHENTICATED)
+                    } else {
+                        emailAuthenticated = false
+                        error = (result as Error).message()
+                        uiState.postValue(UiState.ServiceError)
+                    }
+                }
         }
 
         override fun setPassword(password: String) {

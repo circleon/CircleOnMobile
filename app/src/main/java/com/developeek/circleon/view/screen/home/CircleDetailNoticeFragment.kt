@@ -144,18 +144,28 @@ class CircleDetailNoticeFragment : Fragment() {
         view: View,
     ) {
         val popupMenu = object : PopupMenu(context, view) {}
-        if (item.isPinned) {
-            popupMenu.inflate(R.menu.menu_pinned_notice_settings)
-        } else {
-            popupMenu.inflate(R.menu.menu_notice_settings)
+        val userId = userManager.getUser()?.id
+
+        userId?.let {
+            if (it == item.author.id) {
+                if (item.isPinned) {
+                    popupMenu.inflate(R.menu.menu_pinned_author_notice_settings)
+                } else {
+                    popupMenu.inflate(R.menu.menu_author_notice_settings)
+                }
+                Utils.changeMenuItemTextColor(
+                    popupMenu.menu.findItem(R.id.delete_post),
+                    ContextCompat.getColor(context, R.color.error),
+                )
+            } else {
+                if (item.isPinned) {
+                    popupMenu.inflate(R.menu.menu_pinned_notice_settings)
+                } else {
+                    popupMenu.inflate(R.menu.menu_notice_settings)
+                }
+            }
         }
-
         popupMenu.setOnMenuItemClickListener(noticeOverflowMenuItemClickListener(context, item))
-        Utils.changeMenuItemTextColor(
-            popupMenu.menu.findItem(R.id.delete_post),
-            ContextCompat.getColor(context, R.color.error),
-        )
-
         popupMenu.show()
     }
 
@@ -166,11 +176,11 @@ class CircleDetailNoticeFragment : Fragment() {
         viewModel.saveScrollState(binding.rvCircleNotice.layoutManager?.onSaveInstanceState())
         when (it.itemId) {
             R.id.pin_post -> {
-                if (item.isPinned) {
-                    viewModel.removePinAndRefresh(item.id)
-                } else {
-                    viewModel.pinAndRefresh(item.id)
-                }
+                viewModel.pinAndFetch(item.id)
+            }
+
+            R.id.unpin_post -> {
+                viewModel.removePinAndFetch(item.id)
             }
 
             R.id.edit_post -> {
@@ -179,7 +189,7 @@ class CircleDetailNoticeFragment : Fragment() {
 
             R.id.delete_post -> {
                 ContentDeleteAlertDialog(context, MESSAGE_DELETE_NOTICE) {
-                    viewModel.deleteAndRefresh(item.id)
+                    viewModel.deleteAndFetch(item.id)
                 }.show()
             }
         }
@@ -195,7 +205,7 @@ class CircleDetailNoticeFragment : Fragment() {
         bundle.putInt(Const.TAG_CIRCLE_ID, circleId)
         bundle.putSerializable(Const.TAG_POST_TYPE, PostType.NOTICE)
         bundle.putSerializable(Const.TAG_CIRCLE_POST, item)
-        bundle.putBoolean(Const.FLAG_IS_EDIT, true) // 수정 기능 전용 활성화
+        bundle.putBoolean(Const.FLAG_EDIT_SCREEN, true) // 수정 기능 전용 활성화
         findNavController().navigate(R.id.action_circleDetailFragment_to_uploadPostFragment, bundle)
     }
 
@@ -232,7 +242,7 @@ class CircleDetailNoticeFragment : Fragment() {
     ) = Observer<UiState> {
         when (it) {
             UiState.Loading -> {
-                toggleView(binding.pgbLoading)
+                toggleView(binding.pgbNoticeLoading)
             }
             UiState.Success -> {
                 if (viewModel.posts.isEmpty()) {
@@ -244,15 +254,11 @@ class CircleDetailNoticeFragment : Fragment() {
             }
             UiState.AuthenticationError -> {
                 sendUserToLoginScreen(parentActivity)
-                if (ErrorToast.previousFinished()) {
-                    ErrorToast(context, viewModel.error).show()
-                }
+                showErrorToast(context)
             }
             UiState.ServiceError -> {
                 toggleView(binding.llServiceError)
-                if (ErrorToast.previousFinished()) {
-                    ErrorToast(context, viewModel.error).show()
-                }
+                showErrorToast(context)
             }
             else -> {}
         }
@@ -272,6 +278,12 @@ class CircleDetailNoticeFragment : Fragment() {
         val intent = Intent(activity, LoginActivity::class.java)
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)
         startActivity(intent)
+    }
+
+    private fun showErrorToast(context: Context) {
+        if (ErrorToast.previousFinished()) {
+            ErrorToast(context, viewModel.error).show()
+        }
     }
 
     private fun scrollOverObserver() =
@@ -326,7 +338,7 @@ class CircleDetailNoticeFragment : Fragment() {
 
     private fun toggleView(view: View) {
         binding.rvCircleNotice.isVisible = view == binding.rvCircleNotice
-        binding.pgbLoading.isVisible = view == binding.pgbLoading
+        binding.pgbNoticeLoading.isVisible = view == binding.pgbNoticeLoading
         binding.txtNoNotice.isVisible = view == binding.txtNoNotice
         binding.llServiceError.isVisible = view == binding.llServiceError
     }

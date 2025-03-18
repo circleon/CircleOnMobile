@@ -28,7 +28,7 @@ object RemoteSourceModule {
 
     annotation class ServiceClient
 
-    private const val TIMEOUT_LIMIT: Long = 5
+    private const val TIMEOUT_LIMIT: Long = 10
 
     @Provides
     @Singleton

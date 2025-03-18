@@ -30,7 +30,7 @@ data class CommentModels(private val models: List<CommentModel>) {
     fun isLastPage() = isLastPage
 
     companion object {
-        fun emptyInstance() = CommentModels(listOf())
+        fun emptyInstance() = CommentModels(emptyList())
     }
 }
 

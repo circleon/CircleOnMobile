@@ -23,7 +23,6 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.cancel
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import java.io.File
 import java.time.LocalDateTime
@@ -48,6 +47,7 @@ class UploadCircleViewModelImpl
 
         override lateinit var circle: CircleDetailModel
         private var uploadJob: Job? = null
+        private var editJob: Job? = null
         override val categories: LiveData<CategoryModels>
             get() = circleCategories
         private var circleCategories =
@@ -68,7 +68,6 @@ class UploadCircleViewModelImpl
         private var hasThumbnailChanged = false
         private var hasIntroductionImageChanged = false
 
-        private var loadingStartTime = 0L
         override lateinit var error: String
 
         init {
@@ -77,14 +76,13 @@ class UploadCircleViewModelImpl
 
         override fun edit() {
             if (!isCircleFormat(circle)) return
-            uploadJob?.let {
+            editJob?.let {
                 if (!it.isCompleted) return
             }
             uiState.postValue(UiState.Loading)
-            saveLoadingStartTime()
 
             var tmpState: UiState = UiState.Success
-            uploadJob =
+            editJob =
                 viewModelScope.launch {
                     val editCircleJob =
                         async {
@@ -96,12 +94,7 @@ class UploadCircleViewModelImpl
                             return@async if (isAnyImageEdited()) editCircleImage(circle) else UiState.Success
                         }
 
-                    val deleteCircleImageJob =
-                        async {
-                            return@async if (isAnyImageRemoved()) deleteCircleImage(circle) else UiState.Success
-                        }
-
-                    val jobs: List<Deferred<UiState>> = listOf(editCircleJob, editCircleImageJob, deleteCircleImageJob)
+                    val jobs: List<Deferred<UiState>> = listOf(editCircleJob, editCircleImageJob)
                     jobs.map { job ->
                         job.invokeOnCompletion {
                             if (job.isCancelled) {
@@ -109,7 +102,7 @@ class UploadCircleViewModelImpl
                             }
                         }
                     }
-                    // 코루틴별 invokeOnCompletion 등록 이후에 await() 을 해야 자식 코루틴 캔슬이 부모 코루틴에게 즉시 전파됨
+                    // 코루틴별 invokeOnCompletion 을 전부 등록해준 이후에 await() 을 해야 자식 코루틴 캔슬이 부모 코루틴에게 즉시 전파됨
                     jobs.awaitAll().map {
                         if (it !is UiState.Success) tmpState = it
                     }
@@ -122,7 +115,6 @@ class UploadCircleViewModelImpl
 
         private suspend fun editCircle(circle: CircleDetailModel): UiState {
             val result = repository.putCircle(circle)
-            delay(remainedLoadingTime())
 
             if (result is Success) {
                 return UiState.Success
@@ -136,7 +128,8 @@ class UploadCircleViewModelImpl
             val result = repository.putCircleImage(circle.id, thumbnail, introductionImage)
 
             if (result is Success) {
-                return UiState.Success
+                // TODO: 서버 설계 문제로 이미지 편집과 삭제 작업은 동기 통신 방식으로 진행
+                return if (isAnyImageRemoved()) deleteCircleImage(circle) else UiState.Success
             } else {
                 error = (result as Error).message()
                 return if (result.isAuthenticationError()) UiState.AuthenticationError else UiState.ServiceError
@@ -216,18 +209,4 @@ class UploadCircleViewModelImpl
         private fun isThumbnailRemoved() = thumbnail == null && hasThumbnailChanged
 
         private fun isIntroductionImageRemoved() = introductionImage == null && hasIntroductionImageChanged
-
-        private fun saveLoadingStartTime() {
-            this.loadingStartTime = System.currentTimeMillis()
-        }
-
-        private fun remainedLoadingTime(): Long {
-            val remainTime = MAX_DEFAULT_ANIM_TIME_MILLIS - (System.currentTimeMillis() - loadingStartTime)
-
-            return if (remainTime > 0) remainTime else 0
-        }
-
-        companion object {
-            private const val MAX_DEFAULT_ANIM_TIME_MILLIS = 200L
-        }
     }

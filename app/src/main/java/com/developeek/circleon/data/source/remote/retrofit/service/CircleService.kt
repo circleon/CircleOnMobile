@@ -4,11 +4,14 @@ import com.developeek.circleon.data.dto.home.Circle
 import com.developeek.circleon.data.dto.home.CircleDetail
 import com.developeek.circleon.data.dto.home.CircleSummaries
 import com.developeek.circleon.data.dto.home.Comment
+import com.developeek.circleon.data.dto.home.Member
 import com.developeek.circleon.data.dto.home.Paging
 import com.developeek.circleon.data.dto.home.Pin
 import com.developeek.circleon.data.dto.home.Post
 import com.developeek.circleon.data.dto.home.RequestBodyEditCircleDetail
 import com.developeek.circleon.data.dto.home.RequestBodyEditComment
+import com.developeek.circleon.data.dto.home.RequestBodyEditMemberRole
+import com.developeek.circleon.data.dto.home.RequestBodyEditMemberStatus
 import com.developeek.circleon.data.dto.home.RequestBodyEditPost
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
@@ -47,6 +50,15 @@ interface CircleService {
     suspend fun getCircleDetail(
         @Path("circleId") circleId: Int,
     ): CircleDetail
+
+    @GET("circles/{circleId}/members")
+    suspend fun getMembers(
+        @Path("circleId") circleId: Int,
+        @Query("page") page: Int,
+        @Query("size") size: Int,
+        @Query("sort") sort: String,
+        @Query("membershipStatus") membershipStatus: String,
+    ): Paging<Member>
 
     @GET("circles/{circleId}/posts")
     suspend fun getCirclePosts(
@@ -118,6 +130,20 @@ interface CircleService {
         @Body data: RequestBodyEditComment,
     )
 
+    @PUT("circles/{circleId}/members/{memberId}/role")
+    suspend fun putCircleMemberRole(
+        @Path("circleId") circleId: Int,
+        @Path("memberId") memberId: Int,
+        @Body data: RequestBodyEditMemberRole,
+    )
+
+    @PUT("circles/{circleId}/members/{memberId}/status")
+    suspend fun putCircleMemberStatus(
+        @Path("circleId") circleId: Int,
+        @Path("memberId") memberId: Int,
+        @Body data: RequestBodyEditMemberStatus,
+    )
+
     // DELETE
     @DELETE("circles/{circleId}/images")
     suspend fun deleteCircleImage(
@@ -137,5 +163,11 @@ interface CircleService {
         @Path("circleId") circleId: Int,
         @Path("postId") postId: Int,
         @Path("commentId") commentId: Int,
+    )
+
+    @DELETE("circles/{circleId}/members/{memberId}")
+    suspend fun deleteCircleMember(
+        @Path("circleId") circleId: Int,
+        @Path("memberId") memberId: Int,
     )
 }

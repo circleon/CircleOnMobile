@@ -47,19 +47,35 @@
         android:textSize="@dimen/text_size_default"
         android:imeOptions="actionDone"/>
 
-    <androidx.appcompat.widget.AppCompatTextView
-        android:id="@+id/btnLogin"
+    <FrameLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="40dp"
         android:layout_marginTop="@dimen/margin_padding_small"
-        android:paddingHorizontal="@dimen/margin_padding_large"
-        android:paddingVertical="10dp"
-        android:gravity="center"
-        android:text="@string/btn_login"
-        android:textSize="@dimen/text_size_default"
-        android:textColor="@color/white"
         android:background="@drawable/bg_rounded_rectangle"
-        android:backgroundTint="@color/purple_5"/>
+        android:backgroundTint="@color/purple_5">
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/btnLogin"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="center"
+            android:text="@string/btn_login"
+            android:textSize="@dimen/text_size_default"
+            android:textColor="@color/white" />
+
+        <com.google.android.material.progressindicator.CircularProgressIndicator
+            android:id="@+id/pgbLoading"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_gravity="center"
+            app:indicatorColor="@color/white"
+            app:trackColor="@color/grey_3"
+            app:trackThickness="1dp"
+            app:indicatorSize="20dp"
+            android:indeterminate="true"
+            android:visibility="gone"/>
+
+    </FrameLayout>
 
     <androidx.appcompat.widget.LinearLayoutCompat
         android:layout_width="match_parent"

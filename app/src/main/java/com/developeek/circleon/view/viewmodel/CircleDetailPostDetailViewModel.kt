@@ -22,8 +22,6 @@ interface CircleDetailPostDetailViewModel {
 
     fun refresh()
 
-    fun notifyEnterAnimFinishedAndUpdateUI()
-
     fun scrollOver()
 
     fun saveScrollState(scrollState: Parcelable?)

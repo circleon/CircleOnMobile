@@ -10,7 +10,7 @@ import android.view.ViewGroup
 import androidx.core.os.bundleOf
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.activityViewModels
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -36,7 +36,7 @@ import javax.inject.Inject
 @AndroidEntryPoint
 class HomeFragment : Fragment() {
     private lateinit var binding: FragmentHomeBinding
-    private val viewModel: HomeViewModel by activityViewModels<HomeViewModelImpl>()
+    private val viewModel: HomeViewModel by viewModels<HomeViewModelImpl>()
 
     @Inject
     lateinit var glideProvider: GlideProvider
@@ -60,12 +60,15 @@ class HomeFragment : Fragment() {
     ) {
         super.onViewCreated(view, savedInstanceState)
 
-        initView(requireContext())
+        initView(requireActivity(), requireContext())
         initObserver(requireActivity(), requireContext())
         initListener()
     }
 
-    private fun initView(context: Context) {
+    private fun initView(
+        parentActivity: Activity,
+        context: Context,
+    ) {
         initCategoryRecyclerView(context)
         initCircleRecyclerView(context)
     }
@@ -141,7 +144,7 @@ class HomeFragment : Fragment() {
     ) = Observer<UiState> {
         when (it) {
             UiState.Loading -> {
-                toggleView(binding.pgbLoading)
+                toggleView(binding.pgbCircleLoading)
             }
             UiState.Success -> {
                 if (viewModel.circles.isEmpty()) {
@@ -154,12 +157,11 @@ class HomeFragment : Fragment() {
             }
             UiState.AuthenticationError -> {
                 sendUserToLoginScreen(parentActivity)
+                showErrorToast(context)
             }
             UiState.ServiceError -> {
                 toggleView(binding.llServiceError)
-                if (ErrorToast.previousFinished()) {
-                    ErrorToast(context, viewModel.error).show()
-                }
+                showErrorToast(context)
             }
             else -> {}
         }
@@ -188,6 +190,12 @@ class HomeFragment : Fragment() {
         val intent = Intent(activity, LoginActivity::class.java)
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)
         startActivity(intent)
+    }
+
+    private fun showErrorToast(context: Context) {
+        if (ErrorToast.previousFinished()) {
+            ErrorToast(context, viewModel.error).show()
+        }
     }
 
     private fun scrollOverObserver() =
@@ -248,7 +256,7 @@ class HomeFragment : Fragment() {
 
     private fun toggleView(view: View) {
         binding.rvCircle.isVisible = view == binding.rvCircle
-        binding.pgbLoading.isVisible = view == binding.pgbLoading
+        binding.pgbCircleLoading.isVisible = view == binding.pgbCircleLoading
         binding.txtNoCircle.isVisible = view == binding.txtNoCircle
         binding.llServiceError.isVisible = view == binding.llServiceError
     }

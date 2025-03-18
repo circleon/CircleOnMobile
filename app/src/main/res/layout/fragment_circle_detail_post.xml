@@ -15,7 +15,7 @@
         android:visibility="gone"/>
 
     <com.google.android.material.progressindicator.CircularProgressIndicator
-        android:id="@+id/pgbLoading"
+        android:id="@+id/pgbPostLoading"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:paddingBottom="182dp"

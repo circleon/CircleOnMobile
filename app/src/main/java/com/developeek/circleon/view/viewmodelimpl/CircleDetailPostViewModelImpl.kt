@@ -35,8 +35,10 @@ class CircleDetailPostViewModelImpl
             get() = uiState
         private val uiState = MutableLiveData<UiState>()
 
-        override lateinit var posts: PostModels
-        private var fetchPostJob: Job? = null
+        override val posts: PostModels
+            get() = postModels
+        private var postModels = PostModels.empty()
+        private var fetchPostsJob: Job? = null
         private var deletePostJob: Job? = null
         private var currentPage = DEFAULT_PAGE
 
@@ -63,16 +65,16 @@ class CircleDetailPostViewModelImpl
             page: Int,
             size: Int,
         ) {
-            fetchPostJob?.let {
+            fetchPostsJob?.let {
                 if (!it.isCompleted) return
             }
 
-            fetchPostJob =
+            fetchPostsJob =
                 viewModelScope.launch {
                     val result = repository.getCirclePosts(circleId, page, size)
 
                     if (result is Success) {
-                        posts = result.data
+                        postModels = result.data
                         uiState.postValue(UiState.Success)
                     } else {
                         error = (result as Error).message()
@@ -86,6 +88,7 @@ class CircleDetailPostViewModelImpl
         }
 
         override fun refresh() {
+            uiState.postValue(UiState.Loading)
             fetchPosts(DEFAULT_PAGE, (currentPage + 1) * SIZE_BY_PAGE)
         }
 
@@ -99,8 +102,8 @@ class CircleDetailPostViewModelImpl
                     val result = repository.getCirclePosts(circleId, currentPage + 1, SIZE_BY_PAGE)
 
                     if (result is Success) {
-                        posts =
-                            posts.addAll(result.data).also {
+                        postModels =
+                            postModels.addAll(result.data).also {
                                 if (result.data.isLastPage()) {
                                     it.setAsLast()
                                 }
@@ -126,7 +129,7 @@ class CircleDetailPostViewModelImpl
             this.isTop = isTop
         }
 
-        override fun deleteAndRefresh(postId: Int) {
+        override fun deleteAndFetch(postId: Int) {
             deletePostJob?.let {
                 if (!it.isCompleted) return
             }
@@ -136,7 +139,7 @@ class CircleDetailPostViewModelImpl
                     val result = repository.deleteCirclePost(circleId, postId)
 
                     if (result is Success) {
-                        refresh()
+                        fetchPosts(DEFAULT_PAGE, (currentPage + 1) * SIZE_BY_PAGE)
                     } else {
                         error = (result as Error).message()
                         if (result.isAuthenticationError()) {
@@ -149,9 +152,9 @@ class CircleDetailPostViewModelImpl
         }
 
         // 현재는 공지사항용 핀 고정 기능이고, 나중에 게시글 고정 기능 추가 시 사용
-        override fun pinAndRefresh(postId: Int) {}
+        override fun pinAndFetch(postId: Int) {}
 
-        override fun removePinAndRefresh(postId: Int) {}
+        override fun removePinAndFetch(postId: Int) {}
 
         companion object {
             private const val SIZE_BY_PAGE = 20

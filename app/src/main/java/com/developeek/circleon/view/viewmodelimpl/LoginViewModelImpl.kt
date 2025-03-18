@@ -36,6 +36,8 @@ class LoginViewModelImpl
                 if (!it.isCompleted) return
             }
 
+            uiState.postValue(UiState.Loading)
+
             loginJob =
                 viewModelScope.launch {
                     val result = repository.login(email, password)

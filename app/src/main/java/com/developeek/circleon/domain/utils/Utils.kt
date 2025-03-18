@@ -16,14 +16,12 @@ import java.io.File
 import java.io.FileOutputStream
 import java.time.LocalDateTime
 import kotlin.math.max
-import kotlin.math.min
 
 object Utils {
     // TODO: local properties 로 이동
     private const val CIRCLE_IMAGE_PATH = "circles/images/"
     private const val POST_IMAGE_PATH = "posts/images/"
     private const val MAX_IMAGE_WIDTH = 800f
-    private const val MAX_IMAGE_HEIGHT = 800f
 
     fun getCircleImageUrlOrNull(url: String?): String? {
         url ?: return null
@@ -88,14 +86,8 @@ object Utils {
             }
         BitmapFactory.decodeFile(file.absolutePath, options)
 
-        val scaleFactor =
-            max(
-                1,
-                min(
-                    options.outWidth.toFloat() / MAX_IMAGE_WIDTH,
-                    options.outHeight.toFloat() / MAX_IMAGE_HEIGHT,
-                ).toInt(),
-            )
+        // 압축 배수는 최소 1 이상(원본보다 해상도를 크게 x), 원본의 가로 해상도 기준으로 결정
+        val scaleFactor = max(1, (options.outWidth.toFloat() / MAX_IMAGE_WIDTH).toInt())
 
         options.inJustDecodeBounds = false
         options.inSampleSize = scaleFactor

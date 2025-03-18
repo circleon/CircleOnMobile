@@ -4,6 +4,7 @@ import android.util.TimeFormatException
 import com.developeek.circleon.domain.enums.Category
 import com.developeek.circleon.domain.enums.Role
 import com.developeek.circleon.domain.model.CircleDetailModel
+import com.developeek.circleon.domain.model.MemberModels
 import com.developeek.circleon.domain.utils.Utils
 import com.google.gson.annotations.SerializedName
 import java.time.LocalDateTime
@@ -20,20 +21,21 @@ data class CircleDetail(
     val introduction: String,
     val recruitmentStartDate: String?,
     val recruitmentEndDate: String?,
-    @SerializedName("circleRole") val memberRole: String?,
+    @SerializedName("circleRole") val role: String?,
     val memberId: Int?,
 ) {
-    fun toCircleDetailModel() =
+    fun toCircleDetailModel(circleMembers: MemberModels) =
         CircleDetailModel(
             id,
             name,
-            Role.findOrDefault(memberRole),
+            Role.findOrDefault(role),
             memberId(memberId),
             Utils.getCircleImageUrlOrNull(profileImgUrl),
             Utils.getCircleImageUrlOrNull(thumbnailUrl),
             Category.findOrDefault(category),
             singleLineIntroduction,
             memberCount,
+            circleMembers,
             Utils.getCircleImageUrlOrNull(introImgUrl),
             introduction,
             localDateTime(recruitmentStartDate),

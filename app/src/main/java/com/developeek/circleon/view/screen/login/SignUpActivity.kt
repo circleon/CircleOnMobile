@@ -7,6 +7,7 @@ import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
+import androidx.core.view.isVisible
 import androidx.fragment.app.FragmentManager
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleOwner
@@ -58,6 +59,8 @@ class SignUpActivity : AppCompatActivity() {
 
     private fun stateObserver(activity: Activity) =
         Observer<UiState> {
+            binding.pgbLoading.isVisible = it is UiState.Loading
+            binding.btnNext.isVisible = it !is UiState.Loading
             when (it) {
                 UiState.ServiceError -> {
                     ErrorAlertDialog(
