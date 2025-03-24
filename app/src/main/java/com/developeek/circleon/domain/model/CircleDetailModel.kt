@@ -2,6 +2,7 @@ package com.developeek.circleon.domain.model
 
 import com.developeek.circleon.data.dto.home.RequestBodyEditCircleDetail
 import com.developeek.circleon.domain.enums.Category
+import com.developeek.circleon.domain.enums.MembershipStatus
 import com.developeek.circleon.domain.enums.Role
 import com.developeek.circleon.domain.utils.Const
 import java.io.Serializable
@@ -12,6 +13,7 @@ data class CircleDetailModel(
     val name: String,
     val role: Role,
     val memberId: Int,
+    val membershipStatus: MembershipStatus,
     val profileImgUrl: String?,
     val thumbnailUrl: String?,
     val category: Category,
@@ -34,6 +36,7 @@ data class CircleDetailModel(
         name: String = this.name,
         role: Role = this.role,
         memberId: Int = this.memberId,
+        membershipStatus: MembershipStatus = this.membershipStatus,
         profileImgUrl: String? = this.profileImgUrl,
         thumbnailUrl: String? = this.thumbnailUrl,
         category: Category = this.category,
@@ -49,6 +52,7 @@ data class CircleDetailModel(
         name,
         role,
         memberId,
+        membershipStatus,
         profileImgUrl,
         thumbnailUrl,
         category,
@@ -78,6 +82,7 @@ data class CircleDetailModel(
                 Const.EMPTY_TEXT,
                 Role.NONE_MEMBER,
                 0,
+                MembershipStatus.NOT_JOINED,
                 null,
                 null,
                 Category.ETC,

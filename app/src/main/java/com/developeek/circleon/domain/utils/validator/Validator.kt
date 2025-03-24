@@ -8,6 +8,7 @@ import java.io.IOException
 
 object Validator {
     private const val MAX_COMMENT_SIZE = 255
+    private const val MAX_MESSAGE_SIZE = 255
     private const val MAX_POST_SIZE = 1000
     // 텍스트 유효성 검증은 즉각적인 피드백이 요구되기 때문에 UI 스레드에서 진행
 
@@ -80,7 +81,7 @@ object Validator {
         } catch (e: IllegalArgumentException) {
             InputValidationResult.invalid(
                 IOException(
-                    String.format(ValidatorExceptionMessage.MESSAGE_OVER_SIZE_POST, MAX_POST_SIZE),
+                    String.format(ValidatorExceptionMessage.MESSAGE_OVER_SIZE, MAX_POST_SIZE),
                 ),
             )
         }
@@ -97,7 +98,24 @@ object Validator {
         } catch (e: IllegalArgumentException) {
             InputValidationResult.invalid(
                 IOException(
-                    String.format(ValidatorExceptionMessage.MESSAGE_OVER_SIZE_COMMENT, MAX_COMMENT_SIZE),
+                    String.format(ValidatorExceptionMessage.MESSAGE_OVER_SIZE, MAX_COMMENT_SIZE),
+                ),
+            )
+        }
+    }
+
+    fun checkMessage(data: String): InputValidationResult<String> {
+        checkEmpty(data).also {
+            if (it is Invalid) return it
+        }
+
+        return try {
+            require(data.length <= MAX_MESSAGE_SIZE)
+            InputValidationResult.valid(data)
+        } catch (e: IllegalArgumentException) {
+            InputValidationResult.invalid(
+                IOException(
+                    String.format(ValidatorExceptionMessage.MESSAGE_OVER_SIZE, MAX_MESSAGE_SIZE),
                 ),
             )
         }

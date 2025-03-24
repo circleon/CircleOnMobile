@@ -88,7 +88,11 @@ class ManageCircleViewModelImpl
                         }
 
                     val jobs: List<Deferred<UiState>> =
-                        listOf(fetchCircleJoinRequestedMembersJob, fetchCircleLeaveRequestedMembersJob)
+                        listOf(
+                            fetchCircleMembersJob,
+                            fetchCircleJoinRequestedMembersJob,
+                            fetchCircleLeaveRequestedMembersJob,
+                        )
                     jobs.map { job ->
                         job.invokeOnCompletion {
                             if (job.isCancelled) {

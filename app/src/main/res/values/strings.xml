@@ -52,10 +52,11 @@
     <string name="btn_cancel">취소</string>
 
     <!--Circle Detail-->
-    <string name="btn_join_circle">가입신청</string>
+    <string name="btn_request_join_circle">가입신청</string>
+    <string name="text_circle_join_requested">대기중</string>
     <string name="menu_circle_settings_edit">수정하기</string>
     <string name="menu_circle_settings_manage">관리하기</string>
-    <string name="menu_circle_settings_leave">탈퇴하기</string>
+    <string name="menu_circle_settings_request_leave">탈퇴하기</string>
     <string name="tab_name_introduction">소개글</string>
     <string name="tab_name_notice">공지사항</string>
     <string name="tab_name_post">게시글</string>
@@ -102,11 +103,14 @@
     <string name="btn_reject_join_request">거절</string>
     <string name="btn_accept_join_request">수락</string>
     <string name="btn_show_member_message">사유 보기</string>
-    <string name="title_member_message_dialog">%s님이 이런 메세지를 남겨주셨어요</string>
+    <string name="title_member_message_dialog_for_accept">%s님이 이런 메세지를 남겨주셨어요</string>
+    <string name="title_member_message_dialog">탈퇴 사유를 알려주세요</string>
     <string name="btn_accept_leave_request">승인하기</string>
+    <string name="btn_leave_request">탈퇴하기</string>
 
     <!--Post Detail-->
     <string name="hint_comment">댓글을 입력해주세요.</string>
+    <string name="title_edit_comment_dialog">댓글 수정하기</string>
 
     <!--Upload Post-->
     <string name="btn_finish">완료</string>

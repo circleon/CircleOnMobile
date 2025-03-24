@@ -63,6 +63,13 @@ interface CircleRepository {
     ): Result<CommentModels>
 
     // POST
+    suspend fun postMyCircle(circleId: Int): Result<Unit>
+
+    suspend fun postCircleLeaveRequest(
+        memberId: Int,
+        leaveMessage: String,
+    ): Result<Unit>
+
     suspend fun postCirclePost(
         circleId: Int,
         postType: PostType,

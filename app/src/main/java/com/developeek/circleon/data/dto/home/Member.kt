@@ -37,3 +37,7 @@ data class RequestBodyEditMemberRole(
 data class RequestBodyEditMemberStatus(
     @SerializedName("membershipStatus") val status: String,
 )
+
+data class RequestBodyCircleLeave(
+    @SerializedName("leaveMessage") val message: String,
+)

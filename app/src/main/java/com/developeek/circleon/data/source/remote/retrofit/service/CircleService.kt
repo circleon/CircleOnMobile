@@ -8,6 +8,7 @@ import com.developeek.circleon.data.dto.home.Member
 import com.developeek.circleon.data.dto.home.Paging
 import com.developeek.circleon.data.dto.home.Pin
 import com.developeek.circleon.data.dto.home.Post
+import com.developeek.circleon.data.dto.home.RequestBodyCircleLeave
 import com.developeek.circleon.data.dto.home.RequestBodyEditCircleDetail
 import com.developeek.circleon.data.dto.home.RequestBodyEditComment
 import com.developeek.circleon.data.dto.home.RequestBodyEditMemberRole
@@ -77,6 +78,17 @@ interface CircleService {
     ): Paging<Comment>
 
     // POST
+    @POST("my-circles/{circleId}")
+    suspend fun postMyCircle(
+        @Path("circleId") circleId: Int,
+    )
+
+    @POST("my-circles/{memberId}/leave-request")
+    suspend fun postCircleLeaveRequest(
+        @Path("memberId") memberId: Int,
+        @Body data: RequestBodyCircleLeave,
+    )
+
     @Multipart
     @POST("circles/{circleId}/posts")
     suspend fun postCirclePost(

@@ -35,9 +35,9 @@ import com.developeek.circleon.view.screen.login.LoginActivity
 import com.developeek.circleon.view.viewmodel.CircleDetailPostDetailViewModel
 import com.developeek.circleon.view.viewmodelimpl.CircleDetailPostDetailViewModelImpl
 import com.developeek.circleon.view.widget.ContentDeleteAlertDialog
+import com.developeek.circleon.view.widget.EditCommentAlertDialog
 import com.developeek.circleon.view.widget.ErrorAlertDialog
 import com.developeek.circleon.view.widget.ErrorToast
-import com.developeek.circleon.view.widget.TextInputAlertDialog
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.progressindicator.CircularProgressIndicator
 import dagger.hilt.android.AndroidEntryPoint
@@ -218,7 +218,7 @@ class CircleDetailPostDetailFragment : Fragment() {
         viewModel.saveScrollState(binding.rvPostDetail.layoutManager?.onSaveInstanceState())
         when (it.itemId) {
             R.id.edit_comment -> {
-                TextInputAlertDialog(
+                EditCommentAlertDialog(
                     context,
                     comment.content,
                     object : ItemListenerInitializer<String> {

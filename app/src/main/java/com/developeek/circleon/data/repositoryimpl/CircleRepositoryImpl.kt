@@ -1,6 +1,7 @@
 package com.developeek.circleon.data.repositoryimpl
 
 import com.developeek.circleon.data.dto.home.Pin
+import com.developeek.circleon.data.dto.home.RequestBodyCircleLeave
 import com.developeek.circleon.data.dto.home.RequestBodyEditComment
 import com.developeek.circleon.data.dto.home.RequestBodyEditMemberRole
 import com.developeek.circleon.data.dto.home.RequestBodyEditMemberStatus
@@ -233,6 +234,31 @@ class CircleRepositoryImpl(
             }
         } catch (e: ServiceException.NoResultException) {
             Result.success(CommentModels.emptyInstance())
+        } catch (e: IOException) {
+            Result.error(e)
+        }
+    }
+
+    override suspend fun postMyCircle(circleId: Int): Result<Unit> {
+        return try {
+            withContext(dispatcher) {
+                service.postMyCircle(circleId)
+                Result.success(Unit)
+            }
+        } catch (e: IOException) {
+            Result.error(e)
+        }
+    }
+
+    override suspend fun postCircleLeaveRequest(
+        memberId: Int,
+        leaveMessage: String,
+    ): Result<Unit> {
+        return try {
+            withContext(dispatcher) {
+                service.postCircleLeaveRequest(memberId, RequestBodyCircleLeave(leaveMessage))
+                Result.success(Unit)
+            }
         } catch (e: IOException) {
             Result.error(e)
         }

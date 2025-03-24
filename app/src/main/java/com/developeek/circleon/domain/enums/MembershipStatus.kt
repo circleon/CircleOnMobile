@@ -14,6 +14,10 @@ enum class MembershipStatus(
 
     fun statusName() = statusName
 
+    fun isNotJoined() = this == NOT_JOINED
+
+    fun isJoinRequested() = this == JOIN_REQUESTED
+
     companion object {
         private val default = NOT_JOINED
 

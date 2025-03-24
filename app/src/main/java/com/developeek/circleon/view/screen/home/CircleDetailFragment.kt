@@ -27,9 +27,11 @@ import com.developeek.circleon.domain.state.UiState
 import com.developeek.circleon.domain.utils.Const
 import com.developeek.circleon.domain.utils.Utils
 import com.developeek.circleon.domain.utils.glide.GlideProvider
+import com.developeek.circleon.view.listener.ItemListenerInitializer
 import com.developeek.circleon.view.screen.login.LoginActivity
 import com.developeek.circleon.view.viewmodel.CircleDetailViewModel
 import com.developeek.circleon.view.viewmodelimpl.CircleDetailViewModelImpl
+import com.developeek.circleon.view.widget.CircleLeaveRequestAlertDialog
 import com.developeek.circleon.view.widget.ErrorToast
 import com.google.android.material.progressindicator.CircularProgressIndicator
 import com.google.android.material.tabs.TabLayout
@@ -132,6 +134,7 @@ class CircleDetailFragment : Fragment() {
                 inflateOverflowMenu(context)
                 setMemberCountListener()
                 setOverflowMenuItemListener(context)
+                setBtnRequestJoinCircle(context)
             }
             UiState.AuthenticationError -> {
                 sendUserToLoginScreen(parentActivity)
@@ -224,6 +227,19 @@ class CircleDetailFragment : Fragment() {
                 sendUserToManageCircleScreen(item)
             }
             R.id.leave_circle -> {
+                CircleLeaveRequestAlertDialog(
+                    context,
+                    object : ItemListenerInitializer<String> {
+                        override fun initialize(item: String) {
+                            viewModel.requestLeave(item)
+                        }
+
+                        override fun initialize(
+                            item: String,
+                            view: View?,
+                        ) {}
+                    },
+                ).show()
             }
         }
         true
@@ -242,6 +258,21 @@ class CircleDetailFragment : Fragment() {
 
         bundle.putSerializable(Const.TAG_CIRCLE_DETAIL, item)
         findNavController().navigate(R.id.action_circleDetailFragment_to_manageCircleFragment, bundle)
+    }
+
+    private fun setBtnRequestJoinCircle(context: Context) {
+        binding.btnRequestJoinCircle.isVisible = !viewModel.circleDetail.isUserJoined()
+
+        if (viewModel.circleDetail.membershipStatus.isNotJoined()) {
+            binding.btnRequestJoinCircle.text = context.getString(R.string.btn_request_join_circle)
+            binding.btnRequestJoinCircle.setOnClickListener {
+                viewModel.requestJoin()
+            }
+        }
+        if (viewModel.circleDetail.membershipStatus.isJoinRequested()) {
+            binding.btnRequestJoinCircle.text = context.getString(R.string.text_circle_join_requested)
+            binding.btnRequestJoinCircle.isClickable = false
+        }
     }
 
     private fun initListener() {
