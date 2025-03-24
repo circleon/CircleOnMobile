@@ -27,9 +27,11 @@ import com.developeek.circleon.domain.state.UiState
 import com.developeek.circleon.domain.utils.Const
 import com.developeek.circleon.domain.utils.Utils
 import com.developeek.circleon.domain.utils.glide.GlideProvider
+import com.developeek.circleon.view.listener.ItemListenerInitializer
 import com.developeek.circleon.view.screen.login.LoginActivity
 import com.developeek.circleon.view.viewmodel.CircleDetailViewModel
 import com.developeek.circleon.view.viewmodelimpl.CircleDetailViewModelImpl
+import com.developeek.circleon.view.widget.CircleLeaveRequestAlertDialog
 import com.developeek.circleon.view.widget.ErrorToast
 import com.google.android.material.progressindicator.CircularProgressIndicator
 import com.google.android.material.tabs.TabLayout
@@ -225,6 +227,19 @@ class CircleDetailFragment : Fragment() {
                 sendUserToManageCircleScreen(item)
             }
             R.id.leave_circle -> {
+                CircleLeaveRequestAlertDialog(
+                    context,
+                    object : ItemListenerInitializer<String> {
+                        override fun initialize(item: String) {
+                            viewModel.requestLeave(item)
+                        }
+
+                        override fun initialize(
+                            item: String,
+                            view: View?,
+                        ) {}
+                    },
+                ).show()
             }
         }
         true

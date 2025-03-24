@@ -1,39 +1,56 @@
 package com.developeek.circleon.view.widget
 
 import android.content.Context
+import android.content.res.ColorStateList
 import android.view.LayoutInflater
 import android.view.View
+import android.widget.EditText
 import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
+import androidx.core.content.ContextCompat
 import com.developeek.circleon.R
-import com.developeek.circleon.domain.model.MemberModel
 import com.developeek.circleon.view.listener.ItemClickListener
 import com.developeek.circleon.view.listener.ItemListenerInitializer
 
-class CircleMemberLeaveRequestAcceptAlertDialog(
+class CircleLeaveRequestAlertDialog(
     private val context: Context,
-    private val member: MemberModel,
-    private val positiveListenerInitializer: ItemListenerInitializer<MemberModel>,
+    private val positiveListenerInitializer: ItemListenerInitializer<String>,
 ) {
     private lateinit var alertDialog: AlertDialog
 
     init {
         val layoutInflater = LayoutInflater.from(context)
-        val view = layoutInflater.inflate(R.layout.dialog_accept_circle_member_leave_request, null)
+        val view = layoutInflater.inflate(R.layout.dialog_title_content_negative_positive, null)
 
-        alertDialog =
-            AlertDialog.Builder(context, R.style.custom_alert_dialog)
-                .setView(view)
-                .create()
+        alertDialog = AlertDialog.Builder(context, R.style.custom_alert_dialog).setView(view).create()
 
         initView(view)
         initListener(view)
     }
 
     private fun initView(view: View) {
+        initTitle(view)
+        initPositiveButton(view)
+        initContent(view)
+    }
+
+    private fun initTitle(view: View) {
         val title = view.findViewById<TextView>(R.id.txtTitle)
 
-        title.text = String.format(context.getString(R.string.title_member_message_dialog), member.name)
+        title.text = context.getString(R.string.title_member_message_dialog)
+    }
+
+    private fun initPositiveButton(view: View) {
+        val positiveButton = view.findViewById<TextView>(R.id.btnLeaveRequest)
+
+        positiveButton.text = context.getString(R.string.btn_leave_request)
+    }
+
+    private fun initContent(view: View) {
+        val edtContent = view.findViewById<EditText>(R.id.edtContent)
+        val backgroundColor = ContextCompat.getColor(context, R.color.grey_3)
+
+        edtContent.backgroundTintList = ColorStateList.valueOf(backgroundColor)
     }
 
     private fun initListener(view: View) {
@@ -42,18 +59,17 @@ class CircleMemberLeaveRequestAcceptAlertDialog(
     }
 
     private fun setPositiveListener(view: View) {
-        val btnAcceptLeaveRequest = view.findViewById<TextView>(R.id.btnAcceptLeaveRequest)
+        val btnAcceptLeaveRequest = view.findViewById<TextView>(R.id.btnLeaveRequest)
 
         val positiveClickListener =
-            object : ItemClickListener<MemberModel> {
-                override lateinit var item: MemberModel
+            object : ItemClickListener<String> {
+                override lateinit var item: String
 
                 override fun onClick(p0: View?) {
+                    item = view.findViewById<EditText>(R.id.edtContent).text.toString()
                     positiveListenerInitializer.initialize(item)
                     alertDialog.dismiss()
                 }
-            }.apply {
-                item = member
             }
 
         btnAcceptLeaveRequest.setOnClickListener(positiveClickListener)

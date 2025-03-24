@@ -19,4 +19,6 @@ interface CircleDetailViewModel {
     fun setAppBarExpanded(expanded: Boolean)
 
     fun requestJoin()
+
+    fun requestLeave(leaveMessage: String)
 }

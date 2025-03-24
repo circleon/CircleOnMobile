@@ -9,6 +9,8 @@ import com.developeek.circleon.data.source.Error
 import com.developeek.circleon.data.source.Success
 import com.developeek.circleon.domain.model.CircleDetailModel
 import com.developeek.circleon.domain.state.UiState
+import com.developeek.circleon.domain.utils.validator.Invalid
+import com.developeek.circleon.domain.utils.validator.Validator
 import com.developeek.circleon.view.viewmodel.CircleDetailViewModel
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
@@ -104,7 +106,7 @@ class CircleDetailViewModelImpl
                     val result = repository.postMyCircle(circleId)
 
                     if (result is Success) {
-                        uiState.postValue(UiState.Success)
+                        refresh()
                     } else {
                         error = (result as Error).message()
                         if (result.isAuthenticationError()) {
@@ -114,5 +116,42 @@ class CircleDetailViewModelImpl
                         }
                     }
                 }
+        }
+
+        override fun requestLeave(message: String) {
+            if (!isMessageFormat(message)) return
+            requestJoinLeaveJob?.let {
+                if (!it.isCompleted) return
+            }
+
+            uiState.postValue(UiState.Loading)
+
+            requestJoinLeaveJob =
+                viewModelScope.launch {
+                    val result = repository.postCircleLeaveRequest(circleDetail.memberId, message)
+
+                    if (result is Success) {
+                        refresh()
+                    } else {
+                        error = (result as Error).message()
+                        if (result.isAuthenticationError()) {
+                            uiState.postValue(UiState.AuthenticationError)
+                        } else {
+                            uiState.postValue(UiState.ServiceError)
+                        }
+                    }
+                }
+        }
+
+        private fun isMessageFormat(message: String): Boolean {
+            val validation = Validator.checkMessage(message)
+
+            return if (validation is Invalid) {
+                error = validation.message()
+                uiState.postValue(UiState.ServiceError)
+                false
+            } else {
+                true
+            }
         }
     }
