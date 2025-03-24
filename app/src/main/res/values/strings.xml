@@ -52,10 +52,11 @@
     <string name="btn_cancel">취소</string>
 
     <!--Circle Detail-->
-    <string name="btn_join_circle">가입신청</string>
+    <string name="btn_request_join_circle">가입신청</string>
+    <string name="text_circle_join_requested">대기중</string>
     <string name="menu_circle_settings_edit">수정하기</string>
     <string name="menu_circle_settings_manage">관리하기</string>
-    <string name="menu_circle_settings_leave">탈퇴하기</string>
+    <string name="menu_circle_settings_request_leave">탈퇴하기</string>
     <string name="tab_name_introduction">소개글</string>
     <string name="tab_name_notice">공지사항</string>
     <string name="tab_name_post">게시글</string>

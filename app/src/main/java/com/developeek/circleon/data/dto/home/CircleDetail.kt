@@ -2,6 +2,7 @@ package com.developeek.circleon.data.dto.home
 
 import android.util.TimeFormatException
 import com.developeek.circleon.domain.enums.Category
+import com.developeek.circleon.domain.enums.MembershipStatus
 import com.developeek.circleon.domain.enums.Role
 import com.developeek.circleon.domain.model.CircleDetailModel
 import com.developeek.circleon.domain.model.MemberModels
@@ -23,6 +24,7 @@ data class CircleDetail(
     val recruitmentEndDate: String?,
     @SerializedName("circleRole") val role: String?,
     val memberId: Int?,
+    val membershipStatus: String?,
 ) {
     fun toCircleDetailModel(circleMembers: MemberModels) =
         CircleDetailModel(
@@ -30,6 +32,7 @@ data class CircleDetail(
             name,
             Role.findOrDefault(role),
             memberId(memberId),
+            MembershipStatus.findOrDefault(membershipStatus),
             Utils.getCircleImageUrlOrNull(profileImgUrl),
             Utils.getCircleImageUrlOrNull(thumbnailUrl),
             Category.findOrDefault(category),
@@ -52,6 +55,8 @@ data class CircleDetail(
         }
     }
 
+    // TODO: 동아리 가입 상태와 상관없이 Member DTO 적용중인데, 막상 memberId 는 가입해야만 값이 넘어옴.
+    // 가입 신청 같은 경우에 memberModel 로 다뤄야돼서 수정이 필요할듯
     private fun memberId(id: Int?) = id ?: 0
 }
 

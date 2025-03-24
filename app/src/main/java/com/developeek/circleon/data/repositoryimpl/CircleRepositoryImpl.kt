@@ -238,6 +238,17 @@ class CircleRepositoryImpl(
         }
     }
 
+    override suspend fun postMyCircle(circleId: Int): Result<Unit> {
+        return try {
+            withContext(dispatcher) {
+                service.postMyCircle(circleId)
+                Result.success(Unit)
+            }
+        } catch (e: IOException) {
+            Result.error(e)
+        }
+    }
+
     override suspend fun postCirclePost(
         circleId: Int,
         postType: PostType,

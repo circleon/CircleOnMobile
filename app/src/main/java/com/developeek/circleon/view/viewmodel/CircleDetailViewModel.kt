@@ -17,4 +17,6 @@ interface CircleDetailViewModel {
     fun setTabPosition(position: Int)
 
     fun setAppBarExpanded(expanded: Boolean)
+
+    fun requestJoin()
 }

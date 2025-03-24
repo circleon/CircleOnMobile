@@ -132,6 +132,7 @@ class CircleDetailFragment : Fragment() {
                 inflateOverflowMenu(context)
                 setMemberCountListener()
                 setOverflowMenuItemListener(context)
+                setBtnRequestJoinCircle(context)
             }
             UiState.AuthenticationError -> {
                 sendUserToLoginScreen(parentActivity)
@@ -242,6 +243,21 @@ class CircleDetailFragment : Fragment() {
 
         bundle.putSerializable(Const.TAG_CIRCLE_DETAIL, item)
         findNavController().navigate(R.id.action_circleDetailFragment_to_manageCircleFragment, bundle)
+    }
+
+    private fun setBtnRequestJoinCircle(context: Context) {
+        binding.btnRequestJoinCircle.isVisible = !viewModel.circleDetail.isUserJoined()
+
+        if (viewModel.circleDetail.membershipStatus.isNotJoined()) {
+            binding.btnRequestJoinCircle.text = context.getString(R.string.btn_request_join_circle)
+            binding.btnRequestJoinCircle.setOnClickListener {
+                viewModel.requestJoin()
+            }
+        }
+        if (viewModel.circleDetail.membershipStatus.isJoinRequested()) {
+            binding.btnRequestJoinCircle.text = context.getString(R.string.text_circle_join_requested)
+            binding.btnRequestJoinCircle.isClickable = false
+        }
     }
 
     private fun initListener() {

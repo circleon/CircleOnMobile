@@ -46,6 +46,8 @@ class CircleDetailViewModelImpl
             get() = appBarExpanded
         private var appBarExpanded = true
 
+        private var requestJoinLeaveJob: Job? = null
+
         override lateinit var error: String
 
         init {
@@ -88,5 +90,29 @@ class CircleDetailViewModelImpl
 
         override fun setAppBarExpanded(expanded: Boolean) {
             appBarExpanded = expanded
+        }
+
+        override fun requestJoin() {
+            requestJoinLeaveJob?.let {
+                if (!it.isCompleted) return
+            }
+
+            uiState.postValue(UiState.Loading)
+
+            requestJoinLeaveJob =
+                viewModelScope.launch {
+                    val result = repository.postMyCircle(circleId)
+
+                    if (result is Success) {
+                        uiState.postValue(UiState.Success)
+                    } else {
+                        error = (result as Error).message()
+                        if (result.isAuthenticationError()) {
+                            uiState.postValue(UiState.AuthenticationError)
+                        } else {
+                            uiState.postValue(UiState.ServiceError)
+                        }
+                    }
+                }
         }
     }

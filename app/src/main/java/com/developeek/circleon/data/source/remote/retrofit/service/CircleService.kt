@@ -77,6 +77,11 @@ interface CircleService {
     ): Paging<Comment>
 
     // POST
+    @POST("my-circles/{circleId}")
+    suspend fun postMyCircle(
+        @Path("circleId") circleId: Int,
+    )
+
     @Multipart
     @POST("circles/{circleId}/posts")
     suspend fun postCirclePost(
