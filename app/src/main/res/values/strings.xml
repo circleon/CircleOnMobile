@@ -1,8 +1,8 @@
 <resources>
     <string name="app_name">CircleOn</string>
 
-    <!--Screnn Title-->
-    <string name="screen_title_manage_circle">동아리 관리</string>
+    <!--Common-->
+    <string name="message_not_released">준비중인 기능이에요</string>
 
     <!--Login-->
     <string name="hint_email">학교 이메일</string>
@@ -86,6 +86,7 @@
     <string name="text_circle_category">동아리 카테고리</string>
 
     <!--Manage Circle-->
+    <string name="title_manage_circle">동아리 관리</string>
     <string name="manage_circle_title_circle_member">동아리 멤버</string>
     <string name="manage_circle_title_approve_circle_join">동아리 가입 승인</string>
     <string name="manage_circle_title_approve_circle_leave">동아리 탈퇴 승인</string>

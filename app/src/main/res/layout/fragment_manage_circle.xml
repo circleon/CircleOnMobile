@@ -30,7 +30,7 @@
             android:layout_height="wrap_content"
             android:textAppearance="@style/large_bold_text"
             android:textColor="@color/grey_9"
-            android:text="@string/screen_title_manage_circle"/>
+            android:text="@string/title_manage_circle"/>
 
     </androidx.appcompat.widget.Toolbar>
 

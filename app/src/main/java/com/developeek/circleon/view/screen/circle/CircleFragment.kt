@@ -1,5 +1,6 @@
 package com.developeek.circleon.view.screen.circle
 
+import android.app.Activity
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -14,8 +15,12 @@ class CircleFragment : Fragment() {
         super.onCreate(savedInstanceState)
 
         requireActivity().onBackPressedDispatcher.addCallback(this) {
-            requireActivity().findViewById<BottomNavigationView>(R.id.btmNav).selectedItemId = R.id.nav_graph_home
+            selectHomeTab(requireActivity())
         }
+    }
+
+    private fun selectHomeTab(parentActivity: Activity) {
+        parentActivity.findViewById<BottomNavigationView>(R.id.btmNav).selectedItemId = R.id.nav_graph_home
     }
 
     override fun onCreateView(

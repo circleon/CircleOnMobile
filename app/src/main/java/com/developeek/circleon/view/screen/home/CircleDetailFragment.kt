@@ -466,6 +466,12 @@ class CircleDetailFragment : Fragment() {
         }
     }
 
+    override fun onDestroyView() {
+        super.onDestroyView()
+
+        requireActivity().findViewById<CircularProgressIndicator>(R.id.pgbLoading).isVisible = false
+    }
+
     private fun toggleView(view: View) {
         binding.flCircleDetail.isVisible = view == binding.flCircleDetail
         binding.llServiceError.isVisible = view == binding.llServiceError

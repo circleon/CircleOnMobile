@@ -5,10 +5,13 @@
     android:layout_height="match_parent"
     tools:context=".view.screen.calendar.CalendarFragment">
 
-    <!-- TODO: Update blank fragment layout -->
-    <TextView
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/txtNotReleased"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:text="@string/hello_blank_fragment" />
+        android:gravity="center"
+        android:text="@string/message_not_released"
+        android:textAppearance="@style/large_bold_text"
+        android:textColor="@color/grey_5" />
 
 </FrameLayout>
