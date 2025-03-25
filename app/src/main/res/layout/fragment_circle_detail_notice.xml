@@ -14,17 +14,36 @@
         android:overScrollMode="never"
         android:visibility="gone"/>
 
-    <com.google.android.material.progressindicator.CircularProgressIndicator
-        android:id="@+id/pgbNoticeLoading"
+    <com.facebook.shimmer.ShimmerFrameLayout
+        android:id="@+id/shimmerNotice"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:paddingBottom="182dp"
-        android:layout_gravity="center"
-        app:indicatorColor="@color/purple_5"
-        app:trackColor="@color/grey_3"
-        app:trackThickness="1dp"
-        android:indeterminate="true"
-        android:visibility="gone"/>
+        android:visibility="gone">
+
+        <androidx.appcompat.widget.LinearLayoutCompat
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical">
+
+            <include layout="@layout/item_shimmer_circle_post"/>
+
+            <include layout="@layout/item_shimmer_circle_post"/>
+
+            <include layout="@layout/item_shimmer_circle_post"/>
+
+            <include layout="@layout/item_shimmer_circle_post"/>
+
+            <include layout="@layout/item_shimmer_circle_post"/>
+
+            <include layout="@layout/item_shimmer_circle_post"/>
+
+            <include layout="@layout/item_shimmer_circle_post"/>
+
+            <include layout="@layout/item_shimmer_circle_post"/>
+
+        </androidx.appcompat.widget.LinearLayoutCompat>
+
+    </com.facebook.shimmer.ShimmerFrameLayout>
 
     <androidx.appcompat.widget.AppCompatTextView
         android:id="@+id/txtNoNotice"

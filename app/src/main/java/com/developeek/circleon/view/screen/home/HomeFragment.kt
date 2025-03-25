@@ -71,6 +71,7 @@ class HomeFragment : Fragment() {
     ) {
         initCategoryRecyclerView(context)
         initCircleRecyclerView(context)
+        startCategoryShimmer()
     }
 
     private fun initCategoryRecyclerView(context: Context) {
@@ -124,6 +125,10 @@ class HomeFragment : Fragment() {
         binding.rvCircle.itemAnimator = null
     }
 
+    private fun startCategoryShimmer() {
+        binding.shimmerCategory.startShimmer()
+    }
+
     private fun initObserver(
         parentActivity: Activity,
         context: Context,
@@ -142,9 +147,14 @@ class HomeFragment : Fragment() {
         parentActivity: Activity,
         context: Context,
     ) = Observer<UiState> {
+        if (it !is UiState.Loading) {
+            loadCircleCategory()
+            binding.shimmerCircle.stopShimmer()
+        }
         when (it) {
             UiState.Loading -> {
-                toggleView(binding.pgbCircleLoading)
+                toggleView(binding.shimmerCircle)
+                binding.shimmerCircle.startShimmer()
             }
             UiState.Success -> {
                 if (viewModel.circles.isEmpty()) {
@@ -172,10 +182,15 @@ class HomeFragment : Fragment() {
         binding.txtContentTitleCircle.text = String.format(CONTENT_TITLE_CIRCLE, viewModel.user.name)
     }
 
-    private fun loadCircles() {
+    private fun loadCircleCategory() {
+        binding.shimmerCategory.stopShimmer()
+        binding.shimmerCategory.isVisible = false
         binding.rvCircleCategory.adapter?.let {
             (it as CategoryAdapter).update(viewModel.categories) {}
         }
+    }
+
+    private fun loadCircles() {
         binding.rvCircle.adapter?.let {
             (it as CircleAdapter).update(viewModel.circles) {
                 viewModel.currentScrollState?.let {
@@ -256,7 +271,7 @@ class HomeFragment : Fragment() {
 
     private fun toggleView(view: View) {
         binding.rvCircle.isVisible = view == binding.rvCircle
-        binding.pgbCircleLoading.isVisible = view == binding.pgbCircleLoading
+        binding.shimmerCircle.isVisible = view == binding.shimmerCircle
         binding.txtNoCircle.isVisible = view == binding.txtNoCircle
         binding.llServiceError.isVisible = view == binding.llServiceError
     }

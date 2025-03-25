@@ -213,9 +213,11 @@ class CircleDetailPostFragment : Fragment() {
         parentActivity: Activity,
         context: Context,
     ) = Observer<UiState> {
+        if (it !is UiState.Loading) binding.shimmerPost.stopShimmer()
         when (it) {
             UiState.Loading -> {
-                toggleView(binding.pgbPostLoading)
+                toggleView(binding.shimmerPost)
+                binding.shimmerPost.startShimmer()
             }
             UiState.Success -> {
                 if (viewModel.posts.isEmpty()) {
@@ -306,7 +308,7 @@ class CircleDetailPostFragment : Fragment() {
 
     private fun toggleView(view: View) {
         binding.rvCirclePost.isVisible = view == binding.rvCirclePost
-        binding.pgbPostLoading.isVisible = view == binding.pgbPostLoading
+        binding.shimmerPost.isVisible = view == binding.shimmerPost
         binding.txtNoPost.isVisible = view == binding.txtNoPost
         binding.llServiceError.isVisible = view == binding.llServiceError
     }
