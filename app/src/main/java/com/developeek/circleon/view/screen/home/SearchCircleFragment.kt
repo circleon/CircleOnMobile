@@ -169,8 +169,9 @@ class SearchCircleFragment : Fragment() {
             when (it.isEmpty()) {
                 true -> toggleView(binding.txtNoResult)
                 false -> {
-                    toggleView(binding.rvCircle)
-                    (binding.rvCircle.adapter as CircleSearchResultAdapter).update(it) {}
+                    (binding.rvCircle.adapter as CircleSearchResultAdapter).update(it) {
+                        toggleView(binding.rvCircle)
+                    }
                 }
             }
         }

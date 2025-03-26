@@ -27,7 +27,9 @@ class SearchViewModelImpl
         override val circles: LiveData<CircleSummaryModels>
             get() = searchResult
         private val searchResult = MutableLiveData<CircleSummaryModels>()
-        private lateinit var circleSummaryModels: CircleSummaryModels
+        private val circleSummaryModels: CircleSummaryModels
+            get() = _circleSummaryModels
+        private var _circleSummaryModels = CircleSummaryModels.empty()
         private var fetchCircleSummariesJob: Job? = null
 
         private var keyword = Const.EMPTY_TEXT
@@ -48,7 +50,7 @@ class SearchViewModelImpl
                     val result = repository.getCircleSummaries()
 
                     if (result is Success) {
-                        circleSummaryModels = result.data
+                        _circleSummaryModels = result.data
                         uiState.postValue(UiState.Success)
                     } else {
                         error = (result as Error).message()
@@ -68,11 +70,8 @@ class SearchViewModelImpl
         override fun setKeywordAndFind(keyword: String) {
             this.keyword = keyword
 
-            if (::circleSummaryModels.isInitialized) {
+            if (uiState.value !is UiState.ServiceError) {
                 notifySearchResultByKeyword()
-            }
-            if (uiState.value is UiState.ServiceError) {
-                fetchCircleSummaries()
             }
         }
 
