@@ -1,9 +1,6 @@
 <resources>
     <string name="app_name">CircleOn</string>
 
-    <!--Common-->
-    <string name="message_not_released">준비중인 기능이에요</string>
-
     <!--Login-->
     <string name="hint_email">학교 이메일</string>
     <string name="hint_password">비밀번호</string>
@@ -40,6 +37,7 @@
     <string name="tab_name_direct_message">채팅</string>
     <string name="tab_name_my_page">MY</string>
     <string name="message_service_error">앗! 다시 시도해볼까요?</string>
+    <string name="message_not_released">준비중인 기능이에요</string>
 
     <!--Home-->
     <string name="home_content_title_new_circle">새로 개설된 동아리를 소개합니다!</string>
@@ -117,5 +115,17 @@
     <string name="btn_finish">완료</string>
     <string name="hint_post_content">내용을 입력하세요.</string>
     <string name="add_image">사진 추가하기</string>
+
+    <!--Circle-->
+    <string name="circle_content_title_my_circle">나의 동아리</string>
+    <string name="circle_content_title_join_requested_circle">동아리 가입 신청 목록</string>
+    <string name="circle_content_title_upload_circle">동아리 생성하기</string>
+    <string name="circle_content_title_upload_requested_circle">동아리 생성 신청 목록</string>
+    <string name="circle_content_my_circle_default">가입중인 동아리 0개</string>
+    <string name="circle_content_my_circle">가입중인 동아리 %d개</string>
+    <string name="circle_content_join_requested_circle_default">가입 대기중인 동아리 0개</string>
+    <string name="circle_content_join_requested_circle">가입 대기중인 동아리 %d개</string>
+    <string name="circle_content_upload_requested_circle_default">생성 대기중인 동아리 0개</string>
+    <string name="circle_content_upload_requested_circle">생성 대기중인 동아리 %d개</string>
 
 </resources>

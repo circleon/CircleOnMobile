@@ -271,18 +271,16 @@ class UploadCircleFragment : Fragment() {
 
     private fun setBtnAddCircleThumbnailListener() {
         binding.btnAddCircleThumbnail.setOnClickListener {
-            val mimeType = "image/jpeg"
             circleThumbnailPickMedia.launch(
-                PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.SingleMimeType(mimeType)),
+                PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.SingleMimeType(PHOTO_MIME_TYPE)),
             )
         }
     }
 
     private fun setBtnAddCircleIntroductionImageListener() {
         binding.btnAddCircleIntroductionImage.setOnClickListener {
-            val mimeType = "image/jpeg"
             circleIntroductionImagePickMedia.launch(
-                PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.SingleMimeType(mimeType)),
+                PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.SingleMimeType(PHOTO_MIME_TYPE)),
             )
         }
     }
@@ -414,5 +412,6 @@ class UploadCircleFragment : Fragment() {
         private const val RECRUITMENT_DATE_FORMAT = "yyyy.MM.dd"
         private const val TITLE_CIRCLE_NEW = "동아리 생성"
         private const val TITLE_CIRCLE_EDIT = "동아리 수정"
+        private const val PHOTO_MIME_TYPE = "image/jpeg"
     }
 }

@@ -28,7 +28,7 @@
         android:paddingHorizontal="@dimen/margin_padding_large"
         android:textSize="@dimen/text_size_default"
         android:textColor="@color/grey_9"
-        android:maxLength="256"
+        android:maxLength="255"
         android:gravity="top|start"
         tools:text="content"
         android:background="@drawable/bg_card"

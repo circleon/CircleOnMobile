@@ -229,9 +229,8 @@ class UploadPostFragment : Fragment() {
         binding.btnAddPostImage.setOnClickListener {
             // 편집 화면에서는 이미지 수정 기능 비활성화
             if (!isEdit) {
-                val mimeType = "image/jpeg"
                 pickMedia.launch(
-                    PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.SingleMimeType(mimeType)),
+                    PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.SingleMimeType(PHOTO_MIME_TYPE)),
                 )
             }
         }
@@ -259,5 +258,6 @@ class UploadPostFragment : Fragment() {
         private const val TITLE_NOTICE_EDIT = "공지사항 수정"
         private const val TITLE_POST = "게시글 작성"
         private const val TITLE_POST_EDIT = "게시글 수정"
+        private const val PHOTO_MIME_TYPE = "image/jpeg"
     }
 }
