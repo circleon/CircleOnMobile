@@ -8,12 +8,12 @@ import com.developeek.circleon.data.dto.home.Member
 import com.developeek.circleon.data.dto.home.Paging
 import com.developeek.circleon.data.dto.home.Pin
 import com.developeek.circleon.data.dto.home.Post
-import com.developeek.circleon.data.dto.home.RequestBodyCircleLeave
 import com.developeek.circleon.data.dto.home.RequestBodyEditCircleDetail
 import com.developeek.circleon.data.dto.home.RequestBodyEditComment
 import com.developeek.circleon.data.dto.home.RequestBodyEditMemberRole
 import com.developeek.circleon.data.dto.home.RequestBodyEditMemberStatus
 import com.developeek.circleon.data.dto.home.RequestBodyEditPost
+import com.developeek.circleon.data.dto.home.RequestResponseBodyCircleLeave
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
 import retrofit2.http.Body
@@ -61,6 +61,12 @@ interface CircleService {
         @Query("membershipStatus") membershipStatus: String,
     ): Paging<Member>
 
+    @GET("circles/{circleId}/members/{memberId}/leave-message")
+    suspend fun getCircleLeaveRequestedMemberMessage(
+        @Path("circleId") circleId: Int,
+        @Path("memberId") memberId: Int,
+    ): RequestResponseBodyCircleLeave
+
     @GET("circles/{circleId}/posts")
     suspend fun getCirclePosts(
         @Path("circleId") circleId: Int,
@@ -86,7 +92,7 @@ interface CircleService {
     @POST("my-circles/{memberId}/leave-request")
     suspend fun postCircleLeaveRequest(
         @Path("memberId") memberId: Int,
-        @Body data: RequestBodyCircleLeave,
+        @Body data: RequestResponseBodyCircleLeave,
     )
 
     @Multipart

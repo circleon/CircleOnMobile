@@ -30,9 +30,13 @@ class CircleDetailViewModelImpl
             fun create(circleId: Int): CircleDetailViewModelImpl
         }
 
-        override val state: LiveData<UiState>
+        override val circleDetailState: LiveData<UiState>
             get() = uiState
         private val uiState = MutableLiveData<UiState>()
+
+        override val requestState: LiveData<UiState>
+            get() = userRequestState
+        private val userRequestState = MutableLiveData<UiState>()
 
         override lateinit var circleDetail: CircleDetailModel
         private var fetchCircleDetailJob: Job? = null
@@ -99,7 +103,7 @@ class CircleDetailViewModelImpl
                 if (!it.isCompleted) return
             }
 
-            uiState.postValue(UiState.Loading)
+            userRequestState.postValue(UiState.Loading)
 
             requestJoinLeaveJob =
                 viewModelScope.launch {
@@ -110,9 +114,9 @@ class CircleDetailViewModelImpl
                     } else {
                         error = (result as Error).message()
                         if (result.isAuthenticationError()) {
-                            uiState.postValue(UiState.AuthenticationError)
+                            userRequestState.postValue(UiState.AuthenticationError)
                         } else {
-                            uiState.postValue(UiState.ServiceError)
+                            userRequestState.postValue(UiState.ServiceError)
                         }
                     }
                 }
@@ -124,7 +128,7 @@ class CircleDetailViewModelImpl
                 if (!it.isCompleted) return
             }
 
-            uiState.postValue(UiState.Loading)
+            userRequestState.postValue(UiState.Loading)
 
             requestJoinLeaveJob =
                 viewModelScope.launch {
@@ -135,9 +139,9 @@ class CircleDetailViewModelImpl
                     } else {
                         error = (result as Error).message()
                         if (result.isAuthenticationError()) {
-                            uiState.postValue(UiState.AuthenticationError)
+                            userRequestState.postValue(UiState.AuthenticationError)
                         } else {
-                            uiState.postValue(UiState.ServiceError)
+                            userRequestState.postValue(UiState.ServiceError)
                         }
                     }
                 }
@@ -148,7 +152,7 @@ class CircleDetailViewModelImpl
 
             return if (validation is Invalid) {
                 error = validation.message()
-                uiState.postValue(UiState.ServiceError)
+                userRequestState.postValue(UiState.ServiceError)
                 false
             } else {
                 true

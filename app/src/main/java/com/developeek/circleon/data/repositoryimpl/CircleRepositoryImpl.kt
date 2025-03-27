@@ -1,11 +1,11 @@
 package com.developeek.circleon.data.repositoryimpl
 
 import com.developeek.circleon.data.dto.home.Pin
-import com.developeek.circleon.data.dto.home.RequestBodyCircleLeave
 import com.developeek.circleon.data.dto.home.RequestBodyEditComment
 import com.developeek.circleon.data.dto.home.RequestBodyEditMemberRole
 import com.developeek.circleon.data.dto.home.RequestBodyEditMemberStatus
 import com.developeek.circleon.data.dto.home.RequestBodyEditPost
+import com.developeek.circleon.data.dto.home.RequestResponseBodyCircleLeave
 import com.developeek.circleon.data.exception.ServiceException
 import com.developeek.circleon.data.repository.CircleRepository
 import com.developeek.circleon.data.source.Result
@@ -119,6 +119,20 @@ class CircleRepositoryImpl(
                         MembershipStatus.JOINED.codeName(),
                     )
                 Result.success(MemberModels(response.content.map { it.toMemberModel() }))
+            }
+        } catch (e: IOException) {
+            Result.error(e)
+        }
+    }
+
+    override suspend fun getCircleLeaveRequestedMemberMessage(
+        circleId: Int,
+        memberId: Int,
+    ): Result<String> {
+        return try {
+            withContext(dispatcher) {
+                val response = service.getCircleLeaveRequestedMemberMessage(circleId, memberId)
+                Result.success(response.message)
             }
         } catch (e: IOException) {
             Result.error(e)
@@ -256,7 +270,7 @@ class CircleRepositoryImpl(
     ): Result<Unit> {
         return try {
             withContext(dispatcher) {
-                service.postCircleLeaveRequest(memberId, RequestBodyCircleLeave(leaveMessage))
+                service.postCircleLeaveRequest(memberId, RequestResponseBodyCircleLeave(leaveMessage))
                 Result.success(Unit)
             }
         } catch (e: IOException) {

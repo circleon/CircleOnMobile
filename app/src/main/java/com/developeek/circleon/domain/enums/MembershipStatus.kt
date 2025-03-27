@@ -18,6 +18,8 @@ enum class MembershipStatus(
 
     fun isJoinRequested() = this == JOIN_REQUESTED
 
+    fun isLeaveRequested() = this == LEAVE_REQUESTED
+
     companion object {
         private val default = NOT_JOINED
 

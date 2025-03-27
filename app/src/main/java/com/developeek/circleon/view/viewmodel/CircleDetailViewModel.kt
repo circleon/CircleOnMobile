@@ -5,7 +5,8 @@ import com.developeek.circleon.domain.model.CircleDetailModel
 import com.developeek.circleon.domain.state.UiState
 
 interface CircleDetailViewModel {
-    val state: LiveData<UiState>
+    val circleDetailState: LiveData<UiState>
+    val requestState: LiveData<UiState>
     val circleDetail: CircleDetailModel
     val circleDetailInitialized: Boolean
     val currentTabPosition: Int

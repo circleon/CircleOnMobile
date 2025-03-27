@@ -38,6 +38,6 @@ data class RequestBodyEditMemberStatus(
     @SerializedName("membershipStatus") val status: String,
 )
 
-data class RequestBodyCircleLeave(
+data class RequestResponseBodyCircleLeave(
     @SerializedName("leaveMessage") val message: String,
 )

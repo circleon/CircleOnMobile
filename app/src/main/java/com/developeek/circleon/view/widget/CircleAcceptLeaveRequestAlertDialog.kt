@@ -15,7 +15,6 @@ import com.developeek.circleon.view.listener.ItemListenerInitializer
 class CircleAcceptLeaveRequestAlertDialog(
     private val context: Context,
     private val member: MemberModel,
-    private val content: String,
     private val positiveListenerInitializer: ItemListenerInitializer<MemberModel>,
 ) {
     private lateinit var alertDialog: AlertDialog
@@ -54,7 +53,7 @@ class CircleAcceptLeaveRequestAlertDialog(
     private fun initContent(view: View) {
         val edtContent = view.findViewById<EditText>(R.id.edtContent)
 
-        edtContent.setText(content)
+        edtContent.setText(member.message)
         edtContent.isClickable = false
         edtContent.isFocusable = false
         edtContent.isCursorVisible = false

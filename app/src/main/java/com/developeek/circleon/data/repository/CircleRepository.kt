@@ -31,6 +31,11 @@ interface CircleRepository {
         size: Int,
     ): Result<MemberModels>
 
+    suspend fun getCircleLeaveRequestedMemberMessage(
+        circleId: Int,
+        memberId: Int,
+    ): Result<String>
+
     suspend fun getCircleJoinRequestedMembers(
         circleId: Int,
         page: Int,

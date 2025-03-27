@@ -32,6 +32,7 @@ import com.developeek.circleon.view.screen.login.LoginActivity
 import com.developeek.circleon.view.viewmodel.CircleDetailViewModel
 import com.developeek.circleon.view.viewmodelimpl.CircleDetailViewModelImpl
 import com.developeek.circleon.view.widget.CircleLeaveRequestAlertDialog
+import com.developeek.circleon.view.widget.ErrorAlertDialog
 import com.developeek.circleon.view.widget.ErrorToast
 import com.google.android.material.tabs.TabLayout
 import dagger.hilt.android.AndroidEntryPoint
@@ -101,9 +102,13 @@ class CircleDetailFragment : Fragment() {
         parentActivity: Activity,
         context: Context,
     ) {
-        viewModel.state.observe(
+        viewModel.circleDetailState.observe(
             viewLifecycleOwner,
-            stateObserver(parentActivity, context),
+            circleDetailStateObserver(parentActivity, context),
+        )
+        viewModel.requestState.observe(
+            viewLifecycleOwner,
+            requestStateObserver(parentActivity, context),
         )
         // 정보 수정 여부 감지
         findNavController()
@@ -120,7 +125,7 @@ class CircleDetailFragment : Fragment() {
             }
     }
 
-    private fun stateObserver(
+    private fun circleDetailStateObserver(
         parentActivity: Activity,
         context: Context,
     ) = Observer<UiState> {
@@ -225,19 +230,23 @@ class CircleDetailFragment : Fragment() {
                 sendUserToManageCircleScreen(item)
             }
             R.id.leave_circle -> {
-                CircleLeaveRequestAlertDialog(
-                    context,
-                    object : ItemListenerInitializer<String> {
-                        override fun initialize(item: String) {
-                            viewModel.requestLeave(item)
-                        }
+                if (item.membershipStatus.isLeaveRequested()) {
+                    ErrorAlertDialog(context, context.getString(R.string.message_already_leave_requested)).show()
+                } else {
+                    CircleLeaveRequestAlertDialog(
+                        context,
+                        object : ItemListenerInitializer<String> {
+                            override fun initialize(item: String) {
+                                viewModel.requestLeave(item)
+                            }
 
-                        override fun initialize(
-                            item: String,
-                            view: View?,
-                        ) {}
-                    },
-                ).show()
+                            override fun initialize(
+                                item: String,
+                                view: View?,
+                            ) {}
+                        },
+                    ).show()
+                }
             }
         }
         true
@@ -271,6 +280,27 @@ class CircleDetailFragment : Fragment() {
             binding.btnRequestJoinCircle.text = context.getString(R.string.text_circle_join_requested)
             binding.btnRequestJoinCircle.isClickable = false
         }
+    }
+
+    private fun requestStateObserver(
+        parentActivity: Activity,
+        context: Context,
+    ) = Observer<UiState> {
+        binding.pgbLoading.isVisible = it is UiState.Loading
+        when (it) {
+            UiState.AuthenticationError -> {
+                sendUserToLoginScreen(parentActivity)
+                showErrorToast(context)
+            }
+            UiState.ServiceError -> {
+                showErrorDialog(context)
+            }
+            else -> {}
+        }
+    }
+
+    private fun showErrorDialog(context: Context) {
+        ErrorAlertDialog(context, viewModel.error).show()
     }
 
     private fun initListener() {

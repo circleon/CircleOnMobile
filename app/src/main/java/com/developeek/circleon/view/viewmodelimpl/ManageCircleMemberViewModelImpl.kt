@@ -18,8 +18,10 @@ import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 @HiltViewModel(assistedFactory = ManageCircleMemberViewModelImpl.ManageCircleMemberViewModelFactory::class)
 class ManageCircleMemberViewModelImpl
@@ -132,7 +134,13 @@ class ManageCircleMemberViewModelImpl
 
         override fun acceptLeaveRequest(member: MemberModel) {
             editMembershipStatus(member, MembershipStatus.NOT_JOINED) { page, size ->
-                fetchCircleLeaveRequestedMembers(page, size)
+                val state = fetchCircleLeaveRequestedMembers(page, size)
+                withContext(Dispatchers.IO) {
+                    _members.get().map {
+                        fetchCircleLeaveRequestedMemberMessage(it)
+                    }
+                }
+                return@editMembershipStatus state
             }
         }
 
@@ -191,6 +199,14 @@ class ManageCircleMemberViewModelImpl
             } else {
                 error = (result as Error).message()
                 return if (result.isAuthenticationError()) UiState.AuthenticationError else UiState.ServiceError
+            }
+        }
+
+        private suspend fun fetchCircleLeaveRequestedMemberMessage(member: MemberModel) {
+            val result = repository.getCircleLeaveRequestedMemberMessage(circle.id, member.id)
+
+            if (result is Success) {
+                member.setMessage(result.data)
             }
         }
 

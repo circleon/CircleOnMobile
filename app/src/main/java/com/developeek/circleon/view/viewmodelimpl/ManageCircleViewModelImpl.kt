@@ -8,6 +8,7 @@ import com.developeek.circleon.data.repository.CircleRepository
 import com.developeek.circleon.data.source.Error
 import com.developeek.circleon.data.source.Success
 import com.developeek.circleon.domain.model.CircleDetailModel
+import com.developeek.circleon.domain.model.MemberModel
 import com.developeek.circleon.domain.model.MemberModels
 import com.developeek.circleon.domain.state.UiState
 import com.developeek.circleon.view.viewmodel.ManageCircleViewModel
@@ -84,7 +85,11 @@ class ManageCircleViewModelImpl
                         }
                     val fetchCircleLeaveRequestedMembersJob =
                         async {
-                            return@async fetchCircleLeaveRequestedMembers(page, size)
+                            val state = fetchCircleLeaveRequestedMembers(page, size)
+                            leaveRequestedMemberModels.get().map {
+                                launch { fetchCircleLeaveRequestedMemberMessage(it) }
+                            }
+                            return@async state
                         }
 
                     val jobs: List<Deferred<UiState>> =
@@ -153,6 +158,14 @@ class ManageCircleViewModelImpl
             } else {
                 error = (result as Error).message()
                 return if (result.isAuthenticationError()) UiState.AuthenticationError else UiState.ServiceError
+            }
+        }
+
+        private suspend fun fetchCircleLeaveRequestedMemberMessage(member: MemberModel) {
+            val result = repository.getCircleLeaveRequestedMemberMessage(circle.id, member.id)
+
+            if (result is Success) {
+                member.setMessage(result.data)
             }
         }
 
