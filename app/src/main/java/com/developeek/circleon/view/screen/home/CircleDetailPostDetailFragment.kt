@@ -39,7 +39,6 @@ import com.developeek.circleon.view.widget.EditCommentAlertDialog
 import com.developeek.circleon.view.widget.ErrorAlertDialog
 import com.developeek.circleon.view.widget.ErrorToast
 import com.google.android.material.bottomnavigation.BottomNavigationView
-import com.google.android.material.progressindicator.CircularProgressIndicator
 import dagger.hilt.android.AndroidEntryPoint
 import dagger.hilt.android.lifecycle.withCreationCallback
 import javax.inject.Inject
@@ -243,16 +242,6 @@ class CircleDetailPostDetailFragment : Fragment() {
         true
     }
 
-    private fun showSoftInput(
-        view: View,
-        activity: Activity,
-    ) {
-        if (view.requestFocus()) {
-            val imm = activity.getSystemService(InputMethodManager::class.java)
-            imm.showSoftInput(view, InputMethodManager.SHOW_IMPLICIT)
-        }
-    }
-
     private fun hideBtmNav(parentActivity: Activity) {
         parentActivity.findViewById<BottomNavigationView>(R.id.btmNav).isVisible = false
     }
@@ -302,8 +291,7 @@ class CircleDetailPostDetailFragment : Fragment() {
         parentActivity: Activity,
         context: Context,
     ) = Observer<UiState> {
-        val loadingIndicator = parentActivity.findViewById<CircularProgressIndicator>(R.id.pgbLoading)
-        loadingIndicator.isVisible = it is UiState.Loading
+        binding.pgbLoading.isVisible = it is UiState.Loading
         when (it) {
             UiState.Success -> {
                 toggleView(binding.rvPostDetail)
@@ -351,8 +339,7 @@ class CircleDetailPostDetailFragment : Fragment() {
         parentActivity: Activity,
         context: Context,
     ) = Observer<UiState> {
-        val loadingIndicator = parentActivity.findViewById<CircularProgressIndicator>(R.id.pgbLoading)
-        loadingIndicator.isVisible = it is UiState.Loading
+        binding.pgbLoading.isVisible = it is UiState.Loading
         when (it) {
             UiState.Success -> {
                 requestRefreshToPreviousScreen()
@@ -375,8 +362,7 @@ class CircleDetailPostDetailFragment : Fragment() {
         parentActivity: Activity,
         context: Context,
     ) = Observer<UiState> {
-        val loadingIndicator = parentActivity.findViewById<CircularProgressIndicator>(R.id.pgbLoading)
-        loadingIndicator.isVisible = it is UiState.Loading
+        binding.pgbLoading.isVisible = it is UiState.Loading
         when (it) {
             UiState.Success -> {
                 loadContents()
@@ -397,8 +383,7 @@ class CircleDetailPostDetailFragment : Fragment() {
         parentActivity: Activity,
         context: Context,
     ) = Observer<UiState> {
-        val loadingIndicator = parentActivity.findViewById<CircularProgressIndicator>(R.id.pgbLoading)
-        loadingIndicator.isVisible = it is UiState.Loading
+        binding.pgbLoading.isVisible = it is UiState.Loading
         when (it) {
             UiState.Success -> {
                 requestRefreshToPreviousScreen()
@@ -427,8 +412,7 @@ class CircleDetailPostDetailFragment : Fragment() {
         parentActivity: Activity,
         context: Context,
     ) = Observer<UiState> {
-        val loadingIndicator = parentActivity.findViewById<CircularProgressIndicator>(R.id.pgbLoading)
-        loadingIndicator.isVisible = it is UiState.Loading
+        binding.pgbLoading.isVisible = it is UiState.Loading
         when (it) {
             UiState.Success -> {
                 requestRefreshToPreviousScreen()

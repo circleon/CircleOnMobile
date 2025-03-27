@@ -84,17 +84,12 @@ class HomeActivity : AppCompatActivity() {
         keyCode: Int,
         event: KeyEvent?,
     ): Boolean {
-        if (keyCode == KeyEvent.KEYCODE_BACK) {
-            if (binding.pgbLoading.isVisible) {
-                binding.pgbLoading.isVisible = false
-            }
-            if (onMainFragment) {
-                if (backClicked) {
-                    finish()
-                } else {
-                    finishWaitingToast.show()
-                    return true
-                }
+        if (keyCode == KeyEvent.KEYCODE_BACK && onMainFragment) {
+            if (backClicked) {
+                finish()
+            } else {
+                finishWaitingToast.show()
+                return true
             }
         }
         return super.onKeyDown(keyCode, event)

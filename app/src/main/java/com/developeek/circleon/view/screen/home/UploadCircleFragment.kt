@@ -38,7 +38,6 @@ import com.developeek.circleon.view.widget.ErrorToast
 import com.google.android.flexbox.FlexDirection
 import com.google.android.flexbox.FlexboxLayoutManager
 import com.google.android.material.bottomnavigation.BottomNavigationView
-import com.google.android.material.progressindicator.CircularProgressIndicator
 import dagger.hilt.android.AndroidEntryPoint
 import dagger.hilt.android.lifecycle.withCreationCallback
 import java.time.LocalDateTime
@@ -214,8 +213,7 @@ class UploadCircleFragment : Fragment() {
         parentActivity: Activity,
         context: Context,
     ) = Observer<UiState> {
-        val loadingIndicator = parentActivity.findViewById<CircularProgressIndicator>(R.id.pgbLoading)
-        loadingIndicator.isVisible = it is UiState.Loading
+        binding.pgbLoading.isVisible = it is UiState.Loading
         when (it) {
             UiState.Success -> {
                 requestRefreshToPreviousScreen()
@@ -320,9 +318,9 @@ class UploadCircleFragment : Fragment() {
         currentDate: LocalDateTime? = LocalDateTime.now(),
     ) {
         val date = currentDate ?: LocalDateTime.now()
-
         DatePickerDialog(
             context,
+            android.R.style.Theme_Material_Dialog,
             onDataSetListener,
             date.year,
             date.monthValue - 1,

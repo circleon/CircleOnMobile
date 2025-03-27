@@ -33,7 +33,6 @@ import com.developeek.circleon.view.viewmodel.CircleDetailViewModel
 import com.developeek.circleon.view.viewmodelimpl.CircleDetailViewModelImpl
 import com.developeek.circleon.view.widget.CircleLeaveRequestAlertDialog
 import com.developeek.circleon.view.widget.ErrorToast
-import com.google.android.material.progressindicator.CircularProgressIndicator
 import com.google.android.material.tabs.TabLayout
 import dagger.hilt.android.AndroidEntryPoint
 import dagger.hilt.android.lifecycle.withCreationCallback
@@ -125,8 +124,7 @@ class CircleDetailFragment : Fragment() {
         parentActivity: Activity,
         context: Context,
     ) = Observer<UiState> {
-        val loadingIndicator = parentActivity.findViewById<CircularProgressIndicator>(R.id.pgbLoading)
-        loadingIndicator.isVisible = it is UiState.Loading
+        binding.pgbLoading.isVisible = it is UiState.Loading
         when (it) {
             UiState.Success -> {
                 toggleView(binding.flCircleDetail)
@@ -464,12 +462,6 @@ class CircleDetailFragment : Fragment() {
         binding.btnRetry.setOnClickListener {
             viewModel.refresh()
         }
-    }
-
-    override fun onDestroyView() {
-        super.onDestroyView()
-
-        requireActivity().findViewById<CircularProgressIndicator>(R.id.pgbLoading).isVisible = false
     }
 
     private fun toggleView(view: View) {

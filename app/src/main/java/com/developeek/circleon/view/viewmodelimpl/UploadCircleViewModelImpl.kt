@@ -89,9 +89,23 @@ class UploadCircleViewModelImpl
                             return@async editCircle(circle)
                         }
 
+                    // TODO: 서버 설계 문제로 이미지 편집과 삭제 작업은 동기 통신 방식으로 진행
                     val editCircleImageJob =
                         async {
-                            return@async if (isAnyImageEdited()) editCircleImage(circle) else UiState.Success
+                            val editImageState =
+                                if (isAnyImageEdited()) {
+                                    editCircleImage(circle)
+                                } else {
+                                    UiState.Success
+                                }
+                            val deleteImageState =
+                                if (isAnyImageRemoved()) {
+                                    deleteCircleImage(circle)
+                                } else {
+                                    UiState.Success
+                                }
+
+                            return@async mergeState(editImageState, deleteImageState)
                         }
 
                     val jobs: List<Deferred<UiState>> = listOf(editCircleJob, editCircleImageJob)
@@ -128,8 +142,7 @@ class UploadCircleViewModelImpl
             val result = repository.putCircleImage(circle.id, thumbnail, introductionImage)
 
             if (result is Success) {
-                // TODO: 서버 설계 문제로 이미지 편집과 삭제 작업은 동기 통신 방식으로 진행
-                return if (isAnyImageRemoved()) deleteCircleImage(circle) else UiState.Success
+                return UiState.Success
             } else {
                 error = (result as Error).message()
                 return if (result.isAuthenticationError()) UiState.AuthenticationError else UiState.ServiceError
@@ -145,6 +158,19 @@ class UploadCircleViewModelImpl
                 error = (result as Error).message()
                 return if (result.isAuthenticationError()) UiState.AuthenticationError else UiState.ServiceError
             }
+        }
+
+        private fun mergeState(
+            state1: UiState,
+            state2: UiState,
+        ): UiState {
+            if (state1 == UiState.ServiceError || state2 == UiState.ServiceError) {
+                return UiState.ServiceError
+            }
+            if (state1 == UiState.AuthenticationError || state2 == UiState.AuthenticationError) {
+                return UiState.AuthenticationError
+            }
+            return UiState.Success
         }
 
         private fun isCircleFormat(circle: CircleDetailModel): Boolean {

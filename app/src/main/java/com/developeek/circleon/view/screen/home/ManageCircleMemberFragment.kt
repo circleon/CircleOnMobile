@@ -39,7 +39,6 @@ import com.developeek.circleon.view.widget.ContentDeleteAlertDialog
 import com.developeek.circleon.view.widget.ErrorAlertDialog
 import com.developeek.circleon.view.widget.ErrorToast
 import com.google.android.material.bottomnavigation.BottomNavigationView
-import com.google.android.material.progressindicator.CircularProgressIndicator
 import dagger.hilt.android.AndroidEntryPoint
 import dagger.hilt.android.lifecycle.withCreationCallback
 import javax.inject.Inject
@@ -297,8 +296,7 @@ class ManageCircleMemberFragment : Fragment() {
         parentActivity: Activity,
         context: Context,
     ) = Observer<UiState> {
-        val loadingIndicator = parentActivity.findViewById<CircularProgressIndicator>(R.id.pgbLoading)
-        loadingIndicator.isVisible = it is UiState.Loading
+        binding.pgbLoading.isVisible = it is UiState.Loading
         when (it) {
             UiState.Success -> {
                 requestRefreshToPreviousScreen()

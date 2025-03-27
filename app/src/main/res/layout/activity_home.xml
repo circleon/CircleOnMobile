@@ -45,20 +45,4 @@
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
-    <com.google.android.material.progressindicator.CircularProgressIndicator
-        android:id="@+id/pgbLoading"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:padding="@dimen/margin_padding_large"
-        android:background="@drawable/bg_rounded_rectangle"
-        android:backgroundTint="@color/purple_5"
-        android:layout_gravity="center"
-        app:indicatorColor="@color/white"
-        app:trackColor="@color/grey_3"
-        app:trackThickness="4dp"
-        android:indeterminate="true"
-        android:visibility="gone">
-
-    </com.google.android.material.progressindicator.CircularProgressIndicator>
-
 </FrameLayout>
