@@ -129,4 +129,7 @@
     <string name="circle_content_upload_requested_circle_default">생성 대기중인 동아리 0개</string>
     <string name="circle_content_upload_requested_circle">생성 대기중인 동아리 %d개</string>
 
+    <!--My Circle-->
+    <string name="message_no_circles">동아리 정보가 없어요</string>
+
 </resources>

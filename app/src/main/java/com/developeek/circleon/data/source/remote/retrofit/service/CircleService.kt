@@ -3,6 +3,7 @@ package com.developeek.circleon.data.source.remote.retrofit.service
 import com.developeek.circleon.data.dto.home.Circle
 import com.developeek.circleon.data.dto.home.CircleDetail
 import com.developeek.circleon.data.dto.home.CircleSummaries
+import com.developeek.circleon.data.dto.home.CircleSummary
 import com.developeek.circleon.data.dto.home.Comment
 import com.developeek.circleon.data.dto.home.Member
 import com.developeek.circleon.data.dto.home.Paging
@@ -82,6 +83,13 @@ interface CircleService {
         @Query("page") page: Int,
         @Query("size") size: Int,
     ): Paging<Comment>
+
+    @GET("my-circles")
+    suspend fun getMyCircles(
+        @Query("membershipStatus") membershipStatus: String,
+        @Query("page") page: Int,
+        @Query("size") size: Int,
+    ): Paging<CircleSummary>
 
     // POST
     @POST("my-circles/{circleId}")

@@ -67,6 +67,11 @@ interface CircleRepository {
         size: Int,
     ): Result<CommentModels>
 
+    suspend fun getMyCircles(
+        page: Int,
+        size: Int,
+    ): Result<CircleSummaryModels>
+
     // POST
     suspend fun postMyCircle(circleId: Int): Result<Unit>
 

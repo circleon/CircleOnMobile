@@ -4,10 +4,12 @@ import com.developeek.circleon.domain.enums.Category
 import java.io.Serializable
 import kotlin.math.absoluteValue
 
-data class CircleSummaryModels(private val models: List<CircleSummaryModel>) {
+data class CircleSummaryModels(private val models: List<CircleSummaryModel>) : Serializable {
     fun get() = models
 
     fun get(index: Int) = models[index]
+
+    fun size() = models.size
 
     fun isEmpty() = models.isEmpty()
 
@@ -30,6 +32,7 @@ data class CircleSummaryModel(
     val id: Int,
     val name: String,
     val category: Category,
+    val thumbnailUrl: String?,
 ) : Serializable {
     fun isSame(circleSummaryModel: CircleSummaryModel) = this.id == circleSummaryModel.id
 

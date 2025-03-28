@@ -9,5 +9,14 @@
         android:id="@+id/circleFragment"
         android:name="com.developeek.circleon.view.screen.circle.CircleFragment"
         android:label="fragment_circle"
-        tools:layout="@layout/fragment_circle" />
+        tools:layout="@layout/fragment_circle" >
+        <action
+            android:id="@+id/action_circleFragment_to_myCircleFragment"
+            app:destination="@id/myCircleFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/myCircleFragment"
+        android:name="com.developeek.circleon.view.screen.circle.MyCircleFragment"
+        android:label="fragment_my_circle"
+        tools:layout="@layout/fragment_my_circle" />
 </navigation>

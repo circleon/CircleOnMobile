@@ -34,7 +34,7 @@
             <androidx.cardview.widget.CardView
                 android:layout_width="24dp"
                 android:layout_height="24dp"
-                app:cardCornerRadius="@dimen/round_default"
+                app:cardCornerRadius="12dp"
                 app:cardElevation="0dp">
 
                 <androidx.appcompat.widget.AppCompatImageView

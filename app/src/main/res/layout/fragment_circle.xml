@@ -1,206 +1,237 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/grey_1"
     tools:context=".view.screen.circle.CircleFragment">
 
-    <androidx.appcompat.widget.Toolbar
-        android:id="@+id/tbManageCircle"
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
-        android:layout_height="56dp"
-        app:contentInsetStart="@dimen/margin_padding_xx_large"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintBottom_toTopOf="@id/llManageCircle">
+        android:layout_height="match_parent"
+        android:background="@color/grey_1">
 
-        <androidx.appcompat.widget.AppCompatTextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textAppearance="@style/large_bold_text"
-            android:textColor="@color/grey_9"
-            android:text="@string/tab_name_circle"/>
+        <androidx.appcompat.widget.Toolbar
+            android:id="@+id/tbCircle"
+            android:layout_width="match_parent"
+            android:layout_height="56dp"
+            app:contentInsetStart="@dimen/margin_padding_xx_large"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintBottom_toTopOf="@id/llManageCircle">
 
-    </androidx.appcompat.widget.Toolbar>
+            <androidx.appcompat.widget.AppCompatTextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textAppearance="@style/large_bold_text"
+                android:textColor="@color/grey_9"
+                android:text="@string/tab_name_circle"/>
 
-    <androidx.appcompat.widget.LinearLayoutCompat
-        android:id="@+id/llManageCircle"
+            <androidx.appcompat.widget.AppCompatImageView
+                android:id="@+id/btnRetry"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:padding="@dimen/margin_padding_large"
+                android:layout_gravity="end"
+                android:tint="@color/grey_6"
+                android:src="@drawable/ic_retry"/>
+
+        </androidx.appcompat.widget.Toolbar>
+
+        <androidx.appcompat.widget.LinearLayoutCompat
+            android:id="@+id/llManageCircle"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_margin="@dimen/margin_padding_large"
+            android:orientation="vertical"
+            app:layout_constraintTop_toBottomOf="@id/tbCircle"
+            app:layout_constraintBottom_toBottomOf="parent">
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/clMyCircle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@drawable/bg_large_rounded_card"
+                android:paddingStart="@dimen/margin_padding_xx_large"
+                android:paddingEnd="@dimen/margin_padding_large"
+                android:paddingVertical="@dimen/margin_padding_large">
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/txtContentTitleMyCircle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/circle_content_title_my_circle"
+                    android:textAppearance="@style/default_bold_text"
+                    android:textColor="@color/grey_9"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintBottom_toTopOf="@id/txtMyCircleCount"/>
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/txtMyCircleCount"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/margin_padding_x_small"
+                    android:textColor="@color/grey_6"
+                    android:textSize="@dimen/text_size_small"
+                    android:text="@string/circle_content_my_circle_default"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/txtContentTitleMyCircle"
+                    app:layout_constraintBottom_toBottomOf="parent"/>
+
+                <androidx.appcompat.widget.AppCompatImageView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:src="@drawable/ic_next"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"/>
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/clJoinRequestedCircle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/margin_padding_small"
+                android:background="@drawable/bg_large_rounded_card"
+                android:paddingStart="@dimen/margin_padding_xx_large"
+                android:paddingEnd="@dimen/margin_padding_large"
+                android:paddingVertical="@dimen/margin_padding_large">
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/txtContentTitleJoinRequestedCircle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/circle_content_title_join_requested_circle"
+                    android:textAppearance="@style/default_bold_text"
+                    android:textColor="@color/grey_9"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintBottom_toTopOf="@id/txtJoinRequestedCircleCount"/>
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/txtJoinRequestedCircleCount"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/margin_padding_x_small"
+                    android:text="@string/circle_content_join_requested_circle_default"
+                    android:textColor="@color/grey_6"
+                    android:textSize="@dimen/text_size_small"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/txtContentTitleJoinRequestedCircle" />
+
+                <androidx.appcompat.widget.AppCompatImageView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:src="@drawable/ic_next"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"/>
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="2dp"
+                android:layout_marginVertical="@dimen/margin_padding_large"
+                android:background="@drawable/dash_divider"
+                android:backgroundTint="@color/grey_3"
+                android:layerType="software"/>
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/clApproveCircleLeave"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@drawable/bg_large_rounded_card"
+                android:paddingStart="@dimen/margin_padding_xx_large"
+                android:paddingEnd="@dimen/margin_padding_large"
+                android:paddingVertical="@dimen/margin_padding_large">
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/txtContentTitleUploadCircle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/circle_content_title_upload_circle"
+                    android:textAppearance="@style/default_bold_text"
+                    android:textColor="@color/grey_9"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintBottom_toBottomOf="parent" />
+
+                <androidx.appcompat.widget.AppCompatImageView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:src="@drawable/ic_next"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"/>
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/clUploadRequestedCircle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/margin_padding_small"
+                android:background="@drawable/bg_large_rounded_card"
+                android:paddingStart="@dimen/margin_padding_xx_large"
+                android:paddingEnd="@dimen/margin_padding_large"
+                android:paddingVertical="@dimen/margin_padding_large">
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/txtContentTitleUploadRequestedCircle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/circle_content_title_upload_requested_circle"
+                    android:textAppearance="@style/default_bold_text"
+                    android:textColor="@color/grey_9"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintBottom_toTopOf="@id/txtUploadRequestedCircleCount"/>
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/txtUploadRequestedCircleCount"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/margin_padding_x_small"
+                    android:text="@string/circle_content_upload_requested_circle_default"
+                    android:textColor="@color/grey_6"
+                    android:textSize="@dimen/text_size_small"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/txtContentTitleUploadRequestedCircle" />
+
+                <androidx.appcompat.widget.AppCompatImageView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:src="@drawable/ic_next"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"/>
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+        </androidx.appcompat.widget.LinearLayoutCompat>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <com.google.android.material.progressindicator.CircularProgressIndicator
+        android:id="@+id/pgbLoading"
         android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_margin="@dimen/margin_padding_large"
-        android:orientation="vertical"
-        app:layout_constraintTop_toBottomOf="@id/tbManageCircle"
-        app:layout_constraintBottom_toBottomOf="parent">
+        android:layout_height="match_parent"
+        android:padding="@dimen/margin_padding_large"
+        android:background="@drawable/bg_rounded_rectangle"
+        android:backgroundTint="@color/purple_5"
+        android:layout_gravity="center"
+        app:indicatorColor="@color/white"
+        app:trackColor="@color/grey_3"
+        app:trackThickness="4dp"
+        android:indeterminate="true"
+        android:visibility="gone">
 
-        <androidx.constraintlayout.widget.ConstraintLayout
-            android:id="@+id/clMyCircle"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:background="@drawable/bg_large_rounded_card"
-            android:paddingStart="@dimen/margin_padding_xx_large"
-            android:paddingEnd="@dimen/margin_padding_large"
-            android:paddingVertical="@dimen/margin_padding_large">
+    </com.google.android.material.progressindicator.CircularProgressIndicator>
 
-            <androidx.appcompat.widget.AppCompatTextView
-                android:id="@+id/txtContentTitleMyCircle"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/circle_content_title_my_circle"
-                android:textAppearance="@style/default_bold_text"
-                android:textColor="@color/grey_9"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintBottom_toTopOf="@id/txtMyCircleCount"/>
-
-            <androidx.appcompat.widget.AppCompatTextView
-                android:id="@+id/txtMyCircleCount"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/margin_padding_x_small"
-                android:textColor="@color/grey_6"
-                android:textSize="@dimen/text_size_small"
-                android:text="@string/circle_content_my_circle_default"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/txtContentTitleMyCircle"
-                app:layout_constraintBottom_toBottomOf="parent"/>
-
-            <androidx.appcompat.widget.AppCompatImageView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:src="@drawable/ic_next"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toTopOf="parent"/>
-
-        </androidx.constraintlayout.widget.ConstraintLayout>
-
-        <androidx.constraintlayout.widget.ConstraintLayout
-            android:id="@+id/clJoinRequestedCircle"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/margin_padding_small"
-            android:background="@drawable/bg_large_rounded_card"
-            android:paddingStart="@dimen/margin_padding_xx_large"
-            android:paddingEnd="@dimen/margin_padding_large"
-            android:paddingVertical="@dimen/margin_padding_large">
-
-            <androidx.appcompat.widget.AppCompatTextView
-                android:id="@+id/txtContentTitleJoinRequestedCircle"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/circle_content_title_join_requested_circle"
-                android:textAppearance="@style/default_bold_text"
-                android:textColor="@color/grey_9"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintBottom_toTopOf="@id/txtJoinRequestedCircleCount"/>
-
-            <androidx.appcompat.widget.AppCompatTextView
-                android:id="@+id/txtJoinRequestedCircleCount"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/margin_padding_x_small"
-                android:text="@string/circle_content_join_requested_circle_default"
-                android:textColor="@color/grey_6"
-                android:textSize="@dimen/text_size_small"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/txtContentTitleJoinRequestedCircle" />
-
-            <androidx.appcompat.widget.AppCompatImageView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:src="@drawable/ic_next"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toTopOf="parent"/>
-
-        </androidx.constraintlayout.widget.ConstraintLayout>
-
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="2dp"
-            android:layout_marginVertical="@dimen/margin_padding_large"
-            android:background="@drawable/dash_divider"
-            android:backgroundTint="@color/grey_3"
-            android:layerType="software"/>
-
-        <androidx.constraintlayout.widget.ConstraintLayout
-            android:id="@+id/clApproveCircleLeave"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:background="@drawable/bg_large_rounded_card"
-            android:paddingStart="@dimen/margin_padding_xx_large"
-            android:paddingEnd="@dimen/margin_padding_large"
-            android:paddingVertical="@dimen/margin_padding_large">
-
-            <androidx.appcompat.widget.AppCompatTextView
-                android:id="@+id/txtContentTitleUploadCircle"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/circle_content_title_upload_circle"
-                android:textAppearance="@style/default_bold_text"
-                android:textColor="@color/grey_9"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintBottom_toBottomOf="parent" />
-
-            <androidx.appcompat.widget.AppCompatImageView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:src="@drawable/ic_next"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toTopOf="parent"/>
-
-        </androidx.constraintlayout.widget.ConstraintLayout>
-
-        <androidx.constraintlayout.widget.ConstraintLayout
-            android:id="@+id/clUploadRequestedCircle"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/margin_padding_small"
-            android:background="@drawable/bg_large_rounded_card"
-            android:paddingStart="@dimen/margin_padding_xx_large"
-            android:paddingEnd="@dimen/margin_padding_large"
-            android:paddingVertical="@dimen/margin_padding_large">
-
-            <androidx.appcompat.widget.AppCompatTextView
-                android:id="@+id/txtContentTitleUploadRequestedCircle"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/circle_content_title_upload_requested_circle"
-                android:textAppearance="@style/default_bold_text"
-                android:textColor="@color/grey_9"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintBottom_toTopOf="@id/txtUploadRequestedCircleCount"/>
-
-            <androidx.appcompat.widget.AppCompatTextView
-                android:id="@+id/txtUploadRequestedCircleCount"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/margin_padding_x_small"
-                android:text="@string/circle_content_upload_requested_circle_default"
-                android:textColor="@color/grey_6"
-                android:textSize="@dimen/text_size_small"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/txtContentTitleUploadRequestedCircle" />
-
-            <androidx.appcompat.widget.AppCompatImageView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:src="@drawable/ic_next"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toTopOf="parent"/>
-
-        </androidx.constraintlayout.widget.ConstraintLayout>
-
-    </androidx.appcompat.widget.LinearLayoutCompat>
-
-</androidx.constraintlayout.widget.ConstraintLayout>
+</FrameLayout>
