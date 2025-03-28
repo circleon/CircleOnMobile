@@ -65,12 +65,12 @@ class SearchCircleFragment : Fragment() {
         parentActivity: Activity,
         context: Context,
     ) {
-        initRecyclerView()
+        initRecyclerView(context)
         initSoftKeyboard(context)
         hideBtmNav(parentActivity)
     }
 
-    private fun initRecyclerView() {
+    private fun initRecyclerView(context: Context) {
         binding.rvCircle.adapter =
             CircleSearchResultAdapter(
                 object : ItemListenerInitializer<CircleSummaryModel> {
@@ -84,7 +84,7 @@ class SearchCircleFragment : Fragment() {
                     ) { }
                 },
             )
-        binding.rvCircle.layoutManager = LinearLayoutManager(activity)
+        binding.rvCircle.layoutManager = LinearLayoutManager(context)
         binding.rvCircle.itemAnimator = null
         if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.R) {
             binding.rvCircle.overScrollMode = RecyclerView.OVER_SCROLL_NEVER
