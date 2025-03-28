@@ -3,6 +3,7 @@ package com.developeek.circleon.view.screen.home
 import android.app.Activity
 import android.content.Context
 import android.content.Intent
+import android.os.Build
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -17,6 +18,7 @@ import androidx.lifecycle.Observer
 import androidx.navigation.NavOptions
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.developeek.circleon.R
 import com.developeek.circleon.databinding.FragmentSearchCircleBinding
 import com.developeek.circleon.domain.model.CircleSummaryModel
@@ -84,6 +86,9 @@ class SearchCircleFragment : Fragment() {
             )
         binding.rvCircle.layoutManager = LinearLayoutManager(activity)
         binding.rvCircle.itemAnimator = null
+        if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.R) {
+            binding.rvCircle.overScrollMode = RecyclerView.OVER_SCROLL_NEVER
+        }
     }
 
     private fun sendUserToCircleDetailScreen(item: CircleSummaryModel) {

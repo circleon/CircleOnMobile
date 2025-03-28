@@ -8,7 +8,7 @@
     android:paddingTop="@dimen/margin_padding_default"
     android:paddingHorizontal="@dimen/margin_padding_large"
     android:background="@color/grey_1"
-    tools:context=".view.screen.home.SearchCricleFragment">
+    tools:context=".view.screen.home.SearchCircleFragment">
 
     <androidx.appcompat.widget.LinearLayoutCompat
         android:id="@+id/llSearchCircle"
@@ -77,7 +77,6 @@
             android:id="@+id/rvCircle"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:overScrollMode="never"
             android:visibility="gone"/>
 
         <androidx.appcompat.widget.AppCompatTextView

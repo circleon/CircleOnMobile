@@ -89,8 +89,7 @@
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/rvCircleCategory"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:overScrollMode="never" />
+            android:layout_height="wrap_content" />
 
     </FrameLayout>
 
@@ -112,7 +111,6 @@
             android:id="@+id/rvCircle"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:overScrollMode="never"
             android:visibility="gone"/>
 
         <com.facebook.shimmer.ShimmerFrameLayout

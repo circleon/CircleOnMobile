@@ -3,6 +3,7 @@ package com.developeek.circleon.view.screen.home
 import android.app.Activity
 import android.content.Context
 import android.content.Intent
+import android.os.Build
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -16,6 +17,7 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.developeek.circleon.R
 import com.developeek.circleon.data.source.manager.UserManager
 import com.developeek.circleon.databinding.FragmentCircleDetailNoticeBinding
@@ -125,6 +127,9 @@ class CircleDetailNoticeFragment : Fragment() {
                 role = role,
             )
         binding.rvCircleNotice.layoutManager = LinearLayoutManager(context)
+        if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.R) {
+            binding.rvCircleNotice.overScrollMode = RecyclerView.OVER_SCROLL_NEVER
+        }
     }
 
     private fun sendUserToNoticeDetailScreen(item: PostModel) {

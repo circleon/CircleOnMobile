@@ -3,6 +3,7 @@ package com.developeek.circleon.view.screen.home
 import android.app.Activity
 import android.content.Context
 import android.content.Intent
+import android.os.Build
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -14,6 +15,7 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.developeek.circleon.R
 import com.developeek.circleon.data.source.manager.UserManager
 import com.developeek.circleon.databinding.FragmentHomeBinding
@@ -96,6 +98,9 @@ class HomeFragment : Fragment() {
         binding.rvCircleCategory.layoutManager =
             LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false)
         binding.rvCircleCategory.itemAnimator = null
+        if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.R) {
+            binding.rvCircleCategory.overScrollMode = RecyclerView.OVER_SCROLL_NEVER
+        }
     }
 
     private fun initCircleRecyclerView(context: Context) {
@@ -123,6 +128,9 @@ class HomeFragment : Fragment() {
             )
         binding.rvCircle.layoutManager = LinearLayoutManager(context)
         binding.rvCircle.itemAnimator = null
+        if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.R) {
+            binding.rvCircle.overScrollMode = RecyclerView.OVER_SCROLL_NEVER
+        }
     }
 
     private fun startCategoryShimmer() {

@@ -2,6 +2,7 @@ package com.developeek.circleon.view.screen.circle
 
 import android.app.Activity
 import android.content.Context
+import android.os.Build
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -12,6 +13,7 @@ import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.developeek.circleon.R
 import com.developeek.circleon.databinding.FragmentMyCircleBinding
 import com.developeek.circleon.domain.enums.MembershipStatus
@@ -109,6 +111,9 @@ class MyCircleFragment : Fragment() {
                     },
             )
         binding.rvCircles.layoutManager = LinearLayoutManager(context)
+        if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.R) {
+            binding.rvCircles.overScrollMode = RecyclerView.OVER_SCROLL_NEVER
+        }
     }
 
     private fun sendUserToCircleDetailScreen(
