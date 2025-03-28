@@ -83,7 +83,7 @@ class MyCircleFragment : Fragment() {
         }
         if (membershipStatus == MembershipStatus.JOIN_REQUESTED) {
             binding.txtTitleCircles.text =
-                ContextCompat.getString(context, R.string.circle_content_join_requested_circle)
+                ContextCompat.getString(context, R.string.circle_content_title_join_requested_circle)
         }
     }
 

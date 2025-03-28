@@ -30,6 +30,9 @@ class CircleViewModelImpl
         override val myCircles: CircleSummaryModels
             get() = _myCircles
         private var _myCircles = CircleSummaryModels.empty()
+        override val myJoinRequestedCircles: CircleSummaryModels
+            get() = _myJoinRequestedCircles
+        private var _myJoinRequestedCircles = CircleSummaryModels.empty()
         private var fetchUserCirclesJob: Job? = null
         private var currentPage = DEFAULT_PAGE
 
@@ -60,8 +63,12 @@ class CircleViewModelImpl
                         async {
                             return@async fetchMyCircles(page, size)
                         }
+                    val fetchMyJoinRequestedCirclesJob =
+                        async {
+                            return@async fetchMyJoinRequestedCircles(page, size)
+                        }
 
-                    val jobs: List<Deferred<UiState>> = listOf(fetchMyCirclesJob)
+                    val jobs: List<Deferred<UiState>> = listOf(fetchMyCirclesJob, fetchMyJoinRequestedCirclesJob)
                     jobs.map { job ->
                         job.invokeOnCompletion {
                             if (job.isCancelled) {
@@ -87,6 +94,21 @@ class CircleViewModelImpl
 
             if (result is Success) {
                 _myCircles = result.data
+                return UiState.Success
+            } else {
+                error = (result as Error).message()
+                return if (result.isAuthenticationError()) UiState.AuthenticationError else UiState.ServiceError
+            }
+        }
+
+        private suspend fun fetchMyJoinRequestedCircles(
+            page: Int,
+            size: Int,
+        ): UiState {
+            val result = repository.getMyJoinRequestedCircles(page, size)
+
+            if (result is Success) {
+                _myJoinRequestedCircles = result.data
                 return UiState.Success
             } else {
                 error = (result as Error).message()
