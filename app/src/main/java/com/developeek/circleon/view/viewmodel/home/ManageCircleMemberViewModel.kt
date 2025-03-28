@@ -1,4 +1,4 @@
-package com.developeek.circleon.view.viewmodel
+package com.developeek.circleon.view.viewmodel.home
 
 import androidx.lifecycle.LiveData
 import com.developeek.circleon.domain.enums.Role

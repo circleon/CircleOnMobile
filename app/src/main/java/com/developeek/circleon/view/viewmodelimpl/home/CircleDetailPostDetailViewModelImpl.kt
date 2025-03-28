@@ -1,4 +1,4 @@
-package com.developeek.circleon.view.viewmodelimpl
+package com.developeek.circleon.view.viewmodelimpl.home
 
 import android.os.Parcelable
 import androidx.lifecycle.LiveData
@@ -15,7 +15,7 @@ import com.developeek.circleon.domain.state.UiState
 import com.developeek.circleon.domain.utils.validator.Invalid
 import com.developeek.circleon.domain.utils.validator.Validator
 import com.developeek.circleon.view.listener.RecyclerViewInfiniteScrollListener
-import com.developeek.circleon.view.viewmodel.CircleDetailPostDetailViewModel
+import com.developeek.circleon.view.viewmodel.home.CircleDetailPostDetailViewModel
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject

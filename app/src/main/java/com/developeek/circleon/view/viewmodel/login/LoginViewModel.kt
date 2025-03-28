@@ -1,4 +1,4 @@
-package com.developeek.circleon.view.viewmodel
+package com.developeek.circleon.view.viewmodel.login
 
 import androidx.lifecycle.LiveData
 import com.developeek.circleon.domain.state.UiState

@@ -15,8 +15,8 @@ import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Observer
 import com.developeek.circleon.databinding.FragmentSignUpEmailBinding
 import com.developeek.circleon.domain.utils.Const
-import com.developeek.circleon.view.viewmodel.SignUpViewModel
-import com.developeek.circleon.view.viewmodelimpl.SignUpViewModelImpl
+import com.developeek.circleon.view.viewmodel.login.SignUpViewModel
+import com.developeek.circleon.view.viewmodelimpl.login.SignUpViewModelImpl
 
 class SignUpEmailFragment : Fragment() {
     private lateinit var binding: FragmentSignUpEmailBinding

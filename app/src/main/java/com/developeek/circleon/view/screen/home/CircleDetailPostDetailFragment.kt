@@ -32,8 +32,8 @@ import com.developeek.circleon.view.listener.ItemListenerInitializer
 import com.developeek.circleon.view.listener.RecyclerViewHideSoftInputListener
 import com.developeek.circleon.view.listener.RecyclerViewInfiniteScrollListener
 import com.developeek.circleon.view.screen.login.LoginActivity
-import com.developeek.circleon.view.viewmodel.CircleDetailPostDetailViewModel
-import com.developeek.circleon.view.viewmodelimpl.CircleDetailPostDetailViewModelImpl
+import com.developeek.circleon.view.viewmodel.home.CircleDetailPostDetailViewModel
+import com.developeek.circleon.view.viewmodelimpl.home.CircleDetailPostDetailViewModelImpl
 import com.developeek.circleon.view.widget.ContentDeleteAlertDialog
 import com.developeek.circleon.view.widget.EditCommentAlertDialog
 import com.developeek.circleon.view.widget.ErrorAlertDialog

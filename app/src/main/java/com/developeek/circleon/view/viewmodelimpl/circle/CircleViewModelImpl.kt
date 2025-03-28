@@ -1,4 +1,4 @@
-package com.developeek.circleon.view.viewmodelimpl
+package com.developeek.circleon.view.viewmodelimpl.circle
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -9,7 +9,7 @@ import com.developeek.circleon.data.source.Error
 import com.developeek.circleon.data.source.Success
 import com.developeek.circleon.domain.model.CircleSummaryModels
 import com.developeek.circleon.domain.state.UiState
-import com.developeek.circleon.view.viewmodel.CircleViewModel
+import com.developeek.circleon.view.viewmodel.circle.CircleViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.Job

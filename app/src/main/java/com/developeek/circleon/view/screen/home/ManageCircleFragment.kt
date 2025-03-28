@@ -22,8 +22,8 @@ import com.developeek.circleon.domain.model.MemberModels
 import com.developeek.circleon.domain.state.UiState
 import com.developeek.circleon.domain.utils.Const
 import com.developeek.circleon.view.screen.login.LoginActivity
-import com.developeek.circleon.view.viewmodel.ManageCircleViewModel
-import com.developeek.circleon.view.viewmodelimpl.ManageCircleViewModelImpl
+import com.developeek.circleon.view.viewmodel.home.ManageCircleViewModel
+import com.developeek.circleon.view.viewmodelimpl.home.ManageCircleViewModelImpl
 import com.developeek.circleon.view.widget.ErrorAlertDialog
 import com.developeek.circleon.view.widget.ErrorToast
 import com.google.android.material.bottomnavigation.BottomNavigationView

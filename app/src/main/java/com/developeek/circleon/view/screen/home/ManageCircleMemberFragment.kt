@@ -31,8 +31,8 @@ import com.developeek.circleon.view.adapter.JoinRequestedMemberAdapter
 import com.developeek.circleon.view.adapter.LeaveRequestedMemberAdapter
 import com.developeek.circleon.view.listener.ItemListenerInitializer
 import com.developeek.circleon.view.screen.login.LoginActivity
-import com.developeek.circleon.view.viewmodel.ManageCircleMemberViewModel
-import com.developeek.circleon.view.viewmodelimpl.ManageCircleMemberViewModelImpl
+import com.developeek.circleon.view.viewmodel.home.ManageCircleMemberViewModel
+import com.developeek.circleon.view.viewmodelimpl.home.ManageCircleMemberViewModelImpl
 import com.developeek.circleon.view.widget.CircleAcceptLeaveRequestAlertDialog
 import com.developeek.circleon.view.widget.CircleMemberRoleEditAlertDialog
 import com.developeek.circleon.view.widget.ContentDeleteAlertDialog

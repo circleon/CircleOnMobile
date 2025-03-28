@@ -1,4 +1,4 @@
-package com.developeek.circleon.view.screen.home
+package com.developeek.circleon.view.screen.circle
 
 import android.app.Activity
 import android.app.DatePickerDialog
@@ -17,7 +17,6 @@ import androidx.core.view.isVisible
 import androidx.core.widget.doAfterTextChanged
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.Observer
 import androidx.navigation.fragment.findNavController
 import com.developeek.circleon.R
 import com.developeek.circleon.databinding.FragmentUploadCircleBinding
@@ -31,8 +30,8 @@ import com.developeek.circleon.domain.utils.glide.GlideProvider
 import com.developeek.circleon.view.adapter.CategoryAdapter
 import com.developeek.circleon.view.listener.ItemListenerInitializer
 import com.developeek.circleon.view.screen.login.LoginActivity
-import com.developeek.circleon.view.viewmodel.UploadCircleViewModel
-import com.developeek.circleon.view.viewmodelimpl.UploadCircleViewModelImpl
+import com.developeek.circleon.view.viewmodel.circle.UploadCircleViewModel
+import com.developeek.circleon.view.viewmodelimpl.circle.UploadCircleViewModelImpl
 import com.developeek.circleon.view.widget.ErrorAlertDialog
 import com.developeek.circleon.view.widget.ErrorToast
 import com.google.android.flexbox.FlexDirection
@@ -150,7 +149,8 @@ class UploadCircleFragment : Fragment() {
                     override fun initialize(
                         item: CategoryModel,
                         view: View?,
-                    ) {}
+                    ) {
+                    }
                 },
             )
         binding.rvCircleCategory.layoutManager = FlexboxLayoutManager(context, FlexDirection.ROW)
@@ -160,10 +160,20 @@ class UploadCircleFragment : Fragment() {
     private fun loadCircleContent() {
         binding.edtCircleName.setText(viewModel.circle.name)
         viewModel.circle.recruitmentStartDate?.let {
-            binding.txtRecruitmentStartDate.text = it.format(DateTimeFormatter.ofPattern(RECRUITMENT_DATE_FORMAT))
+            binding.txtRecruitmentStartDate.text =
+                it.format(
+                    DateTimeFormatter.ofPattern(
+                        RECRUITMENT_DATE_FORMAT,
+                    ),
+                )
         }
         viewModel.circle.recruitmentEndDate?.let {
-            binding.txtRecruitmentEndDate.text = it.format(DateTimeFormatter.ofPattern(RECRUITMENT_DATE_FORMAT))
+            binding.txtRecruitmentEndDate.text =
+                it.format(
+                    DateTimeFormatter.ofPattern(
+                        RECRUITMENT_DATE_FORMAT,
+                    ),
+                )
         }
         binding.edtCircleSingleLineIntroduction.setText(viewModel.circle.singleLineIntroduction)
         binding.txtCurrentCircleSingleIntroductionSize.text =
@@ -270,7 +280,11 @@ class UploadCircleFragment : Fragment() {
     private fun setBtnAddCircleThumbnailListener() {
         binding.btnAddCircleThumbnail.setOnClickListener {
             circleThumbnailPickMedia.launch(
-                PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.SingleMimeType(PHOTO_MIME_TYPE)),
+                PickVisualMediaRequest(
+                    ActivityResultContracts.PickVisualMedia.SingleMimeType(
+                        PHOTO_MIME_TYPE,
+                    ),
+                ),
             )
         }
     }
@@ -278,7 +292,11 @@ class UploadCircleFragment : Fragment() {
     private fun setBtnAddCircleIntroductionImageListener() {
         binding.btnAddCircleIntroductionImage.setOnClickListener {
             circleIntroductionImagePickMedia.launch(
-                PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.SingleMimeType(PHOTO_MIME_TYPE)),
+                PickVisualMediaRequest(
+                    ActivityResultContracts.PickVisualMedia.SingleMimeType(
+                        PHOTO_MIME_TYPE,
+                    ),
+                ),
             )
         }
     }
@@ -293,7 +311,11 @@ class UploadCircleFragment : Fragment() {
             DatePickerDialog.OnDateSetListener { _, y, m, d ->
                 viewModel.setRecruitmentStartDate(LocalDateTime.of(y, m + 1, d, 0, 0))
                 binding.txtRecruitmentStartDate.text =
-                    viewModel.circle.recruitmentStartDate!!.format(DateTimeFormatter.ofPattern(RECRUITMENT_DATE_FORMAT))
+                    viewModel.circle.recruitmentStartDate!!.format(
+                        DateTimeFormatter.ofPattern(
+                            RECRUITMENT_DATE_FORMAT,
+                        ),
+                    )
             }
         binding.btnEditRecruitmentStartDate.setOnClickListener {
             showDatePickerDialog(context, onDataSetListener, viewModel.circle.recruitmentStartDate)
@@ -305,7 +327,11 @@ class UploadCircleFragment : Fragment() {
             DatePickerDialog.OnDateSetListener { _, y, m, d ->
                 viewModel.setRecruitmentEndDate(LocalDateTime.of(y, m + 1, d, 0, 0))
                 binding.txtRecruitmentEndDate.text =
-                    viewModel.circle.recruitmentEndDate!!.format(DateTimeFormatter.ofPattern(RECRUITMENT_DATE_FORMAT))
+                    viewModel.circle.recruitmentEndDate!!.format(
+                        DateTimeFormatter.ofPattern(
+                            RECRUITMENT_DATE_FORMAT,
+                        ),
+                    )
             }
         binding.btnEditRecruitmentEndDate.setOnClickListener {
             showDatePickerDialog(context, onDataSetListener, viewModel.circle.recruitmentEndDate)

@@ -1,4 +1,4 @@
-package com.developeek.circleon.view.viewmodel
+package com.developeek.circleon.view.viewmodel.home
 
 import android.os.Parcelable
 import androidx.lifecycle.LiveData

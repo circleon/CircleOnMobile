@@ -1,4 +1,4 @@
-package com.developeek.circleon.view.viewmodelimpl
+package com.developeek.circleon.view.viewmodelimpl.login
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -14,7 +14,7 @@ import com.developeek.circleon.domain.utils.validator.Validator
 import com.developeek.circleon.domain.vo.Password
 import com.developeek.circleon.domain.vo.UserEmail
 import com.developeek.circleon.domain.vo.UserName
-import com.developeek.circleon.view.viewmodel.SignUpViewModel
+import com.developeek.circleon.view.viewmodel.login.SignUpViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job

@@ -14,8 +14,8 @@ import androidx.lifecycle.Observer
 import com.developeek.circleon.databinding.ActivityLoginBinding
 import com.developeek.circleon.domain.state.UiState
 import com.developeek.circleon.view.screen.HomeActivity
-import com.developeek.circleon.view.viewmodel.LoginViewModel
-import com.developeek.circleon.view.viewmodelimpl.LoginViewModelImpl
+import com.developeek.circleon.view.viewmodel.login.LoginViewModel
+import com.developeek.circleon.view.viewmodelimpl.login.LoginViewModelImpl
 import com.developeek.circleon.view.widget.ErrorAlertDialog
 import dagger.hilt.android.AndroidEntryPoint
 

@@ -16,8 +16,8 @@ import androidx.lifecycle.Observer
 import com.developeek.circleon.R
 import com.developeek.circleon.databinding.FragmentSignUpPasswordBinding
 import com.developeek.circleon.domain.utils.Const
-import com.developeek.circleon.view.viewmodel.SignUpViewModel
-import com.developeek.circleon.view.viewmodelimpl.SignUpViewModelImpl
+import com.developeek.circleon.view.viewmodel.login.SignUpViewModel
+import com.developeek.circleon.view.viewmodelimpl.login.SignUpViewModelImpl
 
 class SignUpPasswordFragment : Fragment() {
     private lateinit var binding: FragmentSignUpPasswordBinding

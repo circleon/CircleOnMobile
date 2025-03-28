@@ -29,8 +29,8 @@ import com.developeek.circleon.view.adapter.CirclePostAdapter
 import com.developeek.circleon.view.listener.ItemListenerInitializer
 import com.developeek.circleon.view.listener.RecyclerViewInfiniteScrollListener
 import com.developeek.circleon.view.screen.login.LoginActivity
-import com.developeek.circleon.view.viewmodel.CircleDetailPostViewModel
-import com.developeek.circleon.view.viewmodelimpl.CircleDetailPostViewModelImpl
+import com.developeek.circleon.view.viewmodel.home.CircleDetailPostViewModel
+import com.developeek.circleon.view.viewmodelimpl.home.CircleDetailPostViewModelImpl
 import com.developeek.circleon.view.widget.ContentDeleteAlertDialog
 import com.developeek.circleon.view.widget.ErrorToast
 import dagger.hilt.android.AndroidEntryPoint

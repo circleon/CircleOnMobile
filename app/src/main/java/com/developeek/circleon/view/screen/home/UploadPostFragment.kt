@@ -26,8 +26,8 @@ import com.developeek.circleon.domain.utils.Const
 import com.developeek.circleon.domain.utils.Utils.toJPEG
 import com.developeek.circleon.domain.utils.glide.GlideProvider
 import com.developeek.circleon.view.screen.login.LoginActivity
-import com.developeek.circleon.view.viewmodel.UploadPostViewModel
-import com.developeek.circleon.view.viewmodelimpl.UploadPostViewModelImpl
+import com.developeek.circleon.view.viewmodel.home.UploadPostViewModel
+import com.developeek.circleon.view.viewmodelimpl.home.UploadPostViewModelImpl
 import com.developeek.circleon.view.widget.ErrorAlertDialog
 import com.developeek.circleon.view.widget.ErrorToast
 import com.google.android.material.bottomnavigation.BottomNavigationView

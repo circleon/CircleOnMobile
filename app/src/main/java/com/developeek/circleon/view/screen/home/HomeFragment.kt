@@ -27,8 +27,8 @@ import com.developeek.circleon.view.adapter.CircleAdapter
 import com.developeek.circleon.view.listener.ItemListenerInitializer
 import com.developeek.circleon.view.listener.RecyclerViewInfiniteScrollListener
 import com.developeek.circleon.view.screen.login.LoginActivity
-import com.developeek.circleon.view.viewmodel.HomeViewModel
-import com.developeek.circleon.view.viewmodelimpl.HomeViewModelImpl
+import com.developeek.circleon.view.viewmodel.home.HomeViewModel
+import com.developeek.circleon.view.viewmodelimpl.home.HomeViewModelImpl
 import com.developeek.circleon.view.widget.ErrorToast
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject

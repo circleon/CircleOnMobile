@@ -17,8 +17,8 @@ import com.developeek.circleon.R
 import com.developeek.circleon.databinding.ActivitySignUpBinding
 import com.developeek.circleon.domain.state.UiState
 import com.developeek.circleon.view.adapter.SignUpFragmentAdapter
-import com.developeek.circleon.view.viewmodel.SignUpViewModel
-import com.developeek.circleon.view.viewmodelimpl.SignUpViewModelImpl
+import com.developeek.circleon.view.viewmodel.login.SignUpViewModel
+import com.developeek.circleon.view.viewmodelimpl.login.SignUpViewModelImpl
 import com.developeek.circleon.view.widget.ErrorAlertDialog
 import dagger.hilt.android.AndroidEntryPoint
 

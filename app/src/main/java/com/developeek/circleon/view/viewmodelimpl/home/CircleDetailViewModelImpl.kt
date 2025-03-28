@@ -1,4 +1,4 @@
-package com.developeek.circleon.view.viewmodelimpl
+package com.developeek.circleon.view.viewmodelimpl.home
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -11,7 +11,7 @@ import com.developeek.circleon.domain.model.CircleDetailModel
 import com.developeek.circleon.domain.state.UiState
 import com.developeek.circleon.domain.utils.validator.Invalid
 import com.developeek.circleon.domain.utils.validator.Validator
-import com.developeek.circleon.view.viewmodel.CircleDetailViewModel
+import com.developeek.circleon.view.viewmodel.home.CircleDetailViewModel
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
@@ -26,7 +26,8 @@ class CircleDetailViewModelImpl
         @Assisted private val circleId: Int,
         private val repository: CircleRepository,
     ) : CircleDetailViewModel, ViewModel() {
-        @AssistedFactory interface CircleDetailViewModelFactory {
+        @AssistedFactory
+        interface CircleDetailViewModelFactory {
             fun create(circleId: Int): CircleDetailViewModelImpl
         }
 

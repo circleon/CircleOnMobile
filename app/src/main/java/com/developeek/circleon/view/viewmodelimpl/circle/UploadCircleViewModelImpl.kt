@@ -1,4 +1,4 @@
-package com.developeek.circleon.view.viewmodelimpl
+package com.developeek.circleon.view.viewmodelimpl.circle
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -13,7 +13,7 @@ import com.developeek.circleon.domain.model.CircleDetailModel
 import com.developeek.circleon.domain.state.UiState
 import com.developeek.circleon.domain.utils.validator.Invalid
 import com.developeek.circleon.domain.utils.validator.Validator
-import com.developeek.circleon.view.viewmodel.UploadCircleViewModel
+import com.developeek.circleon.view.viewmodel.circle.UploadCircleViewModel
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
@@ -52,7 +52,10 @@ class UploadCircleViewModelImpl
             get() = circleCategories
         private var circleCategories =
             MutableLiveData(
-                CategoryModels.selectAndRemoveAndGet(origin?.category ?: Category.ETC, Category.ALL),
+                CategoryModels.selectAndRemoveAndGet(
+                    origin?.category ?: Category.ETC,
+                    Category.ALL,
+                ),
             )
 
         // 썸네일, 소개글 이미지 등 이미지 처리 api 는 별도

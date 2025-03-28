@@ -16,8 +16,8 @@ import androidx.lifecycle.Observer
 import com.developeek.circleon.R
 import com.developeek.circleon.databinding.FragmentSignUpNameBinding
 import com.developeek.circleon.domain.utils.Const
-import com.developeek.circleon.view.viewmodel.SignUpViewModel
-import com.developeek.circleon.view.viewmodelimpl.SignUpViewModelImpl
+import com.developeek.circleon.view.viewmodel.login.SignUpViewModel
+import com.developeek.circleon.view.viewmodelimpl.login.SignUpViewModelImpl
 
 class SignUpNameFragment : Fragment() {
     private lateinit var binding: FragmentSignUpNameBinding

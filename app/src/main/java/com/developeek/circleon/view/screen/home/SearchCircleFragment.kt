@@ -27,8 +27,8 @@ import com.developeek.circleon.view.adapter.CircleSearchResultAdapter
 import com.developeek.circleon.view.listener.ItemListenerInitializer
 import com.developeek.circleon.view.listener.RecyclerViewHideSoftInputListener
 import com.developeek.circleon.view.screen.login.LoginActivity
-import com.developeek.circleon.view.viewmodel.SearchViewModel
-import com.developeek.circleon.view.viewmodelimpl.SearchViewModelImpl
+import com.developeek.circleon.view.viewmodel.home.SearchViewModel
+import com.developeek.circleon.view.viewmodelimpl.home.SearchViewModelImpl
 import com.developeek.circleon.view.widget.ErrorToast
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import dagger.hilt.android.AndroidEntryPoint

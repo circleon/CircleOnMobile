@@ -1,4 +1,4 @@
-package com.developeek.circleon.view.viewmodelimpl
+package com.developeek.circleon.view.viewmodelimpl.home
 
 import android.os.Parcelable
 import androidx.lifecycle.LiveData
@@ -15,7 +15,7 @@ import com.developeek.circleon.domain.model.CircleModels
 import com.developeek.circleon.domain.model.UserModel
 import com.developeek.circleon.domain.state.UiState
 import com.developeek.circleon.view.listener.RecyclerViewInfiniteScrollListener
-import com.developeek.circleon.view.viewmodel.HomeViewModel
+import com.developeek.circleon.view.viewmodel.home.HomeViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.isActive

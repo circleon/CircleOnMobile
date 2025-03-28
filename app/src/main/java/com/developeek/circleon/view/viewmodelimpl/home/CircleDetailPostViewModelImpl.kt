@@ -1,4 +1,4 @@
-package com.developeek.circleon.view.viewmodelimpl
+package com.developeek.circleon.view.viewmodelimpl.home
 
 import android.os.Parcelable
 import androidx.lifecycle.LiveData
@@ -11,7 +11,7 @@ import com.developeek.circleon.data.source.Success
 import com.developeek.circleon.domain.model.PostModels
 import com.developeek.circleon.domain.state.UiState
 import com.developeek.circleon.view.listener.RecyclerViewInfiniteScrollListener
-import com.developeek.circleon.view.viewmodel.CircleDetailPostViewModel
+import com.developeek.circleon.view.viewmodel.home.CircleDetailPostViewModel
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
@@ -19,16 +19,16 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 
-@HiltViewModel(assistedFactory = CircleDetailNoticeViewModelImpl.CircleDetailNoticeViewModelFactory::class)
-class CircleDetailNoticeViewModelImpl
+@HiltViewModel(assistedFactory = CircleDetailPostViewModelImpl.CircleDetailPostViewModelFactory::class)
+class CircleDetailPostViewModelImpl
     @AssistedInject
     constructor(
         @Assisted private val circleId: Int,
         private val repository: CircleRepository,
     ) : CircleDetailPostViewModel, ViewModel() {
         @AssistedFactory
-        interface CircleDetailNoticeViewModelFactory {
-            fun create(circleId: Int): CircleDetailNoticeViewModelImpl
+        interface CircleDetailPostViewModelFactory {
+            fun create(circleId: Int): CircleDetailPostViewModelImpl
         }
 
         override val state: LiveData<UiState>
@@ -38,15 +38,14 @@ class CircleDetailNoticeViewModelImpl
         override val posts: PostModels
             get() = postModels
         private var postModels = PostModels.empty()
-        private var fetchNoticesJob: Job? = null
-        private var pinNoticeJob: Job? = null
-        private var deleteNoticeJob: Job? = null
+        private var fetchPostsJob: Job? = null
+        private var deletePostJob: Job? = null
         private var currentPage = DEFAULT_PAGE
 
         override val scrollOver: LiveData<Boolean>
             get() = scrollOverCompleted
         private var scrollOverCompleted = MutableLiveData<Boolean>()
-        private var scrollOverNoticeJob: Job? = null
+        private var scrollOverPostJob: Job? = null
         override val scrollListener = RecyclerViewInfiniteScrollListener()
         override val currentScrollState: Parcelable?
             get() = scrollState
@@ -59,20 +58,20 @@ class CircleDetailNoticeViewModelImpl
 
         init {
             uiState.postValue(UiState.Loading)
-            fetchNotices(currentPage, SIZE_BY_PAGE)
+            fetchPosts(currentPage, SIZE_BY_PAGE)
         }
 
-        private fun fetchNotices(
+        private fun fetchPosts(
             page: Int,
             size: Int,
         ) {
-            fetchNoticesJob?.let {
+            fetchPostsJob?.let {
                 if (!it.isCompleted) return
             }
 
-            fetchNoticesJob =
+            fetchPostsJob =
                 viewModelScope.launch {
-                    val result = repository.getCircleNotices(circleId, page, size)
+                    val result = repository.getCirclePosts(circleId, page, size)
 
                     if (result is Success) {
                         postModels = result.data
@@ -89,20 +88,18 @@ class CircleDetailNoticeViewModelImpl
         }
 
         override fun refresh() {
-            // currentPage: 0 == page 1
-            // currentPage: 1 == page 2 ...
             uiState.postValue(UiState.Loading)
-            fetchNotices(DEFAULT_PAGE, (currentPage + 1) * SIZE_BY_PAGE)
+            fetchPosts(DEFAULT_PAGE, (currentPage + 1) * SIZE_BY_PAGE)
         }
 
         override fun scrollOver() {
-            scrollOverNoticeJob?.let {
+            scrollOverPostJob?.let {
                 if (!it.isCompleted) return
             }
 
-            scrollOverNoticeJob =
+            scrollOverPostJob =
                 viewModelScope.launch {
-                    val result = repository.getCircleNotices(circleId, currentPage + 1, SIZE_BY_PAGE)
+                    val result = repository.getCirclePosts(circleId, currentPage + 1, SIZE_BY_PAGE)
 
                     if (result is Success) {
                         postModels =
@@ -132,50 +129,17 @@ class CircleDetailNoticeViewModelImpl
             this.isTop = isTop
         }
 
-        override fun pinAndFetch(postId: Int) {
-            togglePinAndFetch(postId, true)
-        }
-
-        override fun removePinAndFetch(postId: Int) {
-            togglePinAndFetch(postId, false)
-        }
-
-        private fun togglePinAndFetch(
-            postId: Int,
-            isPinned: Boolean,
-        ) {
-            pinNoticeJob?.let {
-                if (!it.isCompleted) return
-            }
-
-            pinNoticeJob =
-                viewModelScope.launch {
-                    val result = repository.putPostPin(circleId, postId, isPinned)
-
-                    if (result is Success) {
-                        fetchNotices(DEFAULT_PAGE, (currentPage + 1) * SIZE_BY_PAGE)
-                    } else {
-                        error = (result as Error).message()
-                        if (result.isAuthenticationError()) {
-                            uiState.postValue(UiState.AuthenticationError)
-                        } else {
-                            uiState.postValue(UiState.ServiceError)
-                        }
-                    }
-                }
-        }
-
         override fun deleteAndFetch(postId: Int) {
-            deleteNoticeJob?.let {
+            deletePostJob?.let {
                 if (!it.isCompleted) return
             }
 
-            deleteNoticeJob =
+            deletePostJob =
                 viewModelScope.launch {
                     val result = repository.deleteCirclePost(circleId, postId)
 
                     if (result is Success) {
-                        fetchNotices(DEFAULT_PAGE, (currentPage + 1) * SIZE_BY_PAGE)
+                        fetchPosts(DEFAULT_PAGE, (currentPage + 1) * SIZE_BY_PAGE)
                     } else {
                         error = (result as Error).message()
                         if (result.isAuthenticationError()) {
@@ -186,6 +150,11 @@ class CircleDetailNoticeViewModelImpl
                     }
                 }
         }
+
+        // 현재는 공지사항용 핀 고정 기능이고, 나중에 게시글 고정 기능 추가 시 사용
+        override fun pinAndFetch(postId: Int) {}
+
+        override fun removePinAndFetch(postId: Int) {}
 
         companion object {
             private const val SIZE_BY_PAGE = 20
