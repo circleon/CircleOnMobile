@@ -35,6 +35,10 @@ class CircleDetailNoticeViewModelImpl
             get() = uiState
         private val uiState = MutableLiveData<UiState>()
 
+        override val postState: LiveData<UiState>
+            get() = noticeState
+        private val noticeState = MutableLiveData<UiState>()
+
         override val posts: PostModels
             get() = postModels
         private var postModels = PostModels.empty()
@@ -148,18 +152,21 @@ class CircleDetailNoticeViewModelImpl
                 if (!it.isCompleted) return
             }
 
+            noticeState.postValue(UiState.Loading)
+
             pinNoticeJob =
                 viewModelScope.launch {
                     val result = repository.putPostPin(circleId, postId, isPinned)
 
                     if (result is Success) {
+                        noticeState.postValue(UiState.Success)
                         fetchNotices(DEFAULT_PAGE, (currentPage + 1) * SIZE_BY_PAGE)
                     } else {
                         error = (result as Error).message()
                         if (result.isAuthenticationError()) {
-                            uiState.postValue(UiState.AuthenticationError)
+                            noticeState.postValue(UiState.AuthenticationError)
                         } else {
-                            uiState.postValue(UiState.ServiceError)
+                            noticeState.postValue(UiState.ServiceError)
                         }
                     }
                 }
@@ -170,18 +177,21 @@ class CircleDetailNoticeViewModelImpl
                 if (!it.isCompleted) return
             }
 
+            noticeState.postValue(UiState.Loading)
+
             deleteNoticeJob =
                 viewModelScope.launch {
                     val result = repository.deleteCirclePost(circleId, postId)
 
                     if (result is Success) {
+                        noticeState.postValue(UiState.Success)
                         fetchNotices(DEFAULT_PAGE, (currentPage + 1) * SIZE_BY_PAGE)
                     } else {
                         error = (result as Error).message()
                         if (result.isAuthenticationError()) {
-                            uiState.postValue(UiState.AuthenticationError)
+                            noticeState.postValue(UiState.AuthenticationError)
                         } else {
-                            uiState.postValue(UiState.ServiceError)
+                            noticeState.postValue(UiState.ServiceError)
                         }
                     }
                 }

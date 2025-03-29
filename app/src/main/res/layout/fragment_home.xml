@@ -60,7 +60,9 @@
         <com.facebook.shimmer.ShimmerFrameLayout
             android:id="@+id/shimmerCategory"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="wrap_content"
+            app:shimmer_duration="2000"
+            app:shimmer_highlight_alpha="0.4">
 
             <androidx.appcompat.widget.LinearLayoutCompat
                 android:layout_width="match_parent"
@@ -117,7 +119,9 @@
             android:id="@+id/shimmerCircle"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:visibility="gone">
+            android:visibility="gone"
+            app:shimmer_duration="2000"
+            app:shimmer_highlight_alpha="0.4">
 
             <androidx.appcompat.widget.LinearLayoutCompat
                 android:layout_width="match_parent"

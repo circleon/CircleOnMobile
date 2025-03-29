@@ -35,6 +35,10 @@ class CircleDetailPostViewModelImpl
             get() = uiState
         private val uiState = MutableLiveData<UiState>()
 
+        override val postState: LiveData<UiState>
+            get() = _postState
+        private val _postState = MutableLiveData<UiState>()
+
         override val posts: PostModels
             get() = postModels
         private var postModels = PostModels.empty()
@@ -134,18 +138,21 @@ class CircleDetailPostViewModelImpl
                 if (!it.isCompleted) return
             }
 
+            _postState.postValue(UiState.Loading)
+
             deletePostJob =
                 viewModelScope.launch {
                     val result = repository.deleteCirclePost(circleId, postId)
 
                     if (result is Success) {
+                        _postState.postValue(UiState.Success)
                         fetchPosts(DEFAULT_PAGE, (currentPage + 1) * SIZE_BY_PAGE)
                     } else {
                         error = (result as Error).message()
                         if (result.isAuthenticationError()) {
-                            uiState.postValue(UiState.AuthenticationError)
+                            _postState.postValue(UiState.AuthenticationError)
                         } else {
-                            uiState.postValue(UiState.ServiceError)
+                            _postState.postValue(UiState.ServiceError)
                         }
                     }
                 }

@@ -17,7 +17,11 @@
         android:id="@+id/shimmerNotice"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:visibility="gone">
+        android:visibility="gone"
+        app:shimmer_duration="2000"
+        app:shimmer_highlight_alpha="0.4"
+        app:shimmer_direction="top_to_bottom"
+        app:shimmer_tilt="0">
 
         <androidx.appcompat.widget.LinearLayoutCompat
             android:layout_width="match_parent"

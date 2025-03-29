@@ -309,8 +309,6 @@
         app:trackThickness="8dp"
         app:trackCornerRadius="@dimen/round_default"
         android:visibility="gone"
-        android:indeterminate="true">
-
-    </com.google.android.material.progressindicator.CircularProgressIndicator>
+        android:indeterminate="true"/>
 
 </FrameLayout>

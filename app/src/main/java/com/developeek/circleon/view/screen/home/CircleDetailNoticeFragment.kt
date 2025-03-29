@@ -35,7 +35,9 @@ import com.developeek.circleon.view.screen.login.LoginActivity
 import com.developeek.circleon.view.viewmodel.home.CircleDetailPostViewModel
 import com.developeek.circleon.view.viewmodelimpl.home.CircleDetailNoticeViewModelImpl
 import com.developeek.circleon.view.widget.ContentDeleteAlertDialog
+import com.developeek.circleon.view.widget.ErrorAlertDialog
 import com.developeek.circleon.view.widget.ErrorToast
+import com.google.android.material.progressindicator.CircularProgressIndicator
 import dagger.hilt.android.AndroidEntryPoint
 import dagger.hilt.android.lifecycle.withCreationCallback
 import javax.inject.Inject
@@ -226,6 +228,10 @@ class CircleDetailNoticeFragment : Fragment() {
             viewLifecycleOwner,
             scrollOverObserver(),
         )
+        viewModel.postState.observe(
+            viewLifecycleOwner,
+            postStateObserver(parentActivity, context),
+        )
         // 정보 수정 여부 감지
         findNavController()
             .currentBackStackEntry
@@ -293,6 +299,10 @@ class CircleDetailNoticeFragment : Fragment() {
         }
     }
 
+    private fun showErrorDialog(context: Context) {
+        ErrorAlertDialog(context, viewModel.error).show()
+    }
+
     private fun scrollOverObserver() =
         Observer<Boolean> { completed ->
             if (completed) {
@@ -303,6 +313,24 @@ class CircleDetailNoticeFragment : Fragment() {
                 }
             }
         }
+
+    private fun postStateObserver(
+        parentActivity: Activity,
+        context: Context,
+    ) = Observer<UiState> {
+        val loadingIndicator = parentActivity.findViewById<CircularProgressIndicator>(R.id.pgbLoading)
+        loadingIndicator.isVisible = it is UiState.Loading
+        when (it) {
+            UiState.AuthenticationError -> {
+                sendUserToLoginScreen(parentActivity)
+                showErrorToast(context)
+            }
+            UiState.ServiceError -> {
+                showErrorDialog(context)
+            }
+            else -> {}
+        }
+    }
 
     private fun initListener() {
         setRvCircleNoticeListener()

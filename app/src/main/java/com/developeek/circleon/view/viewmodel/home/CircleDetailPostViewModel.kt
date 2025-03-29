@@ -8,6 +8,7 @@ import com.developeek.circleon.domain.state.UiState
 
 interface CircleDetailPostViewModel {
     val state: LiveData<UiState>
+    val postState: LiveData<UiState>
     val posts: PostModels
     val scrollOver: LiveData<Boolean>
     val scrollListener: RecyclerView.OnScrollListener
