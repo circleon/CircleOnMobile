@@ -63,6 +63,7 @@ dependencies {
     implementation(libs.google.dagger.hilt.android)
     implementation(libs.google.code.gson)
     implementation(libs.squareup.retrofit2)
+    implementation(libs.squareup.okhttp3)
     implementation(libs.squareup.retrofit2.converter)
     implementation(libs.androidx.lifecycle.viewmodel)
     implementation(libs.androidx.fragment)

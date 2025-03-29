@@ -5,9 +5,9 @@ import com.developeek.circleon.data.exception.ServiceException
 import com.developeek.circleon.data.exception.ServiceExceptionMessage
 import com.developeek.circleon.data.source.remote.retrofit.StatusCode
 import okhttp3.Interceptor
-import okhttp3.MediaType
+import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.Response
-import okhttp3.ResponseBody
+import okhttp3.ResponseBody.Companion.toResponseBody
 import org.json.JSONException
 import org.json.JSONObject
 import org.json.JSONTokener
@@ -27,12 +27,11 @@ class ErrorInterceptor
         }
 
         private fun parseResponse(response: Response): Response {
-            val responseCode = response.code()
-            val responseBody = response.body()
+            val responseCode = response.code
+            val responseString = response.peekBody(Long.MAX_VALUE).string()
             val contentType = response.header(PARAM_NAME_CONTENT_TYPE)
 
-            if (responseBody != null) {
-                val responseString = responseBody.string()
+            if (responseString.isNotEmpty()) {
                 val jsonObject = JSONTokener(responseString).nextValue() as JSONObject
 
                 val statusCode = findStatusCode(responseCode, jsonObject)
@@ -40,7 +39,7 @@ class ErrorInterceptor
                 errorLog(statusCode)
                 throwException(statusCode)
 
-                val newResponseBody = ResponseBody.create(MediaType.get(contentType!!), responseString)
+                val newResponseBody = responseString.toResponseBody(contentType!!.toMediaType())
                 return response.newBuilder().body(newResponseBody).build()
             } else {
                 throw IOException(ServiceExceptionMessage.MESSAGE_NO_RESPONSE_BODY)

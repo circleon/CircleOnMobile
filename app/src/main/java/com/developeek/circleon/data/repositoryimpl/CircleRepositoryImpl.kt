@@ -23,9 +23,11 @@ import com.developeek.circleon.domain.model.PostModels
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.async
 import kotlinx.coroutines.withContext
-import okhttp3.MediaType
+import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
+import okhttp3.RequestBody.Companion.asRequestBody
+import okhttp3.RequestBody.Companion.toRequestBody
 import java.io.File
 import java.io.IOException
 
@@ -314,16 +316,16 @@ class CircleRepositoryImpl(
     ): Result<Unit> {
         return try {
             withContext(dispatcher) {
-                val type = RequestBody.create(MediaType.parse("text/plain"), postType.code())
-                val content = RequestBody.create(MediaType.parse("text/plain"), content)
+                val postTypeRequestBody = postType.code().toRequestBody("text/plain; charset=utf-8".toMediaType())
+                val contentRequestBody = content.toRequestBody("text/plain; charset=utf-8".toMediaType())
                 val body =
                     if (image == null) {
                         null
                     } else {
-                        val imageRequestBody = RequestBody.create(MediaType.parse("image/jpeg"), image)
+                        val imageRequestBody = image.asRequestBody("image/jpeg; charset=utf-8".toMediaType())
                         MultipartBody.Part.createFormData("image", image.name, imageRequestBody)
                     }
-                service.postCirclePost(circleId, type, content, body)
+                service.postCirclePost(circleId, postTypeRequestBody, contentRequestBody, body)
                 Result.success(Unit)
             }
         } catch (e: IOException) {
@@ -384,7 +386,7 @@ class CircleRepositoryImpl(
                     if (circleThumbnail == null) {
                         null
                     } else {
-                        imageRequestBody = RequestBody.create(MediaType.parse("image/jpeg"), circleThumbnail)
+                        imageRequestBody = circleThumbnail.asRequestBody("image/jpeg; charset=utf-8".toMediaType())
                         MultipartBody.Part.createFormData("profileImg", circleThumbnail.name, imageRequestBody)
                     }
                 val introductionImage =
@@ -392,7 +394,7 @@ class CircleRepositoryImpl(
                         null
                     } else {
                         imageRequestBody =
-                            RequestBody.create(MediaType.parse("image/jpeg"), circleIntroductionImage)
+                            circleIntroductionImage.asRequestBody("image/jpeg; charset=utf-8".toMediaType())
                         MultipartBody.Part.createFormData(
                             "introImg",
                             circleIntroductionImage.name,
