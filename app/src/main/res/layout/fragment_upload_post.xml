@@ -46,7 +46,7 @@
                 android:layout_gravity="end"
                 android:gravity="center"
                 android:text="@string/btn_finish"
-                android:textAppearance="@style/small_bold_text"
+                android:textAppearance="@style/large_bold_text"
                 android:textColor="@color/purple_5" />
 
         </androidx.appcompat.widget.Toolbar>
@@ -74,8 +74,8 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="@dimen/margin_padding_small"
-            android:paddingTop="@dimen/margin_padding_x_small"
-            android:paddingBottom="@dimen/margin_padding_small"
+            android:paddingTop="@dimen/margin_padding_default"
+            android:paddingBottom="@dimen/margin_padding_large"
             android:paddingStart="@dimen/margin_padding_large"
             android:gravity="center_vertical"
             android:background="@color/white"
@@ -92,7 +92,7 @@
                     android:layout_width="56dp"
                     android:layout_height="56dp"
                     android:layout_gravity="start|bottom"
-                    app:cardCornerRadius="@dimen/round_default"
+                    app:cardCornerRadius="@dimen/round_small"
                     app:cardElevation="0dp">
 
                     <androidx.appcompat.widget.AppCompatImageView
