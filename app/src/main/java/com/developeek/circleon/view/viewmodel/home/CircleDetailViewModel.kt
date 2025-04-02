@@ -11,6 +11,7 @@ interface CircleDetailViewModel {
     val circleDetailInitialized: Boolean
     val currentTabPosition: Int
     val currentAppBarExpanded: Boolean
+    val currentLeaveMessage: String
     val error: String
 
     fun refresh()

@@ -3,6 +3,7 @@ package com.developeek.circleon.view.screen.home
 import android.app.Activity
 import android.content.Context
 import android.content.Intent
+import android.content.res.ColorStateList
 import android.os.Bundle
 import android.text.Html
 import android.view.LayoutInflater
@@ -235,6 +236,7 @@ class CircleDetailFragment : Fragment() {
                 } else {
                     CircleLeaveRequestAlertDialog(
                         context,
+                        viewModel.currentLeaveMessage,
                         object : ItemListenerInitializer<String> {
                             override fun initialize(item: String) {
                                 viewModel.requestLeave(item)
@@ -272,12 +274,16 @@ class CircleDetailFragment : Fragment() {
 
         if (viewModel.circleDetail.membershipStatus.isNotJoined()) {
             binding.btnRequestJoinCircle.text = context.getString(R.string.btn_request_join_circle)
+            binding.btnRequestJoinCircle.backgroundTintList =
+                ColorStateList.valueOf(ContextCompat.getColor(context, R.color.purple_5))
             binding.btnRequestJoinCircle.setOnClickListener {
                 viewModel.requestJoin()
             }
         }
         if (viewModel.circleDetail.membershipStatus.isJoinRequested()) {
             binding.btnRequestJoinCircle.text = context.getString(R.string.text_circle_join_requested)
+            binding.btnRequestJoinCircle.backgroundTintList =
+                ColorStateList.valueOf(ContextCompat.getColor(context, R.color.purple_6))
             binding.btnRequestJoinCircle.isClickable = false
         }
     }

@@ -9,11 +9,13 @@ import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat
 import com.developeek.circleon.R
+import com.developeek.circleon.domain.utils.Const
 import com.developeek.circleon.view.listener.ItemClickListener
 import com.developeek.circleon.view.listener.ItemListenerInitializer
 
 class CircleLeaveRequestAlertDialog(
     private val context: Context,
+    private val content: String = Const.EMPTY_TEXT,
     private val positiveListenerInitializer: ItemListenerInitializer<String>,
 ) {
     private lateinit var alertDialog: AlertDialog
@@ -51,6 +53,7 @@ class CircleLeaveRequestAlertDialog(
         val backgroundColor = ContextCompat.getColor(context, R.color.grey_3)
 
         edtContent.backgroundTintList = ColorStateList.valueOf(backgroundColor)
+        edtContent.setText(content)
     }
 
     private fun initListener(view: View) {

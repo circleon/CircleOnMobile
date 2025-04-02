@@ -9,6 +9,7 @@ import com.developeek.circleon.data.source.Error
 import com.developeek.circleon.data.source.Success
 import com.developeek.circleon.domain.model.CircleDetailModel
 import com.developeek.circleon.domain.state.UiState
+import com.developeek.circleon.domain.utils.Const
 import com.developeek.circleon.domain.utils.validator.Invalid
 import com.developeek.circleon.domain.utils.validator.Validator
 import com.developeek.circleon.view.viewmodel.home.CircleDetailViewModel
@@ -53,6 +54,9 @@ class CircleDetailViewModelImpl
             get() = appBarExpanded
         private var appBarExpanded = true
 
+        override val currentLeaveMessage: String
+            get() = _currentLeaveMessage
+        private var _currentLeaveMessage = Const.EMPTY_TEXT
         private var requestJoinLeaveJob: Job? = null
 
         override lateinit var error: String
@@ -124,6 +128,7 @@ class CircleDetailViewModelImpl
         }
 
         override fun requestLeave(message: String) {
+            _currentLeaveMessage = message
             if (!isMessageFormat(message)) return
             requestJoinLeaveJob?.let {
                 if (!it.isCompleted) return
