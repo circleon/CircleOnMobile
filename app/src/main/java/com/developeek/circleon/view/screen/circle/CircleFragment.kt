@@ -61,7 +61,7 @@ class CircleFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         initObserver(requireActivity(), requireContext())
-        initListener()
+        viewModel.refresh() // 탭 전환 시 자동 새로고침
     }
 
     private fun initObserver(
@@ -151,16 +151,6 @@ class CircleFragment : Fragment() {
     private fun showErrorToast(context: Context) {
         if (ErrorToast.previousFinished()) {
             ErrorToast(context, viewModel.error).show()
-        }
-    }
-
-    private fun initListener() {
-        setBtnRetryListener()
-    }
-
-    private fun setBtnRetryListener() {
-        binding.btnRetry.setOnClickListener {
-            viewModel.refresh()
         }
     }
 }

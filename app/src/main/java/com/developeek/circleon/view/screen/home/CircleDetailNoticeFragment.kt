@@ -318,7 +318,8 @@ class CircleDetailNoticeFragment : Fragment() {
         parentActivity: Activity,
         context: Context,
     ) = Observer<UiState> {
-        val loadingIndicator = parentActivity.findViewById<CircularProgressIndicator>(R.id.pgbLoading)
+        val loadingIndicator =
+            requireParentFragment().requireView().findViewById<CircularProgressIndicator>(R.id.pgbLoading)
         loadingIndicator.isVisible = it is UiState.Loading
         when (it) {
             UiState.AuthenticationError -> {

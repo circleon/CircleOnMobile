@@ -28,15 +28,6 @@
                 android:textColor="@color/grey_9"
                 android:text="@string/tab_name_circle"/>
 
-            <androidx.appcompat.widget.AppCompatImageView
-                android:id="@+id/btnRetry"
-                android:layout_width="wrap_content"
-                android:layout_height="match_parent"
-                android:padding="@dimen/margin_padding_large"
-                android:layout_gravity="end"
-                android:tint="@color/grey_6"
-                android:src="@drawable/ic_retry"/>
-
         </androidx.appcompat.widget.Toolbar>
 
         <androidx.appcompat.widget.LinearLayoutCompat
