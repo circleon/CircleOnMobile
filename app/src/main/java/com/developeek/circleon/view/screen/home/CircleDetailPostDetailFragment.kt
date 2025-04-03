@@ -1,5 +1,7 @@
 package com.developeek.circleon.view.screen.home
 
+import android.animation.Animator
+import android.animation.AnimatorInflater
 import android.app.Activity
 import android.content.Context
 import android.content.Intent
@@ -12,6 +14,7 @@ import android.view.WindowManager
 import android.view.inputmethod.InputMethodManager
 import android.widget.EditText
 import androidx.appcompat.widget.PopupMenu
+import androidx.core.animation.addListener
 import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
@@ -77,6 +80,24 @@ class CircleDetailPostDetailFragment : Fragment() {
         activity?.window?.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE)
     }
 
+    override fun onCreateAnimator(
+        transit: Int,
+        enter: Boolean,
+        nextAnim: Int,
+    ): Animator? {
+        if (nextAnim == R.animator.slide_in_right) {
+            val animator = AnimatorInflater.loadAnimator(requireContext(), nextAnim)
+            animator.addListener(
+                onStart = {
+                    hideBtmNavWhenVisible(requireActivity())
+                },
+            )
+
+            return animator
+        }
+        return super.onCreateAnimator(transit, enter, nextAnim)
+    }
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -92,6 +113,7 @@ class CircleDetailPostDetailFragment : Fragment() {
         savedInstanceState: Bundle?,
     ) {
         super.onViewCreated(view, savedInstanceState)
+        postponeEnterTransition()
 
         initView(requireActivity(), requireContext())
         initObserver(requireActivity(), requireContext())
@@ -104,7 +126,6 @@ class CircleDetailPostDetailFragment : Fragment() {
     ) {
         initToolbar()
         initRecyclerView(context)
-        hideBtmNav(parentActivity)
     }
 
     private fun initToolbar() {
@@ -247,10 +268,6 @@ class CircleDetailPostDetailFragment : Fragment() {
         true
     }
 
-    private fun hideBtmNav(parentActivity: Activity) {
-        parentActivity.findViewById<BottomNavigationView>(R.id.btmNav).isVisible = false
-    }
-
     private fun initObserver(
         parentActivity: Activity,
         context: Context,
@@ -297,10 +314,13 @@ class CircleDetailPostDetailFragment : Fragment() {
         context: Context,
     ) = Observer<UiState> {
         binding.pgbLoading.isVisible = it is UiState.Loading
+        if (it !is UiState.Loading && it !is UiState.Success) {
+            startPostponedEnterTransition()
+        }
         when (it) {
             UiState.Success -> {
                 toggleView(binding.rvPostDetail)
-                loadContents()
+                loadContents(parentActivity)
             }
             UiState.AuthenticationError -> {
                 sendUserToLoginScreen(parentActivity)
@@ -312,6 +332,12 @@ class CircleDetailPostDetailFragment : Fragment() {
             }
             else -> {}
         }
+    }
+
+    private fun hideBtmNavWhenVisible(parentActivity: Activity) {
+        val btmNav = parentActivity.findViewById<BottomNavigationView>(R.id.btmNav)
+
+        if (btmNav.isVisible) btmNav.isVisible = false
     }
 
     private fun showErrorToast(context: Context) {
@@ -330,12 +356,13 @@ class CircleDetailPostDetailFragment : Fragment() {
         startActivity(intent)
     }
 
-    private fun loadContents() {
+    private fun loadContents(parentActivity: Activity) {
         binding.rvPostDetail.adapter?.let {
             (it as PostDetailAdapter).update(viewModel.contents) {
                 viewModel.currentScrollState?.let {
                     binding.rvPostDetail.layoutManager?.onRestoreInstanceState(viewModel.currentScrollState)
                 } ?: binding.rvPostDetail.scrollToPosition(0)
+                startPostponedEnterTransition()
             }
         }
     }
@@ -348,7 +375,7 @@ class CircleDetailPostDetailFragment : Fragment() {
         when (it) {
             UiState.Success -> {
                 requestRefreshToPreviousScreen()
-                loadContents()
+                loadContents(parentActivity)
                 hideSoftInput(context, binding.edtComment)
                 binding.edtComment.text?.clear()
             }
@@ -370,7 +397,7 @@ class CircleDetailPostDetailFragment : Fragment() {
         binding.pgbLoading.isVisible = it is UiState.Loading
         when (it) {
             UiState.Success -> {
-                loadContents()
+                loadContents(parentActivity)
                 hideSoftInput(context, binding.edtComment)
             }
             UiState.AuthenticationError -> {
@@ -392,7 +419,7 @@ class CircleDetailPostDetailFragment : Fragment() {
         when (it) {
             UiState.Success -> {
                 requestRefreshToPreviousScreen()
-                loadContents()
+                loadContents(parentActivity)
             }
             UiState.AuthenticationError -> {
                 sendUserToLoginScreen(parentActivity)

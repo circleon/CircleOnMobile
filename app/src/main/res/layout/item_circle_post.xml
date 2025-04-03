@@ -7,7 +7,8 @@
     android:layout_height="wrap_content"
     android:layout_marginTop="@dimen/margin_padding_small"
     android:paddingVertical="@dimen/margin_padding_large"
-    android:background="@color/white">
+    android:background="@drawable/ripple_grey_rectangle"
+    android:backgroundTint="@color/white">
 
     <androidx.appcompat.widget.AppCompatImageView
         android:id="@+id/imgNoticePin"
@@ -51,7 +52,7 @@
             <androidx.cardview.widget.CardView
                 android:layout_width="40dp"
                 android:layout_height="40dp"
-                app:cardCornerRadius="@dimen/round_default"
+                app:cardCornerRadius="20dp"
                 app:cardElevation="0dp">
 
                 <androidx.appcompat.widget.AppCompatImageView

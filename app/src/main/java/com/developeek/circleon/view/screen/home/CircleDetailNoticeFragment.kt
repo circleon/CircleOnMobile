@@ -135,14 +135,18 @@ class CircleDetailNoticeFragment : Fragment() {
     }
 
     private fun sendUserToNoticeDetailScreen(item: PostModel) {
-        findNavController()
-            .navigate(
-                R.id.action_circleDetailFragment_to_circleDetailPostDetailFragment,
-                bundleOf(
-                    Pair(Const.TAG_CIRCLE_ID, circleId),
-                    Pair(Const.TAG_CIRCLE_POST, item),
-                ),
-            )
+        findNavController().currentDestination?.let { // fragment 진입 도중 중복 navigate 방지
+            if (it.id != R.id.circleDetailPostDetailFragment) {
+                findNavController()
+                    .navigate(
+                        R.id.action_circleDetailFragment_to_circleDetailPostDetailFragment,
+                        bundleOf(
+                            Pair(Const.TAG_CIRCLE_ID, circleId),
+                            Pair(Const.TAG_CIRCLE_POST, item),
+                        ),
+                    )
+            }
+        }
     }
 
     private fun initNoticeOverflowMenuAndShow(
