@@ -29,7 +29,6 @@ import okhttp3.RequestBody
 import okhttp3.RequestBody.Companion.asRequestBody
 import okhttp3.RequestBody.Companion.toRequestBody
 import java.io.File
-import java.io.IOException
 
 class CircleRepositoryImpl(
     private val service: CircleService,
@@ -58,7 +57,7 @@ class CircleRepositoryImpl(
             }
         } catch (e: ServiceException.NoResultException) {
             Result.success(CircleModels.empty())
-        } catch (e: IOException) {
+        } catch (e: Exception) {
             Result.error(e)
         }
     }
@@ -71,7 +70,7 @@ class CircleRepositoryImpl(
             }
         } catch (e: ServiceException.NoResultException) {
             Result.success(CircleSummaryModels.empty())
-        } catch (e: IOException) {
+        } catch (e: Exception) {
             Result.error(e)
         }
     }
@@ -100,7 +99,7 @@ class CircleRepositoryImpl(
                     ),
                 )
             }
-        } catch (e: IOException) {
+        } catch (e: Exception) {
             Result.error(e)
         }
     }
@@ -122,7 +121,7 @@ class CircleRepositoryImpl(
                     )
                 Result.success(MemberModels(response.content.map { it.toMemberModel() }))
             }
-        } catch (e: IOException) {
+        } catch (e: Exception) {
             Result.error(e)
         }
     }
@@ -136,7 +135,7 @@ class CircleRepositoryImpl(
                 val response = service.getCircleLeaveRequestedMemberMessage(circleId, memberId)
                 Result.success(response.message)
             }
-        } catch (e: IOException) {
+        } catch (e: Exception) {
             Result.error(e)
         }
     }
@@ -158,7 +157,7 @@ class CircleRepositoryImpl(
                     )
                 Result.success(MemberModels(response.content.map { it.toMemberModel() }))
             }
-        } catch (e: IOException) {
+        } catch (e: Exception) {
             Result.error(e)
         }
     }
@@ -180,7 +179,7 @@ class CircleRepositoryImpl(
                     )
                 Result.success(MemberModels(response.content.map { it.toMemberModel() }))
             }
-        } catch (e: IOException) {
+        } catch (e: Exception) {
             Result.error(e)
         }
     }
@@ -203,7 +202,7 @@ class CircleRepositoryImpl(
             }
         } catch (e: ServiceException.NoResultException) {
             Result.success(PostModels.empty())
-        } catch (e: IOException) {
+        } catch (e: Exception) {
             Result.error(e)
         }
     }
@@ -226,7 +225,7 @@ class CircleRepositoryImpl(
             }
         } catch (e: ServiceException.NoResultException) {
             Result.success(PostModels.empty())
-        } catch (e: IOException) {
+        } catch (e: Exception) {
             Result.error(e)
         }
     }
@@ -250,7 +249,7 @@ class CircleRepositoryImpl(
             }
         } catch (e: ServiceException.NoResultException) {
             Result.success(CommentModels.emptyInstance())
-        } catch (e: IOException) {
+        } catch (e: Exception) {
             Result.error(e)
         }
     }
@@ -264,7 +263,7 @@ class CircleRepositoryImpl(
                 val response = service.getMyCircles(MembershipStatus.JOINED.codeName(), page, size)
                 Result.success(CircleSummaryModels(response.content.map { it.toCircleSummaryModel() }))
             }
-        } catch (e: IOException) {
+        } catch (e: Exception) {
             Result.error(e)
         }
     }
@@ -278,7 +277,7 @@ class CircleRepositoryImpl(
                 val response = service.getMyCircles(MembershipStatus.JOIN_REQUESTED.codeName(), page, size)
                 Result.success(CircleSummaryModels(response.content.map { it.toCircleSummaryModel() }))
             }
-        } catch (e: IOException) {
+        } catch (e: Exception) {
             Result.error(e)
         }
     }
@@ -289,7 +288,7 @@ class CircleRepositoryImpl(
                 service.postMyCircle(circleId)
                 Result.success(Unit)
             }
-        } catch (e: IOException) {
+        } catch (e: Exception) {
             Result.error(e)
         }
     }
@@ -303,7 +302,7 @@ class CircleRepositoryImpl(
                 service.postCircleLeaveRequest(memberId, RequestResponseBodyCircleLeave(leaveMessage))
                 Result.success(Unit)
             }
-        } catch (e: IOException) {
+        } catch (e: Exception) {
             Result.error(e)
         }
     }
@@ -328,7 +327,7 @@ class CircleRepositoryImpl(
                 service.postCirclePost(circleId, postTypeRequestBody, contentRequestBody, body)
                 Result.success(Unit)
             }
-        } catch (e: IOException) {
+        } catch (e: Exception) {
             Result.error(e)
         }
     }
@@ -343,7 +342,7 @@ class CircleRepositoryImpl(
                 service.postCircleComment(circleId, postId, RequestBodyEditComment(comment))
                 Result.success(Unit)
             }
-        } catch (e: IOException) {
+        } catch (e: Exception) {
             Result.error(e)
         }
     }
@@ -358,7 +357,7 @@ class CircleRepositoryImpl(
                 service.putPostPin(circleId, postId, Pin(isPinned))
                 Result.success(Unit)
             }
-        } catch (e: IOException) {
+        } catch (e: Exception) {
             Result.error(e)
         }
     }
@@ -369,7 +368,7 @@ class CircleRepositoryImpl(
                 service.putCircle(circleDetailModel.id, circleDetailModel.toRequestBodyForEdit())
                 Result.success(Unit)
             }
-        } catch (e: IOException) {
+        } catch (e: Exception) {
             Result.error(e)
         }
     }
@@ -404,7 +403,7 @@ class CircleRepositoryImpl(
                 service.putCircleImage(circleId, thumbnail, introductionImage)
                 Result.success(Unit)
             }
-        } catch (e: IOException) {
+        } catch (e: Exception) {
             Result.error(e)
         }
     }
@@ -420,7 +419,7 @@ class CircleRepositoryImpl(
                 service.putCirclePost(circleId, postId, RequestBodyEditPost(postType.code(), content))
                 Result.success(Unit)
             }
-        } catch (e: IOException) {
+        } catch (e: Exception) {
             Result.error(e)
         }
     }
@@ -436,7 +435,7 @@ class CircleRepositoryImpl(
                 service.putCircleComment(circleId, postId, commentId, RequestBodyEditComment(content))
                 Result.success(Unit)
             }
-        } catch (e: IOException) {
+        } catch (e: Exception) {
             Result.error(e)
         }
     }
@@ -451,7 +450,7 @@ class CircleRepositoryImpl(
                 service.putCircleMemberRole(circleId, memberId, RequestBodyEditMemberRole(role.codeName()))
                 Result.success(Unit)
             }
-        } catch (e: IOException) {
+        } catch (e: Exception) {
             Result.error(e)
         }
     }
@@ -466,7 +465,7 @@ class CircleRepositoryImpl(
                 service.putCircleMemberStatus(circleId, memberId, RequestBodyEditMemberStatus(status.codeName()))
                 Result.success(Unit)
             }
-        } catch (e: IOException) {
+        } catch (e: Exception) {
             Result.error(e)
         }
     }
@@ -481,7 +480,7 @@ class CircleRepositoryImpl(
                 service.deleteCircleImage(circleId, deleteThumbnail, deleteIntroductionImage)
                 Result.success(Unit)
             }
-        } catch (e: IOException) {
+        } catch (e: Exception) {
             Result.error(e)
         }
     }
@@ -495,7 +494,7 @@ class CircleRepositoryImpl(
                 service.deleteCirclePost(circleId, postId)
                 Result.success(Unit)
             }
-        } catch (e: IOException) {
+        } catch (e: Exception) {
             Result.error(e)
         }
     }
@@ -510,7 +509,7 @@ class CircleRepositoryImpl(
                 service.deletePostComment(circleId, postId, commentId)
                 Result.success(Unit)
             }
-        } catch (e: IOException) {
+        } catch (e: Exception) {
             Result.error(e)
         }
     }
@@ -524,7 +523,7 @@ class CircleRepositoryImpl(
                 service.deleteCircleMember(circleId, memberId)
                 Result.success(Unit)
             }
-        } catch (e: IOException) {
+        } catch (e: Exception) {
             Result.error(e)
         }
     }

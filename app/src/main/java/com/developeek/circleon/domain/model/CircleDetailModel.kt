@@ -21,7 +21,7 @@ data class CircleDetailModel(
     val memberCount: Int,
     val members: MemberModels,
     val introImgUrl: String?,
-    val introduction: String,
+    val introduction: String?,
     val recruitmentStartDate: LocalDateTime?,
     val recruitmentEndDate: LocalDateTime?,
 ) : Serializable {
@@ -44,7 +44,7 @@ data class CircleDetailModel(
         memberCount: Int = this.memberCount,
         members: MemberModels = this.members,
         introImgUrl: String? = this.introImgUrl,
-        introduction: String = this.introduction,
+        introduction: String? = this.introduction,
         recruitmentStartDate: LocalDateTime? = this.recruitmentStartDate,
         recruitmentEndDate: LocalDateTime? = this.recruitmentEndDate,
     ) = CircleDetailModel(

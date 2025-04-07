@@ -335,15 +335,6 @@
                         android:textSize="@dimen/text_size_small"
                         android:translationY="-0.91sp" />
 
-                    <androidx.appcompat.widget.AppCompatTextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginHorizontal="@dimen/margin_padding_x_small"
-                        android:lineSpacingExtra="2sp"
-                        android:text="*"
-                        android:textColor="@color/error"
-                        android:textSize="@dimen/text_size_small" />
-
                 </androidx.appcompat.widget.LinearLayoutCompat>
 
                 <androidx.appcompat.widget.AppCompatEditText
@@ -430,15 +421,31 @@
 
                 </FrameLayout>
 
-                <androidx.appcompat.widget.AppCompatTextView
+                <androidx.appcompat.widget.LinearLayoutCompat
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="@dimen/margin_padding_xx_large"
-                    android:lineSpacingExtra="2sp"
-                    android:text="@string/text_circle_category"
-                    android:textColor="@color/grey_9"
-                    android:textSize="@dimen/text_size_small"
-                    android:translationY="-0.91sp" />
+                    android:orientation="horizontal">
+
+                    <androidx.appcompat.widget.AppCompatTextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:lineSpacingExtra="2sp"
+                        android:text="@string/text_circle_category"
+                        android:textColor="@color/grey_9"
+                        android:textSize="@dimen/text_size_small"
+                        android:translationY="-0.91sp" />
+
+                    <androidx.appcompat.widget.AppCompatTextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginHorizontal="@dimen/margin_padding_x_small"
+                        android:lineSpacingExtra="2sp"
+                        android:text="*"
+                        android:textColor="@color/error"
+                        android:textSize="@dimen/text_size_small" />
+
+                </androidx.appcompat.widget.LinearLayoutCompat>
 
                 <androidx.recyclerview.widget.RecyclerView
                     android:id="@+id/rvCircleCategory"

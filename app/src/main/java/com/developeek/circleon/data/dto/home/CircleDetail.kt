@@ -19,7 +19,7 @@ data class CircleDetail(
     @SerializedName("summary") val singleLineIntroduction: String,
     val memberCount: Int,
     val introImgUrl: String?,
-    val introduction: String,
+    val introduction: String?,
     val recruitmentStartDate: String?,
     val recruitmentEndDate: String?,
     @SerializedName("circleRole") val role: String?,
@@ -63,7 +63,7 @@ data class CircleDetail(
 data class RequestBodyEditCircleDetail(
     @SerializedName("circleName") val name: String,
     @SerializedName("summary") val singleLineIntroduction: String,
-    val introduction: String,
+    val introduction: String?,
     val recruitmentStartDate: String?,
     val recruitmentEndDate: String?,
     @SerializedName("categoryType") val category: String,

@@ -13,7 +13,6 @@ import com.developeek.circleon.domain.vo.UserEmail
 import com.developeek.circleon.domain.vo.UserName
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
-import java.io.IOException
 
 class LoginRepositoryImpl(
     private val service: LoginService,
@@ -37,7 +36,7 @@ class LoginRepositoryImpl(
                 }
                 Result.success(Unit)
             }
-        } catch (e: IOException) {
+        } catch (e: Exception) {
             Result.error(e)
         }
     }
@@ -52,7 +51,7 @@ class LoginRepositoryImpl(
                 service.signUp(SignUp(email.get(), userName.get(), password.get()))
                 Result.success(Unit)
             }
-        } catch (e: IOException) {
+        } catch (e: Exception) {
             return Result.error(e)
         }
     }
@@ -63,7 +62,7 @@ class LoginRepositoryImpl(
                 service.requestEmailAuthenticationCode(com.developeek.circleon.data.dto.login.Email(email.get()))
                 Result.success(Unit)
             }
-        } catch (e: IOException) {
+        } catch (e: Exception) {
             return Result.error(e)
         }
     }
@@ -77,7 +76,7 @@ class LoginRepositoryImpl(
                 service.authenticateEmail(EmailAuthentication(email.get(), code))
                 Result.success(Unit)
             }
-        } catch (e: IOException) {
+        } catch (e: Exception) {
             return Result.error(e)
         }
     }
