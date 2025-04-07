@@ -36,10 +36,6 @@ class CircleDetailViewModelImpl
             get() = uiState
         private val uiState = MutableLiveData<UiState>()
 
-        override val requestState: LiveData<UiState>
-            get() = userRequestState
-        private val userRequestState = MutableLiveData<UiState>()
-
         override lateinit var circleDetail: CircleDetailModel
         private var fetchCircleDetailJob: Job? = null
         override val circleDetailInitialized: Boolean
@@ -54,6 +50,13 @@ class CircleDetailViewModelImpl
             get() = appBarExpanded
         private var appBarExpanded = true
 
+        override val requestState: LiveData<UiState>
+            get() = userRequestState
+        private val userRequestState = MutableLiveData<UiState>()
+
+        override val currentJoinMessage: String
+            get() = _currentJoinMessage
+        private var _currentJoinMessage = Const.EMPTY_TEXT
         override val currentLeaveMessage: String
             get() = _currentLeaveMessage
         private var _currentLeaveMessage = Const.EMPTY_TEXT
@@ -103,7 +106,9 @@ class CircleDetailViewModelImpl
             appBarExpanded = expanded
         }
 
-        override fun requestJoin() {
+        override fun requestJoin(joinMessage: String) {
+            _currentJoinMessage = joinMessage
+            if (!isMessageFormat(joinMessage)) return
             requestJoinLeaveJob?.let {
                 if (!it.isCompleted) return
             }
@@ -112,7 +117,7 @@ class CircleDetailViewModelImpl
 
             requestJoinLeaveJob =
                 viewModelScope.launch {
-                    val result = repository.postMyCircle(circleId)
+                    val result = repository.postMyCircle(circleId, _currentJoinMessage)
 
                     if (result is Success) {
                         refresh()
@@ -127,9 +132,9 @@ class CircleDetailViewModelImpl
                 }
         }
 
-        override fun requestLeave(message: String) {
-            _currentLeaveMessage = message
-            if (!isMessageFormat(message)) return
+        override fun requestLeave(leaveMessage: String) {
+            _currentLeaveMessage = leaveMessage
+            if (!isMessageFormat(leaveMessage)) return
             requestJoinLeaveJob?.let {
                 if (!it.isCompleted) return
             }
@@ -138,7 +143,7 @@ class CircleDetailViewModelImpl
 
             requestJoinLeaveJob =
                 viewModelScope.launch {
-                    val result = repository.postCircleLeaveRequest(circleDetail.memberId, message)
+                    val result = repository.postCircleLeaveRequest(circleDetail.memberId, _currentLeaveMessage)
 
                     if (result is Success) {
                         refresh()

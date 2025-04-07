@@ -35,7 +35,7 @@ import com.developeek.circleon.view.listener.ItemListenerInitializer
 import com.developeek.circleon.view.screen.login.LoginActivity
 import com.developeek.circleon.view.viewmodel.home.ManageCircleMemberViewModel
 import com.developeek.circleon.view.viewmodelimpl.home.ManageCircleMemberViewModelImpl
-import com.developeek.circleon.view.widget.CircleAcceptLeaveRequestAlertDialog
+import com.developeek.circleon.view.widget.CircleAcceptRequestAlertDialog
 import com.developeek.circleon.view.widget.CircleMemberRoleEditAlertDialog
 import com.developeek.circleon.view.widget.ContentDeleteAlertDialog
 import com.developeek.circleon.view.widget.ErrorAlertDialog
@@ -218,21 +218,25 @@ class ManageCircleMemberFragment : Fragment() {
             JoinRequestedMemberAdapter(
                 context,
                 glideProvider,
-                positiveListenerInitializer =
+                showMessageListenerInitializer =
                     object : ItemListenerInitializer<MemberModel> {
                         override fun initialize(item: MemberModel) {
-                            viewModel.acceptJoinRequest(item)
-                        }
+                            CircleAcceptRequestAlertDialog(
+                                context,
+                                title = context.getString(R.string.title_member_message_dialog_for_join_accept),
+                                member = item,
+                                positiveListenerInitializer =
+                                    object : ItemListenerInitializer<MemberModel> {
+                                        override fun initialize(item: MemberModel) {
+                                            viewModel.acceptJoinRequest(item)
+                                        }
 
-                        override fun initialize(
-                            item: MemberModel,
-                            view: View?,
-                        ) {}
-                    },
-                negativeListenerInitializer =
-                    object : ItemListenerInitializer<MemberModel> {
-                        override fun initialize(item: MemberModel) {
-                            viewModel.rejectJoinRequest(item)
+                                        override fun initialize(
+                                            item: MemberModel,
+                                            view: View?,
+                                        ) {}
+                                    },
+                            ).show()
                         }
 
                         override fun initialize(
@@ -252,19 +256,21 @@ class ManageCircleMemberFragment : Fragment() {
                 showMessageListenerInitializer =
                     object : ItemListenerInitializer<MemberModel> {
                         override fun initialize(item: MemberModel) {
-                            CircleAcceptLeaveRequestAlertDialog(
+                            CircleAcceptRequestAlertDialog(
                                 context,
-                                item,
-                                object : ItemListenerInitializer<MemberModel> {
-                                    override fun initialize(item: MemberModel) {
-                                        viewModel.acceptLeaveRequest(item)
-                                    }
+                                title = context.getString(R.string.title_member_message_dialog_for_leave_accept),
+                                member = item,
+                                positiveListenerInitializer =
+                                    object : ItemListenerInitializer<MemberModel> {
+                                        override fun initialize(item: MemberModel) {
+                                            viewModel.acceptLeaveRequest(item)
+                                        }
 
-                                    override fun initialize(
-                                        item: MemberModel,
-                                        view: View?,
-                                    ) {}
-                                },
+                                        override fun initialize(
+                                            item: MemberModel,
+                                            view: View?,
+                                        ) {}
+                                    },
                             ).show()
                         }
 

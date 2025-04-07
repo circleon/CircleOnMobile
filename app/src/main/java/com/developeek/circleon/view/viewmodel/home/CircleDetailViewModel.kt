@@ -11,6 +11,7 @@ interface CircleDetailViewModel {
     val circleDetailInitialized: Boolean
     val currentTabPosition: Int
     val currentAppBarExpanded: Boolean
+    val currentJoinMessage: String
     val currentLeaveMessage: String
     val error: String
 
@@ -20,7 +21,7 @@ interface CircleDetailViewModel {
 
     fun setAppBarExpanded(expanded: Boolean)
 
-    fun requestJoin()
+    fun requestJoin(joinMessage: String)
 
     fun requestLeave(leaveMessage: String)
 }

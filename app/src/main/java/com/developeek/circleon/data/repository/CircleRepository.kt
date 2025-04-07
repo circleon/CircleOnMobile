@@ -31,11 +31,6 @@ interface CircleRepository {
         size: Int,
     ): Result<MemberModels>
 
-    suspend fun getCircleLeaveRequestedMemberMessage(
-        circleId: Int,
-        memberId: Int,
-    ): Result<String>
-
     suspend fun getCircleJoinRequestedMembers(
         circleId: Int,
         page: Int,
@@ -47,6 +42,16 @@ interface CircleRepository {
         page: Int,
         size: Int,
     ): Result<MemberModels>
+
+    suspend fun getCircleJoinRequestedMemberMessage(
+        circleId: Int,
+        memberId: Int,
+    ): Result<String>
+
+    suspend fun getCircleLeaveRequestedMemberMessage(
+        circleId: Int,
+        memberId: Int,
+    ): Result<String>
 
     suspend fun getCirclePosts(
         circleId: Int,
@@ -78,7 +83,10 @@ interface CircleRepository {
     ): Result<CircleSummaryModels>
 
     // POST
-    suspend fun postMyCircle(circleId: Int): Result<Unit>
+    suspend fun postMyCircle(
+        circleId: Int,
+        joinMessage: String,
+    ): Result<Unit>
 
     suspend fun postCircleLeaveRequest(
         memberId: Int,

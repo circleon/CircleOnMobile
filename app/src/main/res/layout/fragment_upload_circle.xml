@@ -39,15 +39,16 @@
                 tools:text="title"/>
 
             <androidx.appcompat.widget.AppCompatTextView
-                android:id="@+id/btnUpload"
+                android:id="@+id/btnSaveEdit"
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
                 android:paddingHorizontal="@dimen/margin_padding_large"
                 android:layout_gravity="end"
                 android:gravity="center"
-                android:text="@string/btn_finish"
+                android:text="@string/btn_save_edit"
                 android:textAppearance="@style/large_bold_text"
-                android:textColor="@color/purple_5" />
+                android:textColor="@color/purple_5"
+                android:visibility="gone"/>
 
         </androidx.appcompat.widget.Toolbar>
 
@@ -340,7 +341,7 @@
                 <androidx.appcompat.widget.AppCompatEditText
                     android:id="@+id/edtCircleIntroduction"
                     android:layout_width="match_parent"
-                    android:layout_height="120dp"
+                    android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:layout_marginTop="@dimen/margin_padding_small"
                     android:paddingHorizontal="@dimen/margin_padding_large"
@@ -455,6 +456,20 @@
                     android:layout_marginBottom="@dimen/margin_padding_x_large"
                     android:overScrollMode="never">
                 </androidx.recyclerview.widget.RecyclerView>
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/btnUpload"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="64dp"
+                    android:layout_marginBottom="@dimen/margin_padding_xx_large"
+                    android:paddingVertical="10dp"
+                    android:background="@drawable/bg_rounded_rectangle"
+                    android:backgroundTint="@color/purple_5"
+                    android:text="@string/btn_upload"
+                    android:textColor="@color/white"
+                    android:gravity="center"
+                    android:visibility="gone"/>
 
             </androidx.appcompat.widget.LinearLayoutCompat>
 

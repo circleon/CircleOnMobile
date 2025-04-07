@@ -135,20 +135,14 @@ class ManageCircleMemberViewModelImpl
 
         override fun acceptLeaveRequest(member: MemberModel) {
             editMembershipStatus(member, MembershipStatus.NOT_JOINED) { page, size ->
-                val state = fetchCircleLeaveRequestedMembers(page, size)
-                withContext(Dispatchers.IO) {
-                    _members.get().map {
-                        fetchCircleLeaveRequestedMemberMessage(it)
-                    }
-                }
-                return@editMembershipStatus state
+                fetchCircleLeaveRequestedMembers(page, size)
             }
         }
 
         private fun editMembershipStatus(
             member: MemberModel,
             status: MembershipStatus,
-            afterFetch: suspend (Int, Int) -> UiState,
+            afterEdit: suspend (Int, Int) -> UiState,
         ) {
             editMembershipStatusJob?.let {
                 if (!it.isCompleted) return
@@ -161,7 +155,7 @@ class ManageCircleMemberViewModelImpl
                     val result = repository.putCircleMemberStatus(circle.id, member.id, status)
 
                     if (result is Success) {
-                        _state.postValue(afterFetch(currentPage, SIZE_BY_PAGE))
+                        _state.postValue(afterEdit(currentPage, SIZE_BY_PAGE))
                     } else {
                         error = (result as Error).message()
                         if (result.isAuthenticationError()) {
@@ -181,6 +175,11 @@ class ManageCircleMemberViewModelImpl
 
             if (result is Success) {
                 _members = result.data
+                withContext(Dispatchers.IO) {
+                    _members.get().map {
+                        fetchCircleJoinRequestedMemberMessage(it)
+                    }
+                }
                 return UiState.Success
             } else {
                 error = (result as Error).message()
@@ -196,10 +195,23 @@ class ManageCircleMemberViewModelImpl
 
             if (result is Success) {
                 _members = result.data
+                withContext(Dispatchers.IO) {
+                    _members.get().map {
+                        fetchCircleLeaveRequestedMemberMessage(it)
+                    }
+                }
                 return UiState.Success
             } else {
                 error = (result as Error).message()
                 return if (result.isAuthenticationError()) UiState.AuthenticationError else UiState.ServiceError
+            }
+        }
+
+        private suspend fun fetchCircleJoinRequestedMemberMessage(member: MemberModel) {
+            val result = repository.getCircleJoinRequestedMemberMessage(circle.id, member.id)
+
+            if (result is Success) {
+                member.setMessage(result.data)
             }
         }
 

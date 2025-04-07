@@ -82,7 +82,11 @@ class ManageCircleViewModelImpl
                         }
                     val fetchCircleJoinRequestedMembersJob =
                         async {
-                            return@async fetchCircleJoinRequestedMembers(page, size)
+                            val state = fetchCircleJoinRequestedMembers(page, size)
+                            joinRequestedMembers.get().map {
+                                launch { fetchCircleJoinRequestedMemberMessage(it) }
+                            }
+                            return@async state
                         }
                     val fetchCircleLeaveRequestedMembersJob =
                         async {
@@ -159,6 +163,14 @@ class ManageCircleViewModelImpl
             } else {
                 error = (result as Error).message()
                 return if (result.isAuthenticationError()) UiState.AuthenticationError else UiState.ServiceError
+            }
+        }
+
+        private suspend fun fetchCircleJoinRequestedMemberMessage(member: MemberModel) {
+            val result = repository.getCircleJoinRequestedMemberMessage(circle.id, member.id)
+
+            if (result is Success) {
+                member.setMessage(result.data)
             }
         }
 

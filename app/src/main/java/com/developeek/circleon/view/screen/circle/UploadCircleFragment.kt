@@ -125,6 +125,7 @@ class UploadCircleFragment : Fragment() {
         initCategoryRecyclerView(context)
         initToolbar()
         hideBtmNav(parentActivity)
+        setBtnSaveEditOrUpload()
         loadCircleContent()
         loadCircleThumbnailWhenIsNotNull(context)
         loadCircleIntroductionImageWhenIsNotNull(context)
@@ -132,6 +133,14 @@ class UploadCircleFragment : Fragment() {
 
     private fun hideBtmNav(activity: Activity) {
         activity.findViewById<BottomNavigationView>(R.id.btmNav).isVisible = false
+    }
+
+    private fun setBtnSaveEditOrUpload() {
+        if (isEdit) {
+            binding.btnSaveEdit.isVisible = true
+        } else {
+            binding.btnUpload.isVisible = true
+        }
     }
 
     private fun initToolbar() {
@@ -257,6 +266,7 @@ class UploadCircleFragment : Fragment() {
 
     private fun initListener(context: Context) {
         setBtnCancelListener()
+        setBtnSaveEditListener()
         setBtnUploadListener()
         setBtnAddCircleThumbnailListener()
         setBtnAddCircleIntroductionImageListener()
@@ -273,9 +283,15 @@ class UploadCircleFragment : Fragment() {
         }
     }
 
+    private fun setBtnSaveEditListener() {
+        binding.btnSaveEdit.setOnClickListener {
+            viewModel.edit()
+        }
+    }
+
     private fun setBtnUploadListener() {
         binding.btnUpload.setOnClickListener {
-            if (isEdit) viewModel.edit()
+            // TODO: 동아리 생성
         }
     }
 

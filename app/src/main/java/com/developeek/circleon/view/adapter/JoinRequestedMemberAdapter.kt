@@ -18,8 +18,7 @@ import com.developeek.circleon.view.listener.ItemListenerInitializer
 class JoinRequestedMemberAdapter(
     private val context: Context,
     private val glideProvider: GlideProvider,
-    private val positiveListenerInitializer: ItemListenerInitializer<MemberModel>,
-    private val negativeListenerInitializer: ItemListenerInitializer<MemberModel>,
+    private val showMessageListenerInitializer: ItemListenerInitializer<MemberModel>,
 ) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
     private val diffUtil =
         AsyncListDiffer(
@@ -43,8 +42,7 @@ class JoinRequestedMemberAdapter(
 
     inner class JoinRequestedMemberAdapterItemViewHolder(
         private val binding: ItemJoinRequestedMemberBinding,
-        private val positiveListener: ItemClickListener<MemberModel>,
-        private val negativeListener: ItemClickListener<MemberModel>,
+        private val showMessageListener: ItemClickListener<MemberModel>,
     ) : RecyclerView.ViewHolder(binding.root) {
         fun bind(position: Int) {
             val member = diffUtil.currentList[position]
@@ -61,8 +59,7 @@ class JoinRequestedMemberAdapter(
         }
 
         private fun notifyListenerItemChanged(member: MemberModel) {
-            positiveListener.item = member
-            negativeListener.item = member
+            showMessageListener.item = member
         }
     }
 
@@ -77,25 +74,16 @@ class JoinRequestedMemberAdapter(
                 false,
             )
 
-        val positiveListener =
+        val showMessageListener =
             object : ItemClickListener<MemberModel> {
                 override lateinit var item: MemberModel
 
                 override fun onClick(p0: View?) {
-                    positiveListenerInitializer.initialize(item)
+                    showMessageListenerInitializer.initialize(item)
                 }
             }
-        val negativeListener =
-            object : ItemClickListener<MemberModel> {
-                override lateinit var item: MemberModel
-
-                override fun onClick(p0: View?) {
-                    negativeListenerInitializer.initialize(item)
-                }
-            }
-        binding.btnAcceptJoinRequest.setOnClickListener(positiveListener)
-        binding.btnRejectJoinRequest.setOnClickListener(negativeListener)
-        return JoinRequestedMemberAdapterItemViewHolder(binding, positiveListener, negativeListener)
+        binding.btnShowMemberMessage.setOnClickListener(showMessageListener)
+        return JoinRequestedMemberAdapterItemViewHolder(binding, showMessageListener)
     }
 
     override fun getItemCount() = diffUtil.currentList.size

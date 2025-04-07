@@ -14,6 +14,7 @@ import com.developeek.circleon.data.dto.home.RequestBodyEditComment
 import com.developeek.circleon.data.dto.home.RequestBodyEditMemberRole
 import com.developeek.circleon.data.dto.home.RequestBodyEditMemberStatus
 import com.developeek.circleon.data.dto.home.RequestBodyEditPost
+import com.developeek.circleon.data.dto.home.RequestResponseBodyCircleJoin
 import com.developeek.circleon.data.dto.home.RequestResponseBodyCircleLeave
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
@@ -62,6 +63,12 @@ interface CircleService {
         @Query("membershipStatus") membershipStatus: String,
     ): Paging<Member>
 
+    @GET("circles/{circleId}/members/{memberId}/join-message")
+    suspend fun getCircleJoinRequestedMemberMessage(
+        @Path("circleId") circleId: Int,
+        @Path("memberId") memberId: Int,
+    ): RequestResponseBodyCircleJoin
+
     @GET("circles/{circleId}/members/{memberId}/leave-message")
     suspend fun getCircleLeaveRequestedMemberMessage(
         @Path("circleId") circleId: Int,
@@ -95,6 +102,7 @@ interface CircleService {
     @POST("my-circles/{circleId}")
     suspend fun postMyCircle(
         @Path("circleId") circleId: Int,
+        @Body data: RequestResponseBodyCircleJoin,
     )
 
     @POST("my-circles/{memberId}/leave-request")

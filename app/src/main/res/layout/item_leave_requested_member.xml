@@ -50,7 +50,7 @@
         android:backgroundTint="@color/grey_3"
         android:textColor="@color/grey_6"
         android:textSize="@dimen/text_size_default"
-        android:text="@string/btn_show_member_message"
+        android:text="@string/btn_show_member_leave_message"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@id/txtMemberName"
         app:layout_constraintTop_toTopOf="parent"

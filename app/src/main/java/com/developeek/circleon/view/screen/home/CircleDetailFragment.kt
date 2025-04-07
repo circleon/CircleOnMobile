@@ -32,7 +32,7 @@ import com.developeek.circleon.view.listener.ItemListenerInitializer
 import com.developeek.circleon.view.screen.login.LoginActivity
 import com.developeek.circleon.view.viewmodel.home.CircleDetailViewModel
 import com.developeek.circleon.view.viewmodelimpl.home.CircleDetailViewModelImpl
-import com.developeek.circleon.view.widget.CircleLeaveRequestAlertDialog
+import com.developeek.circleon.view.widget.CircleRequestAlertDialog
 import com.developeek.circleon.view.widget.ErrorAlertDialog
 import com.developeek.circleon.view.widget.ErrorToast
 import com.google.android.material.tabs.TabLayout
@@ -234,9 +234,11 @@ class CircleDetailFragment : Fragment() {
                 if (item.membershipStatus.isLeaveRequested()) {
                     ErrorAlertDialog(context, context.getString(R.string.message_already_leave_requested)).show()
                 } else {
-                    CircleLeaveRequestAlertDialog(
+                    CircleRequestAlertDialog(
                         context,
-                        viewModel.currentLeaveMessage,
+                        title = context.getString(R.string.title_member_leave_message_dialog),
+                        content = viewModel.currentLeaveMessage,
+                        positiveButton = context.getString(R.string.btn_leave_request),
                         object : ItemListenerInitializer<String> {
                             override fun initialize(item: String) {
                                 viewModel.requestLeave(item)
@@ -277,7 +279,7 @@ class CircleDetailFragment : Fragment() {
             binding.btnRequestJoinCircle.backgroundTintList =
                 ColorStateList.valueOf(ContextCompat.getColor(context, R.color.purple_5))
             binding.btnRequestJoinCircle.setOnClickListener {
-                viewModel.requestJoin()
+                showRequestJoinDialog(context)
             }
         }
         if (viewModel.circleDetail.membershipStatus.isJoinRequested()) {
@@ -286,6 +288,25 @@ class CircleDetailFragment : Fragment() {
                 ColorStateList.valueOf(ContextCompat.getColor(context, R.color.purple_6))
             binding.btnRequestJoinCircle.isClickable = false
         }
+    }
+
+    private fun showRequestJoinDialog(context: Context) {
+        CircleRequestAlertDialog(
+            context,
+            title = context.getString(R.string.title_member_join_message_dialog),
+            content = viewModel.currentJoinMessage,
+            positiveButton = context.getString(R.string.btn_join_request),
+            object : ItemListenerInitializer<String> {
+                override fun initialize(item: String) {
+                    viewModel.requestJoin(item)
+                }
+
+                override fun initialize(
+                    item: String,
+                    view: View?,
+                ) {}
+            },
+        ).show()
     }
 
     private fun requestStateObserver(

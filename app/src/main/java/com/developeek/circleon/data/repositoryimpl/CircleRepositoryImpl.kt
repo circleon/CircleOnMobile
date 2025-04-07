@@ -5,6 +5,7 @@ import com.developeek.circleon.data.dto.home.RequestBodyEditComment
 import com.developeek.circleon.data.dto.home.RequestBodyEditMemberRole
 import com.developeek.circleon.data.dto.home.RequestBodyEditMemberStatus
 import com.developeek.circleon.data.dto.home.RequestBodyEditPost
+import com.developeek.circleon.data.dto.home.RequestResponseBodyCircleJoin
 import com.developeek.circleon.data.dto.home.RequestResponseBodyCircleLeave
 import com.developeek.circleon.data.exception.ServiceException
 import com.developeek.circleon.data.repository.CircleRepository
@@ -126,20 +127,6 @@ class CircleRepositoryImpl(
         }
     }
 
-    override suspend fun getCircleLeaveRequestedMemberMessage(
-        circleId: Int,
-        memberId: Int,
-    ): Result<String> {
-        return try {
-            withContext(dispatcher) {
-                val response = service.getCircleLeaveRequestedMemberMessage(circleId, memberId)
-                Result.success(response.message)
-            }
-        } catch (e: Exception) {
-            Result.error(e)
-        }
-    }
-
     override suspend fun getCircleJoinRequestedMembers(
         circleId: Int,
         page: Int,
@@ -178,6 +165,34 @@ class CircleRepositoryImpl(
                         MembershipStatus.LEAVE_REQUESTED.codeName(),
                     )
                 Result.success(MemberModels(response.content.map { it.toMemberModel() }))
+            }
+        } catch (e: Exception) {
+            Result.error(e)
+        }
+    }
+
+    override suspend fun getCircleLeaveRequestedMemberMessage(
+        circleId: Int,
+        memberId: Int,
+    ): Result<String> {
+        return try {
+            withContext(dispatcher) {
+                val response = service.getCircleLeaveRequestedMemberMessage(circleId, memberId)
+                Result.success(response.message)
+            }
+        } catch (e: Exception) {
+            Result.error(e)
+        }
+    }
+
+    override suspend fun getCircleJoinRequestedMemberMessage(
+        circleId: Int,
+        memberId: Int,
+    ): Result<String> {
+        return try {
+            withContext(dispatcher) {
+                val response = service.getCircleJoinRequestedMemberMessage(circleId, memberId)
+                Result.success(response.message)
             }
         } catch (e: Exception) {
             Result.error(e)
@@ -282,10 +297,13 @@ class CircleRepositoryImpl(
         }
     }
 
-    override suspend fun postMyCircle(circleId: Int): Result<Unit> {
+    override suspend fun postMyCircle(
+        circleId: Int,
+        joinMessage: String,
+    ): Result<Unit> {
         return try {
             withContext(dispatcher) {
-                service.postMyCircle(circleId)
+                service.postMyCircle(circleId, RequestResponseBodyCircleJoin(joinMessage))
                 Result.success(Unit)
             }
         } catch (e: Exception) {
