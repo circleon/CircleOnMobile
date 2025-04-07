@@ -46,8 +46,8 @@ class UploadPostFragment : Fragment() {
         registerForActivityResult(ActivityResultContracts.PickVisualMedia()) {
                 uri ->
             uri?.let {
-                glideProvider.loadImage(it, requireActivity(), binding.btnAddPostImage)
-                viewModel.setPostImage(it.toJPEG(requireActivity()))
+                glideProvider.loadImage(it, requireContext(), binding.btnAddPostImage)
+                viewModel.setPostImage(it.toJPEG(requireContext()))
                 binding.btnRemovePostImage.isVisible = true
                 binding.txtAddPostImage.isVisible = false
                 binding.btnAddPostImage.background = null

@@ -131,7 +131,7 @@ class CircleMemberRoleEditAlertDialog(
         memberRole.setSelection(Role.indexOf(member.role) - 1) // 비회원 제외 관련 설정
         member.profileImgUrl?.let {
             glideProvider.fetchImage(it, context, memberProfileImage)
-        } ?: memberProfileImage.setImageResource(R.drawable.ic_user_profile_default)
+        } ?: memberProfileImage.setImageResource(R.drawable.img_user_profile_default)
     }
 
     fun show() {

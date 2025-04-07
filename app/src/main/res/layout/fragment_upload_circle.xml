@@ -68,15 +68,16 @@
                 android:paddingHorizontal="@dimen/margin_padding_xx_large">
 
                 <FrameLayout
-                    android:layout_width="100dp"
-                    android:layout_height="100dp"
+                    android:layout_width="96dp"
+                    android:layout_height="96dp"
                     android:layout_gravity="center_horizontal"
                     android:layout_marginVertical="@dimen/margin_padding_xx_large">
 
                     <androidx.cardview.widget.CardView
-                        android:layout_width="96dp"
-                        android:layout_height="96dp"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
                         android:layout_gravity="start|bottom"
+                        android:backgroundTint="@color/grey_3"
                         app:cardCornerRadius="48dp"
                         app:cardElevation="0dp">
 
@@ -85,18 +86,17 @@
                             android:layout_width="match_parent"
                             android:layout_height="match_parent"
                             android:scaleType="center"
-                            android:src="@drawable/ic_add"
-                            android:background="@drawable/bg_dotted_circle"/>
+                            android:src="@drawable/img_circle_profile_large_default" />
 
                     </androidx.cardview.widget.CardView>
 
                     <androidx.appcompat.widget.AppCompatImageView
-                        android:id="@+id/btnRemoveCircleThumbnail"
+                        android:id="@+id/btnAddOrRemoveCircleThumbnail"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
+                        android:padding="@dimen/margin_padding_xx_small"
                         android:layout_gravity="top|end"
-                        android:src="@drawable/ic_cancel_2"
-                        android:visibility="gone"/>
+                        android:src="@drawable/ic_add_2" />
 
                 </FrameLayout>
 
@@ -348,7 +348,7 @@
                     android:gravity="top"
                     android:maxLength="1000"
                     android:maxLines="6"
-                    android:hint="@string/hint_post_content"
+                    android:hint="@string/hint_circle_introduction"
                     android:textColor="@color/grey_9"
                     android:textColorHint="@color/grey_5"
                     android:textSize="@dimen/text_size_default"

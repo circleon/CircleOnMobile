@@ -62,7 +62,7 @@
                     android:layout_height="wrap_content"
                     android:text="@string/manage_circle_title_circle_member"
                     android:textAppearance="@style/default_bold_text"
-                    android:textColor="@color/grey_9"
+                    android:textColor="@color/purple_5"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent"
                     app:layout_constraintBottom_toTopOf="@id/txtCircleMember"/>
@@ -105,7 +105,7 @@
                     android:layout_height="wrap_content"
                     android:text="@string/manage_circle_title_approve_circle_join"
                     android:textAppearance="@style/default_bold_text"
-                    android:textColor="@color/grey_9"
+                    android:textColor="@color/purple_5"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent"
                     app:layout_constraintBottom_toTopOf="@id/txtJoinRequestedMember"/>
@@ -148,7 +148,7 @@
                     android:layout_height="wrap_content"
                     android:text="@string/manage_circle_title_approve_circle_leave"
                     android:textAppearance="@style/default_bold_text"
-                    android:textColor="@color/grey_9"
+                    android:textColor="@color/purple_5"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent"
                     app:layout_constraintBottom_toTopOf="@id/txtLeaveRequestedMember"/>

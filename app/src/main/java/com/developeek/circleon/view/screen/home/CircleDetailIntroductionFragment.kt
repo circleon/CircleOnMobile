@@ -1,5 +1,6 @@
 package com.developeek.circleon.view.screen.home
 
+import android.content.Context
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -48,21 +49,29 @@ class CircleDetailIntroductionFragment : Fragment() {
     ) {
         super.onViewCreated(view, savedInstanceState)
 
-        initView()
+        initView(requireContext())
     }
 
-    private fun initView() {
-        loadIntroductionContent()
+    private fun initView(context: Context) {
+        loadIntroductionContent(context)
         loadRecruitmentDate()
     }
 
-    private fun loadIntroductionContent() {
-        binding.txtCircleIntroductionContent.text = circleDetail.introduction
+    private fun loadIntroductionContent(context: Context) {
+        if (circleDetail.introduction == null && circleDetail.introImgUrl == null) {
+            binding.llCircleIntroduction.isVisible = false
+            return
+        }
 
+        if (circleDetail.introduction == null) {
+            binding.txtCircleIntroductionContent.isVisible = false
+        } else {
+            binding.txtCircleIntroductionContent.text = circleDetail.introduction
+        }
         if (circleDetail.introImgUrl == null) {
             binding.imgCircleIntroduction.isVisible = false
         } else {
-            glideProvider.fetchImage(circleDetail.introImgUrl!!, requireActivity(), binding.imgCircleIntroduction)
+            glideProvider.fetchImage(circleDetail.introImgUrl!!, context, binding.imgCircleIntroduction)
         }
     }
 

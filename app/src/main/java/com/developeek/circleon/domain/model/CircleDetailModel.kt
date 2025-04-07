@@ -90,7 +90,7 @@ data class CircleDetailModel(
                 0,
                 MemberModels.empty(),
                 null,
-                Const.EMPTY_TEXT,
+                null,
                 null,
                 null,
             )

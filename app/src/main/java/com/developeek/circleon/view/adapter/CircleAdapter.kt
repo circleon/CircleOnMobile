@@ -64,7 +64,7 @@ class CircleAdapter(
             // 싱글 라인인 경우에는 작동
             circle.thumbnailUrl?.let {
                 glideProvider.fetchImage(it, context, binding.imgCircleThumbnail)
-            } ?: binding.imgCircleThumbnail.setImageResource(R.drawable.ic_circle_thumbnail_default)
+            } ?: binding.imgCircleThumbnail.setImageResource(R.drawable.img_circle_thumbnail_default)
         }
 
         private fun notifyListenerItemChanged(circle: CircleModel) {

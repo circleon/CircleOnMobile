@@ -52,13 +52,15 @@
             <androidx.cardview.widget.CardView
                 android:layout_width="40dp"
                 android:layout_height="40dp"
+                android:backgroundTint="@color/grey_3"
                 app:cardCornerRadius="20dp"
                 app:cardElevation="0dp">
 
                 <androidx.appcompat.widget.AppCompatImageView
                     android:id="@+id/imgAuthorProfile"
                     android:layout_width="match_parent"
-                    android:layout_height="match_parent" />
+                    android:layout_height="match_parent"
+                    android:scaleType="center"/>
 
             </androidx.cardview.widget.CardView>
 
@@ -140,7 +142,8 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginEnd="@dimen/margin_padding_x_small"
-        android:paddingHorizontal="@dimen/margin_padding_default"
+        android:padding="@dimen/margin_padding_default"
+        android:paddingBottom="@dimen/margin_padding_default"
         android:background="?attr/selectableItemBackgroundBorderless"
         android:src="@drawable/ic_overflow"
         app:layout_constraintEnd_toEndOf="parent"

@@ -328,22 +328,29 @@ class ManageCircleMemberFragment : Fragment() {
     }
 
     private fun showNoMemberMessage(context: Context) {
-        binding.txtNoMember.isVisible = true
+        binding.llNoMember.isVisible = true
         binding.rvMember.isVisible = false
 
-        val messageId =
-            if (membershipStatus == MembershipStatus.JOINED) {
-                R.string.message_no_circle_member
-            } else {
-                R.string.message_no_member_request
+        when (membershipStatus) {
+            MembershipStatus.JOINED -> {
+                binding.txtNoMember.text = ContextCompat.getString(context, R.string.message_no_circle_member)
+                binding.icSituation.setImageResource(R.drawable.ic_bad_situation)
             }
-        binding.txtNoMember.text =
-            ContextCompat.getString(context, messageId)
+            MembershipStatus.JOIN_REQUESTED -> {
+                binding.txtNoMember.text = ContextCompat.getString(context, R.string.message_no_member_join_requested)
+                binding.icSituation.setImageResource(R.drawable.ic_bad_situation)
+            }
+            MembershipStatus.LEAVE_REQUESTED -> {
+                binding.txtNoMember.text = ContextCompat.getString(context, R.string.message_no_member_leave_requested)
+                binding.icSituation.setImageResource(R.drawable.ic_good_situation)
+            }
+            else -> {}
+        }
     }
 
     private fun loadMembers(members: MemberModels) {
         binding.rvMember.isVisible = true
-        binding.txtNoMember.isVisible = false
+        binding.llNoMember.isVisible = false
 
         binding.rvMember.adapter?.let {
             when (membershipStatus) {

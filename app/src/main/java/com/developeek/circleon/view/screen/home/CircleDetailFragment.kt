@@ -158,7 +158,7 @@ class CircleDetailFragment : Fragment() {
         binding.tlCircleDetail.getTabAt(viewModel.currentTabPosition)?.select() // 탭 복원
         viewModel.circleDetail.thumbnailUrl?.let {
             glideProvider.fetchImage(it, context, binding.imgCircleThumbnail)
-        } ?: binding.imgCircleThumbnail.setImageResource(R.drawable.ic_circle_thumbnail_default)
+        } ?: binding.imgCircleThumbnail.setImageResource(R.drawable.img_circle_profile_default)
         binding.txtCircleCategory.text = viewModel.circleDetail.category.categoryName()
         binding.txtCircleMemberCount.text =
             Html.fromHtml(

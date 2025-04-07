@@ -78,10 +78,11 @@
     <string name="text_circle_name">이름</string>
     <string name="hint_circle_name">동아리 이름</string>
     <string name="text_circle_single_line_introduction">한 줄 소개</string>
-    <string name="hint_circle_single_line_introduction">동아리 한 줄 소개</string>
+    <string name="hint_circle_single_line_introduction">동아리를 한 줄로 간단하게 소개해 주세요</string>
     <string name="text_circle_introduction">동아리 소개글</string>
+    <string name="hint_circle_introduction">사람들에게 가장 먼저 보여지는 글입니다. 자유롭게 동아리를 소개해 주세요!</string>
     <string name="text_circle_introduction_image">소개글 이미지</string>
-    <string name="tip_circle_introduction_image">동아리 홍보 포스터를 추천드려요</string>
+    <string name="tip_circle_introduction_image">동아리 홍보 포스터를 추천드려요!</string>
     <string name="text_circle_category">동아리 카테고리</string>
 
     <!--Manage Circle-->
@@ -96,14 +97,15 @@
     <string name="manage_circle_content_leave_requested_member_default">대기중인 멤버 0명</string>
     <string name="manage_circle_content_leave_requested_member">대기중인 멤버 %d명</string>
     <string name="message_no_circle_member">등록된 멤버가 없어요</string>
-    <string name="message_no_member_request">처리할 요청이 없어요</string>
+    <string name="message_no_member_join_requested">가입 대기중인 인원이 없어요..</string>
+    <string name="message_no_member_leave_requested">탈퇴 대기중인 인원이 없어요!</string>
     <string name="menu_circle_member_settings_edit_role">역할 수정하기</string>
     <string name="menu_circle_member_settings_ban">추방하기</string>
     <string name="btn_edit_circle_member_role">임명하기</string>
     <string name="btn_reject_join_request">거절</string>
     <string name="btn_accept_join_request">수락</string>
     <string name="btn_show_member_message">사유 보기</string>
-    <string name="title_member_message_dialog_for_accept">%s님이 이런 메세지를 남겨주셨어요</string>
+    <string name="title_member_message_dialog_for_accept">%s님이 이런 탈퇴 사유를 남겨주셨어요</string>
     <string name="title_member_message_dialog">탈퇴 사유를 알려주세요</string>
     <string name="btn_accept_leave_request">승인하기</string>
     <string name="btn_leave_request">탈퇴하기</string>

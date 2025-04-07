@@ -61,18 +61,20 @@ class UploadCircleFragment : Fragment() {
         registerForActivityResult(ActivityResultContracts.PickVisualMedia()) {
                 uri ->
             uri?.let {
-                glideProvider.loadImage(it, requireActivity(), binding.btnAddCircleThumbnail)
-                viewModel.setCircleThumbnail(it.toJPEG(requireActivity()))
-                binding.btnRemoveCircleThumbnail.isVisible = true
-                binding.btnAddCircleThumbnail.background = null
+                glideProvider.loadImage(it, requireContext(), binding.btnAddCircleThumbnail)
+                viewModel.setCircleThumbnail(it.toJPEG(requireContext()))
+                binding.btnAddOrRemoveCircleThumbnail.setImageResource(R.drawable.ic_cancel_2)
+                binding.btnAddOrRemoveCircleThumbnail.setOnClickListener {
+                    onBtnRemoveCircleThumbnailClicked()
+                }
             }
         }
     private val circleIntroductionImagePickMedia: ActivityResultLauncher<PickVisualMediaRequest> =
         registerForActivityResult(ActivityResultContracts.PickVisualMedia()) {
                 uri ->
             uri?.let {
-                glideProvider.loadImage(it, requireActivity(), binding.btnAddCircleIntroductionImage)
-                viewModel.setCircleIntroductionImage(it.toJPEG(requireActivity()))
+                glideProvider.loadImage(it, requireContext(), binding.btnAddCircleIntroductionImage)
+                viewModel.setCircleIntroductionImage(it.toJPEG(requireContext()))
                 binding.btnRemoveCircleIntroductionImage.isVisible = true
                 binding.btnAddCircleIntroductionImage.background = null
             }
@@ -189,8 +191,7 @@ class UploadCircleFragment : Fragment() {
                 context,
                 binding.btnAddCircleThumbnail,
             )
-            binding.btnAddCircleThumbnail.background = null
-            binding.btnRemoveCircleThumbnail.isVisible = true
+            binding.btnAddOrRemoveCircleThumbnail.setImageResource(R.drawable.ic_cancel_2)
         }
     }
 
@@ -261,7 +262,7 @@ class UploadCircleFragment : Fragment() {
         setBtnAddCircleIntroductionImageListener()
         setBtnEditRecruitmentDate(requireContext())
         setBtnEdtCircleContentListener()
-        setBtnRemoveCircleThumbnailListener(context)
+        setBtnAddOrRemoveCircleThumbnailListener(context)
         setBtnRemoveCircleIntroductionImageListener(context)
         setEdtSingleLineIntroductionListener()
     }
@@ -280,13 +281,7 @@ class UploadCircleFragment : Fragment() {
 
     private fun setBtnAddCircleThumbnailListener() {
         binding.btnAddCircleThumbnail.setOnClickListener {
-            circleThumbnailPickMedia.launch(
-                PickVisualMediaRequest(
-                    ActivityResultContracts.PickVisualMedia.SingleMimeType(
-                        PHOTO_MIME_TYPE,
-                    ),
-                ),
-            )
+            onBtnAddCircleThumbnailClicked()
         }
     }
 
@@ -385,15 +380,39 @@ class UploadCircleFragment : Fragment() {
         }
     }
 
-    private fun setBtnRemoveCircleThumbnailListener(context: Context) {
-        binding.btnRemoveCircleThumbnail.setOnClickListener {
-            viewModel.removeCircleThumbnail()
-            binding.btnAddCircleThumbnail.setImageResource(R.drawable.ic_add)
-            binding.btnRemoveCircleThumbnail.isVisible = false
-            binding.btnAddCircleThumbnail.setBackgroundDrawable(
-                ContextCompat.getDrawable(context, R.drawable.bg_dotted_circle),
-            )
+    private fun setBtnAddOrRemoveCircleThumbnailListener(context: Context) {
+        if (viewModel.circle.thumbnailUrl == null) {
+            binding.btnAddOrRemoveCircleThumbnail.setOnClickListener {
+                pickImage()
+            }
+        } else {
+            binding.btnAddOrRemoveCircleThumbnail.setOnClickListener {
+                onBtnRemoveCircleThumbnailClicked()
+            }
         }
+    }
+
+    private fun onBtnAddCircleThumbnailClicked() {
+        pickImage()
+    }
+
+    private fun onBtnRemoveCircleThumbnailClicked() {
+        viewModel.removeCircleThumbnail()
+        binding.btnAddCircleThumbnail.setImageResource(R.drawable.img_circle_profile_large_default)
+        binding.btnAddOrRemoveCircleThumbnail.setImageResource(R.drawable.ic_add_2)
+        binding.btnAddOrRemoveCircleThumbnail.setOnClickListener {
+            onBtnAddCircleThumbnailClicked()
+        }
+    }
+
+    private fun pickImage() {
+        circleThumbnailPickMedia.launch(
+            PickVisualMediaRequest(
+                ActivityResultContracts.PickVisualMedia.SingleMimeType(
+                    PHOTO_MIME_TYPE,
+                ),
+            ),
+        )
     }
 
     private fun setBtnRemoveCircleIntroductionImageListener(context: Context) {

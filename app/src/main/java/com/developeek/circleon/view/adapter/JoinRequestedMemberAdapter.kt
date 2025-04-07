@@ -57,7 +57,7 @@ class JoinRequestedMemberAdapter(
             binding.txtMemberName.text = member.name
             member.profileImgUrl?.let {
                 glideProvider.fetchImage(it, context, binding.imgMemberProfile)
-            } ?: binding.imgMemberProfile.setImageResource(R.drawable.ic_user_profile_default)
+            } ?: binding.imgMemberProfile.setImageResource(R.drawable.img_user_profile_default)
         }
 
         private fun notifyListenerItemChanged(member: MemberModel) {

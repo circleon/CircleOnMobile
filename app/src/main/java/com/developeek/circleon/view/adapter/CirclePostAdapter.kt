@@ -76,7 +76,7 @@ class CirclePostAdapter(
             binding.txtAuthorName.text = author.name
             author.profileImgUrl?.let {
                 glideProvider.fetchImage(it, context, binding.imgAuthorProfile)
-            } ?: binding.imgAuthorProfile.setImageResource(R.drawable.ic_user_profile_default)
+            } ?: binding.imgAuthorProfile.setImageResource(R.drawable.img_user_profile_default)
         }
 
         private fun load(post: PostModel) {

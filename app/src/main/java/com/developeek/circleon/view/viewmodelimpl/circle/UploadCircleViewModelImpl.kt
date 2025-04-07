@@ -11,6 +11,7 @@ import com.developeek.circleon.domain.enums.Category
 import com.developeek.circleon.domain.model.CategoryModels
 import com.developeek.circleon.domain.model.CircleDetailModel
 import com.developeek.circleon.domain.state.UiState
+import com.developeek.circleon.domain.utils.Const
 import com.developeek.circleon.domain.utils.validator.Invalid
 import com.developeek.circleon.domain.utils.validator.Validator
 import com.developeek.circleon.view.viewmodel.circle.UploadCircleViewModel
@@ -213,7 +214,11 @@ class UploadCircleViewModelImpl
         }
 
         override fun setIntroduction(content: String) {
-            this.circle = this.circle.fold(introduction = content)
+            if (content == Const.EMPTY_TEXT) {
+                this.circle = this.circle.fold(introduction = null)
+            } else {
+                this.circle = this.circle.fold(introduction = content)
+            }
         }
 
         override fun setCategory(category: Category) {

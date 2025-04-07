@@ -35,7 +35,7 @@ class MyCircleAdapter(
             binding.txtCircleCategory.text = circle.category.categoryName()
             circle.thumbnailUrl?.let {
                 glideProvider.fetchImage(it, context, binding.imgCircleThumbnail)
-            } ?: binding.imgCircleThumbnail.setImageResource(R.drawable.ic_circle_thumbnail_default)
+            } ?: binding.imgCircleThumbnail.setImageResource(R.drawable.img_circle_profile_default)
         }
 
         private fun notifyListenerItemChanged(circle: CircleSummaryModel) {

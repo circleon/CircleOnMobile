@@ -34,13 +34,15 @@
             <androidx.cardview.widget.CardView
                 android:layout_width="24dp"
                 android:layout_height="24dp"
+                android:backgroundTint="@color/grey_3"
                 app:cardCornerRadius="12dp"
                 app:cardElevation="0dp">
 
                 <androidx.appcompat.widget.AppCompatImageView
                     android:id="@+id/imgAuthorProfile"
                     android:layout_width="match_parent"
-                    android:layout_height="match_parent" />
+                    android:layout_height="match_parent"
+                    android:scaleType="center"/>
 
             </androidx.cardview.widget.CardView>
 

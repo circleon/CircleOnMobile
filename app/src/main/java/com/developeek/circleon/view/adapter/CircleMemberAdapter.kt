@@ -59,9 +59,10 @@ class CircleMemberAdapter(
         private fun load(member: MemberModel) {
             binding.txtMemberName.text = member.name
             binding.txtMemberRole.text = member.role.roleName()
+            binding.icExecutive.isVisible = member.role.isExecutive()
             member.profileImgUrl?.let {
                 glideProvider.fetchImage(it, context, binding.imgMemberProfile)
-            } ?: binding.imgMemberProfile.setImageResource(R.drawable.ic_user_profile_default)
+            } ?: binding.imgMemberProfile.setImageResource(R.drawable.img_user_profile_default)
         }
 
         private fun hideOverflowOrNot(member: MemberModel) {
