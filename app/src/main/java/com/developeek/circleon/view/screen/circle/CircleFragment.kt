@@ -117,7 +117,7 @@ class CircleFragment : Fragment() {
     ) {
         binding.txtJoinRequestedCircleCount.text =
             String.format(
-                ContextCompat.getString(context, R.string.circle_content_join_requested_circle),
+                ContextCompat.getString(context, R.string.circle_content_requested_circle),
                 circles.size(),
             )
     }

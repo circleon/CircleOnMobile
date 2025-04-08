@@ -129,16 +129,15 @@
     <!--Circle-->
     <string name="circle_content_title_my_circle">나의 동아리</string>
     <string name="circle_content_title_join_requested_circle">동아리 가입 신청 목록</string>
+    <string name="circle_content_title_leave_requested_circle">동아리 탈퇴 신청 목록</string>
     <string name="circle_content_title_upload_circle">동아리 생성하기</string>
-    <string name="circle_content_title_upload_requested_circle">동아리 생성 신청 목록</string>
     <string name="circle_content_my_circle_default">가입중인 동아리 0개</string>
     <string name="circle_content_my_circle">가입중인 동아리 %d개</string>
-    <string name="circle_content_join_requested_circle_default">가입 대기중인 동아리 0개</string>
-    <string name="circle_content_join_requested_circle">가입 대기중인 동아리 %d개</string>
-    <string name="circle_content_upload_requested_circle_default">생성 대기중인 동아리 0개</string>
-    <string name="circle_content_upload_requested_circle">생성 대기중인 동아리 %d개</string>
+    <string name="circle_content_requested_circle_default">대기중인 동아리 0개</string>
+    <string name="circle_content_requested_circle">대기중인 동아리 %d개</string>
 
     <!--My Circle-->
-    <string name="message_no_circles">동아리 정보가 없어요</string>
+    <string name="message_no_circles">앗! 아직 가입하신 동아리가 없네요</string>
+    <string name="btn_circle_list_screen">둘러보러 가기</string>
 
 </resources>

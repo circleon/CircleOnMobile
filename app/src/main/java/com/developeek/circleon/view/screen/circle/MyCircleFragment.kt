@@ -62,6 +62,7 @@ class MyCircleFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         initView(requireActivity(), requireContext())
+        initListener(requireActivity())
     }
 
     private fun initView(
@@ -71,7 +72,7 @@ class MyCircleFragment : Fragment() {
         initToolbar(context)
 
         if (circles.isEmpty()) {
-            binding.txtNoCircles.isVisible = true
+            binding.llNoCircles.isVisible = true
         } else {
             binding.rvCircles.isVisible = true
             initCircleRecyclerView(parentActivity, context)
@@ -130,6 +131,28 @@ class MyCircleFragment : Fragment() {
                 Pair(Const.TAG_CIRCLE_NAME, circleName),
             ),
         )
+    }
+
+    private fun initListener(parentActivity: Activity) {
+        setBtnBackListener()
+        setBtnCircleListScreenListener(parentActivity)
+    }
+
+    private fun setBtnBackListener() {
+        binding.btnBack.setOnClickListener {
+            sendUserToPreviousScreen()
+        }
+    }
+
+    private fun sendUserToPreviousScreen() {
+        findNavController().navigateUp()
+    }
+
+    private fun setBtnCircleListScreenListener(parentActivity: Activity) {
+        binding.btnCircleListScreen.setOnClickListener {
+            selectHomeTab(parentActivity)
+            findNavController().popBackStack(R.id.homeFragment, inclusive = false)
+        }
     }
 
     private fun selectHomeTab(parentActivity: Activity) {

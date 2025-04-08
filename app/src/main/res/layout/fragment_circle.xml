@@ -54,7 +54,7 @@
                     android:layout_height="wrap_content"
                     android:text="@string/circle_content_title_my_circle"
                     android:textAppearance="@style/default_bold_text"
-                    android:textColor="@color/grey_9"
+                    android:textColor="@color/purple_5"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent"
                     app:layout_constraintBottom_toTopOf="@id/txtMyCircleCount"/>
@@ -97,7 +97,7 @@
                     android:layout_height="wrap_content"
                     android:text="@string/circle_content_title_join_requested_circle"
                     android:textAppearance="@style/default_bold_text"
-                    android:textColor="@color/grey_9"
+                    android:textColor="@color/purple_5"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent"
                     app:layout_constraintBottom_toTopOf="@id/txtJoinRequestedCircleCount"/>
@@ -107,7 +107,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="@dimen/margin_padding_x_small"
-                    android:text="@string/circle_content_join_requested_circle_default"
+                    android:text="@string/circle_content_requested_circle_default"
                     android:textColor="@color/grey_6"
                     android:textSize="@dimen/text_size_small"
                     app:layout_constraintBottom_toBottomOf="parent"
@@ -124,46 +124,8 @@
 
             </androidx.constraintlayout.widget.ConstraintLayout>
 
-            <View
-                android:layout_width="match_parent"
-                android:layout_height="2dp"
-                android:layout_marginVertical="@dimen/margin_padding_large"
-                android:background="@drawable/dash_divider"
-                android:backgroundTint="@color/grey_3"
-                android:layerType="software"/>
-
             <androidx.constraintlayout.widget.ConstraintLayout
-                android:id="@+id/clApproveCircleLeave"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:background="@drawable/bg_large_rounded_card"
-                android:paddingStart="@dimen/margin_padding_xx_large"
-                android:paddingEnd="@dimen/margin_padding_large"
-                android:paddingVertical="@dimen/margin_padding_large">
-
-                <androidx.appcompat.widget.AppCompatTextView
-                    android:id="@+id/txtContentTitleUploadCircle"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/circle_content_title_upload_circle"
-                    android:textAppearance="@style/default_bold_text"
-                    android:textColor="@color/grey_9"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="parent"
-                    app:layout_constraintBottom_toBottomOf="parent" />
-
-                <androidx.appcompat.widget.AppCompatImageView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:src="@drawable/ic_next"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintTop_toTopOf="parent"/>
-
-            </androidx.constraintlayout.widget.ConstraintLayout>
-
-            <androidx.constraintlayout.widget.ConstraintLayout
-                android:id="@+id/clUploadRequestedCircle"
+                android:id="@+id/clLeaveRequestedCircle"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/margin_padding_small"
@@ -173,27 +135,27 @@
                 android:paddingVertical="@dimen/margin_padding_large">
 
                 <androidx.appcompat.widget.AppCompatTextView
-                    android:id="@+id/txtContentTitleUploadRequestedCircle"
+                    android:id="@+id/txtContentTitleLeaveRequestedCircle"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="@string/circle_content_title_upload_requested_circle"
+                    android:text="@string/circle_content_title_leave_requested_circle"
                     android:textAppearance="@style/default_bold_text"
-                    android:textColor="@color/grey_9"
+                    android:textColor="@color/purple_5"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent"
-                    app:layout_constraintBottom_toTopOf="@id/txtUploadRequestedCircleCount"/>
+                    app:layout_constraintBottom_toTopOf="@id/txtLeaveRequestedCircleCount"/>
 
                 <androidx.appcompat.widget.AppCompatTextView
-                    android:id="@+id/txtUploadRequestedCircleCount"
+                    android:id="@+id/txtLeaveRequestedCircleCount"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="@dimen/margin_padding_x_small"
-                    android:text="@string/circle_content_upload_requested_circle_default"
+                    android:text="@string/circle_content_requested_circle_default"
                     android:textColor="@color/grey_6"
                     android:textSize="@dimen/text_size_small"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@id/txtContentTitleUploadRequestedCircle" />
+                    app:layout_constraintTop_toBottomOf="@id/txtContentTitleLeaveRequestedCircle" />
 
                 <androidx.appcompat.widget.AppCompatImageView
                     android:layout_width="wrap_content"

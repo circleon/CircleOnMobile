@@ -7,7 +7,7 @@
     android:layout_height="wrap_content"
     android:layout_marginBottom="@dimen/margin_padding_small"
     android:padding="@dimen/margin_padding_large"
-    android:background="@drawable/bg_card"
+    android:background="@drawable/bg_large_rounded_card"
     android:gravity="center_vertical"
     android:orientation="horizontal">
 

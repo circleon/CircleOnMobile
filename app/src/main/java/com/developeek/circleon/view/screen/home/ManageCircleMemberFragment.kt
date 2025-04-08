@@ -91,6 +91,7 @@ class ManageCircleMemberFragment : Fragment() {
 
         initView(requireActivity(), requireContext())
         initObserver(requireActivity(), requireContext())
+        initListener()
         load(requireContext(), viewModel.members)
     }
 
@@ -320,6 +321,20 @@ class ManageCircleMemberFragment : Fragment() {
 
     private fun requestRefreshToPreviousScreen() {
         findNavController().previousBackStackEntry?.savedStateHandle?.set(Const.FLAG_CIRCLE_DATA_CHANGED, true)
+    }
+
+    private fun initListener() {
+        setBtnBackListener()
+    }
+
+    private fun setBtnBackListener() {
+        binding.btnBack.setOnClickListener {
+            sendUserToPreviousScreen()
+        }
+    }
+
+    private fun sendUserToPreviousScreen() {
+        findNavController().navigateUp()
     }
 
     private fun load(
