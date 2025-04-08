@@ -137,7 +137,9 @@
     <string name="circle_content_requested_circle">대기중인 동아리 %d개</string>
 
     <!--My Circle-->
-    <string name="message_no_circles">앗! 아직 가입하신 동아리가 없네요</string>
-    <string name="btn_circle_list_screen">둘러보러 가기</string>
+    <string name="message_no_my_circles">앗! 아직 가입하신 동아리가 없네요</string>
+    <string name="btn_move_to_search_circle_screen">둘러보러 가기</string>
+    <string name="message_no_join_requested_circles">가입 대기중인 동아리가 없어요!</string>
+    <string name="message_no_leave_requested_circles">탈퇴 대기중인 동아리가 없어요!</string>
 
 </resources>

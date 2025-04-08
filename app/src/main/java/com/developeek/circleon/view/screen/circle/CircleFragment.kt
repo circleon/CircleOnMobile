@@ -97,7 +97,8 @@ class CircleFragment : Fragment() {
 
     private fun loadUserCircles(context: Context) {
         loadMyCircles(context, viewModel.myCircles)
-        loadMyJoinRequestedCircles(context, viewModel.myJoinRequestedCircles)
+        loadMyJoinRequestedCircles(context, viewModel.joinRequestedCircles)
+        loadMyLeaveRequestedCircles(context, viewModel.leaveRequestedCircles)
     }
 
     private fun loadMyCircles(
@@ -122,12 +123,26 @@ class CircleFragment : Fragment() {
             )
     }
 
+    private fun loadMyLeaveRequestedCircles(
+        context: Context,
+        circles: CircleSummaryModels,
+    ) {
+        binding.txtLeaveRequestedCircleCount.text =
+            String.format(
+                ContextCompat.getString(context, R.string.circle_content_requested_circle),
+                circles.size(),
+            )
+    }
+
     private fun setUserCircleCardListener() {
         binding.clMyCircle.setOnClickListener {
             sendUserToCircleListScreen(viewModel.myCircles, MembershipStatus.JOINED)
         }
         binding.clJoinRequestedCircle.setOnClickListener {
-            sendUserToCircleListScreen(viewModel.myJoinRequestedCircles, MembershipStatus.JOIN_REQUESTED)
+            sendUserToCircleListScreen(viewModel.joinRequestedCircles, MembershipStatus.JOIN_REQUESTED)
+        }
+        binding.clLeaveRequestedCircle.setOnClickListener {
+            sendUserToCircleListScreen(viewModel.leaveRequestedCircles, MembershipStatus.LEAVE_REQUESTED)
         }
     }
 

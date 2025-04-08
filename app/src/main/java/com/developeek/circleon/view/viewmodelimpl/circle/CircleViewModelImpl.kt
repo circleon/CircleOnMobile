@@ -30,9 +30,12 @@ class CircleViewModelImpl
         override val myCircles: CircleSummaryModels
             get() = _myCircles
         private var _myCircles = CircleSummaryModels.empty()
-        override val myJoinRequestedCircles: CircleSummaryModels
-            get() = _myJoinRequestedCircles
-        private var _myJoinRequestedCircles = CircleSummaryModels.empty()
+        override val joinRequestedCircles: CircleSummaryModels
+            get() = _joinRequestedCircles
+        private var _joinRequestedCircles = CircleSummaryModels.empty()
+        override val leaveRequestedCircles: CircleSummaryModels
+            get() = _leaveRequestedCircles
+        private var _leaveRequestedCircles = CircleSummaryModels.empty()
         private var fetchUserCirclesJob: Job? = null
         private var currentPage = DEFAULT_PAGE
 
@@ -67,8 +70,18 @@ class CircleViewModelImpl
                         async {
                             return@async fetchMyJoinRequestedCircles(page, size)
                         }
+                    // TODO: 탈퇴 신청 목록 api 개발 이후 추가
+//                    val fetchMyLeaveRequestedCirclesJob =
+//                        async {
+//                            return@async fetchMyLeaveRequestedCircles(page, size)
+//                        }
 
-                    val jobs: List<Deferred<UiState>> = listOf(fetchMyCirclesJob, fetchMyJoinRequestedCirclesJob)
+                    val jobs: List<Deferred<UiState>> =
+                        listOf(
+                            fetchMyCirclesJob,
+                            fetchMyJoinRequestedCirclesJob,
+//                        fetchMyLeaveRequestedCirclesJob,
+                        )
                     jobs.map { job ->
                         job.invokeOnCompletion {
                             if (job.isCancelled) {
@@ -108,7 +121,22 @@ class CircleViewModelImpl
             val result = repository.getMyJoinRequestedCircles(page, size)
 
             if (result is Success) {
-                _myJoinRequestedCircles = result.data
+                _joinRequestedCircles = result.data
+                return UiState.Success
+            } else {
+                error = (result as Error).message()
+                return if (result.isAuthenticationError()) UiState.AuthenticationError else UiState.ServiceError
+            }
+        }
+
+        private suspend fun fetchMyLeaveRequestedCircles(
+            page: Int,
+            size: Int,
+        ): UiState {
+            val result = repository.getMyLeaveRequestedCircles(page, size)
+
+            if (result is Success) {
+                _leaveRequestedCircles = result.data
                 return UiState.Success
             } else {
                 error = (result as Error).message()

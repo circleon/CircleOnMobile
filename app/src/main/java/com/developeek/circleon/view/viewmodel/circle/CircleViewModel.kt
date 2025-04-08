@@ -7,7 +7,8 @@ import com.developeek.circleon.domain.state.UiState
 interface CircleViewModel {
     val state: LiveData<UiState>
     val myCircles: CircleSummaryModels
-    val myJoinRequestedCircles: CircleSummaryModels
+    val joinRequestedCircles: CircleSummaryModels
+    val leaveRequestedCircles: CircleSummaryModels
     val error: String
 
     fun refresh()

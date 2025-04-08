@@ -50,7 +50,7 @@
             android:visibility="gone"/>
 
         <androidx.appcompat.widget.LinearLayoutCompat
-            android:id="@+id/llNoCircles"
+            android:id="@+id/llNoMyCircles"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:gravity="center"
@@ -62,11 +62,11 @@
                 android:layout_height="wrap_content"
                 android:textAppearance="@style/large_bold_text"
                 android:textColor="@color/grey_5"
-                android:text="@string/message_no_circles"
+                android:text="@string/message_no_my_circles"
                 android:gravity="center" />
 
             <androidx.appcompat.widget.LinearLayoutCompat
-                android:id="@+id/btnCircleListScreen"
+                android:id="@+id/btnMoveToSearchCircleScreen"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/margin_padding_large"
@@ -86,10 +86,58 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="@dimen/margin_padding_x_small"
-                    android:text="@string/btn_circle_list_screen"
+                    android:text="@string/btn_move_to_search_circle_screen"
                     android:textColor="@color/purple_5"/>
 
             </androidx.appcompat.widget.LinearLayoutCompat>
+
+        </androidx.appcompat.widget.LinearLayoutCompat>
+
+        <androidx.appcompat.widget.LinearLayoutCompat
+            android:id="@+id/llNoJoinRequestedCircles"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="center"
+            android:orientation="vertical"
+            android:visibility="gone">
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textAppearance="@style/large_bold_text"
+                android:textColor="@color/grey_5"
+                android:text="@string/message_no_join_requested_circles"
+                android:gravity="center" />
+
+            <androidx.appcompat.widget.AppCompatImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/margin_padding_large"
+                android:src="@drawable/ic_good_situation"/>
+
+        </androidx.appcompat.widget.LinearLayoutCompat>
+
+        <androidx.appcompat.widget.LinearLayoutCompat
+            android:id="@+id/llNoLeaveRequestedCircles"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="center"
+            android:orientation="vertical"
+            android:visibility="gone">
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textAppearance="@style/large_bold_text"
+                android:textColor="@color/grey_5"
+                android:text="@string/message_no_leave_requested_circles"
+                android:gravity="center" />
+
+            <androidx.appcompat.widget.AppCompatImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/margin_padding_large"
+                android:src="@drawable/ic_good_situation"/>
 
         </androidx.appcompat.widget.LinearLayoutCompat>
 

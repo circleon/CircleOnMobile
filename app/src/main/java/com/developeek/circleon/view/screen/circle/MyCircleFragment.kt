@@ -70,9 +70,8 @@ class MyCircleFragment : Fragment() {
         context: Context,
     ) {
         initToolbar(context)
-
         if (circles.isEmpty()) {
-            binding.llNoCircles.isVisible = true
+            initNoCircleView()
         } else {
             binding.rvCircles.isVisible = true
             initCircleRecyclerView(parentActivity, context)
@@ -87,6 +86,18 @@ class MyCircleFragment : Fragment() {
         if (membershipStatus == MembershipStatus.JOIN_REQUESTED) {
             binding.txtTitleCircles.text =
                 ContextCompat.getString(context, R.string.circle_content_title_join_requested_circle)
+        }
+    }
+
+    private fun initNoCircleView() {
+        if (membershipStatus == MembershipStatus.JOINED) {
+            binding.llNoMyCircles.isVisible = true
+        }
+        if (membershipStatus == MembershipStatus.JOIN_REQUESTED) {
+            binding.llNoJoinRequestedCircles.isVisible = true
+        }
+        if (membershipStatus == MembershipStatus.LEAVE_REQUESTED) {
+            binding.llNoLeaveRequestedCircles.isVisible = true
         }
     }
 
@@ -135,7 +146,7 @@ class MyCircleFragment : Fragment() {
 
     private fun initListener(parentActivity: Activity) {
         setBtnBackListener()
-        setBtnCircleListScreenListener(parentActivity)
+        setBtnMoveToSearchCircleScreenListener(parentActivity)
     }
 
     private fun setBtnBackListener() {
@@ -148,8 +159,8 @@ class MyCircleFragment : Fragment() {
         findNavController().navigateUp()
     }
 
-    private fun setBtnCircleListScreenListener(parentActivity: Activity) {
-        binding.btnCircleListScreen.setOnClickListener {
+    private fun setBtnMoveToSearchCircleScreenListener(parentActivity: Activity) {
+        binding.btnMoveToSearchCircleScreen.setOnClickListener {
             selectHomeTab(parentActivity)
             findNavController().popBackStack(R.id.homeFragment, inclusive = false)
         }

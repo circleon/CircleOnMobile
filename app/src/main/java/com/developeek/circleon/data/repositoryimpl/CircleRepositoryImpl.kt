@@ -297,6 +297,20 @@ class CircleRepositoryImpl(
         }
     }
 
+    override suspend fun getMyLeaveRequestedCircles(
+        page: Int,
+        size: Int,
+    ): Result<CircleSummaryModels> {
+        return try {
+            withContext(dispatcher) {
+                val response = service.getMyCircles(MembershipStatus.LEAVE_REQUESTED.codeName(), page, size)
+                Result.success(CircleSummaryModels(response.content.map { it.toCircleSummaryModel() }))
+            }
+        } catch (e: Exception) {
+            Result.error(e)
+        }
+    }
+
     override suspend fun postMyCircle(
         circleId: Int,
         joinMessage: String,

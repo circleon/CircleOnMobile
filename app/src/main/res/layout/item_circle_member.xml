@@ -54,11 +54,11 @@
                 tools:text="Name"/>
 
             <androidx.appcompat.widget.AppCompatImageView
-                android:id="@+id/icExecutive"
+                android:id="@+id/icRole"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="2dp"
-                android:src="@drawable/ic_executive"
+                android:src="@drawable/ic_president"
                 android:visibility="gone"/>
 
         </androidx.appcompat.widget.LinearLayoutCompat>

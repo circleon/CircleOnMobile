@@ -59,7 +59,12 @@ class CircleMemberAdapter(
         private fun load(member: MemberModel) {
             binding.txtMemberName.text = member.name
             binding.txtMemberRole.text = member.role.roleName()
-            binding.icExecutive.isVisible = member.role.isExecutive()
+            binding.icRole.isVisible = member.role.isExecutive()
+            if (member.role.isPresident()) {
+                binding.icRole.setImageResource(R.drawable.ic_president)
+            } else if (member.role.isExecutive()) {
+                binding.icRole.setImageResource(R.drawable.ic_executive)
+            }
             member.profileImgUrl?.let {
                 glideProvider.fetchImage(it, context, binding.imgMemberProfile)
             } ?: binding.imgMemberProfile.setImageResource(R.drawable.img_user_profile_default)
