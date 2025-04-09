@@ -104,8 +104,8 @@
     <string name="menu_circle_member_settings_edit_role">역할 수정하기</string>
     <string name="menu_circle_member_settings_ban">추방하기</string>
     <string name="btn_edit_circle_member_role">임명하기</string>
-    <string name="btn_reject_join_request">거절</string>
-    <string name="btn_accept_join_request">수락</string>
+    <string name="btn_reject_join_request">거절하기</string>
+    <string name="btn_accept_join_request">수락하기</string>
     <string name="btn_show_member_join_message">상세 보기</string>
     <string name="btn_show_member_leave_message">사유 보기</string>
     <string name="title_member_message_dialog_for_join_accept">%s님이 자신을 이렇게 소개해주셨어요</string>

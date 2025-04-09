@@ -70,17 +70,16 @@ class CircleViewModelImpl
                         async {
                             return@async fetchMyJoinRequestedCircles(page, size)
                         }
-                    // TODO: 탈퇴 신청 목록 api 개발 이후 추가
-//                    val fetchMyLeaveRequestedCirclesJob =
-//                        async {
-//                            return@async fetchMyLeaveRequestedCircles(page, size)
-//                        }
+                    val fetchMyLeaveRequestedCirclesJob =
+                        async {
+                            return@async fetchMyLeaveRequestedCircles(page, size)
+                        }
 
                     val jobs: List<Deferred<UiState>> =
                         listOf(
                             fetchMyCirclesJob,
                             fetchMyJoinRequestedCirclesJob,
-//                        fetchMyLeaveRequestedCirclesJob,
+                            fetchMyLeaveRequestedCirclesJob,
                         )
                     jobs.map { job ->
                         job.invokeOnCompletion {

@@ -226,6 +226,19 @@ class ManageCircleMemberFragment : Fragment() {
                                 context,
                                 title = context.getString(R.string.title_member_message_dialog_for_join_accept),
                                 member = item,
+                                positiveButton = ContextCompat.getString(context, R.string.btn_accept_join_request),
+                                negativeButton = ContextCompat.getString(context, R.string.btn_reject_join_request),
+                                negativeListenerInitializer =
+                                    object : ItemListenerInitializer<MemberModel> {
+                                        override fun initialize(item: MemberModel) {
+                                            viewModel.rejectJoinRequest(item)
+                                        }
+
+                                        override fun initialize(
+                                            item: MemberModel,
+                                            view: View?,
+                                        ) {}
+                                    },
                                 positiveListenerInitializer =
                                     object : ItemListenerInitializer<MemberModel> {
                                         override fun initialize(item: MemberModel) {
@@ -261,6 +274,16 @@ class ManageCircleMemberFragment : Fragment() {
                                 context,
                                 title = context.getString(R.string.title_member_message_dialog_for_leave_accept),
                                 member = item,
+                                positiveButton = ContextCompat.getString(context, R.string.btn_accept_leave_request),
+                                negativeListenerInitializer =
+                                    object : ItemListenerInitializer<MemberModel> {
+                                        override fun initialize(item: MemberModel) {}
+
+                                        override fun initialize(
+                                            item: MemberModel,
+                                            view: View?,
+                                        ) {}
+                                    },
                                 positiveListenerInitializer =
                                     object : ItemListenerInitializer<MemberModel> {
                                         override fun initialize(item: MemberModel) {

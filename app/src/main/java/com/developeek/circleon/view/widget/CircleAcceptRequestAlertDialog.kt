@@ -16,7 +16,10 @@ class CircleAcceptRequestAlertDialog(
     private val context: Context,
     private val title: String,
     private val member: MemberModel,
+    private val positiveButton: String = POSITIVE,
+    private val negativeButton: String = NEGATIVE,
     private val positiveListenerInitializer: ItemListenerInitializer<MemberModel>,
+    private val negativeListenerInitializer: ItemListenerInitializer<MemberModel>,
 ) {
     private lateinit var alertDialog: AlertDialog
 
@@ -36,6 +39,7 @@ class CircleAcceptRequestAlertDialog(
     private fun initView(view: View) {
         initTitle(view)
         initPositiveButton(view)
+        initNegativeButton(view)
         initContent(view)
     }
 
@@ -49,7 +53,14 @@ class CircleAcceptRequestAlertDialog(
     private fun initPositiveButton(view: View) {
         val positiveButton = view.findViewById<TextView>(R.id.btnLeaveRequest)
 
-        positiveButton.text = context.getString(R.string.btn_accept_leave_request)
+        // R.string.btn_accept_leave_request
+        positiveButton.text = this.positiveButton
+    }
+
+    private fun initNegativeButton(view: View) {
+        val negativeButton = view.findViewById<TextView>(R.id.btnCancel)
+
+        negativeButton.text = this.negativeButton
     }
 
     private fun initContent(view: View) {
@@ -88,12 +99,27 @@ class CircleAcceptRequestAlertDialog(
     private fun setNegativeListener(view: View) {
         val btnCancel = view.findViewById<TextView>(R.id.btnCancel)
 
-        btnCancel.setOnClickListener {
-            alertDialog.dismiss()
-        }
+        val negativeClickListener =
+            object : ItemClickListener<MemberModel> {
+                override lateinit var item: MemberModel
+
+                override fun onClick(p0: View?) {
+                    negativeListenerInitializer.initialize(item)
+                    alertDialog.dismiss()
+                }
+            }.apply {
+                item = member
+            }
+
+        btnCancel.setOnClickListener(negativeClickListener)
     }
 
     fun show() {
         alertDialog.show()
+    }
+
+    companion object {
+        private const val POSITIVE = "확인"
+        private const val NEGATIVE = "취소"
     }
 }
