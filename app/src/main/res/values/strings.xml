@@ -130,7 +130,7 @@
     <string name="circle_content_title_my_circle">나의 동아리</string>
     <string name="circle_content_title_join_requested_circle">동아리 가입 신청 목록</string>
     <string name="circle_content_title_leave_requested_circle">동아리 탈퇴 신청 목록</string>
-    <string name="circle_content_title_upload_circle">동아리 생성하기</string>
+    <string name="circle_content_title_upload_circle">동아리\n생성하기</string>
     <string name="circle_content_my_circle_default">가입중인 동아리 0개</string>
     <string name="circle_content_my_circle">가입중인 동아리 %d개</string>
     <string name="circle_content_requested_circle_default">대기중인 동아리 0개</string>

@@ -15,7 +15,8 @@
             app:destination="@id/myCircleFragment" />
         <action
             android:id="@+id/action_circleFragment_to_uploadCircleFragment2"
-            app:destination="@id/uploadCircleFragment2" />
+            app:destination="@id/uploadCircleFragment2"
+            app:enterAnim="@animator/scale_up"/>
     </fragment>
     <fragment
         android:id="@+id/myCircleFragment"

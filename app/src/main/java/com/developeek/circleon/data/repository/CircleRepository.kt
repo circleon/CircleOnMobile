@@ -88,6 +88,12 @@ interface CircleRepository {
     ): Result<CircleSummaryModels>
 
     // POST
+    suspend fun postCircle(
+        circleDetailModel: CircleDetailModel,
+        profileImg: File?,
+        introductionImg: File?,
+    ): Result<Unit>
+
     suspend fun postMyCircle(
         circleId: Int,
         joinMessage: String,

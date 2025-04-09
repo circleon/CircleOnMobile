@@ -9,6 +9,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.activity.addCallback
 import androidx.core.content.ContextCompat
+import androidx.core.os.bundleOf
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
@@ -61,6 +62,7 @@ class CircleFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         initObserver(requireActivity(), requireContext())
+        initListener()
         viewModel.refresh() // 탭 전환 시 자동 새로고침
     }
 
@@ -143,6 +145,21 @@ class CircleFragment : Fragment() {
         }
         binding.clLeaveRequestedCircle.setOnClickListener {
             sendUserToCircleListScreen(viewModel.leaveRequestedCircles, MembershipStatus.LEAVE_REQUESTED)
+        }
+    }
+
+    private fun initListener() {
+        setBtnUploadCircleListener()
+    }
+
+    private fun setBtnUploadCircleListener() {
+        binding.clUploadCircle.setOnClickListener {
+            findNavController().navigate(
+                R.id.action_circleFragment_to_uploadCircleFragment2,
+                bundleOf(
+                    Pair(Const.FLAG_EDIT_SCREEN, false),
+                ),
+            )
         }
     }
 

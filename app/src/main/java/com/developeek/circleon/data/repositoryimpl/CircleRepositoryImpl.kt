@@ -311,6 +311,54 @@ class CircleRepositoryImpl(
         }
     }
 
+    override suspend fun postCircle(
+        circleDetailModel: CircleDetailModel,
+        profileImg: File?,
+        introductionImg: File?,
+    ): Result<Unit> {
+        return try {
+            withContext(dispatcher) {
+                val textMediaType = TEXT_CONTENT_TYPE.toMediaType()
+
+                val nameRequestBody = circleDetailModel.name.toRequestBody(textMediaType)
+                val singleLineIntroductionRequestBody =
+                    circleDetailModel.singleLineIntroduction.toRequestBody(
+                        textMediaType,
+                    )
+                val categoryRequestBody = circleDetailModel.category.codeName().toRequestBody(textMediaType)
+                val introductionRequestBody = circleDetailModel.introduction?.toRequestBody(textMediaType)
+                val recruitmentStartDate =
+                    circleDetailModel.recruitmentStartDate?.toString()?.toRequestBody(textMediaType)
+                val recruitmentEndDate =
+                    circleDetailModel.recruitmentEndDate?.toString()?.toRequestBody(textMediaType)
+                val profileImgRequestBody =
+                    profileImg?.let {
+                        val imgRequestBody = it.asRequestBody(IMAGE_CONTENT_TYPE.toMediaType())
+                        MultipartBody.Part.createFormData("profileImg", profileImg.name, imgRequestBody)
+                    }
+                val introductionImgRequestBody =
+                    introductionImg?.let {
+                        val imgRequestBody = it.asRequestBody(IMAGE_CONTENT_TYPE.toMediaType())
+                        MultipartBody.Part.createFormData("introductionImg", introductionImg.name, imgRequestBody)
+                    }
+
+                service.postCircle(
+                    nameRequestBody,
+                    singleLineIntroductionRequestBody,
+                    categoryRequestBody,
+                    introductionRequestBody,
+                    recruitmentStartDate,
+                    recruitmentEndDate,
+                    profileImgRequestBody,
+                    introductionImgRequestBody,
+                )
+                Result.success(Unit)
+            }
+        } catch (e: Exception) {
+            Result.error(e)
+        }
+    }
+
     override suspend fun postMyCircle(
         circleId: Int,
         joinMessage: String,
@@ -347,16 +395,16 @@ class CircleRepositoryImpl(
     ): Result<Unit> {
         return try {
             withContext(dispatcher) {
-                val postTypeRequestBody = postType.code().toRequestBody("text/plain; charset=utf-8".toMediaType())
-                val contentRequestBody = content.toRequestBody("text/plain; charset=utf-8".toMediaType())
-                val body =
+                val postTypeRequestBody = postType.code().toRequestBody(TEXT_CONTENT_TYPE.toMediaType())
+                val contentRequestBody = content.toRequestBody(TEXT_CONTENT_TYPE.toMediaType())
+                val postImageRequestBody =
                     if (image == null) {
                         null
                     } else {
-                        val imageRequestBody = image.asRequestBody("image/jpeg; charset=utf-8".toMediaType())
+                        val imageRequestBody = image.asRequestBody(IMAGE_CONTENT_TYPE.toMediaType())
                         MultipartBody.Part.createFormData("image", image.name, imageRequestBody)
                     }
-                service.postCirclePost(circleId, postTypeRequestBody, contentRequestBody, body)
+                service.postCirclePost(circleId, postTypeRequestBody, contentRequestBody, postImageRequestBody)
                 Result.success(Unit)
             }
         } catch (e: Exception) {
@@ -417,7 +465,7 @@ class CircleRepositoryImpl(
                     if (circleThumbnail == null) {
                         null
                     } else {
-                        imageRequestBody = circleThumbnail.asRequestBody("image/jpeg; charset=utf-8".toMediaType())
+                        imageRequestBody = circleThumbnail.asRequestBody(IMAGE_CONTENT_TYPE.toMediaType())
                         MultipartBody.Part.createFormData("profileImg", circleThumbnail.name, imageRequestBody)
                     }
                 val introductionImage =
@@ -425,7 +473,7 @@ class CircleRepositoryImpl(
                         null
                     } else {
                         imageRequestBody =
-                            circleIntroductionImage.asRequestBody("image/jpeg; charset=utf-8".toMediaType())
+                            circleIntroductionImage.asRequestBody(IMAGE_CONTENT_TYPE.toMediaType())
                         MultipartBody.Part.createFormData(
                             "introImg",
                             circleIntroductionImage.name,
@@ -561,6 +609,8 @@ class CircleRepositoryImpl(
     }
 
     companion object {
+        private const val TEXT_CONTENT_TYPE = "text/plain; charset=utf-8"
+        private const val IMAGE_CONTENT_TYPE = "image/jpeg; charset=utf-8"
         private const val SORT_CIRCLE_OLDEST = "createdAt,asc"
         private const val SORT_CIRCLE_LATEST = "createdAt,desc"
         private const val SORT_MEMBER_BY_NAME = "username,asc"

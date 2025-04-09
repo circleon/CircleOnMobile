@@ -99,6 +99,19 @@ interface CircleService {
     ): Paging<CircleSummary>
 
     // POST
+    @Multipart
+    @POST("circles")
+    suspend fun postCircle(
+        @Part("circleName") circleName: RequestBody,
+        @Part("summary") summary: RequestBody,
+        @Part("category") category: RequestBody,
+        @Part("introduction") introduction: RequestBody?,
+        @Part("recruitmentStartDate") recruitmentStartDate: RequestBody?,
+        @Part("recruitmentEndDate") recruitmentEndDate: RequestBody?,
+        @Part profileImg: MultipartBody.Part?,
+        @Part introductionImg: MultipartBody.Part?,
+    )
+
     @POST("my-circles/{circleId}")
     suspend fun postMyCircle(
         @Path("circleId") circleId: Int,

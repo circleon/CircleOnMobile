@@ -48,7 +48,6 @@ class UploadCircleViewModelImpl
 
         override lateinit var circle: CircleDetailModel
         private var uploadJob: Job? = null
-        private var editJob: Job? = null
         override val categories: LiveData<CategoryModels>
             get() = circleCategories
         private var circleCategories =
@@ -59,8 +58,8 @@ class UploadCircleViewModelImpl
                 ),
             )
 
-        // 썸네일, 소개글 이미지 등 이미지 처리 api 는 별도
-        private var thumbnail: File? = null
+        // 동아리 프로필, 소개글 이미지 등 이미지 처리 api 는 별도
+        private var profileImage: File? = null
         private var introductionImage: File? = null
 
         /**
@@ -69,7 +68,7 @@ class UploadCircleViewModelImpl
          * 1. 이미지 null && !hasChanged == 기존 이미지 유지
          * 2. 이미지 null && hasChanged == 기존 이미지 삭제
          */
-        private var hasThumbnailChanged = false
+        private var hasProfileImageChanged = false
         private var hasIntroductionImageChanged = false
 
         override lateinit var error: String
@@ -78,15 +77,39 @@ class UploadCircleViewModelImpl
             this.circle = origin ?: CircleDetailModel.empty()
         }
 
+        override fun upload() {
+            if (!isCircleFormat(circle)) return
+            uploadJob?.let {
+                if (!it.isCompleted) return
+            }
+            uiState.postValue(UiState.Loading)
+
+            uploadJob =
+                viewModelScope.launch {
+                    val result = repository.postCircle(circle, profileImage, introductionImage)
+
+                    if (result is Success) {
+                        uiState.postValue(UiState.Success)
+                    } else {
+                        error = (result as Error).message()
+                        if (result.isAuthenticationError()) {
+                            uiState.postValue(UiState.AuthenticationError)
+                        } else {
+                            uiState.postValue(UiState.ServiceError)
+                        }
+                    }
+                }
+        }
+
         override fun edit() {
             if (!isCircleFormat(circle)) return
-            editJob?.let {
+            uploadJob?.let {
                 if (!it.isCompleted) return
             }
             uiState.postValue(UiState.Loading)
 
             var tmpState: UiState = UiState.Success
-            editJob =
+            uploadJob =
                 viewModelScope.launch {
                     val editCircleJob =
                         async {
@@ -143,7 +166,7 @@ class UploadCircleViewModelImpl
         }
 
         private suspend fun editCircleImage(circle: CircleDetailModel): UiState {
-            val result = repository.putCircleImage(circle.id, thumbnail, introductionImage)
+            val result = repository.putCircleImage(circle.id, profileImage, introductionImage)
 
             if (result is Success) {
                 return UiState.Success
@@ -154,7 +177,7 @@ class UploadCircleViewModelImpl
         }
 
         private suspend fun deleteCircleImage(circle: CircleDetailModel): UiState {
-            val result = repository.deleteCircleImage(circle.id, isThumbnailRemoved(), isIntroductionImageRemoved())
+            val result = repository.deleteCircleImage(circle.id, isProfileImageRemoved(), isIntroductionImageRemoved())
 
             if (result is Success) {
                 return UiState.Success
@@ -189,8 +212,8 @@ class UploadCircleViewModelImpl
             }
         }
 
-        override fun setCircleThumbnail(image: File?) {
-            this.thumbnail = image
+        override fun setCircleProfileImage(image: File?) {
+            this.profileImage = image
         }
 
         override fun setCircleIntroductionImage(image: File?) {
@@ -226,9 +249,9 @@ class UploadCircleViewModelImpl
             circleCategories.postValue(CategoryModels.selectAndRemoveAndGet(category, Category.ALL))
         }
 
-        override fun removeCircleThumbnail() {
-            this.thumbnail = null
-            hasThumbnailChanged = true
+        override fun removeCircleProfileImage() {
+            this.profileImage = null
+            hasProfileImageChanged = true
         }
 
         override fun removeCircleIntroductionImage() {
@@ -236,11 +259,11 @@ class UploadCircleViewModelImpl
             hasIntroductionImageChanged = true
         }
 
-        private fun isAnyImageEdited() = thumbnail != null || introductionImage != null
+        private fun isAnyImageEdited() = profileImage != null || introductionImage != null
 
-        private fun isAnyImageRemoved() = isThumbnailRemoved() || isIntroductionImageRemoved()
+        private fun isAnyImageRemoved() = isProfileImageRemoved() || isIntroductionImageRemoved()
 
-        private fun isThumbnailRemoved() = thumbnail == null && hasThumbnailChanged
+        private fun isProfileImageRemoved() = profileImage == null && hasProfileImageChanged
 
         private fun isIntroductionImageRemoved() = introductionImage == null && hasIntroductionImageChanged
     }

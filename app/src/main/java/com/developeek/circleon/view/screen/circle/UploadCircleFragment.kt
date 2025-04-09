@@ -62,7 +62,7 @@ class UploadCircleFragment : Fragment() {
                 uri ->
             uri?.let {
                 glideProvider.loadImage(it, requireContext(), binding.btnAddCircleThumbnail)
-                viewModel.setCircleThumbnail(it.toJPEG(requireContext()))
+                viewModel.setCircleProfileImage(it.toJPEG(requireContext()))
                 binding.btnAddOrRemoveCircleThumbnail.setImageResource(R.drawable.ic_cancel_2)
                 binding.btnAddOrRemoveCircleThumbnail.setOnClickListener {
                     onBtnRemoveCircleThumbnailClicked()
@@ -291,7 +291,7 @@ class UploadCircleFragment : Fragment() {
 
     private fun setBtnUploadListener() {
         binding.btnUpload.setOnClickListener {
-            // TODO: 동아리 생성
+            viewModel.upload()
         }
     }
 
@@ -413,7 +413,7 @@ class UploadCircleFragment : Fragment() {
     }
 
     private fun onBtnRemoveCircleThumbnailClicked() {
-        viewModel.removeCircleThumbnail()
+        viewModel.removeCircleProfileImage()
         binding.btnAddCircleThumbnail.setImageResource(R.drawable.img_circle_profile_large_default)
         binding.btnAddOrRemoveCircleThumbnail.setImageResource(R.drawable.ic_add_2)
         binding.btnAddOrRemoveCircleThumbnail.setOnClickListener {

@@ -14,9 +14,11 @@ interface UploadCircleViewModel {
     val categories: LiveData<CategoryModels>
     val error: String
 
+    fun upload()
+
     fun edit()
 
-    fun setCircleThumbnail(image: File?)
+    fun setCircleProfileImage(image: File?)
 
     fun setCircleIntroductionImage(image: File?)
 
@@ -32,7 +34,7 @@ interface UploadCircleViewModel {
 
     fun setCategory(category: Category)
 
-    fun removeCircleThumbnail()
+    fun removeCircleProfileImage()
 
     fun removeCircleIntroductionImage()
 }
