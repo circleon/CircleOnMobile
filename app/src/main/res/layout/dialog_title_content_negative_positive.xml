@@ -5,7 +5,7 @@
     android:id="@+id/editCircleMemberDialog"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:padding="@dimen/margin_padding_xx_large"
+    android:padding="@dimen/margin_padding_large"
     android:background="@drawable/bg_rounded_rectangle"
     android:backgroundTint="@color/white">
 

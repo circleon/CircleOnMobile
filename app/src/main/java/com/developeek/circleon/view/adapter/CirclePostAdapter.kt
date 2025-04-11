@@ -188,7 +188,7 @@ class CirclePostAdapter(
 
     companion object {
         private const val COMMENT_COUNT_UNIT = "%d개"
-        private const val CREATED_DATE_FORMAT = "M월 d일 a hh:mm"
+        private const val CREATED_DATE_FORMAT = "M월 d일 HH:mm"
         private const val VIEW_TYPE_LOADING = 0
         private const val VIEW_TYPE_ITEM = 1
         private const val VIEW_TYPE_ITEM_WITH_IMAGE = 2

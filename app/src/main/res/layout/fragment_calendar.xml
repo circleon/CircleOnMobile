@@ -11,7 +11,7 @@
         android:layout_height="match_parent"
         android:gravity="center"
         android:text="@string/message_not_released"
-        android:textAppearance="@style/large_bold_text"
+        android:textAppearance="@style/large_text"
         android:textColor="@color/grey_5" />
 
 </FrameLayout>

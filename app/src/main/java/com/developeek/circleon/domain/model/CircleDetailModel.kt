@@ -91,8 +91,8 @@ data class CircleDetailModel(
                 MemberModels.empty(),
                 null,
                 null,
-                null,
-                null,
+                LocalDateTime.now(),
+                LocalDateTime.now(),
             )
     }
 }

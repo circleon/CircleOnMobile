@@ -52,6 +52,7 @@
             android:id="@+id/llCircleIntroduction"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:paddingBottom="@dimen/margin_padding_large"
             android:orientation="vertical"
             android:background="@color/white">
 
@@ -66,17 +67,18 @@
                 android:text="소개글 영역" />
 
             <androidx.cardview.widget.CardView
+                android:id="@+id/cvCircleIntroduction"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_margin="@dimen/margin_padding_large"
+                android:layout_marginTop="@dimen/margin_padding_large"
+                android:layout_marginHorizontal="@dimen/margin_padding_large"
                 app:cardCornerRadius="@dimen/round_default"
                 app:cardElevation="0dp">
 
                 <androidx.appcompat.widget.AppCompatImageView
                     android:id="@+id/imgCircleIntroduction"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:src="@drawable/ic_retry"/>
+                    android:layout_height="wrap_content" />
 
             </androidx.cardview.widget.CardView>
 

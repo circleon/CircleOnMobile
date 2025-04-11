@@ -60,7 +60,7 @@
             <androidx.appcompat.widget.AppCompatTextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textAppearance="@style/large_bold_text"
+                android:textAppearance="@style/large_text"
                 android:textColor="@color/grey_5"
                 android:text="@string/message_no_my_circles"
                 android:gravity="center" />
@@ -104,7 +104,7 @@
             <androidx.appcompat.widget.AppCompatTextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textAppearance="@style/large_bold_text"
+                android:textAppearance="@style/large_text"
                 android:textColor="@color/grey_5"
                 android:text="@string/message_no_join_requested_circles"
                 android:gravity="center" />
@@ -128,7 +128,7 @@
             <androidx.appcompat.widget.AppCompatTextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textAppearance="@style/large_bold_text"
+                android:textAppearance="@style/large_text"
                 android:textColor="@color/grey_5"
                 android:text="@string/message_no_leave_requested_circles"
                 android:gravity="center" />

@@ -69,7 +69,7 @@ class CircleDetailIntroductionFragment : Fragment() {
             binding.txtCircleIntroductionContent.text = circleDetail.introduction
         }
         if (circleDetail.introImgUrl == null) {
-            binding.imgCircleIntroduction.isVisible = false
+            binding.cvCircleIntroduction.isVisible = false
         } else {
             glideProvider.fetchImage(circleDetail.introImgUrl!!, context, binding.imgCircleIntroduction)
         }

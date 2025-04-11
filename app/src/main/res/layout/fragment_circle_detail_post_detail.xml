@@ -66,7 +66,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/message_service_error"
-                    android:textAppearance="@style/large_bold_text"
+                    android:textAppearance="@style/large_text"
                     android:textColor="@color/grey_5"/>
 
                 <androidx.appcompat.widget.AppCompatImageView
@@ -140,8 +140,6 @@
         android:layout_height="match_parent"
         android:padding="@dimen/margin_padding_large"
         android:layout_gravity="center"
-        android:background="@drawable/bg_rounded_rectangle"
-        android:backgroundTint="@color/bg_indicator"
         app:indicatorColor="@color/purple_5"
         app:trackColor="@color/grey_3"
         app:trackThickness="8dp"

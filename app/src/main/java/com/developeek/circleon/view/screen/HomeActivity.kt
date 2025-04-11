@@ -39,6 +39,7 @@ class HomeActivity : AppCompatActivity() {
         navController = navHostFragment.navController
         NavigationUI.setupWithNavController(binding.btmNav, navController)
         setDestinationChangedListener()
+        setItemReselectionListener()
     }
 
     private fun setDestinationChangedListener() {
@@ -60,6 +61,16 @@ class HomeActivity : AppCompatActivity() {
             destination.id == R.id.manageCircleMemberFragment ||
             destination.id == R.id.uploadPostFragment ||
             destination.id == R.id.circleDetailPostDetailFragment
+
+    private fun setItemReselectionListener() {
+        binding.btmNav.setOnItemReselectedListener {
+            navController.currentDestination?.parent?.let {
+                if (it.startDestinationId != R.id.nav_graph_home) { // 탭 내부가 아닌 탭 간의 최상단으로는 이동 x
+                    navController.popBackStack(it.startDestinationId, inclusive = false)
+                }
+            }
+        }
+    }
 
     private fun initFinishWaitingToast() {
         finishWaitingToast =

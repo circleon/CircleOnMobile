@@ -87,6 +87,10 @@ class MyCircleFragment : Fragment() {
             binding.txtTitleCircles.text =
                 ContextCompat.getString(context, R.string.circle_content_title_join_requested_circle)
         }
+        if (membershipStatus == MembershipStatus.LEAVE_REQUESTED) {
+            binding.txtTitleCircles.text =
+                ContextCompat.getString(context, R.string.circle_content_title_leave_requested_circle)
+        }
     }
 
     private fun initNoCircleView() {

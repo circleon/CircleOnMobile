@@ -231,7 +231,7 @@ class PostDetailAdapter(
     }
 
     companion object {
-        private const val CREATED_DATE_FORMAT = "M월 d일 a hh:mm"
+        private const val CREATED_DATE_FORMAT = "M월 d일 HH:mm"
     }
 }
 

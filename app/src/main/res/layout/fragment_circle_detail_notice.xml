@@ -55,7 +55,7 @@
         android:paddingBottom="140dp"
         android:gravity="center"
         android:text="@string/message_no_notice"
-        android:textAppearance="@style/large_bold_text"
+        android:textAppearance="@style/large_text"
         android:textColor="@color/grey_5"
         android:visibility="gone"/>
 
@@ -72,7 +72,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/message_service_error"
-            android:textAppearance="@style/large_bold_text"
+            android:textAppearance="@style/large_text"
             android:textColor="@color/grey_5"/>
 
         <androidx.appcompat.widget.AppCompatImageView

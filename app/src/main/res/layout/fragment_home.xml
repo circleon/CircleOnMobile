@@ -4,7 +4,6 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:paddingHorizontal="@dimen/margin_padding_large"
     android:background="@color/grey_1"
     android:orientation="vertical"
     tools:context=".view.screen.home.HomeFragment">
@@ -12,6 +11,8 @@
     <androidx.appcompat.widget.Toolbar
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/margin_padding_xx_large"
+        android:layout_marginEnd="@dimen/margin_padding_large"
         app:contentInsetStart="0dp">
 
         <androidx.appcompat.widget.AppCompatImageView
@@ -49,12 +50,15 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginVertical="@dimen/margin_padding_default"
+        android:layout_marginStart="@dimen/margin_padding_xx_large"
+        android:layout_marginEnd="@dimen/margin_padding_large"
         android:text="대학교"
         android:textAppearance="@style/content_title"/>
 
     <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/margin_padding_xx_large"
         android:paddingVertical="@dimen/margin_padding_x_small" >
 
         <com.facebook.shimmer.ShimmerFrameLayout
@@ -99,6 +103,8 @@
         android:id="@+id/txtContentTitleCircle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/margin_padding_xx_large"
+        android:layout_marginEnd="@dimen/margin_padding_large"
         android:paddingVertical="@dimen/margin_padding_small"
         android:textAppearance="@style/content_title"
         android:textSize="16sp"
@@ -107,6 +113,7 @@
     <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="0dp"
+        android:layout_marginHorizontal="@dimen/margin_padding_large"
         android:layout_weight="1">
 
         <androidx.recyclerview.widget.RecyclerView
@@ -159,7 +166,7 @@
             android:paddingBottom="140dp"
             android:gravity="center"
             android:text="@string/message_no_circle"
-            android:textAppearance="@style/large_bold_text"
+            android:textAppearance="@style/large_text"
             android:textColor="@color/grey_5"
             android:visibility="gone"/>
 
@@ -175,7 +182,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/message_service_error"
-                android:textAppearance="@style/large_bold_text"
+                android:textAppearance="@style/large_text"
                 android:textColor="@color/grey_5"/>
 
             <androidx.appcompat.widget.AppCompatImageView
