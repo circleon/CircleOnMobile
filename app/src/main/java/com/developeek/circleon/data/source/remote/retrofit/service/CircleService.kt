@@ -217,4 +217,9 @@ interface CircleService {
         @Path("circleId") circleId: Int,
         @Path("memberId") memberId: Int,
     )
+
+    @DELETE("my-circles/{circleId}/application")
+    suspend fun deleteCircleJoinRequest(
+        @Path("circleId") circleId: Int,
+    )
 }
