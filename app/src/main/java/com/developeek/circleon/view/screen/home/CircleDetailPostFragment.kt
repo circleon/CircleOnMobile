@@ -123,7 +123,6 @@ class CircleDetailPostFragment : Fragment() {
                             initPostOverflowMenuAndShow(context, item, view!!)
                         }
                     },
-                userId = userManager.getUser()?.id,
             )
         binding.rvCirclePost.layoutManager = LinearLayoutManager(context)
         if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.R) {
@@ -152,13 +151,24 @@ class CircleDetailPostFragment : Fragment() {
         view: View,
     ) {
         val popupMenu = object : PopupMenu(context, view) {}
-        popupMenu.inflate(R.menu.menu_post_settings)
-        popupMenu.setOnMenuItemClickListener(postOverflowMenuItemClickListener(context, item))
-        Utils.changeMenuItemTextColor(
-            popupMenu.menu.findItem(R.id.delete_post),
-            ContextCompat.getColor(context, R.color.error),
-        )
+        val userId = userManager.getUser()?.id
 
+        userId?.let {
+            if (it == item.author.id) { // 작성자 본인인 경우
+                popupMenu.inflate(R.menu.menu_author_post_settings)
+                Utils.changeMenuItemTextColor(
+                    popupMenu.menu.findItem(R.id.delete_post),
+                    ContextCompat.getColor(context, R.color.error),
+                )
+            } else { // 작성자가 아닌 경우
+                popupMenu.inflate(R.menu.menu_post_settings)
+                Utils.changeMenuItemTextColor(
+                    popupMenu.menu.findItem(R.id.report_post),
+                    ContextCompat.getColor(context, R.color.error),
+                )
+            }
+        }
+        popupMenu.setOnMenuItemClickListener(postOverflowMenuItemClickListener(context, item))
         popupMenu.show()
     }
 
@@ -171,10 +181,15 @@ class CircleDetailPostFragment : Fragment() {
             R.id.edit_post -> {
                 sendUserToEditPostScreen(circleId, item)
             }
+
             R.id.delete_post -> {
                 ContentDeleteAlertDialog(context, MESSAGE_DELETE_POST) {
                     viewModel.deleteAndFetch(item.id)
                 }.show()
+            }
+
+            R.id.report_post -> {
+                // TODO: 신고하기
             }
         }
         true

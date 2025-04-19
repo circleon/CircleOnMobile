@@ -152,16 +152,17 @@
                     android:layout_width="match_parent"
                     android:layout_height="56dp"
                     app:contentInsetStart="0dp"
+                    app:contentInsetEnd="@dimen/margin_padding_large"
                     app:layout_collapseMode="pin">
 
                     <androidx.appcompat.widget.AppCompatImageView
                         android:id="@+id/btnBack"
                         android:layout_width="wrap_content"
                         android:layout_height="match_parent"
+                        android:background="@null"
                         android:paddingStart="@dimen/margin_padding_large"
                         android:paddingEnd="@dimen/margin_padding_small"
-                        android:src="@drawable/ic_back"
-                        android:background="@null"/>
+                        android:src="@drawable/ic_back" />
 
                     <androidx.appcompat.widget.AppCompatTextView
                         android:id="@+id/txtTbCircleName"
@@ -169,7 +170,16 @@
                         android:layout_height="wrap_content"
                         android:textAppearance="@style/large_bold_text"
                         android:textColor="@color/grey_9"
-                        tools:text="circleName"/>
+                        tools:text="circleName" />
+
+                    <androidx.appcompat.widget.AppCompatImageView
+                        android:id="@+id/btnCircleOverflow"
+                        android:layout_width="24dp"
+                        android:layout_height="match_parent"
+                        android:src="@drawable/ic_overflow"
+                        app:tint="@color/grey_9"
+                        android:layout_gravity="end"
+                        android:background="?attr/selectableItemBackgroundBorderless"/>
 
                 </androidx.appcompat.widget.Toolbar>
 

@@ -26,7 +26,6 @@ class CirclePostAdapter(
     private val glideProvider: GlideProvider,
     private val itemListenerInitializer: ItemListenerInitializer<PostModel>,
     private val overflowListenerInitializer: ItemListenerInitializer<PostModel>,
-    private val userId: Int? = null,
     private val role: Role = Role.NONE_MEMBER,
 ) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
     private val diffUtil =
@@ -68,7 +67,6 @@ class CirclePostAdapter(
 
             load(post.author)
             load(post)
-            hideOverFlowOrNot(post)
             notifyListenerItemChanged(post)
         }
 
@@ -81,11 +79,7 @@ class CirclePostAdapter(
 
         private fun load(post: PostModel) {
             binding.txtPostContent.text = post.content
-            binding.txtCommentCount.text =
-                String.format(
-                    COMMENT_COUNT_UNIT,
-                    post.commentCount,
-                )
+            binding.txtCommentCount.text = post.commentCount.toString()
             binding.txtCreated.text =
                 post.createdAt.format(
                     DateTimeFormatter
@@ -96,16 +90,6 @@ class CirclePostAdapter(
                 glideProvider.fetchImage(it, context, binding.imgPost)
             }
             binding.imgNoticePin.isVisible = post.isPinned
-        }
-
-        private fun hideOverFlowOrNot(post: PostModel) {
-            if (post.type.isPost()) {
-                userId?.let {
-                    binding.btnPostOverflow.isVisible = it == post.author.id
-                }
-            } else if (post.type.isNotice()) {
-                binding.btnPostOverflow.isVisible = role.isExecutive()
-            }
         }
 
         private fun notifyListenerItemChanged(post: PostModel) {
@@ -187,7 +171,6 @@ class CirclePostAdapter(
     }
 
     companion object {
-        private const val COMMENT_COUNT_UNIT = "%d개"
         private const val CREATED_DATE_FORMAT = "M월 d일 HH:mm"
         private const val VIEW_TYPE_LOADING = 0
         private const val VIEW_TYPE_ITEM = 1

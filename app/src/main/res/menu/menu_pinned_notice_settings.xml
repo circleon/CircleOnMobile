@@ -3,4 +3,7 @@
     <item
         android:id="@+id/unpin_post"
         android:title="@string/menu_post_settings_remove_pin"/>
+    <item
+        android:id="@+id/report_post"
+        android:title="@string/menu_report"/>
 </menu>

@@ -70,8 +70,8 @@ data class CircleDetailModel(
             this.name,
             this.singleLineIntroduction,
             this.introduction,
-            this.recruitmentStartDate.toString(),
-            this.recruitmentEndDate.toString(),
+            this.recruitmentStartDate?.toString(),
+            this.recruitmentEndDate?.toString(),
             this.category.codeName(),
         )
 

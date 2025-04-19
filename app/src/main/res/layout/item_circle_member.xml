@@ -76,8 +76,9 @@
     <androidx.appcompat.widget.AppCompatImageView
         android:id="@+id/btnProfileOverflow"
         android:layout_width="24dp"
-        android:layout_height="24dp"
+        android:layout_height="0dp"
         android:src="@drawable/ic_overflow"
+        android:background="?attr/selectableItemBackgroundBorderless"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@id/llMemberName"
         app:layout_constraintTop_toTopOf="parent"

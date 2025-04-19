@@ -177,13 +177,25 @@ class CircleDetailPostDetailFragment : Fragment() {
         view: View,
     ) {
         val popupMenu = object : PopupMenu(context, view) {}
-        popupMenu.inflate(R.menu.menu_post_settings)
-        popupMenu.setOnMenuItemClickListener(postOverflowMenuItemClickListener(context, post))
-        Utils.changeMenuItemTextColor(
-            popupMenu.menu.findItem(R.id.delete_post),
-            ContextCompat.getColor(context, R.color.error),
-        )
+        val userId = userManager.getUser()?.id
 
+        userId?.let {
+            if (it == post.author.id) {
+                popupMenu.inflate(R.menu.menu_author_post_settings)
+                Utils.changeMenuItemTextColor(
+                    popupMenu.menu.findItem(R.id.delete_post),
+                    ContextCompat.getColor(context, R.color.error),
+                )
+            } else {
+                popupMenu.inflate(R.menu.menu_post_settings)
+                Utils.changeMenuItemTextColor(
+                    popupMenu.menu.findItem(R.id.report_post),
+                    ContextCompat.getColor(context, R.color.error),
+                )
+            }
+        }
+
+        popupMenu.setOnMenuItemClickListener(postOverflowMenuItemClickListener(context, post))
         popupMenu.show()
     }
 
@@ -195,6 +207,7 @@ class CircleDetailPostDetailFragment : Fragment() {
             R.id.edit_post -> {
                 sendUserToEditPostScreen(circleId, item)
             }
+
             R.id.delete_post -> {
                 ContentDeleteAlertDialog(
                     context,
@@ -202,6 +215,10 @@ class CircleDetailPostDetailFragment : Fragment() {
                 ) {
                     viewModel.delete()
                 }.show()
+            }
+
+            R.id.report_post -> {
+                // TODO: 신고하기
             }
         }
         true
@@ -226,13 +243,24 @@ class CircleDetailPostDetailFragment : Fragment() {
         view: View,
     ) {
         val popupMenu = object : PopupMenu(context, view) {}
-        popupMenu.inflate(R.menu.menu_comment_settings)
-        popupMenu.setOnMenuItemClickListener(commentOverflowMenuItemClickListener(context, comment))
-        Utils.changeMenuItemTextColor(
-            popupMenu.menu.findItem(R.id.delete_comment),
-            ContextCompat.getColor(context, R.color.error),
-        )
+        val userId = userManager.getUser()?.id
 
+        userId?.let {
+            if (it == comment.author.id) {
+                popupMenu.inflate(R.menu.menu_author_comment_settings)
+                Utils.changeMenuItemTextColor(
+                    popupMenu.menu.findItem(R.id.delete_comment),
+                    ContextCompat.getColor(context, R.color.error),
+                )
+            } else {
+                popupMenu.inflate(R.menu.menu_comment_settings)
+                Utils.changeMenuItemTextColor(
+                    popupMenu.menu.findItem(R.id.report_comment),
+                    ContextCompat.getColor(context, R.color.error),
+                )
+            }
+        }
+        popupMenu.setOnMenuItemClickListener(commentOverflowMenuItemClickListener(context, comment))
         popupMenu.show()
     }
 
@@ -258,11 +286,16 @@ class CircleDetailPostDetailFragment : Fragment() {
                     },
                 ).show()
             }
+
             R.id.delete_comment -> {
                 ContentDeleteAlertDialog(context, MESSAGE_DELETE_COMMENT) {
                     // 삭제 버튼 클릭 시
                     viewModel.deleteComment(comment.id)
                 }.show()
+            }
+
+            R.id.report_comment -> {
+                // TODO: 신고하기
             }
         }
         true

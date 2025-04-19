@@ -147,35 +147,34 @@
         android:background="?attr/selectableItemBackgroundBorderless"
         android:src="@drawable/ic_overflow"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        android:visibility="gone"/>
+        app:layout_constraintTop_toTopOf="parent" />
 
     <androidx.appcompat.widget.LinearLayoutCompat
         android:id="@+id/llComment"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:paddingEnd="@dimen/margin_padding_large"
-        android:orientation="horizontal"
         android:gravity="center"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent">
+        android:orientation="horizontal"
+        android:paddingEnd="@dimen/margin_padding_large"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
 
         <androidx.appcompat.widget.AppCompatImageView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="@dimen/margin_padding_small"
-            android:src="@drawable/ic_comment"/>
+            android:src="@drawable/ic_comment" />
 
         <androidx.appcompat.widget.AppCompatTextView
             android:id="@+id/txtCommentCount"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="2dp"
-            android:textSize="@dimen/text_size_small"
-            android:textColor="@color/grey_9"
             android:lineSpacingExtra="2sp"
+            android:textColor="@color/grey_9"
+            android:textSize="@dimen/text_size_small"
             android:translationY="-0.91sp"
-            tools:text="0개"/>
+            tools:text="0" />
 
     </androidx.appcompat.widget.LinearLayoutCompat>
 

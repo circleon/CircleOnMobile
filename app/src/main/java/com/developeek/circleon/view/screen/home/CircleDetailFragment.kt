@@ -9,9 +9,8 @@ import android.text.Html
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.appcompat.widget.Toolbar
+import androidx.appcompat.widget.PopupMenu
 import androidx.core.content.ContextCompat
-import androidx.core.view.isEmpty
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
@@ -86,12 +85,12 @@ class CircleDetailFragment : Fragment() {
     ) {
         super.onViewCreated(view, savedInstanceState)
 
-        initView(requireActivity())
+        initView()
         initObserver(requireActivity(), requireContext())
         initListener()
     }
 
-    private fun initView(parentActivity: Activity) {
+    private fun initView() {
         initAppBar()
     }
 
@@ -135,9 +134,8 @@ class CircleDetailFragment : Fragment() {
             UiState.Success -> {
                 toggleView(binding.flCircleDetail)
                 loadCircleDetail(context)
-                inflateOverflowMenu(context)
+                setBtnCircleOverflow(context)
                 setMemberCountListener()
-                setOverflowMenuItemListener(context)
                 setBtnRequestJoinCircle(context)
             }
             UiState.AuthenticationError -> {
@@ -181,55 +179,48 @@ class CircleDetailFragment : Fragment() {
         }
     }
 
-    private fun inflateOverflowMenu(context: Context) {
-        if (binding.tbCircleDetail.menu.isEmpty()) {
-            if (viewModel.circleDetail.isUserExecutive()) {
-                binding.tbCircleDetail.inflateMenu(R.menu.menu_executive_circle_settings)
-            } else if (viewModel.circleDetail.isUserJoined()) {
-                binding.tbCircleDetail.inflateMenu(R.menu.menu_member_circle_settings)
-            }
-
-            if (viewModel.circleDetail.isUserExecutive() || viewModel.circleDetail.isUserJoined()) {
+    private fun setBtnCircleOverflow(context: Context) {
+        binding.btnCircleOverflow.setOnClickListener {
+            val popupMenu = object : PopupMenu(context, binding.btnCircleOverflow) {}
+            if (viewModel.circleDetail.isUserPresident()) {
+                popupMenu.inflate(R.menu.menu_president_circle_settings)
+            } else if (viewModel.circleDetail.isUserExecutive()) {
+                popupMenu.inflate(R.menu.menu_executive_circle_settings)
                 Utils.changeMenuItemTextColor(
-                    binding.tbCircleDetail.menu.findItem(R.id.leave_circle),
+                    popupMenu.menu.findItem(R.id.leave_circle),
+                    ContextCompat.getColor(context, R.color.error),
+                )
+            } else if (viewModel.circleDetail.isUserJoined()) {
+                popupMenu.inflate(R.menu.menu_member_circle_settings)
+                Utils.changeMenuItemTextColor(
+                    popupMenu.menu.findItem(R.id.leave_circle),
+                    ContextCompat.getColor(context, R.color.error),
+                )
+            } else {
+                popupMenu.inflate(R.menu.menu_non_member_circle_settings)
+                Utils.changeMenuItemTextColor(
+                    popupMenu.menu.findItem(R.id.report_circle),
                     ContextCompat.getColor(context, R.color.error),
                 )
             }
+            popupMenu.setOnMenuItemClickListener(circleOverflowMenuItemClickListener(context, viewModel.circleDetail))
+            popupMenu.show()
         }
-    }
-
-    private fun setMemberCountListener() {
-        binding.txtCircleMemberCount.setOnClickListener {
-            sendUserToCircleMemberScreen()
-        }
-    }
-
-    private fun sendUserToCircleMemberScreen() {
-        val bundle = Bundle()
-
-        bundle.putSerializable(Const.TAG_CIRCLE_DETAIL, viewModel.circleDetail)
-        bundle.putSerializable(Const.TAG_MEMBERS, viewModel.circleDetail.members)
-        bundle.putSerializable(Const.TAG_MEMBERSHIP_STATUS, MembershipStatus.JOINED)
-        findNavController().navigate(R.id.action_circleDetailFragment_to_manageCircleMemberFragment, bundle)
-    }
-
-    private fun setOverflowMenuItemListener(context: Context) {
-        binding.tbCircleDetail.setOnMenuItemClickListener(
-            circleOverflowMenuItemClickListener(context, viewModel.circleDetail),
-        )
     }
 
     private fun circleOverflowMenuItemClickListener(
         context: Context,
         item: CircleDetailModel,
-    ) = Toolbar.OnMenuItemClickListener {
+    ) = PopupMenu.OnMenuItemClickListener {
         when (it.itemId) {
             R.id.edit_circle -> {
                 sendUserToEditCircleScreen(item)
             }
+
             R.id.manage_circle -> {
                 sendUserToManageCircleScreen(item)
             }
+
             R.id.leave_circle -> {
                 if (item.membershipStatus.isLeaveRequested()) {
                     ErrorAlertDialog(context, context.getString(R.string.message_already_leave_requested)).show()
@@ -247,13 +238,33 @@ class CircleDetailFragment : Fragment() {
                             override fun initialize(
                                 item: String,
                                 view: View?,
-                            ) {}
+                            ) {
+                            }
                         },
                     ).show()
                 }
             }
+
+            R.id.report_circle -> {
+                // TODO: 신고하기
+            }
         }
         true
+    }
+
+    private fun setMemberCountListener() {
+        binding.txtCircleMemberCount.setOnClickListener {
+            sendUserToCircleMemberScreen()
+        }
+    }
+
+    private fun sendUserToCircleMemberScreen() {
+        val bundle = Bundle()
+
+        bundle.putSerializable(Const.TAG_CIRCLE_DETAIL, viewModel.circleDetail)
+        bundle.putSerializable(Const.TAG_MEMBERS, viewModel.circleDetail.members)
+        bundle.putSerializable(Const.TAG_MEMBERSHIP_STATUS, MembershipStatus.JOINED)
+        findNavController().navigate(R.id.action_circleDetailFragment_to_manageCircleMemberFragment, bundle)
     }
 
     private fun sendUserToEditCircleScreen(item: CircleDetailModel) {

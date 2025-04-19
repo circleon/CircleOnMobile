@@ -158,7 +158,7 @@ class CircleDetailNoticeFragment : Fragment() {
         val userId = userManager.getUser()?.id
 
         userId?.let {
-            if (it == item.author.id) {
+            if (role.isExecutive() && it == item.author.id) { // 임원이면서 작성자 본인인 경우
                 if (item.isPinned) {
                     popupMenu.inflate(R.menu.menu_pinned_author_notice_settings)
                 } else {
@@ -168,12 +168,22 @@ class CircleDetailNoticeFragment : Fragment() {
                     popupMenu.menu.findItem(R.id.delete_post),
                     ContextCompat.getColor(context, R.color.error),
                 )
-            } else {
+            } else if (role.isExecutive()) { // 임원인 경우
                 if (item.isPinned) {
                     popupMenu.inflate(R.menu.menu_pinned_notice_settings)
                 } else {
-                    popupMenu.inflate(R.menu.menu_notice_settings)
+                    popupMenu.inflate(R.menu.menu_executive_notice_settings)
                 }
+                Utils.changeMenuItemTextColor(
+                    popupMenu.menu.findItem(R.id.report_post),
+                    ContextCompat.getColor(context, R.color.error),
+                )
+            } else { // 부원인 경우
+                popupMenu.inflate(R.menu.menu_non_executive_notice_settings)
+                Utils.changeMenuItemTextColor(
+                    popupMenu.menu.findItem(R.id.report_post),
+                    ContextCompat.getColor(context, R.color.error),
+                )
             }
         }
         popupMenu.setOnMenuItemClickListener(noticeOverflowMenuItemClickListener(context, item))
@@ -202,6 +212,10 @@ class CircleDetailNoticeFragment : Fragment() {
                 ContentDeleteAlertDialog(context, MESSAGE_DELETE_NOTICE) {
                     viewModel.deleteAndFetch(item.id)
                 }.show()
+            }
+
+            R.id.report_post -> {
+                // TODO: 신고하기
             }
         }
         true

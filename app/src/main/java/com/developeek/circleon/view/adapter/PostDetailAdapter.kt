@@ -59,7 +59,6 @@ class PostDetailAdapter(
 
             loadAuthor(post.author)
             loadContent(post)
-            hideOverflowOrNot(post.author)
             notifyListenerItemChanged(post)
         }
 
@@ -83,12 +82,6 @@ class PostDetailAdapter(
                 )
         }
 
-        private fun hideOverflowOrNot(author: AuthorModel) {
-            userId?.let {
-                binding.btnPostOverflow.isVisible = author.id == it
-            }
-        }
-
         private fun notifyListenerItemChanged(post: PostModel) {
             overflowClickListener.item = post
         }
@@ -103,7 +96,6 @@ class PostDetailAdapter(
 
             loadAuthor(comment.author)
             loadComment(comment)
-            hideOverFlowOrNot(comment.author)
             notifyListenerItemChanged(comment)
         }
 
@@ -122,12 +114,6 @@ class PostDetailAdapter(
                         .ofPattern(CREATED_DATE_FORMAT)
                         .withLocale(Locale.KOREAN),
                 )
-        }
-
-        private fun hideOverFlowOrNot(author: AuthorModel) {
-            userId?.let {
-                binding.btnCommentOverflow.isVisible = author.id == it
-            }
         }
 
         private fun notifyListenerItemChanged(comment: CommentModel) {
