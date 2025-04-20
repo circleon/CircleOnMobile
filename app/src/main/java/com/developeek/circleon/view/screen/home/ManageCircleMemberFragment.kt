@@ -378,15 +378,15 @@ class ManageCircleMemberFragment : Fragment() {
         when (membershipStatus) {
             MembershipStatus.JOINED -> {
                 binding.txtNoMember.text = ContextCompat.getString(context, R.string.message_no_circle_member)
-                binding.icSituation.setImageResource(R.drawable.ic_bad_situation)
+                binding.icSituation.setImageResource(R.drawable.character_bad_situation)
             }
             MembershipStatus.JOIN_REQUESTED -> {
                 binding.txtNoMember.text = ContextCompat.getString(context, R.string.message_no_member_join_requested)
-                binding.icSituation.setImageResource(R.drawable.ic_bad_situation)
+                binding.icSituation.setImageResource(R.drawable.character_bad_situation)
             }
             MembershipStatus.LEAVE_REQUESTED -> {
                 binding.txtNoMember.text = ContextCompat.getString(context, R.string.message_no_member_leave_requested)
-                binding.icSituation.setImageResource(R.drawable.ic_good_situation)
+                binding.icSituation.setImageResource(R.drawable.character_good_situation)
             }
             else -> {}
         }

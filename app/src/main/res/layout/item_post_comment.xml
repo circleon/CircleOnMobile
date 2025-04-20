@@ -5,7 +5,7 @@
     android:id="@+id/clItemPostComment"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:paddingVertical="@dimen/margin_padding_default"
+    android:paddingVertical="@dimen/margin_padding_large"
     android:background="@color/white">
 
     <androidx.constraintlayout.widget.ConstraintLayout

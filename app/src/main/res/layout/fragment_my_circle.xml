@@ -117,7 +117,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="@dimen/margin_padding_large"
-                    android:src="@drawable/ic_good_situation"/>
+                    android:src="@drawable/character_good_situation"/>
 
             </androidx.appcompat.widget.LinearLayoutCompat>
 
@@ -141,7 +141,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="@dimen/margin_padding_large"
-                    android:src="@drawable/ic_good_situation"/>
+                    android:src="@drawable/character_good_situation"/>
 
             </androidx.appcompat.widget.LinearLayoutCompat>
 

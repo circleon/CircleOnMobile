@@ -50,10 +50,11 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/margin_padding_xx_large"
+        android:spinnerMode="dropdown"
         android:background="@drawable/bg_spinner"
         android:paddingHorizontal="@dimen/margin_padding_large"
-        android:paddingVertical="@dimen/margin_padding_default"
-        android:popupBackground="@drawable/bg_rounded_rectangle"
+        android:popupBackground="@drawable/bg_card"
+        android:popupElevation="0dp"
         app:layout_constraintBottom_toTopOf="@id/llNegativePositive"
         app:layout_constraintTop_toBottomOf="@id/llMemberProfile" />
 

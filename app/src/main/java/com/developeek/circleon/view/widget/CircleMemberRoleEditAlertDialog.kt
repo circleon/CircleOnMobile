@@ -54,13 +54,13 @@ class CircleMemberRoleEditAlertDialog(
         val spinnerAdapter =
             ArrayAdapter(
                 context,
-                android.R.layout.simple_spinner_item,
+                android.R.layout.simple_spinner_dropdown_item,
                 Role.getCircleRoles().map { it.roleName() },
             )
-        spinnerAdapter.setDropDownViewResource(R.layout.item_dropdown)
+
         roleSpinner.adapter = spinnerAdapter
         roleSpinner.post {
-            roleSpinner.dropDownVerticalOffset = roleSpinner.height
+            roleSpinner.dropDownVerticalOffset = (roleSpinner.height * 1.2).toInt()
         }
     }
 
