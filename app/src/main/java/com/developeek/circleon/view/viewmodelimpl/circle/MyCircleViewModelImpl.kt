@@ -46,11 +46,11 @@ class MyCircleViewModelImpl
                 }
         }
 
-        private suspend fun cancelCircleJoinRequest(circleId: Int) {
-            val result = repository.deleteCircleJoinRequest(circleId)
+        private suspend fun cancelCircleJoinRequest(memberId: Int) {
+            val result = repository.deleteCircleJoinRequest(memberId)
 
             if (result is Success) {
-                fetchMyJoinRequestedCircles(currentPage, SIZE_BY_PAGE)
+                uiState.postValue(fetchMyJoinRequestedCircles(currentPage, SIZE_BY_PAGE))
             } else {
                 error = (result as Error).message()
                 if (result.isAuthenticationError()) {

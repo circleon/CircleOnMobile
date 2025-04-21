@@ -9,5 +9,5 @@ interface MyCircleViewModel {
     val joinRequestedCircles: CircleSummaryModels
     val error: String
 
-    fun cancelJoinRequest(circleId: Int)
+    fun cancelJoinRequest(memberId: Int)
 }

@@ -14,6 +14,7 @@ data class CircleSummary(
     @SerializedName("circleName") val name: String,
     @SerializedName("categoryType") val category: String,
     val thumbnailUrl: String?,
+    val memberId: Int = 0,
 ) {
     fun toCircleSummaryModel() =
         CircleSummaryModel(
@@ -21,5 +22,6 @@ data class CircleSummary(
             name,
             Category.findOrDefault(category),
             Utils.getCircleImageUrlOrNull(thumbnailUrl),
+            memberId,
         )
 }

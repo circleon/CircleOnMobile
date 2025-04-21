@@ -608,10 +608,10 @@ class CircleRepositoryImpl(
         }
     }
 
-    override suspend fun deleteCircleJoinRequest(circleId: Int): Result<Unit> {
+    override suspend fun deleteCircleJoinRequest(memberId: Int): Result<Unit> {
         return try {
             withContext(dispatcher) {
-                service.deleteCircleJoinRequest(circleId)
+                service.deleteCircleJoinRequest(memberId)
                 Result.success(Unit)
             }
         } catch (e: Exception) {

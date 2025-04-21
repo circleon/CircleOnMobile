@@ -181,5 +181,5 @@ interface CircleRepository {
         memberId: Int,
     ): Result<Unit>
 
-    suspend fun deleteCircleJoinRequest(circleId: Int): Result<Unit>
+    suspend fun deleteCircleJoinRequest(memberId: Int): Result<Unit>
 }

@@ -81,11 +81,12 @@ class MyCircleFragment : Fragment() {
         context: Context,
     ) {
         initToolbar(context)
+        initCircleRecyclerView(parentActivity, context)
+
         if (circles.isEmpty()) {
-            initNoCircleView()
+            loadNoCircleView()
         } else {
-            binding.rvCircles.isVisible = true
-            initCircleRecyclerView(parentActivity, context)
+            loadCircles(circles)
         }
     }
 
@@ -104,7 +105,8 @@ class MyCircleFragment : Fragment() {
         }
     }
 
-    private fun initNoCircleView() {
+    private fun loadNoCircleView() {
+        if (binding.rvCircles.isVisible) binding.rvCircles.isVisible = false
         if (membershipStatus == MembershipStatus.JOINED) {
             binding.llNoMyCircles.isVisible = true
         }
@@ -140,7 +142,7 @@ class MyCircleFragment : Fragment() {
                     object : ItemListenerInitializer<CircleSummaryModel> {
                         override fun initialize(item: CircleSummaryModel) {
                             if (membershipStatus.isJoinRequested()) {
-                                viewModel.cancelJoinRequest(item.id)
+                                viewModel.cancelJoinRequest(item.memberId)
                             }
                         }
 
@@ -149,7 +151,7 @@ class MyCircleFragment : Fragment() {
                             view: View?,
                         ) {}
                     },
-            ).also { it.update(circles) {} }
+            )
         binding.rvCircles.layoutManager = LinearLayoutManager(context)
         if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.R) {
             binding.rvCircles.overScrollMode = RecyclerView.OVER_SCROLL_NEVER
@@ -189,7 +191,11 @@ class MyCircleFragment : Fragment() {
         binding.pgbLoading.isVisible = it is UiState.Loading
         when (it) {
             UiState.Success -> {
-                loadCircles()
+                if (viewModel.joinRequestedCircles.isEmpty()) {
+                    loadNoCircleView()
+                } else {
+                    loadCircles(viewModel.joinRequestedCircles)
+                }
             }
             UiState.AuthenticationError -> {
                 sendUserToLoginScreen(parentActivity)
@@ -202,8 +208,9 @@ class MyCircleFragment : Fragment() {
         }
     }
 
-    private fun loadCircles() {
-        (binding.rvCircles.adapter as MyCircleAdapter).update(viewModel.joinRequestedCircles) {}
+    private fun loadCircles(circles: CircleSummaryModels) {
+        if (!binding.rvCircles.isVisible) binding.rvCircles.isVisible = true
+        (binding.rvCircles.adapter as MyCircleAdapter).update(circles) {}
     }
 
     private fun sendUserToLoginScreen(activity: Activity) {
