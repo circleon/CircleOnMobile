@@ -46,6 +46,10 @@ class UploadCircleViewModelImpl
             get() = uiState
         private val uiState = MutableLiveData<UiState>()
 
+        override val recruitmentLocked: LiveData<Boolean>
+            get() = _recruitmentLocked
+        private val _recruitmentLocked = MutableLiveData(false)
+
         override lateinit var circle: CircleDetailModel
         private var uploadJob: Job? = null
         override val categories: LiveData<CategoryModels>
@@ -257,6 +261,10 @@ class UploadCircleViewModelImpl
         override fun removeCircleIntroductionImage() {
             this.introductionImage = null
             hasIntroductionImageChanged = true
+        }
+
+        override fun toggleRecruitmentLock(state: Boolean) {
+            _recruitmentLocked.postValue(state)
         }
 
         private fun isAnyImageEdited() = profileImage != null || introductionImage != null

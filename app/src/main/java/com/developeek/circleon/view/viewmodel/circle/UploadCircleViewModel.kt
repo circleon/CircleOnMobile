@@ -10,6 +10,7 @@ import java.time.LocalDateTime
 
 interface UploadCircleViewModel {
     val state: LiveData<UiState>
+    val recruitmentLocked: LiveData<Boolean>
     val circle: CircleDetailModel
     val categories: LiveData<CategoryModels>
     val error: String
@@ -37,4 +38,6 @@ interface UploadCircleViewModel {
     fun removeCircleProfileImage()
 
     fun removeCircleIntroductionImage()
+
+    fun toggleRecruitmentLock(state: Boolean)
 }

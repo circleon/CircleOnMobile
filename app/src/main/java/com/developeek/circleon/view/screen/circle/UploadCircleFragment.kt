@@ -224,6 +224,10 @@ class UploadCircleFragment : Fragment() {
             viewLifecycleOwner,
             stateObserver(parentActivity, context),
         )
+        viewModel.recruitmentLocked.observe(
+            viewLifecycleOwner,
+            recruitmentLockedObserver(context),
+        )
         viewModel.categories.observe(
             viewLifecycleOwner,
             categoriesObserver(),
@@ -253,6 +257,29 @@ class UploadCircleFragment : Fragment() {
         }
     }
 
+    private fun recruitmentLockedObserver(context: Context) =
+        Observer<Boolean> {
+            if (it) {
+                lockRecruitment(context)
+            } else {
+                unlockRecruitment(context)
+            }
+        }
+
+    private fun lockRecruitment(context: Context) {
+        binding.btnEditRecruitmentStartDate.isClickable = false
+        binding.btnEditRecruitmentEndDate.isClickable = false
+        binding.txtRecruitmentStartDate.setTextColor(context.getColor(R.color.grey_5))
+        binding.txtRecruitmentEndDate.setTextColor(context.getColor(R.color.grey_5))
+    }
+
+    private fun unlockRecruitment(context: Context) {
+        binding.btnEditRecruitmentStartDate.isClickable = true
+        binding.btnEditRecruitmentEndDate.isClickable = true
+        binding.txtRecruitmentStartDate.setTextColor(context.getColor(R.color.grey_9))
+        binding.txtRecruitmentEndDate.setTextColor(context.getColor(R.color.grey_9))
+    }
+
     private fun categoriesObserver() =
         Observer<CategoryModels> { categories ->
             binding.rvCircleCategory.adapter?.let {
@@ -270,6 +297,7 @@ class UploadCircleFragment : Fragment() {
         setBtnUploadListener()
         setBtnAddCircleThumbnailListener()
         setBtnAddCircleIntroductionImageListener()
+        setSwitchRecruitment()
         setBtnEditRecruitmentDate(requireContext())
         setBtnEdtCircleContentListener()
         setBtnAddOrRemoveCircleThumbnailListener(context)
@@ -310,6 +338,12 @@ class UploadCircleFragment : Fragment() {
                     ),
                 ),
             )
+        }
+    }
+
+    private fun setSwitchRecruitment() {
+        binding.switchRecruitment.setOnCheckedChangeListener { _, checked ->
+            viewModel.toggleRecruitmentLock(checked)
         }
     }
 

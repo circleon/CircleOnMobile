@@ -121,10 +121,12 @@
         android:id="@+id/imgCharacter"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:src="@drawable/img_login_character"
         android:scaleType="fitXY"
-        app:layout_constraintVertical_bias="0"
+        android:src="@drawable/img_login_character"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintDimensionRatio="9:4"/>
+        app:layout_constraintTop_toBottomOf="@id/llLogin"
+        app:layout_constraintDimensionRatio="7:4"
+        app:layout_constraintVertical_bias="1"
+        tools:layout_editor_absoluteX="0dp" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

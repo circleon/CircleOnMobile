@@ -143,15 +143,33 @@
                     android:textSize="@dimen/text_size_default"
                     android:translationY="-1.06sp" />
 
-                <androidx.appcompat.widget.AppCompatTextView
+                <androidx.appcompat.widget.LinearLayoutCompat
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="@dimen/margin_padding_xx_large"
-                    android:lineSpacingExtra="2sp"
-                    android:text="@string/text_recruitment_date"
-                    android:textColor="@color/grey_9"
-                    android:textSize="@dimen/text_size_small"
-                    android:translationY="-0.91sp" />
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical">
+
+                    <androidx.appcompat.widget.AppCompatTextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:lineSpacingExtra="2sp"
+                        android:text="@string/text_recruitment_date"
+                        android:textColor="@color/grey_9"
+                        android:textSize="@dimen/text_size_small"
+                        android:translationY="-0.91sp" />
+
+                    <androidx.appcompat.widget.SwitchCompat
+                        android:id="@+id/switchRecruitment"
+                        android:layout_width="wrap_content"
+                        android:layout_height="0dp"
+                        android:thumb="@drawable/switch_thumb"
+                        app:thumbTint="@color/white"
+                        app:track="@drawable/switch_track"
+                        app:trackTint="@drawable/selector_bottom_nav" />
+
+
+                </androidx.appcompat.widget.LinearLayoutCompat>
 
                 <androidx.appcompat.widget.LinearLayoutCompat
                     android:layout_width="match_parent"
