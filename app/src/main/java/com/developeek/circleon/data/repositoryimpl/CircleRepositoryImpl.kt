@@ -5,6 +5,7 @@ import com.developeek.circleon.data.dto.home.RequestBodyEditComment
 import com.developeek.circleon.data.dto.home.RequestBodyEditMemberRole
 import com.developeek.circleon.data.dto.home.RequestBodyEditMemberStatus
 import com.developeek.circleon.data.dto.home.RequestBodyEditPost
+import com.developeek.circleon.data.dto.home.RequestBodyReport
 import com.developeek.circleon.data.dto.home.RequestResponseBodyCircleJoin
 import com.developeek.circleon.data.dto.home.RequestResponseBodyCircleLeave
 import com.developeek.circleon.data.exception.ServiceException
@@ -245,7 +246,7 @@ class CircleRepositoryImpl(
         }
     }
 
-    override suspend fun getPostComments(
+    override suspend fun getCirclePostComments(
         circleId: Int,
         postId: Int,
         page: Int,
@@ -253,7 +254,7 @@ class CircleRepositoryImpl(
     ): Result<CommentModels> {
         return try {
             withContext(dispatcher) {
-                val response = service.getPostComments(circleId, postId, page, size)
+                val response = service.getCirclePostComments(circleId, postId, page, size)
                 Result.success(
                     CommentModels(response.content.map { it.toCommentModel() }).apply {
                         if (response.isLastPage()) {
@@ -412,14 +413,44 @@ class CircleRepositoryImpl(
         }
     }
 
-    override suspend fun postCircleComment(
+    override suspend fun postCirclePostComment(
         circleId: Int,
         postId: Int,
         comment: String,
     ): Result<Unit> {
         return try {
             withContext(dispatcher) {
-                service.postCircleComment(circleId, postId, RequestBodyEditComment(comment))
+                service.postCirclePostComment(circleId, postId, RequestBodyEditComment(comment))
+                Result.success(Unit)
+            }
+        } catch (e: Exception) {
+            Result.error(e)
+        }
+    }
+
+    override suspend fun postReportCirclePost(
+        circleId: Int,
+        postId: Int,
+        content: String,
+    ): Result<Unit> {
+        return try {
+            withContext(dispatcher) {
+                service.postReportCirclePost(circleId, postId, RequestBodyReport(content))
+                Result.success(Unit)
+            }
+        } catch (e: Exception) {
+            Result.error(e)
+        }
+    }
+
+    override suspend fun postReportCirclePostComment(
+        circleId: Int,
+        commentId: Int,
+        content: String,
+    ): Result<Unit> {
+        return try {
+            withContext(dispatcher) {
+                service.postReportCirclePostComment(circleId, commentId, RequestBodyReport(content))
                 Result.success(Unit)
             }
         } catch (e: Exception) {
@@ -504,7 +535,7 @@ class CircleRepositoryImpl(
         }
     }
 
-    override suspend fun putCircleComment(
+    override suspend fun putCirclePostComment(
         circleId: Int,
         postId: Int,
         commentId: Int,
@@ -512,7 +543,7 @@ class CircleRepositoryImpl(
     ): Result<Unit> {
         return try {
             withContext(dispatcher) {
-                service.putCircleComment(circleId, postId, commentId, RequestBodyEditComment(content))
+                service.putCirclePostComment(circleId, postId, commentId, RequestBodyEditComment(content))
                 Result.success(Unit)
             }
         } catch (e: Exception) {
@@ -579,14 +610,14 @@ class CircleRepositoryImpl(
         }
     }
 
-    override suspend fun deletePostComment(
+    override suspend fun deleteCirclePostComment(
         circleId: Int,
         postId: Int,
         commentId: Int,
     ): Result<Unit> {
         return try {
             with(dispatcher) {
-                service.deletePostComment(circleId, postId, commentId)
+                service.deleteCirclePostComment(circleId, postId, commentId)
                 Result.success(Unit)
             }
         } catch (e: Exception) {

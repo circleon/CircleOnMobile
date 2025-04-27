@@ -29,4 +29,9 @@ interface CircleDetailPostViewModel {
     fun removePinAndFetch(postId: Int)
 
     fun deleteAndFetch(postId: Int)
+
+    fun reportPost(
+        postId: Int,
+        content: String,
+    )
 }

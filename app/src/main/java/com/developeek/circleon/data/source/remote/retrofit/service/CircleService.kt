@@ -6,7 +6,7 @@ import com.developeek.circleon.data.dto.home.CircleSummaries
 import com.developeek.circleon.data.dto.home.CircleSummary
 import com.developeek.circleon.data.dto.home.Comment
 import com.developeek.circleon.data.dto.home.Member
-import com.developeek.circleon.data.dto.home.Paging
+import com.developeek.circleon.data.dto.home.Page
 import com.developeek.circleon.data.dto.home.Pin
 import com.developeek.circleon.data.dto.home.Post
 import com.developeek.circleon.data.dto.home.RequestBodyEditCircleDetail
@@ -14,6 +14,7 @@ import com.developeek.circleon.data.dto.home.RequestBodyEditComment
 import com.developeek.circleon.data.dto.home.RequestBodyEditMemberRole
 import com.developeek.circleon.data.dto.home.RequestBodyEditMemberStatus
 import com.developeek.circleon.data.dto.home.RequestBodyEditPost
+import com.developeek.circleon.data.dto.home.RequestBodyReport
 import com.developeek.circleon.data.dto.home.RequestResponseBodyCircleJoin
 import com.developeek.circleon.data.dto.home.RequestResponseBodyCircleLeave
 import okhttp3.MultipartBody
@@ -36,7 +37,7 @@ interface CircleService {
         @Query("size") size: Int,
         @Query("sort") sort: String,
         @Query("categoryType") category: String,
-    ): Paging<Circle>
+    ): Page<Circle>
 
     // TODO: categoryType 생략 대신에 nullable 로 처리 가능한지? 되면은 getCircle 하나로 통합 가능
     @GET("circles")
@@ -44,7 +45,7 @@ interface CircleService {
         @Query("page") page: Int,
         @Query("size") size: Int,
         @Query("sort") sort: String,
-    ): Paging<Circle>
+    ): Page<Circle>
 
     @GET("circles/summary")
     suspend fun getCircleSummaries(): CircleSummaries
@@ -61,7 +62,7 @@ interface CircleService {
         @Query("size") size: Int,
         @Query("sort") sort: String,
         @Query("membershipStatus") membershipStatus: String,
-    ): Paging<Member>
+    ): Page<Member>
 
     @GET("circles/{circleId}/members/{memberId}/join-message")
     suspend fun getCircleJoinRequestedMemberMessage(
@@ -81,22 +82,22 @@ interface CircleService {
         @Query("page") page: Int,
         @Query("size") size: Int,
         @Query("postType") postType: String,
-    ): Paging<Post>
+    ): Page<Post>
 
     @GET("circles/{circleId}/posts/{postId}/comments")
-    suspend fun getPostComments(
+    suspend fun getCirclePostComments(
         @Path("circleId") circleId: Int,
         @Path("postId") postId: Int,
         @Query("page") page: Int,
         @Query("size") size: Int,
-    ): Paging<Comment>
+    ): Page<Comment>
 
     @GET("my-circles")
     suspend fun getMyCircles(
         @Query("membershipStatus") membershipStatus: String,
         @Query("page") page: Int,
         @Query("size") size: Int,
-    ): Paging<CircleSummary>
+    ): Page<CircleSummary>
 
     // POST
     @Multipart
@@ -134,10 +135,24 @@ interface CircleService {
     )
 
     @POST("circles/{circleId}/posts/{postId}/comments")
-    suspend fun postCircleComment(
+    suspend fun postCirclePostComment(
         @Path("circleId") circleId: Int,
         @Path("postId") postId: Int,
         @Body data: RequestBodyEditComment,
+    )
+
+    @POST("circles/{circleId}/posts/{postId}/reports")
+    suspend fun postReportCirclePost(
+        @Path("circleId") circleId: Int,
+        @Path("postId") postId: Int,
+        @Body data: RequestBodyReport,
+    )
+
+    @POST("circles/{circleId}/comments/{commentId}/reports")
+    suspend fun postReportCirclePostComment(
+        @Path("circleId") circleId: Int,
+        @Path("commentId") commentId: Int,
+        @Body data: RequestBodyReport,
     )
 
     // PUT
@@ -170,7 +185,7 @@ interface CircleService {
     )
 
     @PUT("circles/{circleId}/posts/{postId}/comments/{commentId}")
-    suspend fun putCircleComment(
+    suspend fun putCirclePostComment(
         @Path("circleId") circleId: Int,
         @Path("postId") postId: Int,
         @Path("commentId") commentId: Int,
@@ -206,7 +221,7 @@ interface CircleService {
     )
 
     @DELETE("circles/{circleId}/posts/{postId}/comments/{commentId}")
-    suspend fun deletePostComment(
+    suspend fun deleteCirclePostComment(
         @Path("circleId") circleId: Int,
         @Path("postId") postId: Int,
         @Path("commentId") commentId: Int,

@@ -59,12 +59,3 @@ data class CircleDetail(
     // 가입 신청 같은 경우에 memberModel 로 다뤄야돼서 수정이 필요할듯
     private fun memberId(id: Int?) = id ?: 0
 }
-
-data class RequestBodyEditCircleDetail(
-    @SerializedName("circleName") val name: String,
-    @SerializedName("summary") val singleLineIntroduction: String,
-    val introduction: String?,
-    val recruitmentStartDate: String?,
-    val recruitmentEndDate: String?,
-    @SerializedName("categoryType") val category: String,
-)

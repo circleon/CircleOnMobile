@@ -260,9 +260,9 @@ class UploadCircleFragment : Fragment() {
     private fun recruitmentLockedObserver(context: Context) =
         Observer<Boolean> {
             if (it) {
-                lockRecruitment(context)
-            } else {
                 unlockRecruitment(context)
+            } else {
+                lockRecruitment(context)
             }
         }
 

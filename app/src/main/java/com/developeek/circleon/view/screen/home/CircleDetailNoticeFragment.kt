@@ -34,6 +34,7 @@ import com.developeek.circleon.view.listener.RecyclerViewInfiniteScrollListener
 import com.developeek.circleon.view.screen.login.LoginActivity
 import com.developeek.circleon.view.viewmodel.home.CircleDetailPostViewModel
 import com.developeek.circleon.view.viewmodelimpl.home.CircleDetailNoticeViewModelImpl
+import com.developeek.circleon.view.widget.CircleRequestAlertDialog
 import com.developeek.circleon.view.widget.ContentDeleteAlertDialog
 import com.developeek.circleon.view.widget.ErrorAlertDialog
 import com.developeek.circleon.view.widget.ErrorToast
@@ -192,30 +193,45 @@ class CircleDetailNoticeFragment : Fragment() {
 
     private fun noticeOverflowMenuItemClickListener(
         context: Context,
-        item: PostModel,
+        noticeItem: PostModel,
     ) = PopupMenu.OnMenuItemClickListener {
         viewModel.saveScrollState(binding.rvCircleNotice.layoutManager?.onSaveInstanceState())
         when (it.itemId) {
             R.id.pin_post -> {
-                viewModel.pinAndFetch(item.id)
+                viewModel.pinAndFetch(noticeItem.id)
             }
 
             R.id.unpin_post -> {
-                viewModel.removePinAndFetch(item.id)
+                viewModel.removePinAndFetch(noticeItem.id)
             }
 
             R.id.edit_post -> {
-                sendUserToEditNoticeScreen(circleId, item)
+                sendUserToEditNoticeScreen(circleId, noticeItem)
             }
 
             R.id.delete_post -> {
                 ContentDeleteAlertDialog(context, MESSAGE_DELETE_NOTICE) {
-                    viewModel.deleteAndFetch(item.id)
+                    viewModel.deleteAndFetch(noticeItem.id)
                 }.show()
             }
 
             R.id.report_post -> {
-                // TODO: 신고하기
+                CircleRequestAlertDialog(
+                    context,
+                    title = ContextCompat.getString(context, R.string.title_report_dialog),
+                    positiveButton = ContextCompat.getString(context, R.string.menu_report),
+                    positiveListenerInitializer =
+                        object : ItemListenerInitializer<String> {
+                            override fun initialize(item: String) {
+                                viewModel.reportPost(noticeItem.id, item)
+                            }
+
+                            override fun initialize(
+                                item: String,
+                                view: View?,
+                            ) {}
+                        },
+                ).show()
             }
         }
         true

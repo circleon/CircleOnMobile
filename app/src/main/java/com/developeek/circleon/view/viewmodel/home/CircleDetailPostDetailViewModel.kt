@@ -13,6 +13,7 @@ interface CircleDetailPostDetailViewModel {
     val editCommentState: LiveData<UiState>
     val deleteCommentState: LiveData<UiState>
     val deletePostState: LiveData<UiState>
+    val reportState: LiveData<UiState>
     val contents: List<Identifiable>
     val comments: CommentModels
     val scrollOver: LiveData<Boolean>
@@ -36,4 +37,11 @@ interface CircleDetailPostDetailViewModel {
     fun deleteComment(commentId: Int)
 
     fun delete()
+
+    fun reportPost(content: String)
+
+    fun reportComment(
+        commentId: Int,
+        content: String,
+    )
 }

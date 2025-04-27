@@ -45,6 +45,7 @@ class CircleDetailNoticeViewModelImpl
         private var fetchNoticesJob: Job? = null
         private var pinNoticeJob: Job? = null
         private var deleteNoticeJob: Job? = null
+        private var reportNoticeJob: Job? = null
         private var currentPage = DEFAULT_PAGE
 
         override val scrollOver: LiveData<Boolean>
@@ -186,6 +187,33 @@ class CircleDetailNoticeViewModelImpl
                     if (result is Success) {
                         noticeState.postValue(UiState.Success)
                         fetchNotices(DEFAULT_PAGE, (currentPage + 1) * SIZE_BY_PAGE)
+                    } else {
+                        error = (result as Error).message()
+                        if (result.isAuthenticationError()) {
+                            noticeState.postValue(UiState.AuthenticationError)
+                        } else {
+                            noticeState.postValue(UiState.ServiceError)
+                        }
+                    }
+                }
+        }
+
+        override fun reportPost(
+            postId: Int,
+            content: String,
+        ) {
+            reportNoticeJob?.let {
+                if (!it.isCompleted) return
+            }
+
+            noticeState.postValue(UiState.Loading)
+
+            reportNoticeJob =
+                viewModelScope.launch {
+                    val result = repository.postReportCirclePost(circleId, postId, content)
+
+                    if (result is Success) {
+                        noticeState.postValue(UiState.Success)
                     } else {
                         error = (result as Error).message()
                         if (result.isAuthenticationError()) {

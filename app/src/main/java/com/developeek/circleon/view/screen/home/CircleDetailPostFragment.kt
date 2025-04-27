@@ -33,6 +33,7 @@ import com.developeek.circleon.view.listener.RecyclerViewInfiniteScrollListener
 import com.developeek.circleon.view.screen.login.LoginActivity
 import com.developeek.circleon.view.viewmodel.home.CircleDetailPostViewModel
 import com.developeek.circleon.view.viewmodelimpl.home.CircleDetailPostViewModelImpl
+import com.developeek.circleon.view.widget.CircleRequestAlertDialog
 import com.developeek.circleon.view.widget.ContentDeleteAlertDialog
 import com.developeek.circleon.view.widget.ErrorAlertDialog
 import com.developeek.circleon.view.widget.ErrorToast
@@ -174,22 +175,37 @@ class CircleDetailPostFragment : Fragment() {
 
     private fun postOverflowMenuItemClickListener(
         context: Context,
-        item: PostModel,
+        postItem: PostModel,
     ) = PopupMenu.OnMenuItemClickListener {
         viewModel.saveScrollState(binding.rvCirclePost.layoutManager?.onSaveInstanceState())
         when (it.itemId) {
             R.id.edit_post -> {
-                sendUserToEditPostScreen(circleId, item)
+                sendUserToEditPostScreen(circleId, postItem)
             }
 
             R.id.delete_post -> {
                 ContentDeleteAlertDialog(context, MESSAGE_DELETE_POST) {
-                    viewModel.deleteAndFetch(item.id)
+                    viewModel.deleteAndFetch(postItem.id)
                 }.show()
             }
 
             R.id.report_post -> {
-                // TODO: 신고하기
+                CircleRequestAlertDialog(
+                    context,
+                    title = ContextCompat.getString(context, R.string.title_report_dialog),
+                    positiveButton = ContextCompat.getString(context, R.string.menu_report),
+                    positiveListenerInitializer =
+                        object : ItemListenerInitializer<String> {
+                            override fun initialize(item: String) {
+                                viewModel.reportPost(postItem.id, item)
+                            }
+
+                            override fun initialize(
+                                item: String,
+                                view: View?,
+                            ) {}
+                        },
+                ).show()
             }
         }
         true

@@ -65,7 +65,7 @@ interface CircleRepository {
         size: Int,
     ): Result<PostModels>
 
-    suspend fun getPostComments(
+    suspend fun getCirclePostComments(
         circleId: Int,
         postId: Int,
         page: Int,
@@ -111,10 +111,22 @@ interface CircleRepository {
         image: File?,
     ): Result<Unit>
 
-    suspend fun postCircleComment(
+    suspend fun postCirclePostComment(
         circleId: Int,
         postId: Int,
         comment: String,
+    ): Result<Unit>
+
+    suspend fun postReportCirclePost(
+        circleId: Int,
+        postId: Int,
+        content: String,
+    ): Result<Unit>
+
+    suspend fun postReportCirclePostComment(
+        circleId: Int,
+        commentId: Int,
+        content: String,
     ): Result<Unit>
 
     // PUT
@@ -139,7 +151,7 @@ interface CircleRepository {
         content: String,
     ): Result<Unit>
 
-    suspend fun putCircleComment(
+    suspend fun putCirclePostComment(
         circleId: Int,
         postId: Int,
         commentId: Int,
@@ -170,7 +182,7 @@ interface CircleRepository {
         postId: Int,
     ): Result<Unit>
 
-    suspend fun deletePostComment(
+    suspend fun deleteCirclePostComment(
         circleId: Int,
         postId: Int,
         commentId: Int,

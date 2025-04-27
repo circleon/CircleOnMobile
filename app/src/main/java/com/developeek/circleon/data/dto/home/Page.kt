@@ -1,11 +1,11 @@
 package com.developeek.circleon.data.dto.home
 
 /**
- * Paging<T>
+ * Page<T>
  *
  * 데이터 호출 시 pagination 방식으로 호출할 때 사용되는 범용 제네릭 타입 DTO
  */
-data class Paging<T>(
+data class Page<T>(
     val content: List<T>,
     val currentPageNumber: Int,
     val totalElementCount: Int,

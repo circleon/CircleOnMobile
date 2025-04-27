@@ -44,6 +44,7 @@ class CircleDetailPostViewModelImpl
         private var postModels = PostModels.empty()
         private var fetchPostsJob: Job? = null
         private var deletePostJob: Job? = null
+        private var reportPostJob: Job? = null
         private var currentPage = DEFAULT_PAGE
 
         override val scrollOver: LiveData<Boolean>
@@ -147,6 +148,33 @@ class CircleDetailPostViewModelImpl
                     if (result is Success) {
                         _postState.postValue(UiState.Success)
                         fetchPosts(DEFAULT_PAGE, (currentPage + 1) * SIZE_BY_PAGE)
+                    } else {
+                        error = (result as Error).message()
+                        if (result.isAuthenticationError()) {
+                            _postState.postValue(UiState.AuthenticationError)
+                        } else {
+                            _postState.postValue(UiState.ServiceError)
+                        }
+                    }
+                }
+        }
+
+        override fun reportPost(
+            postId: Int,
+            content: String,
+        ) {
+            reportPostJob?.let {
+                if (!it.isCompleted) return
+            }
+
+            _postState.postValue(UiState.Loading)
+
+            reportPostJob =
+                viewModelScope.launch {
+                    val result = repository.postReportCirclePost(circleId, postId, content)
+
+                    if (result is Success) {
+                        _postState.postValue(UiState.Success)
                     } else {
                         error = (result as Error).message()
                         if (result.isAuthenticationError()) {

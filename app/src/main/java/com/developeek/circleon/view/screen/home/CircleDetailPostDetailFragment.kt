@@ -39,6 +39,7 @@ import com.developeek.circleon.view.listener.RecyclerViewInfiniteScrollListener
 import com.developeek.circleon.view.screen.login.LoginActivity
 import com.developeek.circleon.view.viewmodel.home.CircleDetailPostDetailViewModel
 import com.developeek.circleon.view.viewmodelimpl.home.CircleDetailPostDetailViewModelImpl
+import com.developeek.circleon.view.widget.CircleRequestAlertDialog
 import com.developeek.circleon.view.widget.ContentDeleteAlertDialog
 import com.developeek.circleon.view.widget.EditCommentAlertDialog
 import com.developeek.circleon.view.widget.ErrorAlertDialog
@@ -218,7 +219,22 @@ class CircleDetailPostDetailFragment : Fragment() {
             }
 
             R.id.report_post -> {
-                // TODO: 신고하기
+                CircleRequestAlertDialog(
+                    context,
+                    title = ContextCompat.getString(context, R.string.title_report_dialog),
+                    positiveButton = ContextCompat.getString(context, R.string.menu_report),
+                    positiveListenerInitializer =
+                        object : ItemListenerInitializer<String> {
+                            override fun initialize(item: String) {
+                                viewModel.reportPost(item)
+                            }
+
+                            override fun initialize(
+                                item: String,
+                                view: View?,
+                            ) {}
+                        },
+                ).show()
             }
         }
         true
@@ -295,7 +311,22 @@ class CircleDetailPostDetailFragment : Fragment() {
             }
 
             R.id.report_comment -> {
-                // TODO: 신고하기
+                CircleRequestAlertDialog(
+                    context,
+                    title = ContextCompat.getString(context, R.string.title_report_dialog),
+                    positiveButton = ContextCompat.getString(context, R.string.menu_report),
+                    positiveListenerInitializer =
+                        object : ItemListenerInitializer<String> {
+                            override fun initialize(item: String) {
+                                viewModel.reportComment(comment.id, item)
+                            }
+
+                            override fun initialize(
+                                item: String,
+                                view: View?,
+                            ) {}
+                        },
+                ).show()
             }
         }
         true
@@ -328,6 +359,10 @@ class CircleDetailPostDetailFragment : Fragment() {
         viewModel.scrollOver.observe(
             viewLifecycleOwner,
             scrollOverObserver(),
+        )
+        viewModel.reportState.observe(
+            viewLifecycleOwner,
+            reportStateObserver(parentActivity, context),
         )
         // 정보 수정 여부 감지
         findNavController()
@@ -504,6 +539,23 @@ class CircleDetailPostDetailFragment : Fragment() {
                 }
             }
         }
+
+    private fun reportStateObserver(
+        parentActivity: Activity,
+        context: Context,
+    ) = Observer<UiState> {
+        binding.pgbLoading.isVisible = it is UiState.Loading
+        when (it) {
+            UiState.AuthenticationError -> {
+                sendUserToLoginScreen(parentActivity)
+                showErrorToast(context)
+            }
+            UiState.ServiceError -> {
+                showErrorDialog(context)
+            }
+            else -> {}
+        }
+    }
 
     private fun requestRefreshToPreviousScreen() {
         findNavController().previousBackStackEntry?.savedStateHandle?.set(Const.FLAG_CIRCLE_POST_DATA_CHANGED, true)

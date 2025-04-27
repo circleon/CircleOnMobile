@@ -42,7 +42,6 @@ class CircleDetailPostDetailViewModelImpl
         override val state: LiveData<UiState>
             get() = uiState
         private val uiState = MutableLiveData<UiState>()
-        private lateinit var tmpState: UiState
 
         override val uploadCommentState: LiveData<UiState>
             get() = commentUploadState
@@ -63,6 +62,11 @@ class CircleDetailPostDetailViewModelImpl
             get() = postDeleteState
         private val postDeleteState = MutableLiveData<UiState>()
         private var deletePostJob: Job? = null
+
+        override val reportState: LiveData<UiState>
+            get() = _reportState
+        private val _reportState = MutableLiveData<UiState>()
+        private var reportJob: Job? = null
 
         override lateinit var contents: List<Identifiable>
         override lateinit var comments: CommentModels
@@ -96,7 +100,7 @@ class CircleDetailPostDetailViewModelImpl
 
             fetchCommentsJob =
                 viewModelScope.launch {
-                    val result = repository.getPostComments(circleId, post.id, page, size)
+                    val result = repository.getCirclePostComments(circleId, post.id, page, size)
 
                     if (result is Success) {
                         comments = result.data
@@ -125,7 +129,7 @@ class CircleDetailPostDetailViewModelImpl
             scrollOverCommentJob =
                 viewModelScope.launch {
                     val result =
-                        repository.getPostComments(
+                        repository.getCirclePostComments(
                             circleId, post.id, currentPage + 1, SIZE_BY_PAGE,
                         )
 
@@ -162,7 +166,7 @@ class CircleDetailPostDetailViewModelImpl
 
             uploadCommentJob =
                 viewModelScope.launch {
-                    val result = repository.postCircleComment(circleId, post.id, content)
+                    val result = repository.postCirclePostComment(circleId, post.id, content)
 
                     if (result is Success) {
                         refresh()
@@ -189,7 +193,7 @@ class CircleDetailPostDetailViewModelImpl
 
             editCommentJob =
                 viewModelScope.launch {
-                    val result = repository.putCircleComment(circleId, post.id, commentId, content)
+                    val result = repository.putCirclePostComment(circleId, post.id, commentId, content)
 
                     if (result is Success) {
                         refresh()
@@ -212,7 +216,7 @@ class CircleDetailPostDetailViewModelImpl
 
             deleteCommentJob =
                 viewModelScope.launch {
-                    val result = repository.deletePostComment(circleId, post.id, commentId)
+                    val result = repository.deleteCirclePostComment(circleId, post.id, commentId)
 
                     if (result is Success) {
                         comments =
@@ -260,6 +264,57 @@ class CircleDetailPostDetailViewModelImpl
                         val errorState =
                             if (result.isAuthenticationError()) UiState.AuthenticationError else UiState.ServiceError
                         postDeleteState.postValue(errorState)
+                    }
+                }
+        }
+
+        override fun reportPost(content: String) {
+            reportJob?.let {
+                if (!it.isCompleted) return
+            }
+
+            _reportState.postValue(UiState.Loading)
+
+            reportJob =
+                viewModelScope.launch {
+                    val result = repository.postReportCirclePost(circleId, post.id, content)
+
+                    if (result is Success) {
+                        _reportState.postValue(UiState.Success)
+                    } else {
+                        error = (result as Error).message()
+                        if (result.isAuthenticationError()) {
+                            _reportState.postValue(UiState.AuthenticationError)
+                        } else {
+                            _reportState.postValue(UiState.ServiceError)
+                        }
+                    }
+                }
+        }
+
+        override fun reportComment(
+            commentId: Int,
+            content: String,
+        ) {
+            reportJob?.let {
+                if (!it.isCompleted) return
+            }
+
+            _reportState.postValue(UiState.Loading)
+
+            reportJob =
+                viewModelScope.launch {
+                    val result = repository.postReportCirclePostComment(circleId, commentId, content)
+
+                    if (result is Success) {
+                        _reportState.postValue(UiState.Success)
+                    } else {
+                        error = (result as Error).message()
+                        if (result.isAuthenticationError()) {
+                            _reportState.postValue(UiState.AuthenticationError)
+                        } else {
+                            _reportState.postValue(UiState.ServiceError)
+                        }
                     }
                 }
         }
