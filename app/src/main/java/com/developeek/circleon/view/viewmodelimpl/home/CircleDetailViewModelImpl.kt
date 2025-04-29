@@ -51,8 +51,9 @@ class CircleDetailViewModelImpl
         private var appBarExpanded = true
 
         override val requestState: LiveData<UiState>
-            get() = userRequestState
-        private val userRequestState = MutableLiveData<UiState>()
+            get() = _requestState
+        private val _requestState = MutableLiveData<UiState>()
+        private var reportJob: Job? = null
 
         override val currentJoinMessage: String
             get() = _currentJoinMessage
@@ -113,7 +114,7 @@ class CircleDetailViewModelImpl
                 if (!it.isCompleted) return
             }
 
-            userRequestState.postValue(UiState.Loading)
+            _requestState.postValue(UiState.Loading)
 
             requestJoinLeaveJob =
                 viewModelScope.launch {
@@ -124,9 +125,9 @@ class CircleDetailViewModelImpl
                     } else {
                         error = (result as Error).message()
                         if (result.isAuthenticationError()) {
-                            userRequestState.postValue(UiState.AuthenticationError)
+                            _requestState.postValue(UiState.AuthenticationError)
                         } else {
-                            userRequestState.postValue(UiState.ServiceError)
+                            _requestState.postValue(UiState.ServiceError)
                         }
                     }
                 }
@@ -139,7 +140,7 @@ class CircleDetailViewModelImpl
                 if (!it.isCompleted) return
             }
 
-            userRequestState.postValue(UiState.Loading)
+            _requestState.postValue(UiState.Loading)
 
             requestJoinLeaveJob =
                 viewModelScope.launch {
@@ -150,9 +151,9 @@ class CircleDetailViewModelImpl
                     } else {
                         error = (result as Error).message()
                         if (result.isAuthenticationError()) {
-                            userRequestState.postValue(UiState.AuthenticationError)
+                            _requestState.postValue(UiState.AuthenticationError)
                         } else {
-                            userRequestState.postValue(UiState.ServiceError)
+                            _requestState.postValue(UiState.ServiceError)
                         }
                     }
                 }
@@ -163,10 +164,34 @@ class CircleDetailViewModelImpl
 
             return if (validation is Invalid) {
                 error = validation.message()
-                userRequestState.postValue(UiState.ServiceError)
+                _requestState.postValue(UiState.ServiceError)
                 false
             } else {
                 true
             }
+        }
+
+        override fun reportCircle(content: String) {
+            reportJob?.let {
+                if (!it.isCompleted) return
+            }
+
+            _requestState.postValue(UiState.Loading)
+
+            reportJob =
+                viewModelScope.launch {
+                    val result = repository.postReportCircle(circleId, content)
+
+                    if (result is Success) {
+                        _requestState.postValue(UiState.Success)
+                    } else {
+                        error = (result as Error).message()
+                        if (result.isAuthenticationError()) {
+                            _requestState.postValue(UiState.AuthenticationError)
+                        } else {
+                            _requestState.postValue(UiState.ServiceError)
+                        }
+                    }
+                }
         }
     }

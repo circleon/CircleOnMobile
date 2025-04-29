@@ -246,7 +246,22 @@ class CircleDetailFragment : Fragment() {
             }
 
             R.id.report_circle -> {
-                // TODO: 신고하기
+                CircleRequestAlertDialog(
+                    context,
+                    title = ContextCompat.getString(context, R.string.title_report_dialog),
+                    positiveButton = ContextCompat.getString(context, R.string.menu_report),
+                    positiveListenerInitializer =
+                        object : ItemListenerInitializer<String> {
+                            override fun initialize(item: String) {
+                                viewModel.reportCircle(item)
+                            }
+
+                            override fun initialize(
+                                item: String,
+                                view: View?,
+                            ) {}
+                        },
+                ).show()
             }
         }
         true

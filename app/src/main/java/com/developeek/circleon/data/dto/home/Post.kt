@@ -33,8 +33,3 @@ data class Post(
 data class Pin(
     val isPinned: Boolean,
 )
-
-data class RequestBodyEditPost(
-    val postType: String,
-    val content: String,
-)

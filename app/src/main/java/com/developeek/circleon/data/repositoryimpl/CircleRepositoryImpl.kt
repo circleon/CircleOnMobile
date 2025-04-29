@@ -428,6 +428,20 @@ class CircleRepositoryImpl(
         }
     }
 
+    override suspend fun postReportCircle(
+        circleId: Int,
+        content: String,
+    ): Result<Unit> {
+        return try {
+            withContext(dispatcher) {
+                service.postReportCircle(circleId, RequestBodyReport(content))
+                Result.success(Unit)
+            }
+        } catch (e: Exception) {
+            Result.error(e)
+        }
+    }
+
     override suspend fun postReportCirclePost(
         circleId: Int,
         postId: Int,

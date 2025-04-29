@@ -141,6 +141,12 @@ interface CircleService {
         @Body data: RequestBodyEditComment,
     )
 
+    @POST("circles/{circleId}/reports")
+    suspend fun postReportCircle(
+        @Path("circleId") circleId: Int,
+        @Body data: RequestBodyReport,
+    )
+
     @POST("circles/{circleId}/posts/{postId}/reports")
     suspend fun postReportCirclePost(
         @Path("circleId") circleId: Int,

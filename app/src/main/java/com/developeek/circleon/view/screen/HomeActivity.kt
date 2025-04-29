@@ -97,7 +97,7 @@ class HomeActivity : AppCompatActivity() {
     ): Boolean {
         if (keyCode == KeyEvent.KEYCODE_BACK && onMainFragment) {
             if (backClicked) {
-                finish()
+                finishAffinity()
             } else {
                 finishWaitingToast.show()
                 return true

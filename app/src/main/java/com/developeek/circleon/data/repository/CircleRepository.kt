@@ -117,6 +117,11 @@ interface CircleRepository {
         comment: String,
     ): Result<Unit>
 
+    suspend fun postReportCircle(
+        circleId: Int,
+        content: String,
+    ): Result<Unit>
+
     suspend fun postReportCirclePost(
         circleId: Int,
         postId: Int,

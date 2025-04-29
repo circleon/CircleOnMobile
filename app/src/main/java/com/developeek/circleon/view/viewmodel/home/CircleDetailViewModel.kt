@@ -24,4 +24,6 @@ interface CircleDetailViewModel {
     fun requestJoin(joinMessage: String)
 
     fun requestLeave(leaveMessage: String)
+
+    fun reportCircle(content: String)
 }
