@@ -143,6 +143,8 @@ interface CircleRepository {
 
     suspend fun putCircle(circleDetailModel: CircleDetailModel): Result<Unit>
 
+    suspend fun putCircleOfficialStatus(circleId: Int): Result<Unit>
+
     suspend fun putCircleImage(
         circleId: Int,
         circleThumbnail: File?,

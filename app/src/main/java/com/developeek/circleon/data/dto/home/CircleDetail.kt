@@ -3,6 +3,7 @@ package com.developeek.circleon.data.dto.home
 import android.util.TimeFormatException
 import com.developeek.circleon.domain.enums.Category
 import com.developeek.circleon.domain.enums.MembershipStatus
+import com.developeek.circleon.domain.enums.OfficialStatus
 import com.developeek.circleon.domain.enums.Role
 import com.developeek.circleon.domain.model.CircleDetailModel
 import com.developeek.circleon.domain.model.MemberModels
@@ -13,9 +14,10 @@ import java.time.LocalDateTime
 data class CircleDetail(
     @SerializedName("circleId") val id: Int,
     @SerializedName("circleName") val name: String,
+    val category: String,
+    val officialStatus: String,
     val profileImgUrl: String?,
     val thumbnailUrl: String?,
-    val category: String,
     @SerializedName("summary") val singleLineIntroduction: String,
     val memberCount: Int,
     val introImgUrl: String?,
@@ -30,12 +32,13 @@ data class CircleDetail(
         CircleDetailModel(
             id,
             name,
+            Category.findOrDefault(category),
+            OfficialStatus.find(officialStatus),
             Role.findOrDefault(role),
             memberId(memberId),
             MembershipStatus.findOrDefault(membershipStatus),
             Utils.getCircleImageUrlOrNull(profileImgUrl),
             Utils.getCircleImageUrlOrNull(thumbnailUrl),
-            Category.findOrDefault(category),
             singleLineIntroduction,
             memberCount,
             circleMembers,

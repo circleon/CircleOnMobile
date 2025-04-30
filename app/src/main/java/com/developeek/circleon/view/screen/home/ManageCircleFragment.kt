@@ -76,10 +76,15 @@ class ManageCircleFragment : Fragment() {
 
     private fun initView(parentActivity: Activity) {
         hideBtmNav(parentActivity)
+        hideBtnRequestOfficialStatusWhenAlreadyOfficial()
     }
 
     private fun hideBtmNav(activity: Activity) {
         activity.findViewById<BottomNavigationView>(R.id.btmNav).isVisible = false
+    }
+
+    private fun hideBtnRequestOfficialStatusWhenAlreadyOfficial() {
+        binding.btnRequestOfficialStatus.isVisible = !circle.isOfficial()
     }
 
     private fun initObserver(
@@ -89,6 +94,10 @@ class ManageCircleFragment : Fragment() {
         viewModel.state.observe(
             viewLifecycleOwner,
             stateObserver(parentActivity, context),
+        )
+        viewModel.officialStatusState.observe(
+            viewLifecycleOwner,
+            officialStatusStateObserver(parentActivity, context),
         )
         // 정보 수정 여부 감지
         findNavController()
@@ -170,13 +179,37 @@ class ManageCircleFragment : Fragment() {
             )
     }
 
+    private fun officialStatusStateObserver(
+        parentActivity: Activity,
+        context: Context,
+    ) = Observer<UiState> {
+        binding.pgbLoading.isVisible = it is UiState.Loading
+        when (it) {
+            UiState.AuthenticationError -> {
+                sendUserToLoginScreen(parentActivity)
+                showErrorToast(context)
+            }
+            UiState.ServiceError -> {
+                showErrorDialog(context)
+            }
+            else -> {}
+        }
+    }
+
     private fun initListener() {
         setBtnCancelListener()
+        setBtnRequestOfficialStatus()
     }
 
     private fun setBtnCancelListener() {
         binding.btnCancel.setOnClickListener {
             sendUserToPreviousScreen()
+        }
+    }
+
+    private fun setBtnRequestOfficialStatus() {
+        binding.btnRequestOfficialStatus.setOnClickListener {
+            viewModel.requestOfficialStatus()
         }
     }
 

@@ -3,6 +3,7 @@ package com.developeek.circleon.domain.model
 import com.developeek.circleon.data.dto.home.RequestBodyEditCircleDetail
 import com.developeek.circleon.domain.enums.Category
 import com.developeek.circleon.domain.enums.MembershipStatus
+import com.developeek.circleon.domain.enums.OfficialStatus
 import com.developeek.circleon.domain.enums.Role
 import com.developeek.circleon.domain.utils.Const
 import java.io.Serializable
@@ -11,12 +12,13 @@ import java.time.LocalDateTime
 data class CircleDetailModel(
     val id: Int,
     val name: String,
+    val category: Category,
+    val officialStatus: OfficialStatus,
     val role: Role,
     val memberId: Int,
     val membershipStatus: MembershipStatus,
     val profileImgUrl: String?,
     val thumbnailUrl: String?,
-    val category: Category,
     val singleLineIntroduction: String,
     val memberCount: Int,
     val members: MemberModels,
@@ -25,6 +27,8 @@ data class CircleDetailModel(
     val recruitmentStartDate: LocalDateTime?,
     val recruitmentEndDate: LocalDateTime?,
 ) : Serializable {
+    fun isOfficial() = officialStatus.isOfficial()
+
     fun isUserJoined() = role.isMember()
 
     fun isUserExecutive() = role.isExecutive()
@@ -34,12 +38,13 @@ data class CircleDetailModel(
     fun fold(
         id: Int = this.id,
         name: String = this.name,
+        category: Category = this.category,
+        officialStatus: OfficialStatus = this.officialStatus,
         role: Role = this.role,
         memberId: Int = this.memberId,
         membershipStatus: MembershipStatus = this.membershipStatus,
         profileImgUrl: String? = this.profileImgUrl,
         thumbnailUrl: String? = this.thumbnailUrl,
-        category: Category = this.category,
         singleLineIntroduction: String = this.singleLineIntroduction,
         memberCount: Int = this.memberCount,
         members: MemberModels = this.members,
@@ -50,12 +55,13 @@ data class CircleDetailModel(
     ) = CircleDetailModel(
         id,
         name,
+        category,
+        officialStatus,
         role,
         memberId,
         membershipStatus,
         profileImgUrl,
         thumbnailUrl,
-        category,
         singleLineIntroduction,
         memberCount,
         members,
@@ -80,12 +86,13 @@ data class CircleDetailModel(
             CircleDetailModel(
                 0,
                 Const.EMPTY_TEXT,
+                Category.ETC,
+                OfficialStatus.UNOFFICIAL,
                 Role.NONE_MEMBER,
                 0,
                 MembershipStatus.NOT_JOINED,
                 null,
                 null,
-                Category.ETC,
                 Const.EMPTY_TEXT,
                 0,
                 MemberModels.empty(),

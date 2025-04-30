@@ -175,6 +175,12 @@ interface CircleService {
         @Body data: RequestBodyEditCircleDetail,
     )
 
+    @PUT("circles/{circleId}/official")
+    suspend fun putCircleOfficialStatus(
+        @Path("circleId") circleId: Int,
+        @Query("officialStatus") officialStatus: String,
+    )
+
     @Multipart
     @PUT("circles/{circleId}/images")
     suspend fun putCircleImage(

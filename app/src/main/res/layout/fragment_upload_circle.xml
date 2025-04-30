@@ -166,7 +166,8 @@
                         android:thumb="@drawable/switch_thumb"
                         app:thumbTint="@color/white"
                         app:track="@drawable/switch_track"
-                        app:trackTint="@drawable/selector_bottom_nav" />
+                        app:trackTint="@drawable/selector_bottom_nav"
+                        android:background="@null"/>
 
 
                 </androidx.appcompat.widget.LinearLayoutCompat>

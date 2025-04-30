@@ -14,6 +14,7 @@ import com.developeek.circleon.data.source.Result
 import com.developeek.circleon.data.source.remote.retrofit.service.CircleService
 import com.developeek.circleon.domain.enums.Category
 import com.developeek.circleon.domain.enums.MembershipStatus
+import com.developeek.circleon.domain.enums.OfficialStatus
 import com.developeek.circleon.domain.enums.PostType
 import com.developeek.circleon.domain.enums.Role
 import com.developeek.circleon.domain.model.CircleDetailModel
@@ -491,6 +492,17 @@ class CircleRepositoryImpl(
         return try {
             withContext(dispatcher) {
                 service.putCircle(circleDetailModel.id, circleDetailModel.toRequestBodyForEdit())
+                Result.success(Unit)
+            }
+        } catch (e: Exception) {
+            Result.error(e)
+        }
+    }
+
+    override suspend fun putCircleOfficialStatus(circleId: Int): Result<Unit> {
+        return try {
+            withContext(dispatcher) {
+                service.putCircleOfficialStatus(circleId, OfficialStatus.OFFICIAL_REQUESTED.codeName())
                 Result.success(Unit)
             }
         } catch (e: Exception) {

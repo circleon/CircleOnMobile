@@ -94,6 +94,7 @@
     <string name="manage_circle_title_circle_member">동아리 멤버</string>
     <string name="manage_circle_title_approve_circle_join">동아리 가입 승인</string>
     <string name="manage_circle_title_approve_circle_leave">동아리 탈퇴 승인</string>
+    <string name="manage_circle_title_request_official_status">동아리 인증 뱃지\n신청하기</string>
     <string name="manage_circle_content_circle_member_default">멤버 0명</string>
     <string name="manage_circle_content_circle_member">멤버 %d명</string>
     <string name="manage_circle_content_join_requested_member_default">대기중인 멤버 0명</string>

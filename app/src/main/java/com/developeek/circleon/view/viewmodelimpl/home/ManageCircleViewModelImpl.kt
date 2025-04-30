@@ -41,6 +41,11 @@ class ManageCircleViewModelImpl
             get() = uiState
         private val uiState = MutableLiveData<UiState>()
 
+        override val officialStatusState: LiveData<UiState>
+            get() = _officialStatusState
+        private val _officialStatusState = MutableLiveData<UiState>()
+        private var requestOfficialStatusJob: Job? = null
+
         override val circleMembers: MemberModels
             get() = circleMemberModels
         private var circleMemberModels = MemberModels.empty()
@@ -180,6 +185,30 @@ class ManageCircleViewModelImpl
             if (result is Success) {
                 member.setMessage(result.data)
             }
+        }
+
+        override fun requestOfficialStatus() {
+            requestOfficialStatusJob?.let {
+                if (!it.isCompleted) return
+            }
+
+            _officialStatusState.postValue(UiState.Loading)
+
+            requestOfficialStatusJob =
+                viewModelScope.launch {
+                    val result = repository.putCircleOfficialStatus(circle.id)
+
+                    if (result is Success) {
+                        _officialStatusState.postValue(UiState.Success)
+                    } else {
+                        error = (result as Error).message()
+                        if (result.isAuthenticationError()) {
+                            _officialStatusState.postValue(UiState.AuthenticationError)
+                        } else {
+                            _officialStatusState.postValue(UiState.ServiceError)
+                        }
+                    }
+                }
         }
 
         companion object {

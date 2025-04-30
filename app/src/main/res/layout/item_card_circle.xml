@@ -40,6 +40,13 @@
                 android:textAppearance="@style/content_title"
                 android:textSize="@dimen/text_size_default" />
 
+            <androidx.appcompat.widget.AppCompatImageView
+                android:id="@+id/icOfficial"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/ic_official"
+                android:visibility="gone"/>
+
             <androidx.appcompat.widget.AppCompatTextView
                 android:id="@+id/txtCircleCategory"
                 android:layout_width="wrap_content"

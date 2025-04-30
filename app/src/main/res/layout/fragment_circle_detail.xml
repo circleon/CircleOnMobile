@@ -61,15 +61,28 @@
                             android:layout_marginStart="@dimen/margin_padding_large"
                             android:orientation="vertical">
 
-                            <androidx.appcompat.widget.AppCompatTextView
-                                android:id="@+id/txtCircleName"
+                            <androidx.appcompat.widget.LinearLayoutCompat
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:textAppearance="@style/large_bold_text"
-                                android:textColor="@color/grey_9"
-                                android:lineSpacingExtra="2sp"
-                                android:translationY="-1.22sp"
-                                android:text="동아리 이름"/>
+                                android:gravity="center_vertical"
+                                android:orientation="horizontal">
+
+                                <androidx.appcompat.widget.AppCompatTextView
+                                    android:id="@+id/txtCircleName"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:textAppearance="@style/large_bold_text"
+                                    android:textColor="@color/grey_9"
+                                    android:text="동아리 이름"/>
+
+                                <androidx.appcompat.widget.AppCompatImageView
+                                    android:id="@+id/icOfficial"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:src="@drawable/ic_official"
+                                    android:visibility="gone"/>
+
+                            </androidx.appcompat.widget.LinearLayoutCompat>
 
                             <LinearLayout
                                 android:layout_width="wrap_content"
@@ -82,8 +95,6 @@
                                     android:layout_height="wrap_content"
                                     android:textSize="@dimen/text_size_small"
                                     android:textColor="@color/grey_9"
-                                    android:lineSpacingExtra="2sp"
-                                    android:translationY="-0.91sp"
                                     android:text="기타"/>
 
                                 <androidx.appcompat.widget.AppCompatTextView
@@ -92,8 +103,6 @@
                                     android:layout_marginHorizontal="@dimen/margin_padding_x_small"
                                     android:textColor="@color/grey_5"
                                     android:textStyle="bold"
-                                    android:lineSpacingExtra="2sp"
-                                    android:translationY="-0.91sp"
                                     android:text="·"/>
 
                                 <androidx.appcompat.widget.AppCompatTextView
@@ -101,8 +110,6 @@
                                     android:layout_height="wrap_content"
                                     android:textSize="@dimen/text_size_small"
                                     android:textColor="@color/grey_9"
-                                    android:lineSpacingExtra="2sp"
-                                    android:translationY="-0.91sp"
                                     android:text="멤버"/>
 
                                 <androidx.appcompat.widget.AppCompatTextView
@@ -112,8 +119,6 @@
                                     android:layout_marginStart="@dimen/margin_padding_xx_small"
                                     android:textAppearance="@style/small_bold_text"
                                     android:textColor="@color/purple_5"
-                                    android:lineSpacingExtra="2sp"
-                                    android:translationY="-0.91sp"
                                     android:text="0"/>
 
                                 <androidx.appcompat.widget.AppCompatTextView
@@ -121,8 +126,6 @@
                                     android:layout_height="wrap_content"
                                     android:textSize="@dimen/text_size_small"
                                     android:textColor="@color/grey_9"
-                                    android:lineSpacingExtra="2sp"
-                                    android:translationY="-0.91sp"
                                     android:text="명"/>
 
                             </LinearLayout>

@@ -153,6 +153,7 @@ class CircleDetailFragment : Fragment() {
     private fun loadCircleDetail(context: Context) {
         binding.txtTbCircleName.text = viewModel.circleDetail.name
         binding.txtCircleName.text = viewModel.circleDetail.name
+        binding.icOfficial.isVisible = viewModel.circleDetail.isOfficial()
         binding.tlCircleDetail.getTabAt(viewModel.currentTabPosition)?.select() // 탭 복원
         viewModel.circleDetail.thumbnailUrl?.let {
             glideProvider.fetchImage(it, context, binding.imgCircleThumbnail)

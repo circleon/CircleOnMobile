@@ -38,12 +38,11 @@
 
         </androidx.appcompat.widget.Toolbar>
 
-        <androidx.appcompat.widget.LinearLayoutCompat
+        <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/llManageCircle"
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_margin="@dimen/margin_padding_large"
-            android:orientation="vertical"
             app:layout_constraintTop_toBottomOf="@id/tbManageCircle"
             app:layout_constraintBottom_toBottomOf="parent">
 
@@ -54,7 +53,9 @@
                 android:background="@drawable/bg_large_rounded_card"
                 android:paddingStart="@dimen/margin_padding_xx_large"
                 android:paddingEnd="@dimen/margin_padding_large"
-                android:paddingVertical="@dimen/margin_padding_large">
+                android:paddingVertical="@dimen/margin_padding_large"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toTopOf="@id/clApproveCircleJoin">
 
                 <androidx.appcompat.widget.AppCompatTextView
                     android:id="@+id/txtContentTitleCircleMember"
@@ -97,7 +98,9 @@
                 android:background="@drawable/bg_large_rounded_card"
                 android:paddingStart="@dimen/margin_padding_xx_large"
                 android:paddingEnd="@dimen/margin_padding_large"
-                android:paddingVertical="@dimen/margin_padding_large">
+                android:paddingVertical="@dimen/margin_padding_large"
+                app:layout_constraintTop_toBottomOf="@id/clCircleMember"
+                app:layout_constraintBottom_toTopOf="@id/clApproveCircleLeave">
 
                 <androidx.appcompat.widget.AppCompatTextView
                     android:id="@+id/txtContentTitleApproveCircleJoin"
@@ -138,9 +141,11 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/margin_padding_small"
                 android:background="@drawable/bg_large_rounded_card"
+                android:paddingVertical="@dimen/margin_padding_large"
                 android:paddingStart="@dimen/margin_padding_xx_large"
                 android:paddingEnd="@dimen/margin_padding_large"
-                android:paddingVertical="@dimen/margin_padding_large">
+                app:layout_constraintTop_toBottomOf="@id/clApproveCircleJoin"
+                app:layout_constraintBottom_toTopOf="@id/btnRequestOfficialStatus">
 
                 <androidx.appcompat.widget.AppCompatTextView
                     android:id="@+id/txtContentTitleApproveCircleLeave"
@@ -149,21 +154,21 @@
                     android:text="@string/manage_circle_title_approve_circle_leave"
                     android:textAppearance="@style/default_bold_text"
                     android:textColor="@color/purple_5"
+                    app:layout_constraintBottom_toTopOf="@id/txtLeaveRequestedMember"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="parent"
-                    app:layout_constraintBottom_toTopOf="@id/txtLeaveRequestedMember"/>
+                    app:layout_constraintTop_toTopOf="parent" />
 
                 <androidx.appcompat.widget.AppCompatTextView
                     android:id="@+id/txtLeaveRequestedMember"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="@dimen/margin_padding_x_small"
+                    android:text="@string/manage_circle_content_leave_requested_member_default"
                     android:textColor="@color/grey_6"
                     android:textSize="@dimen/text_size_small"
-                    android:text="@string/manage_circle_content_leave_requested_member_default"
+                    app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@id/txtContentTitleApproveCircleLeave"
-                    app:layout_constraintBottom_toBottomOf="parent"/>
+                    app:layout_constraintTop_toBottomOf="@id/txtContentTitleApproveCircleLeave" />
 
                 <androidx.appcompat.widget.AppCompatImageView
                     android:layout_width="wrap_content"
@@ -171,11 +176,47 @@
                     android:src="@drawable/ic_next"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintTop_toTopOf="parent"/>
+                    app:layout_constraintTop_toTopOf="parent" />
 
             </androidx.constraintlayout.widget.ConstraintLayout>
 
-        </androidx.appcompat.widget.LinearLayoutCompat>
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/btnRequestOfficialStatus"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                app:layout_constraintWidth_percent="0.5"
+                android:layout_marginTop="@dimen/margin_padding_small"
+                android:paddingStart="@dimen/margin_padding_large"
+                android:paddingVertical="@dimen/margin_padding_large"
+                android:background="@drawable/bg_large_rounded_card"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/clApproveCircleLeave">
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/txtUploadCircle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textAppearance="@style/default_bold_text"
+                    android:textColor="@color/grey_7"
+                    android:text="@string/manage_circle_title_request_official_status"
+                    app:layout_constraintHorizontal_bias="0"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintBottom_toBottomOf="parent" />
+
+                <androidx.appcompat.widget.AppCompatImageView
+                    android:id="@+id/imgClip"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:src="@drawable/img_official"
+                    app:layout_constraintHorizontal_bias="0"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"/>
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
