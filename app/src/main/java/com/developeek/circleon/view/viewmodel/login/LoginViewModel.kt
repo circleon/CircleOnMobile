@@ -1,11 +1,10 @@
 package com.developeek.circleon.view.viewmodel.login
 
-import androidx.lifecycle.LiveData
-import com.developeek.circleon.domain.state.UiState
+import com.developeek.circleon.view.viewmodelimpl.login.Event
+import kotlinx.coroutines.flow.SharedFlow
 
 interface LoginViewModel {
-    val state: LiveData<UiState>
-    val error: String
+    val event: SharedFlow<Event>
 
     fun login(
         email: String,

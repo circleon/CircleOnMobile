@@ -9,15 +9,17 @@ import android.view.inputmethod.InputMethodManager
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.isVisible
-import androidx.lifecycle.LifecycleOwner
-import androidx.lifecycle.Observer
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import com.developeek.circleon.databinding.ActivityLoginBinding
-import com.developeek.circleon.domain.state.UiState
 import com.developeek.circleon.view.screen.HomeActivity
 import com.developeek.circleon.view.viewmodel.login.LoginViewModel
+import com.developeek.circleon.view.viewmodelimpl.login.Event
 import com.developeek.circleon.view.viewmodelimpl.login.LoginViewModelImpl
 import com.developeek.circleon.view.widget.ErrorAlertDialog
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
 class LoginActivity : AppCompatActivity() {
@@ -29,37 +31,44 @@ class LoginActivity : AppCompatActivity() {
         binding = ActivityLoginBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        initObserver(this)
         initListener(this)
-    }
-
-    private fun initObserver(activity: Activity) {
-        viewModel.state.observe(
-            activity as LifecycleOwner,
-            stateObserver(activity),
-        )
-    }
-
-    private fun stateObserver(activity: Activity) =
-        Observer<UiState> {
-            binding.pgbLoading.isVisible = it is UiState.Loading
-            binding.btnLogin.isVisible = it !is UiState.Loading
-            when (it) {
-                UiState.Success -> sendUserToHomeScreen(activity)
-                UiState.ServiceError ->
-                    ErrorAlertDialog(
-                        activity,
-                        viewModel.error,
-                    ).show()
-                else -> {}
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.event.collect {
+                    handleEvent(it, this@LoginActivity)
+                }
             }
         }
+    }
+
+    private fun handleEvent(
+        event: Event,
+        activity: Activity,
+    ) {
+        binding.pgbLoading.isVisible = event is Event.ShowLoadingView
+        binding.btnLogin.isVisible = event !is Event.ShowLoadingView
+        when (event) {
+            is Event.SendToHomeScreen -> sendUserToHomeScreen(activity)
+            is Event.ShowErrorDialog -> showErrorDialog(activity, event.text)
+            else -> {}
+        }
+    }
 
     private fun sendUserToHomeScreen(activity: Activity) {
         val intent = Intent(activity, HomeActivity::class.java)
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)
 
         startActivity(intent)
+    }
+
+    private fun showErrorDialog(
+        context: Context,
+        text: String,
+    ) {
+        ErrorAlertDialog(
+            context,
+            text,
+        ).show()
     }
 
     private fun initListener(activity: Activity) {
