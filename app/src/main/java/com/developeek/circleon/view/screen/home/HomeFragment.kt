@@ -12,7 +12,9 @@ import androidx.core.os.bundleOf
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.Observer
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -20,8 +22,9 @@ import com.developeek.circleon.R
 import com.developeek.circleon.data.source.manager.UserManager
 import com.developeek.circleon.databinding.FragmentHomeBinding
 import com.developeek.circleon.domain.model.CategoryModel
+import com.developeek.circleon.domain.model.CategoryModels
 import com.developeek.circleon.domain.model.CircleModel
-import com.developeek.circleon.domain.state.UiState
+import com.developeek.circleon.domain.model.CircleModels
 import com.developeek.circleon.domain.utils.Const
 import com.developeek.circleon.domain.utils.glide.GlideProvider
 import com.developeek.circleon.view.adapter.CategoryAdapter
@@ -30,9 +33,12 @@ import com.developeek.circleon.view.listener.ItemListenerInitializer
 import com.developeek.circleon.view.listener.RecyclerViewInfiniteScrollListener
 import com.developeek.circleon.view.screen.login.LoginActivity
 import com.developeek.circleon.view.viewmodel.home.HomeViewModel
+import com.developeek.circleon.view.viewmodelimpl.home.HomeEvent
 import com.developeek.circleon.view.viewmodelimpl.home.HomeViewModelImpl
 import com.developeek.circleon.view.widget.ErrorToast
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -45,6 +51,12 @@ class HomeFragment : Fragment() {
 
     @Inject
     lateinit var userManager: UserManager
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+
+        userManager.getUser() ?: sendUserToLoginScreen(requireActivity())
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -62,18 +74,20 @@ class HomeFragment : Fragment() {
     ) {
         super.onViewCreated(view, savedInstanceState)
 
-        initView(requireActivity(), requireContext())
-        initObserver(requireActivity(), requireContext())
+        initView(requireContext())
         initListener()
+        lifecycleScope.launch {
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.event.collect {
+                    handleEvent(it, requireActivity(), requireContext())
+                }
+            }
+        }
     }
 
-    private fun initView(
-        parentActivity: Activity,
-        context: Context,
-    ) {
+    private fun initView(context: Context) {
         initCategoryRecyclerView(context)
         initCircleRecyclerView(context)
-        startCategoryShimmer()
     }
 
     private fun initCategoryRecyclerView(context: Context) {
@@ -133,74 +147,50 @@ class HomeFragment : Fragment() {
         }
     }
 
-    private fun startCategoryShimmer() {
-        binding.shimmerCategory.startShimmer()
-    }
-
-    private fun initObserver(
+    private fun handleEvent(
+        event: HomeEvent,
         parentActivity: Activity,
         context: Context,
     ) {
-        viewModel.state.observe(
-            viewLifecycleOwner,
-            stateObserver(parentActivity, context),
-        )
-        viewModel.scrollOver.observe(
-            viewLifecycleOwner,
-            scrollOverObserver(),
-        )
+        loadCircleCategory(viewModel.categories)
+        when (event) {
+            is HomeEvent.ShowSuccessView -> showSuccessView(event)
+            is HomeEvent.ShowInfiniteScrollSuccessView -> showInfiniteScrollSuccessView(event)
+            is HomeEvent.ShowLoadingView -> showLoadingView()
+            is HomeEvent.ShowErrorView -> showErrorView()
+            is HomeEvent.SendToLoginScreen -> sendUserToLoginScreen(parentActivity)
+            is HomeEvent.ShowToast -> showErrorToast(context, event.message)
+        }
     }
 
-    private fun stateObserver(
-        parentActivity: Activity,
-        context: Context,
-    ) = Observer<UiState> {
-        if (it !is UiState.Loading) {
-            loadCircleCategory()
-            binding.shimmerCircle.stopShimmer()
+    private fun loadCircleCategory(categories: CategoryModels) {
+        binding.rvCircleCategory.adapter?.let {
+            (it as CategoryAdapter).update(categories) {}
         }
-        when (it) {
-            UiState.Loading -> {
-                toggleView(binding.shimmerCircle)
-                binding.shimmerCircle.startShimmer()
-            }
-            UiState.Success -> {
-                if (viewModel.circles.isEmpty()) {
-                    toggleView(binding.txtNoCircle)
-                } else {
-                    toggleView(binding.rvCircle)
-                    loadUserInfo()
-                    loadCircles()
-                }
-            }
-            UiState.AuthenticationError -> {
-                sendUserToLoginScreen(parentActivity)
-                showErrorToast(context)
-            }
-            UiState.ServiceError -> {
-                toggleView(binding.llServiceError)
-                showErrorToast(context)
-            }
-            else -> {}
+    }
+
+    private fun showSuccessView(event: HomeEvent.ShowSuccessView) {
+        if (event.circles.isEmpty()) {
+            toggleView(binding.txtNoCircle)
+        } else {
+            toggleView(binding.rvCircle)
+            loadUserInfo()
+            loadCircles(event.circles)
         }
+
+        binding.shimmerCircle.stopShimmer()
     }
 
     private fun loadUserInfo() {
-        binding.txtUnivName.text = viewModel.user.univ.univName()
-        binding.txtContentTitleCircle.text = String.format(CONTENT_TITLE_CIRCLE, viewModel.user.name)
-    }
-
-    private fun loadCircleCategory() {
-        binding.shimmerCategory.stopShimmer()
-        binding.shimmerCategory.isVisible = false
-        binding.rvCircleCategory.adapter?.let {
-            (it as CategoryAdapter).update(viewModel.categories) {}
+        userManager.getUser()?.let {
+            binding.txtUnivName.text = it.univ.univName()
+            binding.txtContentTitleCircle.text = String.format(CONTENT_TITLE_CIRCLE, it.name)
         }
     }
 
-    private fun loadCircles() {
+    private fun loadCircles(circles: CircleModels) {
         binding.rvCircle.adapter?.let {
-            (it as CircleAdapter).update(viewModel.circles) {
+            (it as CircleAdapter).update(circles) {
                 viewModel.currentScrollState?.let {
                     binding.rvCircle.layoutManager?.onRestoreInstanceState(viewModel.currentScrollState)
                     viewModel.removeScrollState()
@@ -209,28 +199,36 @@ class HomeFragment : Fragment() {
         }
     }
 
+    private fun showInfiniteScrollSuccessView(event: HomeEvent.ShowInfiniteScrollSuccessView) {
+        toggleView(binding.rvCircle)
+        binding.rvCircle.adapter?.let {
+            (it as CircleAdapter).update(event.circles) {}
+        }
+    }
+
+    private fun showLoadingView() {
+        toggleView(binding.shimmerCircle)
+        binding.shimmerCircle.startShimmer()
+    }
+
+    private fun showErrorView() {
+        toggleView(binding.llServiceError)
+    }
+
     private fun sendUserToLoginScreen(activity: Activity) {
         val intent = Intent(activity, LoginActivity::class.java)
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)
         startActivity(intent)
     }
 
-    private fun showErrorToast(context: Context) {
+    private fun showErrorToast(
+        context: Context,
+        message: String,
+    ) {
         if (ErrorToast.previousFinished()) {
-            ErrorToast(context, viewModel.error).show()
+            ErrorToast(context, message).show()
         }
     }
-
-    private fun scrollOverObserver() =
-        Observer<Boolean> { completed ->
-            if (completed) {
-                binding.rvCircle.removeOnScrollListener(viewModel.scrollListener)
-                binding.rvCircle.addOnScrollListener(viewModel.scrollListener) // 아이템 정보 업데이트
-                binding.rvCircle.adapter?.let {
-                    (it as CircleAdapter).update(viewModel.circles) {}
-                }
-            }
-        }
 
     private fun initListener() {
         setBtnSearchCircleListener()
@@ -251,12 +249,16 @@ class HomeFragment : Fragment() {
     }
 
     private fun setRvCircleListener() {
-        binding.rvCircle.addOnScrollListener(viewModel.scrollListener)
-        (viewModel.scrollListener as RecyclerViewInfiniteScrollListener).setScrollEndListener {
-            if (!viewModel.circles.isLastPage()) {
-                addScrollLoadingItemAndLoad()
+        val scrollListener =
+            RecyclerViewInfiniteScrollListener().apply {
+                setScrollEndListener {
+                    if (!viewModel.circles.isLastPage()) {
+                        addScrollLoadingItemAndLoad()
+                    }
+                }
             }
-        }
+
+        binding.rvCircle.addOnScrollListener(scrollListener)
     }
 
     private fun addScrollLoadingItemAndLoad() {
@@ -270,18 +272,17 @@ class HomeFragment : Fragment() {
         findNavController().navigate(R.id.action_homeFragment_to_searchCircleFragment)
     }
 
-    // 화면이 잠깐 보여지지 않는 경우가 아니라, 무조건 bottom tab 전환인 경우에만 scroll state 를 저장
-    override fun onDestroyView() {
-        super.onDestroyView()
-
-        viewModel.saveScrollState(binding.rvCircle.layoutManager?.onSaveInstanceState())
-    }
-
     private fun toggleView(view: View) {
         binding.rvCircle.isVisible = view == binding.rvCircle
         binding.shimmerCircle.isVisible = view == binding.shimmerCircle
         binding.txtNoCircle.isVisible = view == binding.txtNoCircle
         binding.llServiceError.isVisible = view == binding.llServiceError
+    }
+
+    override fun onStop() {
+        super.onStop()
+
+        viewModel.saveScrollState(binding.rvCircle.layoutManager?.onSaveInstanceState())
     }
 
     companion object {

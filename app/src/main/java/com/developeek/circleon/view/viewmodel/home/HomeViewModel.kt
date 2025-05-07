@@ -1,23 +1,17 @@
 package com.developeek.circleon.view.viewmodel.home
 
 import android.os.Parcelable
-import androidx.lifecycle.LiveData
-import androidx.recyclerview.widget.RecyclerView
 import com.developeek.circleon.domain.enums.Category
 import com.developeek.circleon.domain.model.CategoryModels
 import com.developeek.circleon.domain.model.CircleModels
-import com.developeek.circleon.domain.model.UserModel
-import com.developeek.circleon.domain.state.UiState
+import com.developeek.circleon.view.viewmodelimpl.home.HomeEvent
+import kotlinx.coroutines.flow.StateFlow
 
 interface HomeViewModel {
-    val state: LiveData<UiState>
-    val user: UserModel
-    val categories: CategoryModels
+    val event: StateFlow<HomeEvent>
     val circles: CircleModels
-    val scrollOver: LiveData<Boolean>
-    val scrollListener: RecyclerView.OnScrollListener
+    val categories: CategoryModels
     val currentScrollState: Parcelable?
-    val error: String
 
     fun refresh()
 

@@ -23,6 +23,8 @@ data class CategoryModels(private val models: List<CategoryModel>) {
             selectionTarget: Category,
             removeTarget: Category,
         ) = selectAndGet(selectionTarget).minus(CategoryModel(removeTarget))
+
+        fun empty() = CategoryModels(emptyList())
     }
 }
 
@@ -38,6 +40,8 @@ data class CategoryModel(val category: Category) : Selectable {
     override fun unSelect() {
         this.selected = false
     }
+
+    fun isSame(target: Category) = this.category.isSame(target)
 
     fun isSame(target: CategoryModel) = this.category.isSame(target.category)
 

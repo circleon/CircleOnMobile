@@ -1,23 +1,19 @@
 package com.developeek.circleon.view.viewmodelimpl.home
 
 import android.os.Parcelable
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.developeek.circleon.data.repository.CircleRepository
 import com.developeek.circleon.data.source.Error
 import com.developeek.circleon.data.source.Success
-import com.developeek.circleon.data.source.manager.UserManager
 import com.developeek.circleon.domain.enums.Category
 import com.developeek.circleon.domain.model.CategoryModels
 import com.developeek.circleon.domain.model.CircleModels
-import com.developeek.circleon.domain.model.UserModel
-import com.developeek.circleon.domain.state.UiState
-import com.developeek.circleon.view.listener.RecyclerViewInfiniteScrollListener
 import com.developeek.circleon.view.viewmodel.home.HomeViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -25,45 +21,28 @@ import javax.inject.Inject
 @HiltViewModel
 class HomeViewModelImpl
     @Inject
-    constructor(
-        private val userManager: UserManager,
-        private val repository: CircleRepository,
-    ) : HomeViewModel, ViewModel() {
-        override val state: LiveData<UiState>
-            get() = uiState
-        private val uiState = MutableLiveData<UiState>()
-        override lateinit var user: UserModel
+    constructor(private val repository: CircleRepository) : HomeViewModel, ViewModel() {
+        private val _event = MutableStateFlow<HomeEvent>(HomeEvent.ShowLoadingView)
+        override val event: StateFlow<HomeEvent> = _event
 
         override val categories: CategoryModels
             get() = _categories
-        private var _categories = CategoryModels.selectAndGet(Category.ALL)
+        private var _categories = CategoryModels.empty()
 
         override val circles: CircleModels
-            get() = circleModels
-        private var circleModels = CircleModels.empty()
-        private var fetchCirclesJob: Job? = null
+            get() = _circles
+        private var _circles = CircleModels.empty()
         private var currentPage = DEFAULT_PAGE
 
-        override val scrollOver: LiveData<Boolean>
-            get() = scrollOverCompleted
-        private var scrollOverCompleted = MutableLiveData<Boolean>()
-        private var scrollOverCircleJob: Job? = null
-        override val scrollListener = RecyclerViewInfiniteScrollListener()
-        override val currentScrollState: Parcelable?
-            get() = scrollState
-        private var scrollState: Parcelable? = null
+        override val currentScrollState
+            get() = _currentScrollState
+        private var _currentScrollState: Parcelable? = null
 
-        override lateinit var error: String
+        private var fetchCirclesJob: Job? = null
+        private var scrollOverCircleJob: Job? = null
 
         init {
-            val user = userManager.getUser()
-
-            if (user == null) {
-                uiState.postValue(UiState.AuthenticationError)
-            } else {
-                this.user = user
-                setFilterAndFetch(Category.ALL)
-            }
+            setFilterAndFetch(Category.ALL)
         }
 
         override fun refresh() {
@@ -74,28 +53,39 @@ class HomeViewModelImpl
             fetchCirclesJob?.let {
                 if (!it.isCompleted) return
             }
-
             _categories = CategoryModels.selectAndGet(category)
-            uiState.postValue(UiState.Loading)
-            scrollOverCircleJob?.cancel()
-            currentPage = DEFAULT_PAGE // 카테고리를 선택할 때는 circles 를 재사용하지 않기 때문에 currentPage 도 초기화
 
-            fetchCirclesJob =
-                viewModelScope.launch {
-                    val result = repository.getCircles(currentPage, SIZE_BY_PAGE, categories.selectedOrFirst().category)
+            viewModelScope.launch {
+                _event.emit(HomeEvent.ShowLoadingView)
+                scrollOverCircleJob?.cancel()
+                currentPage = DEFAULT_PAGE // 카테고리를 선택할 때는 circles 를 재사용하지 않기 때문에 currentPage 도 초기화
 
-                    if (result is Success) {
-                        circleModels = result.data
-                        uiState.postValue(UiState.Success)
-                    } else {
-                        error = (result as Error).message()
-                        if (result.isAuthenticationError()) {
-                            uiState.postValue(UiState.AuthenticationError)
-                        } else {
-                            uiState.postValue(UiState.ServiceError)
+                fetchCirclesJob =
+                    launch {
+                        when (val result = repository.getCircles(currentPage, SIZE_BY_PAGE, category)) {
+                            is Success -> {
+                                whenFetchCirclesSuccess(result)
+                            }
+                            is Error -> {
+                                whenFetchCirclesError(result)
+                            }
                         }
                     }
-                }
+            }
+        }
+
+        private suspend fun whenFetchCirclesSuccess(result: Success<CircleModels>) {
+            _circles = result.data
+            _event.emit(HomeEvent.ShowSuccessView(_circles))
+        }
+
+        private suspend fun whenFetchCirclesError(result: Error<CircleModels>) {
+            if (result.isAuthenticationError()) {
+                _event.emit(HomeEvent.SendToLoginScreen)
+            } else {
+                _event.emit(HomeEvent.ShowToast(result.message()))
+                _event.emit(HomeEvent.ShowErrorView)
+            }
         }
 
         override fun scrollOver() {
@@ -103,40 +93,41 @@ class HomeViewModelImpl
                 if (!it.isCompleted) return
             }
 
-            scrollOverCircleJob =
-                viewModelScope.launch {
-                    val result =
-                        repository.getCircles(
-                            currentPage + 1, SIZE_BY_PAGE, categories.selectedOrFirst().category,
-                        )
+            viewModelScope.launch {
+                scrollOverCircleJob =
+                    launch {
+                        val result =
+                            repository.getCircles(
+                                currentPage + 1, SIZE_BY_PAGE, categories.selectedOrFirst().category,
+                            )
 
-                    if (!isActive) return@launch
-                    if (result is Success) {
-                        circleModels =
-                            circleModels.addAll(result.data).also {
-                                if (result.data.isLastPage()) {
-                                    it.setAsLast()
-                                }
-                            }
-                        currentPage++
-                        scrollOverCompleted.postValue(true)
-                    } else {
-                        error = (result as Error).message()
-                        if (result.isAuthenticationError()) {
-                            uiState.postValue(UiState.AuthenticationError)
-                        } else {
-                            uiState.postValue(UiState.ServiceError)
+                        if (!isActive) return@launch
+                        when (result) {
+                            is Success -> whenScrollOverSuccess(result)
+                            is Error -> whenFetchCirclesError(result)
                         }
                     }
+            }
+        }
+
+        private suspend fun whenScrollOverSuccess(result: Success<CircleModels>) {
+            _circles =
+                _circles.addAll(result.data).also {
+                    if (result.data.isLastPage()) {
+                        it.setAsLast()
+                    }
                 }
+            currentPage++
+
+            _event.emit(HomeEvent.ShowInfiniteScrollSuccessView(circles))
         }
 
         override fun saveScrollState(scrollState: Parcelable?) {
-            this.scrollState = scrollState
+            _currentScrollState = scrollState
         }
 
         override fun removeScrollState() {
-            this.scrollState = null
+            _currentScrollState = null
         }
 
         companion object {
@@ -144,3 +135,17 @@ class HomeViewModelImpl
             private const val DEFAULT_PAGE = 0
         }
     }
+
+sealed class HomeEvent {
+    data class ShowSuccessView(val circles: CircleModels) : HomeEvent()
+
+    data class ShowInfiniteScrollSuccessView(val circles: CircleModels) : HomeEvent()
+
+    data object ShowLoadingView : HomeEvent()
+
+    data object ShowErrorView : HomeEvent()
+
+    data object SendToLoginScreen : HomeEvent()
+
+    data class ShowToast(val message: String) : HomeEvent()
+}
