@@ -126,9 +126,9 @@ class UploadCircleFragment : Fragment() {
         initToolbar()
         hideBtmNav(parentActivity)
         setBtnSaveEditOrUpload()
-        loadCircleContent()
-        loadCircleThumbnailWhenIsNotNull(context)
-        loadCircleIntroductionImageWhenIsNotNull(context)
+        loadCircleContent(viewModel.circle)
+        loadCircleThumbnailWhenIsNotNull(context, viewModel.circle)
+        loadCircleIntroductionImageWhenIsNotNull(context, viewModel.circle)
     }
 
     private fun hideBtmNav(activity: Activity) {
@@ -169,9 +169,11 @@ class UploadCircleFragment : Fragment() {
         binding.rvCircleCategory.itemAnimator = null
     }
 
-    private fun loadCircleContent() {
-        binding.edtCircleName.setText(viewModel.circle.name)
-        viewModel.circle.recruitmentStartDate?.let {
+    private fun loadCircleContent(circle: CircleDetailModel) {
+        binding.edtCircleName.setText(circle.name)
+        viewModel.toggleRecruitmentLock(circle.recruiting)
+        binding.switchRecruitment.isChecked = circle.recruiting
+        circle.recruitmentStartDate?.let {
             binding.txtRecruitmentStartDate.text =
                 it.format(
                     DateTimeFormatter.ofPattern(
@@ -179,7 +181,7 @@ class UploadCircleFragment : Fragment() {
                     ),
                 )
         }
-        viewModel.circle.recruitmentEndDate?.let {
+        circle.recruitmentEndDate?.let {
             binding.txtRecruitmentEndDate.text =
                 it.format(
                     DateTimeFormatter.ofPattern(
@@ -187,14 +189,17 @@ class UploadCircleFragment : Fragment() {
                     ),
                 )
         }
-        binding.edtCircleSingleLineIntroduction.setText(viewModel.circle.singleLineIntroduction)
+        binding.edtCircleSingleLineIntroduction.setText(circle.singleLineIntroduction)
         binding.txtCurrentCircleSingleIntroductionSize.text =
-            viewModel.circle.singleLineIntroduction.length.toString()
-        binding.edtCircleIntroduction.setText(viewModel.circle.introduction)
+            circle.singleLineIntroduction.length.toString()
+        binding.edtCircleIntroduction.setText(circle.introduction)
     }
 
-    private fun loadCircleThumbnailWhenIsNotNull(context: Context) {
-        viewModel.circle.thumbnailUrl?.let {
+    private fun loadCircleThumbnailWhenIsNotNull(
+        context: Context,
+        circle: CircleDetailModel,
+    ) {
+        circle.thumbnailUrl?.let {
             glideProvider.fetchImage(
                 it,
                 context,
@@ -204,8 +209,11 @@ class UploadCircleFragment : Fragment() {
         }
     }
 
-    private fun loadCircleIntroductionImageWhenIsNotNull(context: Context) {
-        viewModel.circle.introImgUrl?.let {
+    private fun loadCircleIntroductionImageWhenIsNotNull(
+        context: Context,
+        circle: CircleDetailModel,
+    ) {
+        circle.introImgUrl?.let {
             glideProvider.fetchImage(
                 it,
                 context,

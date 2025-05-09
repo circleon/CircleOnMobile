@@ -1,6 +1,11 @@
 <resources>
     <string name="app_name">CircleOn</string>
 
+    <!--Common-->
+    <string name="btn_positive">확인</string>
+    <string name="btn_cancel">취소</string>
+    <string name="btn_delete">삭제</string>
+
     <!--Login-->
     <string name="hint_email">학교 이메일</string>
     <string name="hint_password">비밀번호</string>
@@ -48,7 +53,6 @@
     <!--Search Circle-->
     <string name="message_no_result">검색 결과가 존재하지 않습니다</string>
     <string name="hint_search_circle">동아리 검색</string>
-    <string name="btn_cancel">취소</string>
 
     <!--Circle Detail-->
     <string name="btn_request_join_circle">가입신청</string>
@@ -104,6 +108,8 @@
     <string name="message_no_circle_member">등록된 멤버가 없어요</string>
     <string name="message_no_member_join_requested">가입 대기중인 인원이 없어요..</string>
     <string name="message_no_member_leave_requested">탈퇴 대기중인 인원이 없어요!</string>
+    <string name="message_request_ban_member">해당 멤버를 추방할까요?</string>
+    <string name="message_request_official_status">교내 정식 동아리 인증을 신청하시겠어요?(3~5일 정도 소요돼요)</string>
     <string name="menu_circle_member_settings_edit_role">역할 수정하기</string>
     <string name="menu_circle_member_settings_ban">추방하기</string>
     <string name="btn_edit_circle_member_role">임명하기</string>
@@ -111,6 +117,7 @@
     <string name="btn_accept_join_request">수락하기</string>
     <string name="btn_show_member_join_message">상세 보기</string>
     <string name="btn_show_member_leave_message">사유 보기</string>
+    <string name="btn_ban_member">추방</string>
     <string name="title_member_message_dialog_for_join_accept">%s님은 자신을 이렇게 소개해주셨어요</string>
     <string name="title_member_message_dialog_for_leave_accept">%s님이 이런 탈퇴 사유를 남겨주셨어요</string>
     <string name="title_member_leave_message_dialog">탈퇴 사유를 알려주세요!</string>

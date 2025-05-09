@@ -35,9 +35,9 @@ import com.developeek.circleon.view.screen.login.LoginActivity
 import com.developeek.circleon.view.viewmodel.home.CircleDetailPostViewModel
 import com.developeek.circleon.view.viewmodelimpl.home.CircleDetailNoticeViewModelImpl
 import com.developeek.circleon.view.widget.CircleRequestAlertDialog
-import com.developeek.circleon.view.widget.ContentDeleteAlertDialog
 import com.developeek.circleon.view.widget.ErrorAlertDialog
 import com.developeek.circleon.view.widget.ErrorToast
+import com.developeek.circleon.view.widget.SingleMessageAlertDialog
 import com.google.android.material.progressindicator.CircularProgressIndicator
 import dagger.hilt.android.AndroidEntryPoint
 import dagger.hilt.android.lifecycle.withCreationCallback
@@ -210,9 +210,14 @@ class CircleDetailNoticeFragment : Fragment() {
             }
 
             R.id.delete_post -> {
-                ContentDeleteAlertDialog(context, MESSAGE_DELETE_NOTICE) {
-                    viewModel.deleteAndFetch(noticeItem.id)
-                }.show()
+                SingleMessageAlertDialog(
+                    context,
+                    MESSAGE_DELETE_NOTICE,
+                    ContextCompat.getString(context, R.string.btn_delete),
+                    positiveListener = {
+                        viewModel.deleteAndFetch(noticeItem.id)
+                    },
+                ).show()
             }
 
             R.id.report_post -> {

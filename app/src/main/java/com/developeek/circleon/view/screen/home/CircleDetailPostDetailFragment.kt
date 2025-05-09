@@ -40,10 +40,10 @@ import com.developeek.circleon.view.screen.login.LoginActivity
 import com.developeek.circleon.view.viewmodel.home.CircleDetailPostDetailViewModel
 import com.developeek.circleon.view.viewmodelimpl.home.CircleDetailPostDetailViewModelImpl
 import com.developeek.circleon.view.widget.CircleRequestAlertDialog
-import com.developeek.circleon.view.widget.ContentDeleteAlertDialog
 import com.developeek.circleon.view.widget.EditCommentAlertDialog
 import com.developeek.circleon.view.widget.ErrorAlertDialog
 import com.developeek.circleon.view.widget.ErrorToast
+import com.developeek.circleon.view.widget.SingleMessageAlertDialog
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import dagger.hilt.android.AndroidEntryPoint
 import dagger.hilt.android.lifecycle.withCreationCallback
@@ -210,12 +210,14 @@ class CircleDetailPostDetailFragment : Fragment() {
             }
 
             R.id.delete_post -> {
-                ContentDeleteAlertDialog(
+                SingleMessageAlertDialog(
                     context,
                     if (item.isNotice()) MESSAGE_DELETE_NOTICE else MESSAGE_DELETE_POST,
-                ) {
-                    viewModel.delete()
-                }.show()
+                    ContextCompat.getString(context, R.string.btn_delete),
+                    positiveListener = {
+                        viewModel.delete()
+                    },
+                ).show()
             }
 
             R.id.report_post -> {
@@ -304,10 +306,14 @@ class CircleDetailPostDetailFragment : Fragment() {
             }
 
             R.id.delete_comment -> {
-                ContentDeleteAlertDialog(context, MESSAGE_DELETE_COMMENT) {
-                    // 삭제 버튼 클릭 시
-                    viewModel.deleteComment(comment.id)
-                }.show()
+                SingleMessageAlertDialog(
+                    context,
+                    MESSAGE_DELETE_COMMENT,
+                    ContextCompat.getString(context, R.string.btn_delete),
+                    positiveListener = {
+                        viewModel.deleteComment(comment.id)
+                    },
+                ).show()
             }
 
             R.id.report_comment -> {

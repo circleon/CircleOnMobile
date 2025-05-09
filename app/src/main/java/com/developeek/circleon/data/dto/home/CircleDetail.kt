@@ -24,6 +24,7 @@ data class CircleDetail(
     val introduction: String?,
     val recruitmentStartDate: String?,
     val recruitmentEndDate: String?,
+    val recruiting: Boolean,
     @SerializedName("circleRole") val role: String?,
     val memberId: Int?,
     val membershipStatus: String?,
@@ -46,6 +47,7 @@ data class CircleDetail(
             introduction,
             localDateTime(recruitmentStartDate),
             localDateTime(recruitmentEndDate),
+            recruiting,
         )
 
     private fun localDateTime(dateTime: String?): LocalDateTime? {

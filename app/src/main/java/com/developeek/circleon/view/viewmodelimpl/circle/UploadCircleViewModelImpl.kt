@@ -253,6 +253,11 @@ class UploadCircleViewModelImpl
             circleCategories.postValue(CategoryModels.selectAndRemoveAndGet(category, Category.ALL))
         }
 
+        override fun toggleRecruitmentLock(state: Boolean) {
+            this.circle = this.circle.fold(recruiting = state)
+            _recruitmentLocked.postValue(state)
+        }
+
         override fun removeCircleProfileImage() {
             this.profileImage = null
             hasProfileImageChanged = true
@@ -261,10 +266,6 @@ class UploadCircleViewModelImpl
         override fun removeCircleIntroductionImage() {
             this.introductionImage = null
             hasIntroductionImageChanged = true
-        }
-
-        override fun toggleRecruitmentLock(state: Boolean) {
-            _recruitmentLocked.postValue(state)
         }
 
         private fun isAnyImageEdited() = profileImage != null || introductionImage != null

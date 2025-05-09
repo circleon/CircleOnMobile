@@ -26,6 +26,7 @@ data class CircleDetailModel(
     val introduction: String?,
     val recruitmentStartDate: LocalDateTime?,
     val recruitmentEndDate: LocalDateTime?,
+    val recruiting: Boolean,
 ) : Serializable {
     fun isOfficial() = officialStatus.isOfficial()
 
@@ -52,6 +53,7 @@ data class CircleDetailModel(
         introduction: String? = this.introduction,
         recruitmentStartDate: LocalDateTime? = this.recruitmentStartDate,
         recruitmentEndDate: LocalDateTime? = this.recruitmentEndDate,
+        recruiting: Boolean = this.recruiting,
     ) = CircleDetailModel(
         id,
         name,
@@ -69,16 +71,18 @@ data class CircleDetailModel(
         introduction,
         recruitmentStartDate,
         recruitmentEndDate,
+        recruiting,
     )
 
     fun toRequestBodyForEdit() =
         RequestBodyEditCircleDetail(
             this.name,
+            this.category.codeName(),
             this.singleLineIntroduction,
             this.introduction,
             this.recruitmentStartDate?.toString(),
             this.recruitmentEndDate?.toString(),
-            this.category.codeName(),
+            this.recruiting,
         )
 
     companion object {
@@ -100,6 +104,7 @@ data class CircleDetailModel(
                 null,
                 LocalDateTime.now(),
                 LocalDateTime.now(),
+                false,
             )
     }
 }

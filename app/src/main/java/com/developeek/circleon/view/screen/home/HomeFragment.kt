@@ -37,7 +37,6 @@ import com.developeek.circleon.view.viewmodelimpl.home.HomeEvent
 import com.developeek.circleon.view.viewmodelimpl.home.HomeViewModelImpl
 import com.developeek.circleon.view.widget.ErrorToast
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -159,7 +158,7 @@ class HomeFragment : Fragment() {
             is HomeEvent.ShowLoadingView -> showLoadingView()
             is HomeEvent.ShowErrorView -> showErrorView()
             is HomeEvent.SendToLoginScreen -> sendUserToLoginScreen(parentActivity)
-            is HomeEvent.ShowToast -> showErrorToast(context, event.message)
+            is HomeEvent.ShowToast -> showToast(context, event)
         }
     }
 
@@ -175,7 +174,12 @@ class HomeFragment : Fragment() {
         } else {
             toggleView(binding.rvCircle)
             loadUserInfo()
-            loadCircles(event.circles)
+            loadCircles(
+                event.circles,
+                after = {
+                    if (!event.hasCollected) binding.rvCircle.scrollToPosition(0)
+                },
+            )
         }
 
         binding.shimmerCircle.stopShimmer()
@@ -188,13 +192,13 @@ class HomeFragment : Fragment() {
         }
     }
 
-    private fun loadCircles(circles: CircleModels) {
+    private fun loadCircles(
+        circles: CircleModels,
+        after: () -> Unit,
+    ) {
         binding.rvCircle.adapter?.let {
             (it as CircleAdapter).update(circles) {
-                viewModel.currentScrollState?.let {
-                    binding.rvCircle.layoutManager?.onRestoreInstanceState(viewModel.currentScrollState)
-                    viewModel.removeScrollState()
-                } ?: binding.rvCircle.scrollToPosition(0)
+                after()
             }
         }
     }
@@ -221,12 +225,12 @@ class HomeFragment : Fragment() {
         startActivity(intent)
     }
 
-    private fun showErrorToast(
+    private fun showToast(
         context: Context,
-        message: String,
+        event: HomeEvent.ShowToast,
     ) {
         if (ErrorToast.previousFinished()) {
-            ErrorToast(context, message).show()
+            ErrorToast(context, event.message).show()
         }
     }
 

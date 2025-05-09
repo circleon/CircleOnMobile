@@ -2,11 +2,13 @@ package com.developeek.circleon.view.widget
 
 import android.app.AlertDialog
 import android.content.Context
+import androidx.core.content.ContextCompat
+import com.developeek.circleon.R
 
-class ContentDeleteAlertDialog(
+class SingleMessageAlertDialog(
     private val context: Context,
     private val message: String,
-    private val positiveButton: String = POSITIVE_BUTTON,
+    private val positiveButton: String = ContextCompat.getString(context, R.string.btn_positive),
     private val positiveListener: Runnable,
 ) {
     private lateinit var dialog: AlertDialog
@@ -19,7 +21,7 @@ class ContentDeleteAlertDialog(
                     positiveListener.run()
                     dialog.dismiss()
                 }
-                setNegativeButton(NEGATIVE_BUTTON) { dialog, _ ->
+                setNegativeButton(ContextCompat.getString(context, R.string.btn_cancel)) { dialog, _ ->
                     dialog.dismiss()
                 }
             }.create()
@@ -27,10 +29,5 @@ class ContentDeleteAlertDialog(
 
     fun show() {
         dialog.show()
-    }
-
-    companion object {
-        private const val POSITIVE_BUTTON = "삭제"
-        private const val NEGATIVE_BUTTON = "취소"
     }
 }

@@ -137,6 +137,8 @@ class HomeViewModelImpl
     }
 
 sealed class HomeEvent {
+    var hasCollected: Boolean = false
+
     data class ShowSuccessView(val circles: CircleModels) : HomeEvent()
 
     data class ShowInfiniteScrollSuccessView(val circles: CircleModels) : HomeEvent()

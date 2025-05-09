@@ -37,9 +37,9 @@ import com.developeek.circleon.view.viewmodel.home.ManageCircleMemberViewModel
 import com.developeek.circleon.view.viewmodelimpl.home.ManageCircleMemberViewModelImpl
 import com.developeek.circleon.view.widget.CircleAcceptRequestAlertDialog
 import com.developeek.circleon.view.widget.CircleMemberRoleEditAlertDialog
-import com.developeek.circleon.view.widget.ContentDeleteAlertDialog
 import com.developeek.circleon.view.widget.ErrorAlertDialog
 import com.developeek.circleon.view.widget.ErrorToast
+import com.developeek.circleon.view.widget.SingleMessageAlertDialog
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import dagger.hilt.android.AndroidEntryPoint
 import dagger.hilt.android.lifecycle.withCreationCallback
@@ -206,9 +206,14 @@ class ManageCircleMemberFragment : Fragment() {
             }
 
             R.id.ban_member -> {
-                ContentDeleteAlertDialog(context, MESSAGE_BAN_MEMBER, BUTTON_NAME_BAN_MEMBER) {
-                    viewModel.banCircleMember(member)
-                }.show()
+                SingleMessageAlertDialog(
+                    context,
+                    ContextCompat.getString(context, R.string.message_request_ban_member),
+                    ContextCompat.getString(context, R.string.btn_ban_member),
+                    positiveListener = {
+                        viewModel.banCircleMember(member)
+                    },
+                ).show()
             }
         }
         true
@@ -426,10 +431,5 @@ class ManageCircleMemberFragment : Fragment() {
 
     private fun showErrorDialog(context: Context) {
         ErrorAlertDialog(context, viewModel.error).show()
-    }
-
-    companion object {
-        private const val MESSAGE_BAN_MEMBER = "해당 멤버를 추방할까요?"
-        private const val BUTTON_NAME_BAN_MEMBER = "추방"
     }
 }

@@ -26,6 +26,7 @@ import com.developeek.circleon.view.viewmodel.home.ManageCircleViewModel
 import com.developeek.circleon.view.viewmodelimpl.home.ManageCircleViewModelImpl
 import com.developeek.circleon.view.widget.ErrorAlertDialog
 import com.developeek.circleon.view.widget.ErrorToast
+import com.developeek.circleon.view.widget.SingleMessageAlertDialog
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import dagger.hilt.android.AndroidEntryPoint
 import dagger.hilt.android.lifecycle.withCreationCallback
@@ -71,7 +72,7 @@ class ManageCircleFragment : Fragment() {
 
         initView(requireActivity())
         initObserver(requireActivity(), requireContext())
-        initListener()
+        initListener(requireContext())
     }
 
     private fun initView(parentActivity: Activity) {
@@ -196,9 +197,9 @@ class ManageCircleFragment : Fragment() {
         }
     }
 
-    private fun initListener() {
+    private fun initListener(context: Context) {
         setBtnCancelListener()
-        setBtnRequestOfficialStatus()
+        setBtnRequestOfficialStatus(context)
     }
 
     private fun setBtnCancelListener() {
@@ -207,9 +208,15 @@ class ManageCircleFragment : Fragment() {
         }
     }
 
-    private fun setBtnRequestOfficialStatus() {
+    private fun setBtnRequestOfficialStatus(context: Context) {
         binding.btnRequestOfficialStatus.setOnClickListener {
-            viewModel.requestOfficialStatus()
+            SingleMessageAlertDialog(
+                context,
+                ContextCompat.getString(context, R.string.message_request_official_status),
+                positiveListener = {
+                    viewModel.requestOfficialStatus()
+                },
+            ).show()
         }
     }
 

@@ -35,9 +35,9 @@ interface UploadCircleViewModel {
 
     fun setCategory(category: Category)
 
+    fun toggleRecruitmentLock(state: Boolean)
+
     fun removeCircleProfileImage()
 
     fun removeCircleIntroductionImage()
-
-    fun toggleRecruitmentLock(state: Boolean)
 }

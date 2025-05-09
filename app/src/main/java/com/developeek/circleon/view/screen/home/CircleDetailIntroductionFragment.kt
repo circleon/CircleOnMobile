@@ -76,7 +76,10 @@ class CircleDetailIntroductionFragment : Fragment() {
     }
 
     private fun loadRecruitmentDate() {
-        if (circleDetail.recruitmentStartDate == null || circleDetail.recruitmentEndDate == null) {
+        if (!circleDetail.recruiting ||
+            circleDetail.recruitmentStartDate == null ||
+            circleDetail.recruitmentEndDate == null
+        ) {
             binding.txtRecruitmentDate.text = NO_RECRUITMENT_MESSAGE
         } else {
             val start = circleDetail.recruitmentStartDate!!.format(DateTimeFormatter.ofPattern(RECRUITMENT_DATE_FORMAT))
