@@ -7,8 +7,10 @@ import com.developeek.circleon.data.source.Error
 import com.developeek.circleon.data.source.Success
 import com.developeek.circleon.domain.enums.Category
 import com.developeek.circleon.domain.model.CategoryModels
+import com.developeek.circleon.domain.model.CircleModel
 import com.developeek.circleon.domain.model.CircleModels
 import com.developeek.circleon.view.viewmodel.home.HomeViewModel
+import com.developeek.circleon.view.viewmodelimpl.Page
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -27,10 +29,11 @@ class HomeViewModelImpl
         override val categories: CategoryModels
             get() = _categories
         private var _categories = CategoryModels.empty()
+        private var circles = CircleModels.empty()
 
-        override val circles: CircleModels
-            get() = _circles
-        private var _circles = CircleModels.empty()
+        override val isLastPage: Boolean
+            get() = _isLastPage
+        private var _isLastPage = false
         private var currentPage = DEFAULT_PAGE
 
         private var fetchCirclesJob: Job? = null
@@ -69,12 +72,13 @@ class HomeViewModelImpl
             }
         }
 
-        private suspend fun whenFetchCirclesSuccess(result: Success<CircleModels>) {
-            _circles = result.data
-            _event.emit(HomeEvent.ShowSuccessView(_circles))
+        private suspend fun whenFetchCirclesSuccess(result: Success<Page<CircleModel>>) {
+            circles = CircleModels(result.data.content)
+            _isLastPage = result.data.isLastPage
+            _event.emit(HomeEvent.ShowSuccessView(circles))
         }
 
-        private suspend fun whenFetchCirclesError(result: Error<CircleModels>) {
+        private suspend fun whenFetchCirclesError(result: Error<Page<CircleModel>>) {
             if (result.isAuthenticationError()) {
                 _event.emit(HomeEvent.SendToLoginScreen)
             } else {
@@ -105,18 +109,14 @@ class HomeViewModelImpl
             }
         }
 
-        private suspend fun whenScrollOverSuccess(result: Success<CircleModels>) {
-            _circles =
-                _circles.addAll(result.data).also {
-                    if (result.data.isLastPage()) {
-                        it.setAsLast()
-                    }
-                }
+        private suspend fun whenScrollOverSuccess(result: Success<Page<CircleModel>>) {
+            circles = circles.addAllAndGet(result.data.content)
+            _isLastPage = result.data.isLastPage
             currentPage++
 
             _event.emit(
                 HomeEvent.ShowSuccessView(circles).apply {
-                    hasCollected = true // 페이지 로딩의 경우 스크롤 초기화 방지
+                    hasCollected = true // 페이지 로딩의 경우 스크롤 상단 초기화 방지
                 },
             )
         }

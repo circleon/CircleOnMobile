@@ -252,7 +252,7 @@ class HomeFragment : Fragment() {
         val scrollListener =
             RecyclerViewInfiniteScrollListener().apply {
                 setScrollEndListener {
-                    if (!viewModel.circles.isLastPage()) {
+                    if (!viewModel.isLastPage) {
                         addScrollLoadingItemAndLoad()
                     }
                 }
@@ -263,7 +263,7 @@ class HomeFragment : Fragment() {
 
     private fun addScrollLoadingItemAndLoad() {
         binding.rvCircle.adapter?.let {
-            (it as CircleAdapter).update(viewModel.circles.add(CircleModel.emptyInstance())) {}
+            (it as CircleAdapter).addLoadingItem()
         }
         viewModel.scrollOver()
     }

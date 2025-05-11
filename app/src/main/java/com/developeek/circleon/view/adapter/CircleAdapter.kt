@@ -130,6 +130,12 @@ class CircleAdapter(
         diffUtil.submitList(models.get(), commitCallback)
     }
 
+    fun addLoadingItem() {
+        if (diffUtil.currentList.last() == CircleModel.emptyInstance()) return
+
+        diffUtil.submitList(diffUtil.currentList + CircleModel.emptyInstance())
+    }
+
     companion object {
         private const val MEMBER_COUNT_UNIT = "%d명"
         private const val VIEW_TYPE_LOADING = 0

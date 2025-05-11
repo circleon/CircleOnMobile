@@ -6,11 +6,12 @@ import com.developeek.circleon.domain.enums.MembershipStatus
 import com.developeek.circleon.domain.enums.PostType
 import com.developeek.circleon.domain.enums.Role
 import com.developeek.circleon.domain.model.CircleDetailModel
-import com.developeek.circleon.domain.model.CircleModels
+import com.developeek.circleon.domain.model.CircleModel
 import com.developeek.circleon.domain.model.CircleSummaryModels
 import com.developeek.circleon.domain.model.CommentModels
 import com.developeek.circleon.domain.model.MemberModels
 import com.developeek.circleon.domain.model.PostModels
+import com.developeek.circleon.view.viewmodelimpl.Page
 import java.io.File
 
 interface CircleRepository {
@@ -19,7 +20,7 @@ interface CircleRepository {
         page: Int,
         size: Int,
         category: Category,
-    ): Result<CircleModels>
+    ): Result<Page<CircleModel>>
 
     suspend fun getCircleSummaries(): Result<CircleSummaryModels>
 

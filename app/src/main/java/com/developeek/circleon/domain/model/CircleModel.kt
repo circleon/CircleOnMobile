@@ -6,8 +6,6 @@ import com.developeek.circleon.domain.utils.Const
 import java.io.Serializable
 
 data class CircleModels(private val models: List<CircleModel>) {
-    private var isLastPage = false
-
     fun get() = models
 
     fun get(index: Int) = models[index]
@@ -16,15 +14,7 @@ data class CircleModels(private val models: List<CircleModel>) {
 
     fun isEmpty() = models.isEmpty()
 
-    fun add(circleModel: CircleModel) = CircleModels(models + circleModel)
-
-    fun addAll(circleModels: CircleModels) = CircleModels(models + circleModels.get())
-
-    fun setAsLast() {
-        isLastPage = true
-    }
-
-    fun isLastPage() = isLastPage
+    fun addAllAndGet(circleModels: List<CircleModel>) = CircleModels(models + circleModels)
 
     companion object {
         fun empty() = CircleModels(emptyList())

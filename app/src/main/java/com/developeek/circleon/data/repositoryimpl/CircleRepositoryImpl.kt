@@ -18,11 +18,12 @@ import com.developeek.circleon.domain.enums.OfficialStatus
 import com.developeek.circleon.domain.enums.PostType
 import com.developeek.circleon.domain.enums.Role
 import com.developeek.circleon.domain.model.CircleDetailModel
-import com.developeek.circleon.domain.model.CircleModels
+import com.developeek.circleon.domain.model.CircleModel
 import com.developeek.circleon.domain.model.CircleSummaryModels
 import com.developeek.circleon.domain.model.CommentModels
 import com.developeek.circleon.domain.model.MemberModels
 import com.developeek.circleon.domain.model.PostModels
+import com.developeek.circleon.view.viewmodelimpl.Page
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.async
 import kotlinx.coroutines.withContext
@@ -41,7 +42,7 @@ class CircleRepositoryImpl(
         page: Int,
         size: Int,
         category: Category,
-    ): Result<CircleModels> {
+    ): Result<Page<CircleModel>> {
         return try {
             withContext(dispatcher) {
                 val response =
@@ -51,7 +52,7 @@ class CircleRepositoryImpl(
                         service.getCircleScrollContents(page, size, SORT_CIRCLE_OLDEST, category.codeName())
                     }
                 Result.success(
-                    CircleModels(response.content.map { it.toCircleModel() }).apply {
+                    Page(response.content.map { it.toCircleModel() }).apply {
                         if (response.isLastPage()) {
                             setAsLast()
                         }
@@ -59,7 +60,7 @@ class CircleRepositoryImpl(
                 )
             }
         } catch (e: ServiceException.NoResultException) {
-            Result.success(CircleModels.empty())
+            Result.success(Page(emptyList()))
         } catch (e: Exception) {
             Result.error(e)
         }
