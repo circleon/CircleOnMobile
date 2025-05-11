@@ -1,6 +1,5 @@
 package com.developeek.circleon.view.viewmodelimpl.home
 
-import android.os.Parcelable
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.developeek.circleon.data.repository.CircleRepository
@@ -33,10 +32,6 @@ class HomeViewModelImpl
             get() = _circles
         private var _circles = CircleModels.empty()
         private var currentPage = DEFAULT_PAGE
-
-        override val currentScrollState
-            get() = _currentScrollState
-        private var _currentScrollState: Parcelable? = null
 
         private var fetchCirclesJob: Job? = null
         private var scrollOverCircleJob: Job? = null
@@ -119,15 +114,11 @@ class HomeViewModelImpl
                 }
             currentPage++
 
-            _event.emit(HomeEvent.ShowInfiniteScrollSuccessView(circles))
-        }
-
-        override fun saveScrollState(scrollState: Parcelable?) {
-            _currentScrollState = scrollState
-        }
-
-        override fun removeScrollState() {
-            _currentScrollState = null
+            _event.emit(
+                HomeEvent.ShowSuccessView(circles).apply {
+                    hasCollected = true // 페이지 로딩의 경우 스크롤 초기화 방지
+                },
+            )
         }
 
         companion object {
@@ -140,8 +131,6 @@ sealed class HomeEvent {
     var hasCollected: Boolean = false
 
     data class ShowSuccessView(val circles: CircleModels) : HomeEvent()
-
-    data class ShowInfiniteScrollSuccessView(val circles: CircleModels) : HomeEvent()
 
     data object ShowLoadingView : HomeEvent()
 

@@ -154,7 +154,6 @@ class HomeFragment : Fragment() {
         loadCircleCategory(viewModel.categories)
         when (event) {
             is HomeEvent.ShowSuccessView -> showSuccessView(event)
-            is HomeEvent.ShowInfiniteScrollSuccessView -> showInfiniteScrollSuccessView(event)
             is HomeEvent.ShowLoadingView -> showLoadingView()
             is HomeEvent.ShowErrorView -> showErrorView()
             is HomeEvent.SendToLoginScreen -> sendUserToLoginScreen(parentActivity)
@@ -177,7 +176,10 @@ class HomeFragment : Fragment() {
             loadCircles(
                 event.circles,
                 after = {
-                    if (!event.hasCollected) binding.rvCircle.scrollToPosition(0)
+                    if (!event.hasCollected) {
+                        binding.rvCircle.scrollToPosition(0)
+                        event.hasCollected = true
+                    }
                 },
             )
         }
@@ -203,13 +205,6 @@ class HomeFragment : Fragment() {
         }
     }
 
-    private fun showInfiniteScrollSuccessView(event: HomeEvent.ShowInfiniteScrollSuccessView) {
-        toggleView(binding.rvCircle)
-        binding.rvCircle.adapter?.let {
-            (it as CircleAdapter).update(event.circles) {}
-        }
-    }
-
     private fun showLoadingView() {
         toggleView(binding.shimmerCircle)
         binding.shimmerCircle.startShimmer()
@@ -229,8 +224,9 @@ class HomeFragment : Fragment() {
         context: Context,
         event: HomeEvent.ShowToast,
     ) {
-        if (ErrorToast.previousFinished()) {
+        if (ErrorToast.previousFinished() && !event.hasCollected) {
             ErrorToast(context, event.message).show()
+            event.hasCollected = true
         }
     }
 
@@ -281,12 +277,6 @@ class HomeFragment : Fragment() {
         binding.shimmerCircle.isVisible = view == binding.shimmerCircle
         binding.txtNoCircle.isVisible = view == binding.txtNoCircle
         binding.llServiceError.isVisible = view == binding.llServiceError
-    }
-
-    override fun onStop() {
-        super.onStop()
-
-        viewModel.saveScrollState(binding.rvCircle.layoutManager?.onSaveInstanceState())
     }
 
     companion object {
