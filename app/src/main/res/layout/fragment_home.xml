@@ -77,7 +77,7 @@
         android:paddingVertical="@dimen/margin_padding_small"
         android:textAppearance="@style/content_title"
         android:textSize="16sp"
-        android:text="@string/home_content_title_circle"/>
+        android:text="@string/home_content_title_circle_default"/>
 
     <FrameLayout
         android:layout_width="match_parent"

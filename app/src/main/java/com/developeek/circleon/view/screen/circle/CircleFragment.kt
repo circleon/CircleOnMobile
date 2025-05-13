@@ -24,7 +24,7 @@ import com.developeek.circleon.domain.utils.Const
 import com.developeek.circleon.view.screen.login.LoginActivity
 import com.developeek.circleon.view.viewmodel.circle.CircleViewModel
 import com.developeek.circleon.view.viewmodelimpl.circle.CircleViewModelImpl
-import com.developeek.circleon.view.widget.ErrorToast
+import com.developeek.circleon.view.widget.SingleMessageToast
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -181,8 +181,8 @@ class CircleFragment : Fragment() {
     }
 
     private fun showErrorToast(context: Context) {
-        if (ErrorToast.previousFinished()) {
-            ErrorToast(context, viewModel.error).show()
+        if (SingleMessageToast.previousFinished()) {
+            SingleMessageToast(context, viewModel.error).show()
         }
     }
 }

@@ -4,7 +4,7 @@ import android.content.Context
 import android.widget.Toast
 import com.developeek.circleon.domain.utils.Const
 
-class ErrorToast(
+class SingleMessageToast(
     private val context: Context,
     private val message: CharSequence,
 ) : Toast(context) {

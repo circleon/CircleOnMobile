@@ -12,11 +12,13 @@ import com.developeek.circleon.domain.model.CircleModels
 import com.developeek.circleon.view.viewmodel.home.HomeViewModel
 import com.developeek.circleon.view.viewmodelimpl.Page
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 @HiltViewModel
@@ -29,7 +31,7 @@ class HomeViewModelImpl
         override val categories: CategoryModels
             get() = _categories
         private var _categories = CategoryModels.empty()
-        private var circles = CircleModels.empty()
+        private lateinit var circles: CircleModels
 
         override val isLastPage: Boolean
             get() = _isLastPage
@@ -38,6 +40,7 @@ class HomeViewModelImpl
 
         private var fetchCirclesJob: Job? = null
         private var scrollOverCircleJob: Job? = null
+        private val dispatcher = Dispatchers.IO
 
         init {
             setFilterAndFetch(Category.ALL)
@@ -51,8 +54,8 @@ class HomeViewModelImpl
             fetchCirclesJob?.let {
                 if (!it.isCompleted) return
             }
-            _categories = CategoryModels.selectAndGet(category)
 
+            _categories = CategoryModels.selectAndGet(category)
             viewModelScope.launch {
                 _event.emit(HomeEvent.ShowLoadingView)
                 scrollOverCircleJob?.cancel()
@@ -60,16 +63,20 @@ class HomeViewModelImpl
 
                 fetchCirclesJob =
                     launch {
-                        when (val result = repository.getCircles(currentPage, SIZE_BY_PAGE, category)) {
-                            is Success -> {
-                                whenFetchCirclesSuccess(result)
-                            }
-                            is Error -> {
-                                whenFetchCirclesError(result)
-                            }
+                        when (val result = getCircles(currentPage, SIZE_BY_PAGE, category)) {
+                            is Success -> whenFetchCirclesSuccess(result)
+                            is Error -> whenFetchCirclesFail(result)
                         }
                     }
             }
+        }
+
+        private suspend fun getCircles(
+            page: Int,
+            size: Int,
+            category: Category,
+        ) = withContext(dispatcher) {
+            repository.getCircles(page, size, category)
         }
 
         private suspend fun whenFetchCirclesSuccess(result: Success<Page<CircleModel>>) {
@@ -78,11 +85,12 @@ class HomeViewModelImpl
             _event.emit(HomeEvent.ShowSuccessView(circles))
         }
 
-        private suspend fun whenFetchCirclesError(result: Error<Page<CircleModel>>) {
+        private suspend fun whenFetchCirclesFail(result: Error<Page<CircleModel>>) {
+            _event.emit(HomeEvent.ShowToast(result.message()))
+
             if (result.isAuthenticationError()) {
                 _event.emit(HomeEvent.SendToLoginScreen)
             } else {
-                _event.emit(HomeEvent.ShowToast(result.message()))
                 _event.emit(HomeEvent.ShowErrorView)
             }
         }
@@ -96,27 +104,27 @@ class HomeViewModelImpl
                 scrollOverCircleJob =
                     launch {
                         val result =
-                            repository.getCircles(
-                                currentPage + 1, SIZE_BY_PAGE, categories.selectedOrFirst().category,
-                            )
+                            getCircles(currentPage + 1, SIZE_BY_PAGE, categories.selectedOrFirst().category)
 
                         if (!isActive) return@launch
                         when (result) {
                             is Success -> whenScrollOverSuccess(result)
-                            is Error -> whenFetchCirclesError(result)
+                            is Error -> whenFetchCirclesFail(result)
                         }
                     }
             }
         }
 
         private suspend fun whenScrollOverSuccess(result: Success<Page<CircleModel>>) {
-            circles = circles.addAllAndGet(result.data.content)
-            _isLastPage = result.data.isLastPage
+            result.data.let {
+                circles = circles.addAllAndGet(it.content)
+                _isLastPage = it.isLastPage
+            }
             currentPage++
 
             _event.emit(
                 HomeEvent.ShowSuccessView(circles).apply {
-                    hasCollected = true // 페이지 로딩의 경우 스크롤 상단 초기화 방지
+                    notifyCollected() // 페이지 로딩의 경우 스크롤 상단 초기화 방지
                 },
             )
         }
@@ -128,7 +136,13 @@ class HomeViewModelImpl
     }
 
 sealed class HomeEvent {
-    var hasCollected: Boolean = false
+    val hasCollected: Boolean
+        get() = _hasCollected
+    private var _hasCollected = false
+
+    fun notifyCollected() {
+        _hasCollected = true
+    }
 
     data class ShowSuccessView(val circles: CircleModels) : HomeEvent()
 

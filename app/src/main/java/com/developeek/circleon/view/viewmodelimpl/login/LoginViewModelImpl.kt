@@ -19,8 +19,8 @@ import javax.inject.Inject
 class LoginViewModelImpl
     @Inject
     constructor(private val repository: LoginRepository) : LoginViewModel, ViewModel() {
-        private val _event = MutableSharedFlow<Event>()
-        override val event: SharedFlow<Event> = _event
+        private val _event = MutableSharedFlow<LoginEvent>()
+        override val event: SharedFlow<LoginEvent> = _event
 
         private var loginJob: Job? = null
 
@@ -33,37 +33,36 @@ class LoginViewModelImpl
             }
 
             viewModelScope.launch {
-                checkEmailFormat(email)?.let {
-                    _event.emit(Event.ShowErrorDialog(it))
-                    return@launch
-                }
+                if (!checkEmailFormat(email)) return@launch
 
-                _event.emit(Event.ShowLoadingView)
+                _event.emit(LoginEvent.ShowLoadingView)
 
                 loginJob =
                     launch {
-                        val result = repository.login(email, password)
-
-                        if (result is Success) {
-                            _event.emit(Event.SendToHomeScreen)
-                        } else {
-                            _event.emit(Event.ShowErrorDialog((result as Error).message()))
+                        when (val result = repository.login(email, password)) {
+                            is Success -> _event.emit(LoginEvent.SendToHomeScreen)
+                            is Error -> _event.emit(LoginEvent.ShowDialog(result.message()))
                         }
                     }
             }
         }
 
-        private fun checkEmailFormat(email: String): String? {
+        private suspend fun checkEmailFormat(email: String): Boolean {
             val validation = Validator.checkEmailAsId(email)
 
-            return if (validation is Invalid) validation.message() else null
+            return if (validation is Invalid) {
+                _event.emit(LoginEvent.ShowDialog(validation.message()))
+                false
+            } else {
+                true
+            }
         }
     }
 
-sealed class Event {
-    data object ShowLoadingView : Event()
+sealed class LoginEvent {
+    data object ShowLoadingView : LoginEvent()
 
-    data object SendToHomeScreen : Event()
+    data object SendToHomeScreen : LoginEvent()
 
-    data class ShowErrorDialog(val text: String) : Event()
+    data class ShowDialog(val text: String) : LoginEvent()
 }

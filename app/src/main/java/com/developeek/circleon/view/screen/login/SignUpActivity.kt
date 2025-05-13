@@ -19,7 +19,7 @@ import com.developeek.circleon.domain.state.UiState
 import com.developeek.circleon.view.adapter.SignUpFragmentAdapter
 import com.developeek.circleon.view.viewmodel.login.SignUpViewModel
 import com.developeek.circleon.view.viewmodelimpl.login.SignUpViewModelImpl
-import com.developeek.circleon.view.widget.ErrorAlertDialog
+import com.developeek.circleon.view.widget.SingleMessageAlertDialog
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -63,7 +63,7 @@ class SignUpActivity : AppCompatActivity() {
             binding.btnNext.isVisible = it !is UiState.Loading
             when (it) {
                 UiState.ServiceError -> {
-                    ErrorAlertDialog(
+                    SingleMessageAlertDialog(
                         activity,
                         viewModel.error,
                     ).show()

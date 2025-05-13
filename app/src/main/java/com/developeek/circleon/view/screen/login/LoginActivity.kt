@@ -15,9 +15,9 @@ import androidx.lifecycle.repeatOnLifecycle
 import com.developeek.circleon.databinding.ActivityLoginBinding
 import com.developeek.circleon.view.screen.HomeActivity
 import com.developeek.circleon.view.viewmodel.login.LoginViewModel
-import com.developeek.circleon.view.viewmodelimpl.login.Event
+import com.developeek.circleon.view.viewmodelimpl.login.LoginEvent
 import com.developeek.circleon.view.viewmodelimpl.login.LoginViewModelImpl
-import com.developeek.circleon.view.widget.ErrorAlertDialog
+import com.developeek.circleon.view.widget.SingleMessageAlertDialog
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 
@@ -42,14 +42,14 @@ class LoginActivity : AppCompatActivity() {
     }
 
     private fun handleEvent(
-        event: Event,
+        event: LoginEvent,
         activity: Activity,
     ) {
-        binding.pgbLoading.isVisible = event is Event.ShowLoadingView
-        binding.btnLogin.isVisible = event !is Event.ShowLoadingView
+        binding.pgbLoading.isVisible = event is LoginEvent.ShowLoadingView
+        binding.btnLogin.isVisible = event !is LoginEvent.ShowLoadingView
         when (event) {
-            is Event.SendToHomeScreen -> sendUserToHomeScreen(activity)
-            is Event.ShowErrorDialog -> showErrorDialog(activity, event.text)
+            is LoginEvent.SendToHomeScreen -> sendUserToHomeScreen(activity)
+            is LoginEvent.ShowDialog -> showDialog(activity, event.text)
             else -> {}
         }
     }
@@ -61,11 +61,11 @@ class LoginActivity : AppCompatActivity() {
         startActivity(intent)
     }
 
-    private fun showErrorDialog(
+    private fun showDialog(
         context: Context,
         text: String,
     ) {
-        ErrorAlertDialog(
+        SingleMessageAlertDialog(
             context,
             text,
         ).show()

@@ -2,14 +2,10 @@ package com.developeek.circleon.view.widget
 
 import android.app.AlertDialog
 import android.content.Context
-import androidx.core.content.ContextCompat
-import com.developeek.circleon.R
 
 class SingleMessageAlertDialog(
     private val context: Context,
     private val message: String,
-    private val positiveButton: String = ContextCompat.getString(context, R.string.btn_positive),
-    private val positiveListener: Runnable,
 ) {
     private lateinit var dialog: AlertDialog
 
@@ -17,11 +13,7 @@ class SingleMessageAlertDialog(
         dialog =
             AlertDialog.Builder(context).apply {
                 setMessage(message)
-                setPositiveButton(positiveButton) { dialog, _ ->
-                    positiveListener.run()
-                    dialog.dismiss()
-                }
-                setNegativeButton(ContextCompat.getString(context, R.string.btn_cancel)) { dialog, _ ->
+                setPositiveButton(POSITIVE_BUTTON) { dialog, _ ->
                     dialog.dismiss()
                 }
             }.create()
@@ -29,5 +21,9 @@ class SingleMessageAlertDialog(
 
     fun show() {
         dialog.show()
+    }
+
+    companion object {
+        private const val POSITIVE_BUTTON = "확인"
     }
 }

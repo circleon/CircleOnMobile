@@ -37,9 +37,9 @@ import com.developeek.circleon.view.viewmodel.home.ManageCircleMemberViewModel
 import com.developeek.circleon.view.viewmodelimpl.home.ManageCircleMemberViewModelImpl
 import com.developeek.circleon.view.widget.CircleAcceptRequestAlertDialog
 import com.developeek.circleon.view.widget.CircleMemberRoleEditAlertDialog
-import com.developeek.circleon.view.widget.ErrorAlertDialog
-import com.developeek.circleon.view.widget.ErrorToast
+import com.developeek.circleon.view.widget.PositiveAlertDialog
 import com.developeek.circleon.view.widget.SingleMessageAlertDialog
+import com.developeek.circleon.view.widget.SingleMessageToast
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import dagger.hilt.android.AndroidEntryPoint
 import dagger.hilt.android.lifecycle.withCreationCallback
@@ -206,7 +206,7 @@ class ManageCircleMemberFragment : Fragment() {
             }
 
             R.id.ban_member -> {
-                SingleMessageAlertDialog(
+                PositiveAlertDialog(
                     context,
                     ContextCompat.getString(context, R.string.message_request_ban_member),
                     ContextCompat.getString(context, R.string.btn_ban_member),
@@ -424,12 +424,12 @@ class ManageCircleMemberFragment : Fragment() {
     }
 
     private fun showErrorToast(context: Context) {
-        if (ErrorToast.previousFinished()) {
-            ErrorToast(context, viewModel.error).show()
+        if (SingleMessageToast.previousFinished()) {
+            SingleMessageToast(context, viewModel.error).show()
         }
     }
 
     private fun showErrorDialog(context: Context) {
-        ErrorAlertDialog(context, viewModel.error).show()
+        SingleMessageAlertDialog(context, viewModel.error).show()
     }
 }

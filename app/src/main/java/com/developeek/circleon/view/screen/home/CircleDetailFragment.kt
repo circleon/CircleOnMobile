@@ -15,36 +15,41 @@ import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.Observer
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.RecyclerView
 import com.developeek.circleon.R
 import com.developeek.circleon.databinding.FragmentCircleDetailBinding
 import com.developeek.circleon.domain.enums.MembershipStatus
 import com.developeek.circleon.domain.enums.PostType
+import com.developeek.circleon.domain.enums.Role
 import com.developeek.circleon.domain.model.CircleDetailModel
-import com.developeek.circleon.domain.state.UiState
 import com.developeek.circleon.domain.utils.Const
 import com.developeek.circleon.domain.utils.Utils
 import com.developeek.circleon.domain.utils.glide.GlideProvider
 import com.developeek.circleon.view.listener.ItemListenerInitializer
 import com.developeek.circleon.view.screen.login.LoginActivity
 import com.developeek.circleon.view.viewmodel.home.CircleDetailViewModel
+import com.developeek.circleon.view.viewmodelimpl.home.CircleDetailEvent
 import com.developeek.circleon.view.viewmodelimpl.home.CircleDetailViewModelImpl
+import com.developeek.circleon.view.viewmodelimpl.home.SelectTab
 import com.developeek.circleon.view.widget.CircleRequestAlertDialog
-import com.developeek.circleon.view.widget.ErrorAlertDialog
-import com.developeek.circleon.view.widget.ErrorToast
+import com.developeek.circleon.view.widget.SingleMessageAlertDialog
+import com.developeek.circleon.view.widget.SingleMessageToast
 import com.google.android.material.tabs.TabLayout
 import dagger.hilt.android.AndroidEntryPoint
 import dagger.hilt.android.lifecycle.withCreationCallback
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @AndroidEntryPoint
 class CircleDetailFragment : Fragment() {
     private lateinit var binding: FragmentCircleDetailBinding
     private lateinit var fragmentManager: FragmentManager
-    private var circleId: Int = 0
-    private lateinit var circleName: String
+    private var circleId = 0
+    private var circleName = Const.EMPTY_TEXT
     private val viewModel: CircleDetailViewModel by viewModels<CircleDetailViewModelImpl>(
         extrasProducer = {
             defaultViewModelCreationExtras
@@ -86,8 +91,22 @@ class CircleDetailFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         initView()
-        initObserver(requireActivity(), requireContext())
         initListener()
+        initRefreshObserver()
+        lifecycleScope.launch {
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                launch {
+                    viewModel.event.collect {
+                        handleEvent(it, requireActivity(), requireContext())
+                    }
+                }
+                launch {
+                    viewModel.tabFlow.collect {
+                        selectTab(it)
+                    }
+                }
+            }
+        }
     }
 
     private fun initView() {
@@ -98,114 +117,119 @@ class CircleDetailFragment : Fragment() {
         binding.abCircleDetail.setExpanded(viewModel.currentAppBarExpanded)
     }
 
-    private fun initObserver(
+    private fun handleEvent(
+        event: CircleDetailEvent,
         parentActivity: Activity,
         context: Context,
     ) {
-        viewModel.circleDetailState.observe(
-            viewLifecycleOwner,
-            circleDetailStateObserver(parentActivity, context),
-        )
-        viewModel.requestState.observe(
-            viewLifecycleOwner,
-            requestStateObserver(parentActivity, context),
-        )
-        // 정보 수정 여부 감지
-        findNavController()
-            .currentBackStackEntry
-            ?.savedStateHandle
-            ?.let {
-                it.getLiveData<Boolean>(Const.FLAG_CIRCLE_DATA_CHANGED)
-                    .observe(viewLifecycleOwner) { dataChanged ->
-                        if (dataChanged) {
-                            viewModel.refresh()
-                            it[Const.FLAG_CIRCLE_DATA_CHANGED] = false
-                        }
-                    }
-            }
-    }
-
-    private fun circleDetailStateObserver(
-        parentActivity: Activity,
-        context: Context,
-    ) = Observer<UiState> {
-        binding.pgbLoading.isVisible = it is UiState.Loading
-        when (it) {
-            UiState.Success -> {
-                toggleView(binding.flCircleDetail)
-                loadCircleDetail(context)
-                setBtnCircleOverflow(context)
-                setMemberCountListener()
-                setBtnRequestJoinCircle(context)
-            }
-            UiState.AuthenticationError -> {
-                sendUserToLoginScreen(parentActivity)
-                showErrorToast(context)
-            }
-            UiState.ServiceError -> {
-                toggleView(binding.llServiceError)
-                showErrorToast(context)
-            }
+        binding.pgbLoading.isVisible = event is CircleDetailEvent.ShowLoadingView
+        when (event) {
+            is CircleDetailEvent.ShowSuccessView -> showSuccessView(context, event)
+            is CircleDetailEvent.ShowErrorView -> showErrorView()
+            is CircleDetailEvent.ShowToast -> showToast(context, event)
+            is CircleDetailEvent.ShowDialog -> showDialog(context, event)
+            is CircleDetailEvent.SendToLoginScreen -> sendUserToLoginScreen(parentActivity)
             else -> {}
         }
     }
 
-    private fun loadCircleDetail(context: Context) {
-        binding.txtTbCircleName.text = viewModel.circleDetail.name
-        binding.txtCircleName.text = viewModel.circleDetail.name
-        binding.icOfficial.isVisible = viewModel.circleDetail.isOfficial()
-        binding.tlCircleDetail.getTabAt(viewModel.currentTabPosition)?.select() // 탭 복원
-        viewModel.circleDetail.thumbnailUrl?.let {
-            glideProvider.fetchImage(it, context, binding.imgCircleThumbnail)
-        } ?: binding.imgCircleThumbnail.setImageResource(R.drawable.img_circle_profile_default)
-        binding.txtCircleCategory.text = viewModel.circleDetail.category.categoryName()
-        binding.txtCircleMemberCount.text =
-            Html.fromHtml(
-                String.format(
-                    ContextCompat.getString(context, R.string.underlined_number), viewModel.circleDetail.memberCount,
-                ),
-                Html.FROM_HTML_MODE_LEGACY,
-            )
-    }
-
-    private fun sendUserToLoginScreen(activity: Activity) {
-        val intent = Intent(activity, LoginActivity::class.java)
-        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)
-        startActivity(intent)
-    }
-
-    private fun showErrorToast(context: Context) {
-        if (ErrorToast.previousFinished()) {
-            ErrorToast(context, viewModel.error).show()
+    private fun showSuccessView(
+        context: Context,
+        event: CircleDetailEvent.ShowSuccessView,
+    ) {
+        switchView(binding.flCircleDetail)
+        loadCurrentTab(viewModel.currentTabPosition)
+        event.circleDetail.let {
+            loadCircleDetail(context, it)
+            setBtnCircleDetailListener(context, it)
         }
     }
 
-    private fun setBtnCircleOverflow(context: Context) {
+    private fun loadCurrentTab(tabPosition: Int) {
+        binding.tlCircleDetail.getTabAt(tabPosition)?.select()
+    }
+
+    private fun loadCircleDetail(
+        context: Context,
+        circleDetail: CircleDetailModel,
+    ) {
+        circleDetail.let {
+            binding.txtTbCircleName.text = it.name
+            binding.txtCircleName.text = it.name
+            binding.icOfficial.isVisible = it.isOfficial()
+            it.thumbnailUrl?.let {
+                glideProvider.fetchImage(it, context, binding.imgCircleThumbnail)
+            } ?: binding.imgCircleThumbnail.setImageResource(R.drawable.img_circle_profile_default)
+            binding.txtCircleCategory.text = it.category.categoryName()
+            binding.txtCircleMemberCount.text =
+                Html.fromHtml(
+                    String.format(
+                        ContextCompat.getString(context, R.string.underlined_number), it.memberCount,
+                    ),
+                    Html.FROM_HTML_MODE_LEGACY,
+                )
+        }
+    }
+
+    private fun setBtnCircleDetailListener(
+        context: Context,
+        circleDetail: CircleDetailModel,
+    ) {
+        setBtnCircleOverflowListener(context, circleDetail)
+        setBtnMemberCountListener(circleDetail)
+        setBtnRequestJoinCircle(context, circleDetail)
+    }
+
+    private fun setBtnCircleOverflowListener(
+        context: Context,
+        circleDetail: CircleDetailModel,
+    ) {
         binding.btnCircleOverflow.setOnClickListener {
-            val popupMenu = object : PopupMenu(context, binding.btnCircleOverflow) {}
-            if (viewModel.circleDetail.isUserPresident()) {
-                popupMenu.inflate(R.menu.menu_president_circle_settings)
-            } else if (viewModel.circleDetail.isUserExecutive()) {
-                popupMenu.inflate(R.menu.menu_executive_circle_settings)
-                Utils.changeMenuItemTextColor(
-                    popupMenu.menu.findItem(R.id.leave_circle),
-                    ContextCompat.getColor(context, R.color.error),
-                )
-            } else if (viewModel.circleDetail.isUserJoined()) {
-                popupMenu.inflate(R.menu.menu_member_circle_settings)
-                Utils.changeMenuItemTextColor(
-                    popupMenu.menu.findItem(R.id.leave_circle),
-                    ContextCompat.getColor(context, R.color.error),
-                )
-            } else {
+            showPopupByUserRole(context, circleDetail)
+        }
+    }
+
+    private fun showPopupByUserRole(
+        context: Context,
+        circleDetail: CircleDetailModel,
+    ) {
+        val popupMenu = object : PopupMenu(context, binding.btnCircleOverflow) {}
+
+        inflatePopupByUserRole(context, popupMenu, circleDetail.role)
+        popupMenu.setOnMenuItemClickListener(circleOverflowMenuItemClickListener(context, circleDetail))
+        popupMenu.show()
+    }
+
+    private fun inflatePopupByUserRole(
+        context: Context,
+        popupMenu: PopupMenu,
+        role: Role,
+    ) {
+        when (role) {
+            Role.NONE_MEMBER -> {
                 popupMenu.inflate(R.menu.menu_non_member_circle_settings)
                 Utils.changeMenuItemTextColor(
                     popupMenu.menu.findItem(R.id.report_circle),
                     ContextCompat.getColor(context, R.color.error),
                 )
             }
-            popupMenu.setOnMenuItemClickListener(circleOverflowMenuItemClickListener(context, viewModel.circleDetail))
-            popupMenu.show()
+            Role.MEMBER -> {
+                popupMenu.inflate(R.menu.menu_member_circle_settings)
+                Utils.changeMenuItemTextColor(
+                    popupMenu.menu.findItem(R.id.leave_circle),
+                    ContextCompat.getColor(context, R.color.error),
+                )
+            }
+            Role.EXECUTIVE -> {
+                popupMenu.inflate(R.menu.menu_executive_circle_settings)
+                Utils.changeMenuItemTextColor(
+                    popupMenu.menu.findItem(R.id.leave_circle),
+                    ContextCompat.getColor(context, R.color.error),
+                )
+            }
+            Role.PRESIDENT -> {
+                popupMenu.inflate(R.menu.menu_president_circle_settings)
+            }
         }
     }
 
@@ -217,70 +241,21 @@ class CircleDetailFragment : Fragment() {
             R.id.edit_circle -> {
                 sendUserToEditCircleScreen(item)
             }
-
             R.id.manage_circle -> {
                 sendUserToManageCircleScreen(item)
             }
-
             R.id.leave_circle -> {
                 if (item.membershipStatus.isLeaveRequested()) {
-                    ErrorAlertDialog(context, context.getString(R.string.message_already_leave_requested)).show()
+                    showAlreadyLeaveRequestedDialog(context)
                 } else {
-                    CircleRequestAlertDialog(
-                        context,
-                        title = context.getString(R.string.title_member_leave_message_dialog),
-                        content = viewModel.currentLeaveMessage,
-                        positiveButton = context.getString(R.string.btn_leave_request),
-                        object : ItemListenerInitializer<String> {
-                            override fun initialize(item: String) {
-                                viewModel.requestLeave(item)
-                            }
-
-                            override fun initialize(
-                                item: String,
-                                view: View?,
-                            ) {
-                            }
-                        },
-                    ).show()
+                    showLeaveRequestDialog(context)
                 }
             }
-
             R.id.report_circle -> {
-                CircleRequestAlertDialog(
-                    context,
-                    title = ContextCompat.getString(context, R.string.title_report_dialog),
-                    positiveButton = ContextCompat.getString(context, R.string.menu_report),
-                    positiveListenerInitializer =
-                        object : ItemListenerInitializer<String> {
-                            override fun initialize(item: String) {
-                                viewModel.reportCircle(item)
-                            }
-
-                            override fun initialize(
-                                item: String,
-                                view: View?,
-                            ) {}
-                        },
-                ).show()
+                showReportRequestDialog(context)
             }
         }
         true
-    }
-
-    private fun setMemberCountListener() {
-        binding.txtCircleMemberCount.setOnClickListener {
-            sendUserToCircleMemberScreen()
-        }
-    }
-
-    private fun sendUserToCircleMemberScreen() {
-        val bundle = Bundle()
-
-        bundle.putSerializable(Const.TAG_CIRCLE_DETAIL, viewModel.circleDetail)
-        bundle.putSerializable(Const.TAG_MEMBERS, viewModel.circleDetail.members)
-        bundle.putSerializable(Const.TAG_MEMBERSHIP_STATUS, MembershipStatus.JOINED)
-        findNavController().navigate(R.id.action_circleDetailFragment_to_manageCircleMemberFragment, bundle)
     }
 
     private fun sendUserToEditCircleScreen(item: CircleDetailModel) {
@@ -298,10 +273,71 @@ class CircleDetailFragment : Fragment() {
         findNavController().navigate(R.id.action_circleDetailFragment_to_manageCircleFragment, bundle)
     }
 
-    private fun setBtnRequestJoinCircle(context: Context) {
-        binding.btnRequestJoinCircle.isVisible = !viewModel.circleDetail.isUserJoined()
+    private fun showAlreadyLeaveRequestedDialog(context: Context) {
+        SingleMessageAlertDialog(context, context.getString(R.string.message_already_leave_requested)).show()
+    }
 
-        if (viewModel.circleDetail.membershipStatus.isNotJoined()) {
+    private fun showLeaveRequestDialog(context: Context) {
+        CircleRequestAlertDialog(
+            context,
+            title = context.getString(R.string.title_member_leave_message_dialog),
+            positiveButton = context.getString(R.string.btn_leave_request),
+            positiveListenerInitializer =
+                object : ItemListenerInitializer<String> {
+                    override fun initialize(item: String) {
+                        viewModel.requestLeave(item)
+                    }
+
+                    override fun initialize(
+                        item: String,
+                        view: View?,
+                    ) {
+                    }
+                },
+        ).show()
+    }
+
+    private fun showReportRequestDialog(context: Context) {
+        CircleRequestAlertDialog(
+            context,
+            title = context.getString(R.string.title_report_dialog),
+            positiveButton = context.getString(R.string.menu_report),
+            positiveListenerInitializer =
+                object : ItemListenerInitializer<String> {
+                    override fun initialize(item: String) {
+                        viewModel.reportCircle(item)
+                    }
+
+                    override fun initialize(
+                        item: String,
+                        view: View?,
+                    ) {}
+                },
+        ).show()
+    }
+
+    private fun setBtnMemberCountListener(circleDetail: CircleDetailModel) {
+        binding.txtCircleMemberCount.setOnClickListener {
+            sendUserToCircleMemberScreen(circleDetail)
+        }
+    }
+
+    private fun sendUserToCircleMemberScreen(circleDetail: CircleDetailModel) {
+        val bundle = Bundle()
+
+        bundle.putSerializable(Const.TAG_CIRCLE_DETAIL, circleDetail)
+        bundle.putSerializable(Const.TAG_MEMBERS, circleDetail.members)
+        bundle.putSerializable(Const.TAG_MEMBERSHIP_STATUS, MembershipStatus.JOINED)
+        findNavController().navigate(R.id.action_circleDetailFragment_to_manageCircleMemberFragment, bundle)
+    }
+
+    private fun setBtnRequestJoinCircle(
+        context: Context,
+        circleDetail: CircleDetailModel,
+    ) {
+        binding.btnRequestJoinCircle.isVisible = !circleDetail.isUserJoined()
+
+        if (circleDetail.membershipStatus.isNotJoined()) {
             binding.btnRequestJoinCircle.text = context.getString(R.string.btn_request_join_circle)
             binding.btnRequestJoinCircle.backgroundTintList =
                 ColorStateList.valueOf(ContextCompat.getColor(context, R.color.purple_5))
@@ -309,7 +345,7 @@ class CircleDetailFragment : Fragment() {
                 showRequestJoinDialog(context)
             }
         }
-        if (viewModel.circleDetail.membershipStatus.isJoinRequested()) {
+        if (circleDetail.membershipStatus.isJoinRequested()) {
             binding.btnRequestJoinCircle.text = context.getString(R.string.text_circle_join_requested)
             binding.btnRequestJoinCircle.backgroundTintList =
                 ColorStateList.valueOf(ContextCompat.getColor(context, R.color.purple_6))
@@ -321,197 +357,72 @@ class CircleDetailFragment : Fragment() {
         CircleRequestAlertDialog(
             context,
             title = context.getString(R.string.title_member_join_message_dialog),
-            content = viewModel.currentJoinMessage,
             positiveButton = context.getString(R.string.btn_join_request),
-            object : ItemListenerInitializer<String> {
-                override fun initialize(item: String) {
-                    viewModel.requestJoin(item)
-                }
+            positiveListenerInitializer =
+                object : ItemListenerInitializer<String> {
+                    override fun initialize(item: String) {
+                        viewModel.requestJoin(item)
+                    }
 
-                override fun initialize(
-                    item: String,
-                    view: View?,
-                ) {}
-            },
+                    override fun initialize(
+                        item: String,
+                        view: View?,
+                    ) {}
+                },
         ).show()
     }
 
-    private fun requestStateObserver(
-        parentActivity: Activity,
+    private fun showErrorView() {
+        switchView(binding.llServiceError)
+    }
+
+    private fun showToast(
         context: Context,
-    ) = Observer<UiState> {
-        binding.pgbLoading.isVisible = it is UiState.Loading
-        when (it) {
-            UiState.AuthenticationError -> {
-                sendUserToLoginScreen(parentActivity)
-                showErrorToast(context)
-            }
-            UiState.ServiceError -> {
-                showErrorDialog(context)
-            }
-            else -> {}
-        }
-    }
-
-    private fun showErrorDialog(context: Context) {
-        ErrorAlertDialog(context, viewModel.error).show()
-    }
-
-    private fun initListener() {
-        setBtnBackListener()
-        setAbCircleDetailListener()
-        setTlCircleDetailListener()
-        setBtnRetryListener()
-    }
-
-    private fun setBtnBackListener() {
-        binding.btnBack.setOnClickListener {
-            sendUserToPreviousScreen()
-        }
-    }
-
-    private fun sendUserToPreviousScreen() {
-        findNavController().navigateUp()
-    }
-
-    private fun setAbCircleDetailListener() {
-        binding.abCircleDetail.addOnOffsetChangedListener { _, offset ->
-            if (viewModel.currentAppBarExpanded && offset != 0) {
-                viewModel.setAppBarExpanded(false)
-            } else if (!viewModel.currentAppBarExpanded && offset == 0) {
-                viewModel.setAppBarExpanded(true)
-            }
-        }
-    }
-
-    private fun setTlCircleDetailListener() {
-        binding.tlCircleDetail.addOnTabSelectedListener(
-            object : TabLayout.OnTabSelectedListener {
-                override fun onTabSelected(tab: TabLayout.Tab?) {
-                    viewModel.setTabPosition(tab?.position!!)
-                    if (viewModel.circleDetailInitialized) {
-                        replaceScreenByTabPosition()
-                        replaceFabContentByTabPosition()
-                    }
-                }
-
-                override fun onTabUnselected(p0: TabLayout.Tab?) {
-                }
-
-                override fun onTabReselected(p0: TabLayout.Tab?) {
-                    if (viewModel.circleDetailInitialized) {
-                        resetScrollByTabPosition()
-                    }
-                }
-            },
-        )
-    }
-
-    private fun replaceScreenByTabPosition() {
-        val bundle = Bundle()
-
-        when (viewModel.currentTabPosition) {
-            0 -> {
-                replaceToIntroductionScreen(bundle)
-            }
-            1 -> {
-                replaceToNoticeScreen(bundle)
-            }
-            2 -> {
-                replaceToPostScreen(bundle)
-            }
-            3 -> {
-                replaceToPhotoScreen(bundle)
-            }
-        }
-    }
-
-    private fun replaceToIntroductionScreen(bundle: Bundle) {
-        bundle.putSerializable(Const.TAG_CIRCLE_DETAIL, viewModel.circleDetail)
-        replaceTo(CircleDetailIntroductionFragment(), bundle)
-    }
-
-    private fun replaceToNoticeScreen(bundle: Bundle) {
-        if (viewModel.circleDetail.isUserJoined()) {
-            bundle.putInt(Const.TAG_CIRCLE_ID, viewModel.circleDetail.id)
-            bundle.putSerializable(Const.TAG_USER_ROLE, viewModel.circleDetail.role)
-            replaceTo(CircleDetailNoticeFragment(), bundle)
-        } else if (!binding.llNotMember.isVisible) {
-            binding.llNotMember.isVisible = true
-        }
-    }
-
-    private fun replaceToPostScreen(bundle: Bundle) {
-        if (viewModel.circleDetail.isUserJoined()) {
-            bundle.putInt(Const.TAG_CIRCLE_ID, viewModel.circleDetail.id)
-            replaceTo(CircleDetailPostFragment(), bundle)
-        } else if (!binding.llNotMember.isVisible) {
-            binding.llNotMember.isVisible = true
-        }
-    }
-
-    private fun replaceToPhotoScreen(bundle: Bundle) {
-        replaceTo(CircleDetailActivityPhotoFragment())
-    }
-
-    private fun replaceTo(
-        fragment: Fragment,
-        bundle: Bundle? = null,
+        event: CircleDetailEvent.ShowToast,
     ) {
-        bundle?.let {
-            fragment.arguments = bundle
-        }
-
-        val transaction = fragmentManager.beginTransaction()
-        transaction
-            .replace(binding.flCircleDetail.id, fragment)
-            .runOnCommit { removeNotMemberViewIfVisible() } // 비공개 뷰는 fragment 가 아니기 때문에 커밋 직후 별도로 전환
-            .commit()
-    }
-
-    private fun replaceFabContentByTabPosition() {
-        val bundle = Bundle()
-
-        when (viewModel.currentTabPosition) {
-            0 -> {
-                binding.fabUploadCircleContent.isVisible = false
-            }
-            1 -> {
-                binding.fabUploadCircleContent.isVisible = viewModel.circleDetail.isUserExecutive()
-                binding.fabUploadCircleContent.setOnClickListener {
-                    sendUserToUploadPostScreen(circleId, PostType.NOTICE, bundle)
-                }
-            }
-            2 -> {
-                binding.fabUploadCircleContent.isVisible = viewModel.circleDetail.isUserJoined()
-                binding.fabUploadCircleContent.setOnClickListener {
-                    sendUserToUploadPostScreen(circleId, PostType.POST, bundle)
-                }
-            }
-            3 -> {
-                // TODO: 활동 사진 기능 추가 후 fab src 교체 및 리스너 설정
-                binding.fabUploadCircleContent.isVisible = false
-            }
+        if (SingleMessageToast.previousFinished() && !event.hasCollected) {
+            SingleMessageToast(context, event.message).show()
+            event.notifyCollected()
         }
     }
 
-    private fun sendUserToUploadPostScreen(
-        circleId: Int,
-        postType: PostType,
-        bundle: Bundle,
+    private fun showDialog(
+        context: Context,
+        event: CircleDetailEvent.ShowDialog,
     ) {
-        bundle.putInt(Const.TAG_CIRCLE_ID, circleId)
-        bundle.putSerializable(Const.TAG_POST_TYPE, postType)
-        bundle.putBoolean(Const.FLAG_EDIT_SCREEN, false) // 신규 작성 전용 기능 활성화
-        findNavController().navigate(R.id.action_circleDetailFragment_to_uploadPostFragment, bundle)
+        if (!event.hasCollected) {
+            SingleMessageAlertDialog(context, event.message).show()
+            event.notifyCollected()
+        }
     }
 
-    private fun resetScrollByTabPosition() {
+    private fun sendUserToLoginScreen(activity: Activity) {
+        val intent = Intent(activity, LoginActivity::class.java)
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)
+        startActivity(intent)
+    }
+
+    private fun selectTab(event: SelectTab) {
+        event.let {
+            if (it.reselected) {
+                resetScrollByTabPosition(it.circleDetail, it.tabPosition)
+                return
+            }
+
+            replaceScreenByTabPosition(it.circleDetail, it.tabPosition)
+            replaceFabContentByTabPosition(it.circleDetail, it.tabPosition)
+        }
+    }
+
+    private fun resetScrollByTabPosition(
+        circleDetail: CircleDetailModel,
+        tabPosition: Int,
+    ) {
         val bundle = Bundle()
 
-        when (viewModel.currentTabPosition) {
+        when (tabPosition) {
             0 -> {
-                replaceToIntroductionScreen(bundle)
+                replaceToIntroductionScreen(circleDetail, bundle)
             }
             1 -> {
                 resetScrollOfNoticeView()
@@ -542,13 +453,187 @@ class CircleDetailFragment : Fragment() {
         }
     }
 
+    private fun replaceScreenByTabPosition(
+        circleDetail: CircleDetailModel,
+        tabPosition: Int,
+    ) {
+        val bundle = Bundle()
+
+        when (tabPosition) {
+            0 -> {
+                replaceToIntroductionScreen(circleDetail, bundle)
+            }
+            1 -> {
+                replaceToNoticeScreen(circleDetail, bundle)
+            }
+            2 -> {
+                replaceToPostScreen(circleDetail, bundle)
+            }
+            3 -> {
+                replaceToPhotoScreen(bundle)
+            }
+        }
+    }
+
+    private fun replaceToIntroductionScreen(
+        circleDetail: CircleDetailModel,
+        bundle: Bundle,
+    ) {
+        bundle.putSerializable(Const.TAG_CIRCLE_DETAIL, circleDetail)
+        replaceTo(CircleDetailIntroductionFragment(), bundle)
+    }
+
+    private fun replaceToNoticeScreen(
+        circleDetail: CircleDetailModel,
+        bundle: Bundle,
+    ) {
+        if (circleDetail.isUserJoined()) {
+            bundle.putInt(Const.TAG_CIRCLE_ID, circleDetail.id)
+            bundle.putSerializable(Const.TAG_USER_ROLE, circleDetail.role)
+            replaceTo(CircleDetailNoticeFragment(), bundle)
+        } else if (!binding.llNotMember.isVisible) {
+            binding.llNotMember.isVisible = true
+        }
+    }
+
+    private fun replaceToPostScreen(
+        circleDetail: CircleDetailModel,
+        bundle: Bundle,
+    ) {
+        if (circleDetail.isUserJoined()) {
+            bundle.putInt(Const.TAG_CIRCLE_ID, circleDetail.id)
+            replaceTo(CircleDetailPostFragment(), bundle)
+        } else if (!binding.llNotMember.isVisible) {
+            binding.llNotMember.isVisible = true
+        }
+    }
+
+    private fun replaceToPhotoScreen(bundle: Bundle) {
+        replaceTo(CircleDetailActivityPhotoFragment())
+    }
+
+    private fun replaceTo(
+        fragment: Fragment,
+        bundle: Bundle? = null,
+    ) {
+        bundle?.let {
+            fragment.arguments = bundle
+        }
+
+        val transaction = fragmentManager.beginTransaction()
+        transaction
+            .replace(binding.flCircleDetail.id, fragment)
+            .runOnCommit { removeNotMemberViewIfVisible() } // 비공개 뷰는 fragment 가 아니기 때문에 커밋 직후 별도로 전환
+            .commit()
+    }
+
+    private fun replaceFabContentByTabPosition(
+        circleDetail: CircleDetailModel,
+        tabPosition: Int,
+    ) {
+        val bundle = Bundle()
+
+        when (tabPosition) {
+            0 -> {
+                binding.fabUploadCircleContent.isVisible = false
+            }
+            1 -> {
+                binding.fabUploadCircleContent.isVisible = circleDetail.isUserExecutive()
+                binding.fabUploadCircleContent.setOnClickListener {
+                    sendUserToUploadPostScreen(circleId, PostType.NOTICE, bundle)
+                }
+            }
+            2 -> {
+                binding.fabUploadCircleContent.isVisible = circleDetail.isUserJoined()
+                binding.fabUploadCircleContent.setOnClickListener {
+                    sendUserToUploadPostScreen(circleId, PostType.POST, bundle)
+                }
+            }
+            3 -> {
+                // TODO: 활동 사진 기능 추가 후 fab src 교체 및 리스너 설정
+                binding.fabUploadCircleContent.isVisible = false
+            }
+        }
+    }
+
+    private fun sendUserToUploadPostScreen(
+        circleId: Int,
+        postType: PostType,
+        bundle: Bundle,
+    ) {
+        bundle.putInt(Const.TAG_CIRCLE_ID, circleId)
+        bundle.putSerializable(Const.TAG_POST_TYPE, postType)
+        bundle.putBoolean(Const.FLAG_EDIT_SCREEN, false) // 신규 작성 전용 기능 활성화
+        findNavController().navigate(R.id.action_circleDetailFragment_to_uploadPostFragment, bundle)
+    }
+
+    private fun initListener() {
+        setBtnBackListener()
+        setAbCircleDetailListener()
+        setTlCircleDetailListener()
+        setBtnRetryListener()
+    }
+
+    private fun setBtnBackListener() {
+        binding.btnBack.setOnClickListener {
+            sendUserToPreviousScreen()
+        }
+    }
+
+    private fun sendUserToPreviousScreen() {
+        findNavController().popBackStack()
+    }
+
+    private fun setAbCircleDetailListener() {
+        binding.abCircleDetail.addOnOffsetChangedListener { _, offset ->
+            if (viewModel.currentAppBarExpanded && offset != 0) {
+                viewModel.setAppBarExpanded(false)
+            } else if (!viewModel.currentAppBarExpanded && offset == 0) {
+                viewModel.setAppBarExpanded(true)
+            }
+        }
+    }
+
+    private fun setTlCircleDetailListener() {
+        binding.tlCircleDetail.addOnTabSelectedListener(
+            object : TabLayout.OnTabSelectedListener {
+                override fun onTabSelected(tab: TabLayout.Tab?) {
+                    viewModel.selectTab(tab?.position!!, false)
+                }
+
+                override fun onTabUnselected(p0: TabLayout.Tab?) {
+                }
+
+                override fun onTabReselected(tab: TabLayout.Tab?) {
+                    viewModel.selectTab(tab?.position!!, true)
+                }
+            },
+        )
+    }
+
     private fun setBtnRetryListener() {
         binding.btnRetry.setOnClickListener {
             viewModel.refresh()
         }
     }
 
-    private fun toggleView(view: View) {
+    private fun initRefreshObserver() {
+        // 정보 수정 여부 감지
+        findNavController()
+            .currentBackStackEntry
+            ?.savedStateHandle
+            ?.let {
+                it.getLiveData<Boolean>(Const.FLAG_CIRCLE_DATA_CHANGED)
+                    .observe(viewLifecycleOwner) { dataChanged ->
+                        if (dataChanged) {
+                            viewModel.refresh()
+                            it[Const.FLAG_CIRCLE_DATA_CHANGED] = false
+                        }
+                    }
+            }
+    }
+
+    private fun switchView(view: View) {
         binding.flCircleDetail.isVisible = view == binding.flCircleDetail
         binding.llServiceError.isVisible = view == binding.llServiceError
     }

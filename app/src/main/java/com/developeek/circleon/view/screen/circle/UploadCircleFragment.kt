@@ -33,8 +33,8 @@ import com.developeek.circleon.view.listener.ItemListenerInitializer
 import com.developeek.circleon.view.screen.login.LoginActivity
 import com.developeek.circleon.view.viewmodel.circle.UploadCircleViewModel
 import com.developeek.circleon.view.viewmodelimpl.circle.UploadCircleViewModelImpl
-import com.developeek.circleon.view.widget.ErrorAlertDialog
-import com.developeek.circleon.view.widget.ErrorToast
+import com.developeek.circleon.view.widget.SingleMessageAlertDialog
+import com.developeek.circleon.view.widget.SingleMessageToast
 import com.google.android.flexbox.FlexDirection
 import com.google.android.flexbox.FlexboxLayoutManager
 import com.google.android.material.bottomnavigation.BottomNavigationView
@@ -254,12 +254,12 @@ class UploadCircleFragment : Fragment() {
             }
             UiState.AuthenticationError -> {
                 sendUserToLoginScreen(parentActivity)
-                if (ErrorToast.previousFinished()) {
-                    ErrorToast(context, viewModel.error).show()
+                if (SingleMessageToast.previousFinished()) {
+                    SingleMessageToast(context, viewModel.error).show()
                 }
             }
             UiState.ServiceError -> {
-                ErrorAlertDialog(context, viewModel.error).show()
+                SingleMessageAlertDialog(context, viewModel.error).show()
             }
             else -> {}
         }

@@ -44,21 +44,19 @@ class CircleRepositoryImpl(
         category: Category,
     ): Result<Page<CircleModel>> {
         return try {
-            withContext(dispatcher) {
-                val response =
-                    if (category == Category.ALL) {
-                        service.getAllCircles(page, size, SORT_CIRCLE_OLDEST)
-                    } else {
-                        service.getCircleScrollContents(page, size, SORT_CIRCLE_OLDEST, category.codeName())
+            val response =
+                if (category.isSame(Category.ALL)) {
+                    service.getAllCircles(page, size, SORT_CIRCLE_OLDEST)
+                } else {
+                    service.getCircleScrollContents(page, size, SORT_CIRCLE_OLDEST, category.codeName())
+                }
+            Result.success(
+                Page(response.content.map { it.toCircleModel() }).apply {
+                    if (response.isLastPage()) {
+                        setAsLast()
                     }
-                Result.success(
-                    Page(response.content.map { it.toCircleModel() }).apply {
-                        if (response.isLastPage()) {
-                            setAsLast()
-                        }
-                    },
-                )
-            }
+                },
+            )
         } catch (e: ServiceException.NoResultException) {
             Result.success(Page(emptyList()))
         } catch (e: Exception) {

@@ -31,7 +31,7 @@ import com.developeek.circleon.view.listener.RecyclerViewHideSoftInputListener
 import com.developeek.circleon.view.screen.login.LoginActivity
 import com.developeek.circleon.view.viewmodel.home.SearchViewModel
 import com.developeek.circleon.view.viewmodelimpl.home.SearchViewModelImpl
-import com.developeek.circleon.view.widget.ErrorToast
+import com.developeek.circleon.view.widget.SingleMessageToast
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -149,14 +149,14 @@ class SearchCircleFragment : Fragment() {
             }
             UiState.AuthenticationError -> {
                 sendUserToLoginScreen(parentActivity)
-                if (ErrorToast.previousFinished()) {
-                    ErrorToast(context, viewModel.error).show()
+                if (SingleMessageToast.previousFinished()) {
+                    SingleMessageToast(context, viewModel.error).show()
                 }
             }
             UiState.ServiceError -> {
                 toggleView(binding.llServiceError)
-                if (ErrorToast.previousFinished()) {
-                    ErrorToast(context, viewModel.error).show()
+                if (SingleMessageToast.previousFinished()) {
+                    SingleMessageToast(context, viewModel.error).show()
                 }
             }
             else -> {}

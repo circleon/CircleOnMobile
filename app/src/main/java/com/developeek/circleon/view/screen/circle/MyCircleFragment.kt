@@ -30,8 +30,8 @@ import com.developeek.circleon.view.listener.ItemListenerInitializer
 import com.developeek.circleon.view.screen.login.LoginActivity
 import com.developeek.circleon.view.viewmodel.circle.MyCircleViewModel
 import com.developeek.circleon.view.viewmodelimpl.circle.MyCircleViewModelImpl
-import com.developeek.circleon.view.widget.ErrorAlertDialog
-import com.developeek.circleon.view.widget.ErrorToast
+import com.developeek.circleon.view.widget.SingleMessageAlertDialog
+import com.developeek.circleon.view.widget.SingleMessageToast
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
@@ -220,12 +220,12 @@ class MyCircleFragment : Fragment() {
     }
 
     private fun showErrorDialog(context: Context) {
-        ErrorAlertDialog(context, viewModel.error).show()
+        SingleMessageAlertDialog(context, viewModel.error).show()
     }
 
     private fun showErrorToast(context: Context) {
-        if (ErrorToast.previousFinished()) {
-            ErrorToast(context, viewModel.error).show()
+        if (SingleMessageToast.previousFinished()) {
+            SingleMessageToast(context, viewModel.error).show()
         }
     }
 

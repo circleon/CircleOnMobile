@@ -1,29 +1,28 @@
 package com.developeek.circleon.view.viewmodel.home
 
-import androidx.lifecycle.LiveData
-import com.developeek.circleon.domain.model.CircleDetailModel
-import com.developeek.circleon.domain.state.UiState
+import com.developeek.circleon.view.viewmodelimpl.home.CircleDetailEvent
+import com.developeek.circleon.view.viewmodelimpl.home.SelectTab
+import kotlinx.coroutines.flow.SharedFlow
+import kotlinx.coroutines.flow.StateFlow
 
 interface CircleDetailViewModel {
-    val circleDetailState: LiveData<UiState>
-    val requestState: LiveData<UiState>
-    val circleDetail: CircleDetailModel
-    val circleDetailInitialized: Boolean
+    val event: StateFlow<CircleDetailEvent>
+    val tabFlow: SharedFlow<SelectTab>
     val currentTabPosition: Int
     val currentAppBarExpanded: Boolean
-    val currentJoinMessage: String
-    val currentLeaveMessage: String
-    val error: String
 
     fun refresh()
-
-    fun setTabPosition(position: Int)
-
-    fun setAppBarExpanded(expanded: Boolean)
 
     fun requestJoin(joinMessage: String)
 
     fun requestLeave(leaveMessage: String)
 
-    fun reportCircle(content: String)
+    fun reportCircle(reportMessage: String)
+
+    fun selectTab(
+        position: Int,
+        reselected: Boolean,
+    )
+
+    fun setAppBarExpanded(expanded: Boolean)
 }

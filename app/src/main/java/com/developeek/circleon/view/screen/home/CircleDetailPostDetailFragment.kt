@@ -41,9 +41,9 @@ import com.developeek.circleon.view.viewmodel.home.CircleDetailPostDetailViewMod
 import com.developeek.circleon.view.viewmodelimpl.home.CircleDetailPostDetailViewModelImpl
 import com.developeek.circleon.view.widget.CircleRequestAlertDialog
 import com.developeek.circleon.view.widget.EditCommentAlertDialog
-import com.developeek.circleon.view.widget.ErrorAlertDialog
-import com.developeek.circleon.view.widget.ErrorToast
+import com.developeek.circleon.view.widget.PositiveAlertDialog
 import com.developeek.circleon.view.widget.SingleMessageAlertDialog
+import com.developeek.circleon.view.widget.SingleMessageToast
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import dagger.hilt.android.AndroidEntryPoint
 import dagger.hilt.android.lifecycle.withCreationCallback
@@ -210,7 +210,7 @@ class CircleDetailPostDetailFragment : Fragment() {
             }
 
             R.id.delete_post -> {
-                SingleMessageAlertDialog(
+                PositiveAlertDialog(
                     context,
                     if (item.isNotice()) MESSAGE_DELETE_NOTICE else MESSAGE_DELETE_POST,
                     ContextCompat.getString(context, R.string.btn_delete),
@@ -306,7 +306,7 @@ class CircleDetailPostDetailFragment : Fragment() {
             }
 
             R.id.delete_comment -> {
-                SingleMessageAlertDialog(
+                PositiveAlertDialog(
                     context,
                     MESSAGE_DELETE_COMMENT,
                     ContextCompat.getString(context, R.string.btn_delete),
@@ -415,13 +415,13 @@ class CircleDetailPostDetailFragment : Fragment() {
     }
 
     private fun showErrorToast(context: Context) {
-        if (ErrorToast.previousFinished()) {
-            ErrorToast(context, viewModel.error).show()
+        if (SingleMessageToast.previousFinished()) {
+            SingleMessageToast(context, viewModel.error).show()
         }
     }
 
     private fun showErrorDialog(context: Context) {
-        ErrorAlertDialog(context, viewModel.error).show()
+        SingleMessageAlertDialog(context, viewModel.error).show()
     }
 
     private fun sendUserToLoginScreen(activity: Activity) {
@@ -500,7 +500,7 @@ class CircleDetailPostDetailFragment : Fragment() {
                 showErrorToast(context)
             }
             UiState.ServiceError -> {
-                ErrorAlertDialog(context, viewModel.error).show()
+                SingleMessageAlertDialog(context, viewModel.error).show()
             }
             else -> {}
         }
@@ -529,7 +529,7 @@ class CircleDetailPostDetailFragment : Fragment() {
                 showErrorToast(context)
             }
             UiState.ServiceError -> {
-                ErrorAlertDialog(context, viewModel.error).show()
+                SingleMessageAlertDialog(context, viewModel.error).show()
             }
             else -> {}
         }

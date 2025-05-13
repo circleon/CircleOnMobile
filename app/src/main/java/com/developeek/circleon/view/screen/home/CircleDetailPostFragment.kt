@@ -34,9 +34,9 @@ import com.developeek.circleon.view.screen.login.LoginActivity
 import com.developeek.circleon.view.viewmodel.home.CircleDetailPostViewModel
 import com.developeek.circleon.view.viewmodelimpl.home.CircleDetailPostViewModelImpl
 import com.developeek.circleon.view.widget.CircleRequestAlertDialog
-import com.developeek.circleon.view.widget.ErrorAlertDialog
-import com.developeek.circleon.view.widget.ErrorToast
+import com.developeek.circleon.view.widget.PositiveAlertDialog
 import com.developeek.circleon.view.widget.SingleMessageAlertDialog
+import com.developeek.circleon.view.widget.SingleMessageToast
 import com.google.android.material.progressindicator.CircularProgressIndicator
 import dagger.hilt.android.AndroidEntryPoint
 import dagger.hilt.android.lifecycle.withCreationCallback
@@ -184,7 +184,7 @@ class CircleDetailPostFragment : Fragment() {
             }
 
             R.id.delete_post -> {
-                SingleMessageAlertDialog(
+                PositiveAlertDialog(
                     context,
                     MESSAGE_DELETE_POST,
                     ContextCompat.getString(context, R.string.btn_delete),
@@ -307,13 +307,13 @@ class CircleDetailPostFragment : Fragment() {
     }
 
     private fun showErrorToast(context: Context) {
-        if (ErrorToast.previousFinished()) {
-            ErrorToast(context, viewModel.error).show()
+        if (SingleMessageToast.previousFinished()) {
+            SingleMessageToast(context, viewModel.error).show()
         }
     }
 
     private fun showErrorDialog(context: Context) {
-        ErrorAlertDialog(context, viewModel.error).show()
+        SingleMessageAlertDialog(context, viewModel.error).show()
     }
 
     private fun scrollOverObserver() =

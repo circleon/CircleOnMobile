@@ -28,8 +28,8 @@ import com.developeek.circleon.domain.utils.glide.GlideProvider
 import com.developeek.circleon.view.screen.login.LoginActivity
 import com.developeek.circleon.view.viewmodel.home.UploadPostViewModel
 import com.developeek.circleon.view.viewmodelimpl.home.UploadPostViewModelImpl
-import com.developeek.circleon.view.widget.ErrorAlertDialog
-import com.developeek.circleon.view.widget.ErrorToast
+import com.developeek.circleon.view.widget.SingleMessageAlertDialog
+import com.developeek.circleon.view.widget.SingleMessageToast
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import dagger.hilt.android.AndroidEntryPoint
 import dagger.hilt.android.lifecycle.withCreationCallback
@@ -175,12 +175,12 @@ class UploadPostFragment : Fragment() {
             }
             UiState.AuthenticationError -> {
                 sendUserToLoginScreen(parentActivity)
-                if (ErrorToast.previousFinished()) {
-                    ErrorToast(context, viewModel.error).show()
+                if (SingleMessageToast.previousFinished()) {
+                    SingleMessageToast(context, viewModel.error).show()
                 }
             }
             UiState.ServiceError -> {
-                ErrorAlertDialog(context, viewModel.error).show()
+                SingleMessageAlertDialog(context, viewModel.error).show()
             }
             else -> {}
         }

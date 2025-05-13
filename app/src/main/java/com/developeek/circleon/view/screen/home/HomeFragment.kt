@@ -25,6 +25,7 @@ import com.developeek.circleon.domain.model.CategoryModel
 import com.developeek.circleon.domain.model.CategoryModels
 import com.developeek.circleon.domain.model.CircleModel
 import com.developeek.circleon.domain.model.CircleModels
+import com.developeek.circleon.domain.model.UserModel
 import com.developeek.circleon.domain.utils.Const
 import com.developeek.circleon.domain.utils.glide.GlideProvider
 import com.developeek.circleon.view.adapter.CategoryAdapter
@@ -35,7 +36,7 @@ import com.developeek.circleon.view.screen.login.LoginActivity
 import com.developeek.circleon.view.viewmodel.home.HomeViewModel
 import com.developeek.circleon.view.viewmodelimpl.home.HomeEvent
 import com.developeek.circleon.view.viewmodelimpl.home.HomeViewModelImpl
-import com.developeek.circleon.view.widget.ErrorToast
+import com.developeek.circleon.view.widget.SingleMessageToast
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -87,6 +88,9 @@ class HomeFragment : Fragment() {
     private fun initView(context: Context) {
         initCategoryRecyclerView(context)
         initCircleRecyclerView(context)
+        userManager.getUser()?.let {
+            loadUserInfo(context, it)
+        }
     }
 
     private fun initCategoryRecyclerView(context: Context) {
@@ -146,6 +150,17 @@ class HomeFragment : Fragment() {
         }
     }
 
+    private fun loadUserInfo(
+        context: Context,
+        user: UserModel,
+    ) {
+        binding.txtUnivName.text = user.univ.univName()
+        binding.txtContentTitleCircle.text =
+            String.format(
+                context.getString(R.string.home_content_title_circle), user.name,
+            )
+    }
+
     private fun handleEvent(
         event: HomeEvent,
         parentActivity: Activity,
@@ -169,16 +184,15 @@ class HomeFragment : Fragment() {
 
     private fun showSuccessView(event: HomeEvent.ShowSuccessView) {
         if (event.circles.isEmpty()) {
-            toggleView(binding.txtNoCircle)
+            switchView(binding.txtNoCircle)
         } else {
-            toggleView(binding.rvCircle)
-            loadUserInfo()
-            loadCircles(
+            switchView(binding.rvCircle)
+            loadCirclesAndDoAfter(
                 event.circles,
                 after = {
                     if (!event.hasCollected) {
                         binding.rvCircle.scrollToPosition(0)
-                        event.hasCollected = true
+                        event.notifyCollected()
                     }
                 },
             )
@@ -187,14 +201,7 @@ class HomeFragment : Fragment() {
         binding.shimmerCircle.stopShimmer()
     }
 
-    private fun loadUserInfo() {
-        userManager.getUser()?.let {
-            binding.txtUnivName.text = it.univ.univName()
-            binding.txtContentTitleCircle.text = String.format(CONTENT_TITLE_CIRCLE, it.name)
-        }
-    }
-
-    private fun loadCircles(
+    private fun loadCirclesAndDoAfter(
         circles: CircleModels,
         after: () -> Unit,
     ) {
@@ -206,12 +213,12 @@ class HomeFragment : Fragment() {
     }
 
     private fun showLoadingView() {
-        toggleView(binding.shimmerCircle)
+        switchView(binding.shimmerCircle)
         binding.shimmerCircle.startShimmer()
     }
 
     private fun showErrorView() {
-        toggleView(binding.llServiceError)
+        switchView(binding.llServiceError)
     }
 
     private fun sendUserToLoginScreen(activity: Activity) {
@@ -224,9 +231,9 @@ class HomeFragment : Fragment() {
         context: Context,
         event: HomeEvent.ShowToast,
     ) {
-        if (ErrorToast.previousFinished() && !event.hasCollected) {
-            ErrorToast(context, event.message).show()
-            event.hasCollected = true
+        if (SingleMessageToast.previousFinished() && !event.hasCollected) {
+            SingleMessageToast(context, event.message).show()
+            event.notifyCollected()
         }
     }
 
@@ -264,22 +271,18 @@ class HomeFragment : Fragment() {
     private fun addScrollLoadingItemAndLoad() {
         binding.rvCircle.adapter?.let {
             (it as CircleAdapter).addLoadingItem()
+            viewModel.scrollOver()
         }
-        viewModel.scrollOver()
     }
 
     private fun sendUserToSearchCircleScreen() {
         findNavController().navigate(R.id.action_homeFragment_to_searchCircleFragment)
     }
 
-    private fun toggleView(view: View) {
+    private fun switchView(view: View) {
         binding.rvCircle.isVisible = view == binding.rvCircle
         binding.shimmerCircle.isVisible = view == binding.shimmerCircle
         binding.txtNoCircle.isVisible = view == binding.txtNoCircle
         binding.llServiceError.isVisible = view == binding.llServiceError
-    }
-
-    companion object {
-        private const val CONTENT_TITLE_CIRCLE = "%s 님 이런 동아리는 어떠신가요?"
     }
 }
