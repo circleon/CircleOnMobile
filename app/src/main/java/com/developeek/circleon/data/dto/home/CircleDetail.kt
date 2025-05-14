@@ -6,7 +6,6 @@ import com.developeek.circleon.domain.enums.MembershipStatus
 import com.developeek.circleon.domain.enums.OfficialStatus
 import com.developeek.circleon.domain.enums.Role
 import com.developeek.circleon.domain.model.CircleDetailModel
-import com.developeek.circleon.domain.model.MemberModels
 import com.developeek.circleon.domain.utils.Utils
 import com.google.gson.annotations.SerializedName
 import java.time.LocalDateTime
@@ -29,7 +28,7 @@ data class CircleDetail(
     val memberId: Int?,
     val membershipStatus: String?,
 ) {
-    fun toCircleDetailModel(circleMembers: MemberModels) =
+    fun toCircleDetailModel() =
         CircleDetailModel(
             id,
             name,
@@ -42,7 +41,6 @@ data class CircleDetail(
             Utils.getCircleImageUrlOrNull(thumbnailUrl),
             singleLineIntroduction,
             memberCount,
-            circleMembers,
             Utils.getCircleImageUrlOrNull(introImgUrl),
             introduction,
             localDateTime(recruitmentStartDate),

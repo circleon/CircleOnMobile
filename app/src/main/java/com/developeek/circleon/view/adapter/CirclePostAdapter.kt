@@ -170,6 +170,12 @@ class CirclePostAdapter(
         diffUtil.submitList(models.get(), commitCallback)
     }
 
+    fun addLoadingItem() {
+        if (diffUtil.currentList.last() == PostModel.emptyInstance()) return
+
+        diffUtil.submitList(diffUtil.currentList + PostModel.emptyInstance())
+    }
+
     companion object {
         private const val CREATED_DATE_FORMAT = "M월 d일 HH:mm"
         private const val VIEW_TYPE_LOADING = 0

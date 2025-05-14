@@ -18,7 +18,7 @@ data class PostModels(private val models: List<PostModel>) {
 
     fun add(postModel: PostModel) = PostModels(models + postModel)
 
-    fun addAll(postModels: PostModels) = PostModels(models + postModels.get())
+    fun addAllAndGet(postModels: List<PostModel>) = PostModels(models + postModels)
 
     fun setAsLast() {
         isLastPage = true

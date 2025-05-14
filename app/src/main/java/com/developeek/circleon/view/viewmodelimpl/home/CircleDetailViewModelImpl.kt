@@ -4,10 +4,13 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.developeek.circleon.data.repository.CircleRepository
 import com.developeek.circleon.data.source.Error
+import com.developeek.circleon.data.source.Result
 import com.developeek.circleon.data.source.Success
 import com.developeek.circleon.domain.model.CircleDetailModel
+import com.developeek.circleon.domain.model.MemberModels
 import com.developeek.circleon.domain.utils.validator.Invalid
 import com.developeek.circleon.domain.utils.validator.Validator
+import com.developeek.circleon.view.Event
 import com.developeek.circleon.view.viewmodel.home.CircleDetailViewModel
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
@@ -15,6 +18,7 @@ import dagger.assisted.AssistedInject
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
@@ -34,11 +38,12 @@ class CircleDetailViewModelImpl
             fun create(circleId: Int): CircleDetailViewModelImpl
         }
 
-        private val _event = MutableStateFlow<CircleDetailEvent>(CircleDetailEvent.ShowLoadingView)
-        override val event: StateFlow<CircleDetailEvent> = _event
+        private val _event = MutableSharedFlow<Event>()
+        override val event: SharedFlow<Event> = _event
+        private val _screenFlow = MutableStateFlow<CircleDetailScreen>(CircleDetailScreen.LoadingView)
+        override val screenFlow: StateFlow<CircleDetailScreen> = _screenFlow
         private val _tabFlow = MutableSharedFlow<SelectTab>()
         override val tabFlow: SharedFlow<SelectTab> = _tabFlow
-        private val dispatcher = Dispatchers.IO
 
         override val currentTabPosition: Int
             get() = _currentTabPosition
@@ -52,6 +57,7 @@ class CircleDetailViewModelImpl
 
         private var fetchCircleDetailJob: Job? = null
         private var userRequestJob: Job? = null
+        private val dispatcher = Dispatchers.IO
 
         init {
             fetchCircleDetail()
@@ -64,36 +70,58 @@ class CircleDetailViewModelImpl
 
             fetchCircleDetailJob =
                 viewModelScope.launch {
-                    _event.emit(CircleDetailEvent.ShowLoadingView)
+                    _screenFlow.emit(CircleDetailScreen.LoadingView)
 
-                    when (val result = getCircleDetail(circleId)) {
-                        is Success -> {
-                            whenFetchCircleDetailSuccess(result)
-                        }
-                        is Error -> {
-                            whenFetchCircleDetailFail(result)
-                        }
+                    val circleDetailResult: Result<CircleDetailModel>
+                    val circleMembersResult: Result<MemberModels>
+                    withContext(dispatcher) {
+                        val circleDetail =
+                            async {
+                                repository.getCircleDetail(circleId)
+                            }
+                        val circleMembers =
+                            async {
+                                repository.getCircleMembers(circleId, DEFAULT_PAGE, MEMBER_SIZE_BY_PAGE)
+                            }
+
+                        circleDetailResult = circleDetail.await()
+                        circleMembersResult = circleMembers.await()
+                    }
+
+                    if (circleDetailResult is Success && circleMembersResult is Success) {
+                        whenFetchCircleDetailAndMembersSuccess(circleDetailResult, circleMembersResult)
+                    }
+                    if (circleDetailResult is Error) {
+                        whenFetchCircleDetailFail(circleDetailResult)
+                    } else if (circleMembersResult is Error) {
+                        whenFetchCircleMembersFail(circleMembersResult)
                     }
                 }
         }
 
-        private suspend fun getCircleDetail(circleId: Int) =
-            withContext(dispatcher) {
-                repository.getCircleDetail(circleId)
-            }
-
-        private suspend fun whenFetchCircleDetailSuccess(result: Success<CircleDetailModel>) {
-            circleDetail = result.data
-            _event.emit(CircleDetailEvent.ShowSuccessView(circleDetail))
+        private suspend fun whenFetchCircleDetailAndMembersSuccess(
+            circleDetailResult: Success<CircleDetailModel>,
+            circleMembersResult: Success<MemberModels>,
+        ) {
+            circleDetail = CircleDetailModel(circleDetailResult.data, circleMembersResult.data)
+            _screenFlow.emit(CircleDetailScreen.SuccessView(circleDetail))
         }
 
         private suspend fun whenFetchCircleDetailFail(result: Error<CircleDetailModel>) {
-            _event.emit(CircleDetailEvent.ShowToast(result.message()))
+            _event.emit(Event.ShowToast(result.message()))
+            _screenFlow.emit(CircleDetailScreen.ErrorView)
 
             if (result.isAuthenticationError()) {
-                _event.emit(CircleDetailEvent.SendToLoginScreen)
-            } else {
-                _event.emit(CircleDetailEvent.ShowErrorView)
+                _event.emit(Event.SendToLoginScreen)
+            }
+        }
+
+        private suspend fun whenFetchCircleMembersFail(result: Error<MemberModels>) {
+            _event.emit(Event.ShowToast(result.message()))
+            _screenFlow.emit(CircleDetailScreen.ErrorView)
+
+            if (result.isAuthenticationError()) {
+                _event.emit(Event.SendToLoginScreen)
             }
         }
 
@@ -108,16 +136,23 @@ class CircleDetailViewModelImpl
 
             viewModelScope.launch {
                 if (!checkMessageFormat(joinMessage)) return@launch
-                _event.emit(CircleDetailEvent.ShowLoadingView)
+                _event.emit(Event.Loading)
 
                 userRequestJob =
                     launch {
-                        when (val result = repository.postMyCircle(circleId, joinMessage)) {
+                        when (val result = postMyCircle(circleId, joinMessage)) {
                             is Success -> showToastAndRefresh(MESSAGE_SUCCESS_REQUEST_JOIN)
                             is Error -> whenUserRequestFail(result)
                         }
                     }
             }
+        }
+
+        private suspend fun postMyCircle(
+            circleId: Int,
+            message: String,
+        ) = withContext(dispatcher) {
+            repository.postMyCircle(circleId, message)
         }
 
         override fun requestLeave(leaveMessage: String) {
@@ -127,11 +162,11 @@ class CircleDetailViewModelImpl
 
             viewModelScope.launch {
                 if (!checkMessageFormat(leaveMessage)) return@launch
-                _event.emit(CircleDetailEvent.ShowLoadingView)
+                _event.emit(Event.Loading)
 
                 userRequestJob =
                     launch {
-                        when (val result = repository.postCircleLeaveRequest(circleDetail.memberId, leaveMessage)) {
+                        when (val result = postCircleLeaveRequest(circleDetail.memberId, leaveMessage)) {
                             is Success -> showToastAndRefresh(MESSAGE_SUCCESS_REQUEST_LEAVE)
                             is Error -> whenUserRequestFail(result)
                         }
@@ -139,27 +174,41 @@ class CircleDetailViewModelImpl
             }
         }
 
-        override fun reportCircle(reportMessage: String) {
+        private suspend fun postCircleLeaveRequest(
+            memberId: Int,
+            message: String,
+        ) = withContext(dispatcher) {
+            repository.postCircleLeaveRequest(memberId, message)
+        }
+
+        override fun requestReport(reportMessage: String) {
             userRequestJob?.let {
                 if (!it.isCompleted) return
             }
 
             viewModelScope.launch {
                 if (!checkMessageFormat(reportMessage)) return@launch
-                _event.emit(CircleDetailEvent.ShowLoadingView)
+                _event.emit(Event.Loading)
 
-                when (val result = repository.postReportCircle(circleId, reportMessage)) {
+                when (val result = postReportCircle(circleId, reportMessage)) {
                     is Success -> showToastAndRefresh(MESSAGE_SUCCESS_REQUEST_REPORT)
                     is Error -> whenUserRequestFail(result)
                 }
             }
         }
 
+        private suspend fun postReportCircle(
+            circleId: Int,
+            message: String,
+        ) = withContext(dispatcher) {
+            repository.postReportCircle(circleId, message)
+        }
+
         private suspend fun checkMessageFormat(message: String): Boolean {
             val result = Validator.checkMessage(message)
 
             return if (result is Invalid) {
-                _event.emit(CircleDetailEvent.ShowDialog(result.message()))
+                _event.emit(Event.ShowDialog(result.message()))
                 false
             } else {
                 true
@@ -167,18 +216,18 @@ class CircleDetailViewModelImpl
         }
 
         private suspend fun showToastAndRefresh(message: String) {
-            _event.emit(CircleDetailEvent.ShowToast(message))
+            _event.emit(Event.ShowToast(message))
             refresh()
         }
 
         private suspend fun whenUserRequestFail(result: Error<Unit>) {
             if (result.isAuthenticationError()) {
-                _event.emit(CircleDetailEvent.ShowToast(result.message()))
-                _event.emit(CircleDetailEvent.SendToLoginScreen)
+                _event.emit(Event.ShowToast(result.message()))
+                _event.emit(Event.SendToLoginScreen)
                 return
             }
 
-            _event.emit(CircleDetailEvent.ShowDialog(result.message()))
+            _event.emit(Event.ShowDialog(result.message()))
         }
 
         override fun selectTab(
@@ -202,29 +251,17 @@ class CircleDetailViewModelImpl
             private const val MESSAGE_SUCCESS_REQUEST_JOIN = "가입 신청이 완료됐어요"
             private const val MESSAGE_SUCCESS_REQUEST_LEAVE = "탈퇴 신청이 완료됐어요"
             private const val MESSAGE_SUCCESS_REQUEST_REPORT = "신고 요청이 완료됐어요"
+            private const val MEMBER_SIZE_BY_PAGE = 200
+            private const val DEFAULT_PAGE = 0
         }
     }
 
-sealed class CircleDetailEvent {
-    val hasCollected: Boolean
-        get() = _hasCollected
-    private var _hasCollected = false
+sealed class CircleDetailScreen {
+    data class SuccessView(val circleDetail: CircleDetailModel) : CircleDetailScreen()
 
-    fun notifyCollected() {
-        _hasCollected = true
-    }
+    data object LoadingView : CircleDetailScreen()
 
-    data class ShowSuccessView(val circleDetail: CircleDetailModel) : CircleDetailEvent()
-
-    data object ShowLoadingView : CircleDetailEvent()
-
-    data object ShowErrorView : CircleDetailEvent()
-
-    data class ShowToast(val message: String) : CircleDetailEvent()
-
-    data class ShowDialog(val message: String) : CircleDetailEvent()
-
-    data object SendToLoginScreen : CircleDetailEvent()
+    data object ErrorView : CircleDetailScreen()
 }
 
 data class SelectTab(

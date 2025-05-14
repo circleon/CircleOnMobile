@@ -1,28 +1,18 @@
 package com.developeek.circleon.view.viewmodel.home
 
-import android.os.Parcelable
-import androidx.lifecycle.LiveData
-import androidx.recyclerview.widget.RecyclerView
-import com.developeek.circleon.domain.model.PostModels
-import com.developeek.circleon.domain.state.UiState
+import com.developeek.circleon.view.Event
+import com.developeek.circleon.view.viewmodelimpl.home.CircleDetailPostScreen
+import kotlinx.coroutines.flow.SharedFlow
+import kotlinx.coroutines.flow.StateFlow
 
 interface CircleDetailPostViewModel {
-    val state: LiveData<UiState>
-    val postState: LiveData<UiState>
-    val posts: PostModels
-    val scrollOver: LiveData<Boolean>
-    val scrollListener: RecyclerView.OnScrollListener
-    val currentScrollState: Parcelable?
-    val currentTopOrNot: Boolean
-    val error: String
+    val event: SharedFlow<Event>
+    val screenFlow: StateFlow<CircleDetailPostScreen>
+    val isLastPage: Boolean
 
     fun refresh()
 
     fun scrollOver()
-
-    fun saveScrollState(scrollState: Parcelable?)
-
-    fun setTopOrNot(isTop: Boolean)
 
     fun pinAndFetch(postId: Int)
 
@@ -30,8 +20,8 @@ interface CircleDetailPostViewModel {
 
     fun deleteAndFetch(postId: Int)
 
-    fun reportPost(
+    fun requestReportPost(
         postId: Int,
-        content: String,
+        reportMessage: String,
     )
 }

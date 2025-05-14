@@ -14,7 +14,9 @@ import androidx.core.os.bundleOf
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.Observer
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -23,17 +25,20 @@ import com.developeek.circleon.data.source.manager.UserManager
 import com.developeek.circleon.databinding.FragmentCircleDetailNoticeBinding
 import com.developeek.circleon.domain.enums.PostType
 import com.developeek.circleon.domain.enums.Role
+import com.developeek.circleon.domain.model.CircleDetailModel
 import com.developeek.circleon.domain.model.PostModel
-import com.developeek.circleon.domain.state.UiState
+import com.developeek.circleon.domain.model.PostModels
 import com.developeek.circleon.domain.utils.Const
 import com.developeek.circleon.domain.utils.Utils
 import com.developeek.circleon.domain.utils.glide.GlideProvider
+import com.developeek.circleon.view.Event
 import com.developeek.circleon.view.adapter.CirclePostAdapter
 import com.developeek.circleon.view.listener.ItemListenerInitializer
 import com.developeek.circleon.view.listener.RecyclerViewInfiniteScrollListener
 import com.developeek.circleon.view.screen.login.LoginActivity
 import com.developeek.circleon.view.viewmodel.home.CircleDetailPostViewModel
 import com.developeek.circleon.view.viewmodelimpl.home.CircleDetailNoticeViewModelImpl
+import com.developeek.circleon.view.viewmodelimpl.home.CircleDetailPostScreen
 import com.developeek.circleon.view.widget.CircleRequestAlertDialog
 import com.developeek.circleon.view.widget.PositiveAlertDialog
 import com.developeek.circleon.view.widget.SingleMessageAlertDialog
@@ -41,21 +46,18 @@ import com.developeek.circleon.view.widget.SingleMessageToast
 import com.google.android.material.progressindicator.CircularProgressIndicator
 import dagger.hilt.android.AndroidEntryPoint
 import dagger.hilt.android.lifecycle.withCreationCallback
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @AndroidEntryPoint
 class CircleDetailNoticeFragment : Fragment() {
     private lateinit var binding: FragmentCircleDetailNoticeBinding
-    private var circleId = 0
-    private lateinit var role: Role
+    private lateinit var circleDetail: CircleDetailModel
     private val viewModel: CircleDetailPostViewModel by viewModels<CircleDetailNoticeViewModelImpl>(
-        ownerProducer = {
-            requireParentFragment()
-        },
         extrasProducer = {
             defaultViewModelCreationExtras
                 .withCreationCallback<CircleDetailNoticeViewModelImpl.CircleDetailNoticeViewModelFactory> {
-                    it.create(circleId)
+                    it.create(circleDetail)
                 }
         },
     )
@@ -70,8 +72,7 @@ class CircleDetailNoticeFragment : Fragment() {
         super.onCreate(savedInstanceState)
 
         arguments?.let {
-            circleId = it.getInt(Const.TAG_CIRCLE_ID)
-            role = it.getSerializable(Const.TAG_USER_ROLE) as Role
+            circleDetail = it.getSerializable(Const.TAG_CIRCLE_DETAIL) as CircleDetailModel
         }
     }
 
@@ -92,8 +93,22 @@ class CircleDetailNoticeFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         initView(requireContext())
-        initObserver(requireActivity(), requireContext())
         initListener()
+        initRefreshObserver()
+        lifecycleScope.launch {
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                launch {
+                    viewModel.event.collect {
+                        handleEvent(it, requireActivity(), requireContext())
+                    }
+                }
+                launch {
+                    viewModel.screenFlow.collect {
+                        handleScreenFlow(it)
+                    }
+                }
+            }
+        }
     }
 
     private fun initView(context: Context) {
@@ -124,10 +139,10 @@ class CircleDetailNoticeFragment : Fragment() {
                             item: PostModel,
                             view: View?,
                         ) {
-                            initNoticeOverflowMenuAndShow(context, item, view!!)
+                            showPopupMenuByUser(context, item, view!!)
                         }
                     },
-                role = role,
+                role = circleDetail.role,
             )
         binding.rvCircleNotice.layoutManager = LinearLayoutManager(context)
         if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.R) {
@@ -142,7 +157,7 @@ class CircleDetailNoticeFragment : Fragment() {
                     .navigate(
                         R.id.action_circleDetailFragment_to_circleDetailPostDetailFragment,
                         bundleOf(
-                            Pair(Const.TAG_CIRCLE_ID, circleId),
+                            Pair(Const.TAG_CIRCLE_ID, circleDetail.id),
                             Pair(Const.TAG_CIRCLE_POST, item),
                         ),
                     )
@@ -150,93 +165,80 @@ class CircleDetailNoticeFragment : Fragment() {
         }
     }
 
-    private fun initNoticeOverflowMenuAndShow(
+    private fun showPopupMenuByUser(
         context: Context,
         item: PostModel,
         view: View,
     ) {
         val popupMenu = object : PopupMenu(context, view) {}
-        val userId = userManager.getUser()?.id
 
-        userId?.let {
-            if (role.isExecutive() && it == item.author.id) { // 임원이면서 작성자 본인인 경우
-                if (item.isPinned) {
-                    popupMenu.inflate(R.menu.menu_pinned_author_notice_settings)
-                } else {
-                    popupMenu.inflate(R.menu.menu_author_notice_settings)
-                }
-                Utils.changeMenuItemTextColor(
-                    popupMenu.menu.findItem(R.id.delete_post),
-                    ContextCompat.getColor(context, R.color.error),
-                )
-            } else if (role.isExecutive()) { // 임원인 경우
-                if (item.isPinned) {
-                    popupMenu.inflate(R.menu.menu_pinned_notice_settings)
-                } else {
-                    popupMenu.inflate(R.menu.menu_executive_notice_settings)
-                }
-                Utils.changeMenuItemTextColor(
-                    popupMenu.menu.findItem(R.id.report_post),
-                    ContextCompat.getColor(context, R.color.error),
-                )
-            } else { // 부원인 경우
-                popupMenu.inflate(R.menu.menu_non_executive_notice_settings)
-                Utils.changeMenuItemTextColor(
-                    popupMenu.menu.findItem(R.id.report_post),
-                    ContextCompat.getColor(context, R.color.error),
-                )
-            }
-        }
+        inflatePopupByUser(context, popupMenu, circleDetail.role, item)
         popupMenu.setOnMenuItemClickListener(noticeOverflowMenuItemClickListener(context, item))
         popupMenu.show()
     }
 
+    private fun inflatePopupByUser(
+        context: Context,
+        popupMenu: PopupMenu,
+        role: Role,
+        item: PostModel,
+    ) {
+        userManager.getUser()?.let { user ->
+            when (role) {
+                Role.MEMBER -> {
+                    popupMenu.inflate(R.menu.menu_non_executive_notice_settings)
+                    Utils.changeMenuItemTextColor(
+                        popupMenu.menu.findItem(R.id.report_post),
+                        ContextCompat.getColor(context, R.color.error),
+                    )
+                }
+                Role.EXECUTIVE, Role.PRESIDENT -> {
+                    if (user.id == item.author.id) {
+                        if (item.isPinned) {
+                            popupMenu.inflate(R.menu.menu_pinned_author_notice_settings)
+                        } else {
+                            popupMenu.inflate(R.menu.menu_author_notice_settings)
+                        }
+                        Utils.changeMenuItemTextColor(
+                            popupMenu.menu.findItem(R.id.delete_post),
+                            ContextCompat.getColor(context, R.color.error),
+                        )
+                    } else {
+                        if (item.isPinned) {
+                            popupMenu.inflate(R.menu.menu_pinned_notice_settings)
+                        } else {
+                            popupMenu.inflate(R.menu.menu_executive_notice_settings)
+                        }
+                        Utils.changeMenuItemTextColor(
+                            popupMenu.menu.findItem(R.id.report_post),
+                            ContextCompat.getColor(context, R.color.error),
+                        )
+                    }
+                }
+                else -> {}
+            }
+        }
+    }
+
     private fun noticeOverflowMenuItemClickListener(
         context: Context,
-        noticeItem: PostModel,
+        notice: PostModel,
     ) = PopupMenu.OnMenuItemClickListener {
-        viewModel.saveScrollState(binding.rvCircleNotice.layoutManager?.onSaveInstanceState())
         when (it.itemId) {
             R.id.pin_post -> {
-                viewModel.pinAndFetch(noticeItem.id)
+                viewModel.pinAndFetch(notice.id)
             }
-
             R.id.unpin_post -> {
-                viewModel.removePinAndFetch(noticeItem.id)
+                viewModel.removePinAndFetch(notice.id)
             }
-
             R.id.edit_post -> {
-                sendUserToEditNoticeScreen(circleId, noticeItem)
+                sendUserToEditNoticeScreen(circleDetail.id, notice)
             }
-
             R.id.delete_post -> {
-                PositiveAlertDialog(
-                    context,
-                    MESSAGE_DELETE_NOTICE,
-                    ContextCompat.getString(context, R.string.btn_delete),
-                    positiveListener = {
-                        viewModel.deleteAndFetch(noticeItem.id)
-                    },
-                ).show()
+                showDeleteNoticeRequestDialog(context, notice)
             }
-
             R.id.report_post -> {
-                CircleRequestAlertDialog(
-                    context,
-                    title = ContextCompat.getString(context, R.string.title_report_dialog),
-                    positiveButton = ContextCompat.getString(context, R.string.menu_report),
-                    positiveListenerInitializer =
-                        object : ItemListenerInitializer<String> {
-                            override fun initialize(item: String) {
-                                viewModel.reportPost(noticeItem.id, item)
-                            }
-
-                            override fun initialize(
-                                item: String,
-                                view: View?,
-                            ) {}
-                        },
-                ).show()
+                showReportNoticeRequestDialog(context, notice)
             }
         }
         true
@@ -255,22 +257,74 @@ class CircleDetailNoticeFragment : Fragment() {
         findNavController().navigate(R.id.action_circleDetailFragment_to_uploadPostFragment, bundle)
     }
 
-    private fun initObserver(
-        parentActivity: Activity,
+    private fun showDeleteNoticeRequestDialog(
         context: Context,
+        notice: PostModel,
     ) {
-        viewModel.state.observe(
-            viewLifecycleOwner,
-            stateObserver(parentActivity, context),
-        )
-        viewModel.scrollOver.observe(
-            viewLifecycleOwner,
-            scrollOverObserver(),
-        )
-        viewModel.postState.observe(
-            viewLifecycleOwner,
-            postStateObserver(parentActivity, context),
-        )
+        PositiveAlertDialog(
+            context,
+            context.getString(R.string.message_delete_notice),
+            context.getString(R.string.btn_delete),
+            positiveListener = {
+                viewModel.deleteAndFetch(notice.id)
+            },
+        ).show()
+    }
+
+    private fun showReportNoticeRequestDialog(
+        context: Context,
+        notice: PostModel,
+    ) {
+        CircleRequestAlertDialog(
+            context,
+            title = context.getString(R.string.title_report_dialog),
+            positiveButton = context.getString(R.string.menu_report),
+            positiveListenerInitializer =
+                object : ItemListenerInitializer<String> {
+                    override fun initialize(item: String) {
+                        viewModel.requestReportPost(notice.id, item)
+                    }
+
+                    override fun initialize(
+                        item: String,
+                        view: View?,
+                    ) {}
+                },
+        ).show()
+    }
+
+    private fun initListener() {
+        setRvCircleNoticeListener()
+        setBtnRetryListener()
+    }
+
+    private fun setRvCircleNoticeListener() {
+        val scrollListener =
+            RecyclerViewInfiniteScrollListener().apply {
+                setScrollEndListener {
+                    if (!viewModel.isLastPage) {
+                        addScrollLoadingItemAndLoad()
+                    }
+                }
+            }
+
+        binding.rvCircleNotice.addOnScrollListener(scrollListener)
+    }
+
+    private fun addScrollLoadingItemAndLoad() {
+        binding.rvCircleNotice.adapter?.let {
+            (it as CirclePostAdapter).addLoadingItem()
+            viewModel.scrollOver()
+        }
+    }
+
+    private fun setBtnRetryListener() {
+        binding.btnRetry.setOnClickListener {
+            viewModel.refresh()
+        }
+    }
+
+    private fun initRefreshObserver() {
         // 정보 수정 여부 감지
         findNavController()
             .currentBackStackEntry
@@ -286,43 +340,19 @@ class CircleDetailNoticeFragment : Fragment() {
             }
     }
 
-    private fun stateObserver(
+    private fun handleEvent(
+        event: Event,
         parentActivity: Activity,
         context: Context,
-    ) = Observer<UiState> {
-        if (it !is UiState.Loading) binding.shimmerNotice.stopShimmer()
-        when (it) {
-            UiState.Loading -> {
-                toggleView(binding.shimmerNotice)
-                binding.shimmerNotice.startShimmer()
-            }
-            UiState.Success -> {
-                if (viewModel.posts.isEmpty()) {
-                    toggleView(binding.txtNoNotice)
-                } else {
-                    toggleView(binding.rvCircleNotice)
-                    loadCircleNotices()
-                }
-            }
-            UiState.AuthenticationError -> {
-                sendUserToLoginScreen(parentActivity)
-                showErrorToast(context)
-            }
-            UiState.ServiceError -> {
-                toggleView(binding.llServiceError)
-                showErrorToast(context)
-            }
+    ) {
+        val loadingIndicator =
+            requireParentFragment().requireView().findViewById<CircularProgressIndicator>(R.id.pgbLoading)
+        loadingIndicator.isVisible = event is Event.Loading
+        when (event) {
+            is Event.SendToLoginScreen -> sendUserToLoginScreen(parentActivity)
+            is Event.ShowToast -> showToast(event, context)
+            is Event.ShowDialog -> showDialog(event, context)
             else -> {}
-        }
-    }
-
-    private fun loadCircleNotices() {
-        binding.rvCircleNotice.adapter?.let {
-            (it as CirclePostAdapter).update(viewModel.posts) {
-                viewModel.currentScrollState?.let {
-                    binding.rvCircleNotice.layoutManager?.onRestoreInstanceState(viewModel.currentScrollState)
-                } ?: binding.rvCircleNotice.scrollToPosition(0)
-            }
         }
     }
 
@@ -332,93 +362,65 @@ class CircleDetailNoticeFragment : Fragment() {
         startActivity(intent)
     }
 
-    private fun showErrorToast(context: Context) {
-        if (SingleMessageToast.previousFinished()) {
-            SingleMessageToast(context, viewModel.error).show()
-        }
-    }
-
-    private fun showErrorDialog(context: Context) {
-        SingleMessageAlertDialog(context, viewModel.error).show()
-    }
-
-    private fun scrollOverObserver() =
-        Observer<Boolean> { completed ->
-            if (completed) {
-                binding.rvCircleNotice.removeOnScrollListener(viewModel.scrollListener)
-                binding.rvCircleNotice.addOnScrollListener(viewModel.scrollListener)
-                binding.rvCircleNotice.adapter?.let {
-                    (it as CirclePostAdapter).update(viewModel.posts) {}
-                }
-            }
-        }
-
-    private fun postStateObserver(
-        parentActivity: Activity,
+    private fun showToast(
+        event: Event.ShowToast,
         context: Context,
-    ) = Observer<UiState> {
-        val loadingIndicator =
-            requireParentFragment().requireView().findViewById<CircularProgressIndicator>(R.id.pgbLoading)
-        loadingIndicator.isVisible = it is UiState.Loading
-        when (it) {
-            UiState.AuthenticationError -> {
-                sendUserToLoginScreen(parentActivity)
-                showErrorToast(context)
-            }
-            UiState.ServiceError -> {
-                showErrorDialog(context)
-            }
-            else -> {}
+    ) {
+        if (SingleMessageToast.previousFinished()) {
+            SingleMessageToast(context, event.message).show()
         }
     }
 
-    private fun initListener() {
-        setRvCircleNoticeListener()
-        setBtnRetryListener()
-        setFabRegisterNoticeListener()
+    private fun showDialog(
+        event: Event.ShowDialog,
+        context: Context,
+    ) {
+        SingleMessageAlertDialog(context, event.message).show()
     }
 
-    private fun setRvCircleNoticeListener() {
-        binding.rvCircleNotice.addOnScrollListener(viewModel.scrollListener)
-        (viewModel.scrollListener as RecyclerViewInfiniteScrollListener).setScrollEndListener {
-            if (!viewModel.posts.isLastPage()) {
-                addScrollLoadingItemAndLoad()
-                // scrollOver 시 문제가 발생하더라도 정상으로 돌아온 경우 스크롤 복원하기 위함
-                viewModel.saveScrollState(binding.rvCircleNotice.layoutManager?.onSaveInstanceState())
-            }
+    private fun handleScreenFlow(screenFlow: CircleDetailPostScreen) {
+        when (screenFlow) {
+            is CircleDetailPostScreen.SuccessView -> showSuccessView(screenFlow)
+            is CircleDetailPostScreen.LoadingView -> showLoadingView()
+            is CircleDetailPostScreen.ErrorView -> showErrorView()
         }
     }
 
-    private fun addScrollLoadingItemAndLoad() {
+    private fun showSuccessView(screenFlow: CircleDetailPostScreen.SuccessView) {
+        binding.shimmerNotice.stopShimmer()
+        if (screenFlow.posts.isEmpty()) {
+            switchView(binding.txtNoNotice)
+            return
+        }
+
+        switchView(binding.rvCircleNotice)
+        loadCircleNoticesAndDoAfter(screenFlow.posts) {}
+    }
+
+    private fun loadCircleNoticesAndDoAfter(
+        notices: PostModels,
+        after: () -> Unit,
+    ) {
         binding.rvCircleNotice.adapter?.let {
-            (it as CirclePostAdapter).update(viewModel.posts.add(PostModel.emptyInstance())) {}
-        }
-        viewModel.scrollOver()
-    }
-
-    private fun setBtnRetryListener() {
-        binding.btnRetry.setOnClickListener {
-            viewModel.refresh()
+            (it as CirclePostAdapter).update(notices) {
+                after()
+            }
         }
     }
 
-    private fun setFabRegisterNoticeListener() {
+    private fun showLoadingView() {
+        switchView(binding.shimmerNotice)
+        binding.shimmerNotice.startShimmer()
     }
 
-    override fun onDestroyView() {
-        super.onDestroyView()
-
-        viewModel.saveScrollState(binding.rvCircleNotice.layoutManager?.onSaveInstanceState())
+    private fun showErrorView() {
+        switchView(binding.llServiceError)
     }
 
-    private fun toggleView(view: View) {
+    private fun switchView(view: View) {
         binding.rvCircleNotice.isVisible = view == binding.rvCircleNotice
         binding.shimmerNotice.isVisible = view == binding.shimmerNotice
         binding.txtNoNotice.isVisible = view == binding.txtNoNotice
         binding.llServiceError.isVisible = view == binding.llServiceError
-    }
-
-    companion object {
-        private const val MESSAGE_DELETE_NOTICE = "공지사항을 삭제할까요?"
     }
 }

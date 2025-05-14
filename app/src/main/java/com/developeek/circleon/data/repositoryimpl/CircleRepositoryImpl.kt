@@ -22,10 +22,9 @@ import com.developeek.circleon.domain.model.CircleModel
 import com.developeek.circleon.domain.model.CircleSummaryModels
 import com.developeek.circleon.domain.model.CommentModels
 import com.developeek.circleon.domain.model.MemberModels
-import com.developeek.circleon.domain.model.PostModels
+import com.developeek.circleon.domain.model.PostModel
 import com.developeek.circleon.view.viewmodelimpl.Page
 import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.async
 import kotlinx.coroutines.withContext
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.MultipartBody
@@ -79,28 +78,8 @@ class CircleRepositoryImpl(
 
     override suspend fun getCircleDetail(circleId: Int): Result<CircleDetailModel> {
         return try {
-            withContext(dispatcher) {
-                val getCircleDetailJob =
-                    async {
-                        return@async service.getCircleDetail(circleId)
-                    }
-                val getMembersJob =
-                    async {
-                        return@async service.getMembers(
-                            circleId,
-                            0,
-                            200,
-                            SORT_MEMBER_BY_NAME,
-                            MembershipStatus.JOINED.codeName(),
-                        )
-                    }
-
-                Result.success(
-                    getCircleDetailJob.await().toCircleDetailModel(
-                        MemberModels(getMembersJob.await().content.map { it.toMemberModel() }),
-                    ),
-                )
-            }
+            val response = service.getCircleDetail(circleId)
+            Result.success(response.toCircleDetailModel())
         } catch (e: Exception) {
             Result.error(e)
         }
@@ -112,17 +91,15 @@ class CircleRepositoryImpl(
         size: Int,
     ): Result<MemberModels> {
         return try {
-            withContext(dispatcher) {
-                val response =
-                    service.getMembers(
-                        circleId,
-                        page,
-                        size,
-                        SORT_MEMBER_BY_NAME,
-                        MembershipStatus.JOINED.codeName(),
-                    )
-                Result.success(MemberModels(response.content.map { it.toMemberModel() }))
-            }
+            val response =
+                service.getMembers(
+                    circleId,
+                    page,
+                    size,
+                    SORT_MEMBER_BY_NAME,
+                    MembershipStatus.JOINED.codeName(),
+                )
+            Result.success(MemberModels(response.content.map { it.toMemberModel() }))
         } catch (e: Exception) {
             Result.error(e)
         }
@@ -204,20 +181,18 @@ class CircleRepositoryImpl(
         circleId: Int,
         page: Int,
         size: Int,
-    ): Result<PostModels> {
+    ): Result<Page<PostModel>> {
         return try {
-            withContext(dispatcher) {
-                val response = service.getCirclePosts(circleId, page, size, TYPE_POST)
-                Result.success(
-                    PostModels(response.content.map { it.toPostModel() }).apply {
-                        if (response.isLastPage()) {
-                            setAsLast()
-                        }
-                    },
-                )
-            }
+            val response = service.getCirclePosts(circleId, page, size, TYPE_POST)
+            Result.success(
+                Page(response.content.map { it.toPostModel() }).apply {
+                    if (response.isLastPage()) {
+                        setAsLast()
+                    }
+                },
+            )
         } catch (e: ServiceException.NoResultException) {
-            Result.success(PostModels.empty())
+            Result.success(Page(emptyList()))
         } catch (e: Exception) {
             Result.error(e)
         }
@@ -227,20 +202,18 @@ class CircleRepositoryImpl(
         circleId: Int,
         page: Int,
         size: Int,
-    ): Result<PostModels> {
+    ): Result<Page<PostModel>> {
         return try {
-            withContext(dispatcher) {
-                val response = service.getCirclePosts(circleId, page, size, TYPE_NOTICE)
-                Result.success(
-                    PostModels(response.content.map { it.toPostModel() }).apply {
-                        if (response.isLastPage()) {
-                            setAsLast()
-                        }
-                    },
-                )
-            }
+            val response = service.getCirclePosts(circleId, page, size, TYPE_NOTICE)
+            Result.success(
+                Page(response.content.map { it.toPostModel() }).apply {
+                    if (response.isLastPage()) {
+                        setAsLast()
+                    }
+                },
+            )
         } catch (e: ServiceException.NoResultException) {
-            Result.success(PostModels.empty())
+            Result.success(Page(emptyList()))
         } catch (e: Exception) {
             Result.error(e)
         }
@@ -365,10 +338,8 @@ class CircleRepositoryImpl(
         joinMessage: String,
     ): Result<Unit> {
         return try {
-            withContext(dispatcher) {
-                service.postMyCircle(circleId, RequestResponseBodyCircleJoin(joinMessage))
-                Result.success(Unit)
-            }
+            service.postMyCircle(circleId, RequestResponseBodyCircleJoin(joinMessage))
+            Result.success(Unit)
         } catch (e: Exception) {
             Result.error(e)
         }
@@ -379,10 +350,8 @@ class CircleRepositoryImpl(
         leaveMessage: String,
     ): Result<Unit> {
         return try {
-            withContext(dispatcher) {
-                service.postCircleLeaveRequest(memberId, RequestResponseBodyCircleLeave(leaveMessage))
-                Result.success(Unit)
-            }
+            service.postCircleLeaveRequest(memberId, RequestResponseBodyCircleLeave(leaveMessage))
+            Result.success(Unit)
         } catch (e: Exception) {
             Result.error(e)
         }
@@ -433,10 +402,8 @@ class CircleRepositoryImpl(
         content: String,
     ): Result<Unit> {
         return try {
-            withContext(dispatcher) {
-                service.postReportCircle(circleId, RequestBodyReport(content))
-                Result.success(Unit)
-            }
+            service.postReportCircle(circleId, RequestBodyReport(content))
+            Result.success(Unit)
         } catch (e: Exception) {
             Result.error(e)
         }

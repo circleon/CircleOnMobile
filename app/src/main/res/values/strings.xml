@@ -75,12 +75,15 @@
 
     <!--Circle Detail Introduction-->
     <string name="text_recruitment_date">모집기간</string>
+    <string name="message_no_recruitment">현재 모집기간이 아니에요</string>
 
-    <!--Circle Detail Notice-->
+    <!--Circle Detail Post,Notice-->
     <string name="menu_post_settings_pin">고정하기</string>
     <string name="menu_post_settings_remove_pin">고정 해제하기</string>
     <string name="menu_post_settings_edit">수정하기</string>
     <string name="menu_post_settings_delete">삭제하기</string>
+    <string name="message_delete_notice">공지사항을 삭제할까요?</string>
+    <string name="message_delete_post">게시글을 삭제할까요?</string>
 
     <!--Upload Circle-->
     <string name="btn_upload">생성하기</string>

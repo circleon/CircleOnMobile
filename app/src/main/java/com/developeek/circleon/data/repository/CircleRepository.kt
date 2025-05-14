@@ -10,7 +10,7 @@ import com.developeek.circleon.domain.model.CircleModel
 import com.developeek.circleon.domain.model.CircleSummaryModels
 import com.developeek.circleon.domain.model.CommentModels
 import com.developeek.circleon.domain.model.MemberModels
-import com.developeek.circleon.domain.model.PostModels
+import com.developeek.circleon.domain.model.PostModel
 import com.developeek.circleon.view.viewmodelimpl.Page
 import java.io.File
 
@@ -58,13 +58,13 @@ interface CircleRepository {
         circleId: Int,
         page: Int,
         size: Int,
-    ): Result<PostModels>
+    ): Result<Page<PostModel>>
 
     suspend fun getCircleNotices(
         circleId: Int,
         page: Int,
         size: Int,
-    ): Result<PostModels>
+    ): Result<Page<PostModel>>
 
     suspend fun getCirclePostComments(
         circleId: Int,

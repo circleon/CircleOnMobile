@@ -9,12 +9,15 @@ import com.developeek.circleon.domain.enums.Category
 import com.developeek.circleon.domain.model.CategoryModels
 import com.developeek.circleon.domain.model.CircleModel
 import com.developeek.circleon.domain.model.CircleModels
+import com.developeek.circleon.view.Event
 import com.developeek.circleon.view.viewmodel.home.HomeViewModel
 import com.developeek.circleon.view.viewmodelimpl.Page
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
@@ -25,8 +28,10 @@ import javax.inject.Inject
 class HomeViewModelImpl
     @Inject
     constructor(private val repository: CircleRepository) : HomeViewModel, ViewModel() {
-        private val _event = MutableStateFlow<HomeEvent>(HomeEvent.ShowLoadingView)
-        override val event: StateFlow<HomeEvent> = _event
+        private val _screenFlow = MutableStateFlow<HomeScreen>(HomeScreen.LoadingView)
+        override val screenFlow: StateFlow<HomeScreen> = _screenFlow
+        private val _event = MutableSharedFlow<Event>()
+        override val event: SharedFlow<Event> = _event
 
         override val categories: CategoryModels
             get() = _categories
@@ -57,7 +62,7 @@ class HomeViewModelImpl
 
             _categories = CategoryModels.selectAndGet(category)
             viewModelScope.launch {
-                _event.emit(HomeEvent.ShowLoadingView)
+                _screenFlow.emit(HomeScreen.LoadingView)
                 scrollOverCircleJob?.cancel()
                 currentPage = DEFAULT_PAGE // 카테고리를 선택할 때는 circles 를 재사용하지 않기 때문에 currentPage 도 초기화
 
@@ -82,16 +87,15 @@ class HomeViewModelImpl
         private suspend fun whenFetchCirclesSuccess(result: Success<Page<CircleModel>>) {
             circles = CircleModels(result.data.content)
             _isLastPage = result.data.isLastPage
-            _event.emit(HomeEvent.ShowSuccessView(circles))
+            _screenFlow.emit(HomeScreen.SuccessView(circles))
         }
 
         private suspend fun whenFetchCirclesFail(result: Error<Page<CircleModel>>) {
-            _event.emit(HomeEvent.ShowToast(result.message()))
+            _event.emit(Event.ShowToast(result.message()))
+            _screenFlow.emit(HomeScreen.ErrorView)
 
             if (result.isAuthenticationError()) {
-                _event.emit(HomeEvent.SendToLoginScreen)
-            } else {
-                _event.emit(HomeEvent.ShowErrorView)
+                _event.emit(Event.SendToLoginScreen)
             }
         }
 
@@ -100,19 +104,16 @@ class HomeViewModelImpl
                 if (!it.isCompleted) return
             }
 
-            viewModelScope.launch {
-                scrollOverCircleJob =
-                    launch {
-                        val result =
-                            getCircles(currentPage + 1, SIZE_BY_PAGE, categories.selectedOrFirst().category)
+            scrollOverCircleJob =
+                viewModelScope.launch {
+                    val result = getCircles(currentPage + 1, SIZE_BY_PAGE, categories.selectedOrFirst().category)
 
-                        if (!isActive) return@launch
-                        when (result) {
-                            is Success -> whenScrollOverSuccess(result)
-                            is Error -> whenFetchCirclesFail(result)
-                        }
+                    if (!isActive) return@launch // 스크롤 작업 캔슬 시 내용을 업데이트하지 않고 작업 종료
+                    when (result) {
+                        is Success -> whenScrollOverSuccess(result)
+                        is Error -> whenScrollOverFail(result)
                     }
-            }
+                }
         }
 
         private suspend fun whenScrollOverSuccess(result: Success<Page<CircleModel>>) {
@@ -122,11 +123,20 @@ class HomeViewModelImpl
             }
             currentPage++
 
-            _event.emit(
-                HomeEvent.ShowSuccessView(circles).apply {
-                    notifyCollected() // 페이지 로딩의 경우 스크롤 상단 초기화 방지
+            _screenFlow.emit(
+                HomeScreen.SuccessView(circles).apply {
+                    // 페이지 로딩의 경우 스크롤 상단 초기화가 collected 여부로 결정되기 때문에 초기화 방지를 위해 collect 처리
+                    notifyCollected()
                 },
             )
+        }
+
+        private suspend fun whenScrollOverFail(result: Error<Page<CircleModel>>) {
+            _event.emit(Event.ShowToast(result.message()))
+
+            if (result.isAuthenticationError()) {
+                _event.emit(Event.SendToLoginScreen)
+            }
         }
 
         companion object {
@@ -135,7 +145,7 @@ class HomeViewModelImpl
         }
     }
 
-sealed class HomeEvent {
+sealed class HomeScreen {
     val hasCollected: Boolean
         get() = _hasCollected
     private var _hasCollected = false
@@ -144,13 +154,9 @@ sealed class HomeEvent {
         _hasCollected = true
     }
 
-    data class ShowSuccessView(val circles: CircleModels) : HomeEvent()
+    data class SuccessView(val circles: CircleModels) : HomeScreen()
 
-    data object ShowLoadingView : HomeEvent()
+    data object LoadingView : HomeScreen()
 
-    data object ShowErrorView : HomeEvent()
-
-    data object SendToLoginScreen : HomeEvent()
-
-    data class ShowToast(val message: String) : HomeEvent()
+    data object ErrorView : HomeScreen()
 }

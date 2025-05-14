@@ -21,13 +21,33 @@ data class CircleDetailModel(
     val thumbnailUrl: String?,
     val singleLineIntroduction: String,
     val memberCount: Int,
-    val members: MemberModels,
     val introImgUrl: String?,
     val introduction: String?,
     val recruitmentStartDate: LocalDateTime?,
     val recruitmentEndDate: LocalDateTime?,
     val recruiting: Boolean,
+    val members: MemberModels = MemberModels.empty(),
 ) : Serializable {
+    constructor(circleDetailModel: CircleDetailModel, members: MemberModels) : this(
+        circleDetailModel.id,
+        circleDetailModel.name,
+        circleDetailModel.category,
+        circleDetailModel.officialStatus,
+        circleDetailModel.role,
+        circleDetailModel.memberId,
+        circleDetailModel.membershipStatus,
+        circleDetailModel.profileImgUrl,
+        circleDetailModel.thumbnailUrl,
+        circleDetailModel.singleLineIntroduction,
+        circleDetailModel.memberCount,
+        circleDetailModel.introImgUrl,
+        circleDetailModel.introduction,
+        circleDetailModel.recruitmentStartDate,
+        circleDetailModel.recruitmentEndDate,
+        circleDetailModel.recruiting,
+        members,
+    )
+
     fun isOfficial() = officialStatus.isOfficial()
 
     fun isUserJoined() = role.isMember()
@@ -48,12 +68,12 @@ data class CircleDetailModel(
         thumbnailUrl: String? = this.thumbnailUrl,
         singleLineIntroduction: String = this.singleLineIntroduction,
         memberCount: Int = this.memberCount,
-        members: MemberModels = this.members,
         introImgUrl: String? = this.introImgUrl,
         introduction: String? = this.introduction,
         recruitmentStartDate: LocalDateTime? = this.recruitmentStartDate,
         recruitmentEndDate: LocalDateTime? = this.recruitmentEndDate,
         recruiting: Boolean = this.recruiting,
+        members: MemberModels = this.members,
     ) = CircleDetailModel(
         id,
         name,
@@ -66,12 +86,12 @@ data class CircleDetailModel(
         thumbnailUrl,
         singleLineIntroduction,
         memberCount,
-        members,
         introImgUrl,
         introduction,
         recruitmentStartDate,
         recruitmentEndDate,
         recruiting,
+        members,
     )
 
     fun toRequestBodyForEdit() =
@@ -99,7 +119,6 @@ data class CircleDetailModel(
                 null,
                 Const.EMPTY_TEXT,
                 0,
-                MemberModels.empty(),
                 null,
                 null,
                 LocalDateTime.now(),

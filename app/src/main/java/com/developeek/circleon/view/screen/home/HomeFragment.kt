@@ -28,13 +28,14 @@ import com.developeek.circleon.domain.model.CircleModels
 import com.developeek.circleon.domain.model.UserModel
 import com.developeek.circleon.domain.utils.Const
 import com.developeek.circleon.domain.utils.glide.GlideProvider
+import com.developeek.circleon.view.Event
 import com.developeek.circleon.view.adapter.CategoryAdapter
 import com.developeek.circleon.view.adapter.CircleAdapter
 import com.developeek.circleon.view.listener.ItemListenerInitializer
 import com.developeek.circleon.view.listener.RecyclerViewInfiniteScrollListener
 import com.developeek.circleon.view.screen.login.LoginActivity
 import com.developeek.circleon.view.viewmodel.home.HomeViewModel
-import com.developeek.circleon.view.viewmodelimpl.home.HomeEvent
+import com.developeek.circleon.view.viewmodelimpl.home.HomeScreen
 import com.developeek.circleon.view.viewmodelimpl.home.HomeViewModelImpl
 import com.developeek.circleon.view.widget.SingleMessageToast
 import dagger.hilt.android.AndroidEntryPoint
@@ -78,8 +79,15 @@ class HomeFragment : Fragment() {
         initListener()
         lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
-                viewModel.event.collect {
-                    handleEvent(it, requireActivity(), requireContext())
+                launch {
+                    viewModel.event.collect {
+                        handleEvent(it, requireActivity(), requireContext())
+                    }
+                }
+                launch {
+                    viewModel.screenFlow.collect {
+                        handleScreenFlow(it)
+                    }
                 }
             }
         }
@@ -162,17 +170,23 @@ class HomeFragment : Fragment() {
     }
 
     private fun handleEvent(
-        event: HomeEvent,
+        event: Event,
         parentActivity: Activity,
         context: Context,
     ) {
-        loadCircleCategory(viewModel.categories)
         when (event) {
-            is HomeEvent.ShowSuccessView -> showSuccessView(event)
-            is HomeEvent.ShowLoadingView -> showLoadingView()
-            is HomeEvent.ShowErrorView -> showErrorView()
-            is HomeEvent.SendToLoginScreen -> sendUserToLoginScreen(parentActivity)
-            is HomeEvent.ShowToast -> showToast(context, event)
+            is Event.SendToLoginScreen -> sendUserToLoginScreen(parentActivity)
+            is Event.ShowToast -> showToast(event, context)
+            else -> {}
+        }
+    }
+
+    private fun handleScreenFlow(screenFlow: HomeScreen) {
+        loadCircleCategory(viewModel.categories)
+        when (screenFlow) {
+            is HomeScreen.SuccessView -> showSuccessView(screenFlow)
+            is HomeScreen.LoadingView -> showLoadingView()
+            is HomeScreen.ErrorView -> showErrorView()
         }
     }
 
@@ -182,23 +196,23 @@ class HomeFragment : Fragment() {
         }
     }
 
-    private fun showSuccessView(event: HomeEvent.ShowSuccessView) {
-        if (event.circles.isEmpty()) {
+    private fun showSuccessView(screenFlow: HomeScreen.SuccessView) {
+        binding.shimmerCircle.stopShimmer()
+        if (screenFlow.circles.isEmpty()) {
             switchView(binding.txtNoCircle)
-        } else {
-            switchView(binding.rvCircle)
-            loadCirclesAndDoAfter(
-                event.circles,
-                after = {
-                    if (!event.hasCollected) {
-                        binding.rvCircle.scrollToPosition(0)
-                        event.notifyCollected()
-                    }
-                },
-            )
+            return
         }
 
-        binding.shimmerCircle.stopShimmer()
+        switchView(binding.rvCircle)
+        loadCirclesAndDoAfter(
+            screenFlow.circles,
+            after = {
+                if (!screenFlow.hasCollected) {
+                    binding.rvCircle.scrollToPosition(0)
+                    screenFlow.notifyCollected()
+                }
+            },
+        )
     }
 
     private fun loadCirclesAndDoAfter(
@@ -228,12 +242,11 @@ class HomeFragment : Fragment() {
     }
 
     private fun showToast(
+        event: Event.ShowToast,
         context: Context,
-        event: HomeEvent.ShowToast,
     ) {
-        if (SingleMessageToast.previousFinished() && !event.hasCollected) {
+        if (SingleMessageToast.previousFinished()) {
             SingleMessageToast(context, event.message).show()
-            event.notifyCollected()
         }
     }
 

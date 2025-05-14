@@ -7,6 +7,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
+import com.developeek.circleon.R
 import com.developeek.circleon.databinding.FragmentCircleDetailIntroductionBinding
 import com.developeek.circleon.domain.model.CircleDetailModel
 import com.developeek.circleon.domain.utils.Const
@@ -54,7 +55,7 @@ class CircleDetailIntroductionFragment : Fragment() {
 
     private fun initView(context: Context) {
         loadIntroductionContent(context)
-        loadRecruitmentDate()
+        loadRecruitmentDate(context)
     }
 
     private fun loadIntroductionContent(context: Context) {
@@ -75,12 +76,12 @@ class CircleDetailIntroductionFragment : Fragment() {
         }
     }
 
-    private fun loadRecruitmentDate() {
+    private fun loadRecruitmentDate(context: Context) {
         if (!circleDetail.recruiting ||
             circleDetail.recruitmentStartDate == null ||
             circleDetail.recruitmentEndDate == null
         ) {
-            binding.txtRecruitmentDate.text = NO_RECRUITMENT_MESSAGE
+            binding.txtRecruitmentDate.text = context.getString(R.string.message_no_recruitment)
         } else {
             val start = circleDetail.recruitmentStartDate!!.format(DateTimeFormatter.ofPattern(RECRUITMENT_DATE_FORMAT))
             val startDayOfWeek =
@@ -101,7 +102,6 @@ class CircleDetailIntroductionFragment : Fragment() {
     }
 
     companion object {
-        private const val NO_RECRUITMENT_MESSAGE = "현재 모집기간이 아니에요"
         private const val RECRUITMENT_DATE_FORMAT = "M월 d일"
         private const val DAY_OF_WEEK_UNIT = "(%s)"
         private const val RECRUITMENT_DATE_DIVIDER = " ~ "

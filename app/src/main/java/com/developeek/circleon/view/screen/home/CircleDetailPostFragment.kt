@@ -14,7 +14,9 @@ import androidx.core.os.bundleOf
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.Observer
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -22,16 +24,19 @@ import com.developeek.circleon.R
 import com.developeek.circleon.data.source.manager.UserManager
 import com.developeek.circleon.databinding.FragmentCircleDetailPostBinding
 import com.developeek.circleon.domain.enums.PostType
+import com.developeek.circleon.domain.model.CircleDetailModel
 import com.developeek.circleon.domain.model.PostModel
-import com.developeek.circleon.domain.state.UiState
+import com.developeek.circleon.domain.model.PostModels
 import com.developeek.circleon.domain.utils.Const
 import com.developeek.circleon.domain.utils.Utils
 import com.developeek.circleon.domain.utils.glide.GlideProvider
+import com.developeek.circleon.view.Event
 import com.developeek.circleon.view.adapter.CirclePostAdapter
 import com.developeek.circleon.view.listener.ItemListenerInitializer
 import com.developeek.circleon.view.listener.RecyclerViewInfiniteScrollListener
 import com.developeek.circleon.view.screen.login.LoginActivity
 import com.developeek.circleon.view.viewmodel.home.CircleDetailPostViewModel
+import com.developeek.circleon.view.viewmodelimpl.home.CircleDetailPostScreen
 import com.developeek.circleon.view.viewmodelimpl.home.CircleDetailPostViewModelImpl
 import com.developeek.circleon.view.widget.CircleRequestAlertDialog
 import com.developeek.circleon.view.widget.PositiveAlertDialog
@@ -40,20 +45,18 @@ import com.developeek.circleon.view.widget.SingleMessageToast
 import com.google.android.material.progressindicator.CircularProgressIndicator
 import dagger.hilt.android.AndroidEntryPoint
 import dagger.hilt.android.lifecycle.withCreationCallback
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @AndroidEntryPoint
 class CircleDetailPostFragment : Fragment() {
     private lateinit var binding: FragmentCircleDetailPostBinding
-    private var circleId = 0
+    private lateinit var circleDetail: CircleDetailModel
     private val viewModel: CircleDetailPostViewModel by viewModels<CircleDetailPostViewModelImpl>(
-        ownerProducer = {
-            requireParentFragment()
-        },
         extrasProducer = {
             defaultViewModelCreationExtras
                 .withCreationCallback<CircleDetailPostViewModelImpl.CircleDetailPostViewModelFactory> {
-                    it.create(circleId)
+                    it.create(circleDetail)
                 }
         },
     )
@@ -68,7 +71,7 @@ class CircleDetailPostFragment : Fragment() {
         super.onCreate(savedInstanceState)
 
         arguments?.let {
-            circleId = it.getInt(Const.TAG_CIRCLE_ID)
+            circleDetail = it.getSerializable(Const.TAG_CIRCLE_DETAIL) as CircleDetailModel
         }
     }
 
@@ -89,8 +92,22 @@ class CircleDetailPostFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         initView(requireContext())
-        initObserver(requireActivity(), requireContext())
         initListener()
+        initRefreshObserver()
+        lifecycleScope.launch {
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                launch {
+                    viewModel.event.collect {
+                        handleEvent(it, requireActivity(), requireContext())
+                    }
+                }
+                launch {
+                    viewModel.screenFlow.collect {
+                        handleScreenFlow(it)
+                    }
+                }
+            }
+        }
     }
 
     private fun initView(context: Context) {
@@ -121,7 +138,7 @@ class CircleDetailPostFragment : Fragment() {
                             item: PostModel,
                             view: View?,
                         ) {
-                            initPostOverflowMenuAndShow(context, item, view!!)
+                            showPopupMenuByUser(context, item, view!!)
                         }
                     },
             )
@@ -138,7 +155,7 @@ class CircleDetailPostFragment : Fragment() {
                     .navigate(
                         R.id.action_circleDetailFragment_to_circleDetailPostDetailFragment,
                         bundleOf(
-                            Pair(Const.TAG_CIRCLE_ID, circleId),
+                            Pair(Const.TAG_CIRCLE_ID, circleDetail.id),
                             Pair(Const.TAG_CIRCLE_POST, item),
                         ),
                     )
@@ -146,16 +163,25 @@ class CircleDetailPostFragment : Fragment() {
         }
     }
 
-    private fun initPostOverflowMenuAndShow(
+    private fun showPopupMenuByUser(
         context: Context,
         item: PostModel,
         view: View,
     ) {
         val popupMenu = object : PopupMenu(context, view) {}
-        val userId = userManager.getUser()?.id
 
-        userId?.let {
-            if (it == item.author.id) { // 작성자 본인인 경우
+        inflatePopupByUser(context, popupMenu, item)
+        popupMenu.setOnMenuItemClickListener(postOverflowMenuItemClickListener(context, item))
+        popupMenu.show()
+    }
+
+    private fun inflatePopupByUser(
+        context: Context,
+        popupMenu: PopupMenu,
+        item: PostModel,
+    ) {
+        userManager.getUser()?.let {
+            if (it.id == item.author.id) { // 작성자 본인인 경우
                 popupMenu.inflate(R.menu.menu_author_post_settings)
                 Utils.changeMenuItemTextColor(
                     popupMenu.menu.findItem(R.id.delete_post),
@@ -169,48 +195,23 @@ class CircleDetailPostFragment : Fragment() {
                 )
             }
         }
-        popupMenu.setOnMenuItemClickListener(postOverflowMenuItemClickListener(context, item))
-        popupMenu.show()
     }
 
     private fun postOverflowMenuItemClickListener(
         context: Context,
         postItem: PostModel,
     ) = PopupMenu.OnMenuItemClickListener {
-        viewModel.saveScrollState(binding.rvCirclePost.layoutManager?.onSaveInstanceState())
         when (it.itemId) {
             R.id.edit_post -> {
-                sendUserToEditPostScreen(circleId, postItem)
+                sendUserToEditPostScreen(circleDetail.id, postItem)
             }
 
             R.id.delete_post -> {
-                PositiveAlertDialog(
-                    context,
-                    MESSAGE_DELETE_POST,
-                    ContextCompat.getString(context, R.string.btn_delete),
-                    positiveListener = {
-                        viewModel.deleteAndFetch(postItem.id)
-                    },
-                ).show()
+                showDeletePostRequestDialog(context, postItem)
             }
 
             R.id.report_post -> {
-                CircleRequestAlertDialog(
-                    context,
-                    title = ContextCompat.getString(context, R.string.title_report_dialog),
-                    positiveButton = ContextCompat.getString(context, R.string.menu_report),
-                    positiveListenerInitializer =
-                        object : ItemListenerInitializer<String> {
-                            override fun initialize(item: String) {
-                                viewModel.reportPost(postItem.id, item)
-                            }
-
-                            override fun initialize(
-                                item: String,
-                                view: View?,
-                            ) {}
-                        },
-                ).show()
+                showReportPostRequestDialog(context, postItem)
             }
         }
         true
@@ -229,22 +230,74 @@ class CircleDetailPostFragment : Fragment() {
         findNavController().navigate(R.id.action_circleDetailFragment_to_uploadPostFragment, bundle)
     }
 
-    private fun initObserver(
-        parentActivity: Activity,
+    private fun showDeletePostRequestDialog(
         context: Context,
+        post: PostModel,
     ) {
-        viewModel.state.observe(
-            viewLifecycleOwner,
-            stateObserver(parentActivity, context),
-        )
-        viewModel.scrollOver.observe(
-            viewLifecycleOwner,
-            scrollOverObserver(),
-        )
-        viewModel.postState.observe(
-            viewLifecycleOwner,
-            postStateObserver(parentActivity, context),
-        )
+        PositiveAlertDialog(
+            context,
+            context.getString(R.string.message_delete_post),
+            context.getString(R.string.btn_delete),
+            positiveListener = {
+                viewModel.deleteAndFetch(post.id)
+            },
+        ).show()
+    }
+
+    private fun showReportPostRequestDialog(
+        context: Context,
+        post: PostModel,
+    ) {
+        CircleRequestAlertDialog(
+            context,
+            title = context.getString(R.string.title_report_dialog),
+            positiveButton = context.getString(R.string.menu_report),
+            positiveListenerInitializer =
+                object : ItemListenerInitializer<String> {
+                    override fun initialize(item: String) {
+                        viewModel.requestReportPost(post.id, item)
+                    }
+
+                    override fun initialize(
+                        item: String,
+                        view: View?,
+                    ) {}
+                },
+        ).show()
+    }
+
+    private fun initListener() {
+        setRvCirclePostListener()
+        setBtnRetryListener()
+    }
+
+    private fun setRvCirclePostListener() {
+        val scrollListener =
+            RecyclerViewInfiniteScrollListener().apply {
+                setScrollEndListener {
+                    if (!viewModel.isLastPage) {
+                        addScrollLoadingItemAndLoad()
+                    }
+                }
+            }
+
+        binding.rvCirclePost.addOnScrollListener(scrollListener)
+    }
+
+    private fun addScrollLoadingItemAndLoad() {
+        binding.rvCirclePost.adapter?.let {
+            (it as CirclePostAdapter).addLoadingItem()
+            viewModel.scrollOver()
+        }
+    }
+
+    private fun setBtnRetryListener() {
+        binding.btnRetry.setOnClickListener {
+            viewModel.refresh()
+        }
+    }
+
+    private fun initRefreshObserver() {
         // 정보 수정 여부 감지
         findNavController()
             .currentBackStackEntry
@@ -260,43 +313,19 @@ class CircleDetailPostFragment : Fragment() {
             }
     }
 
-    private fun stateObserver(
+    private fun handleEvent(
+        event: Event,
         parentActivity: Activity,
         context: Context,
-    ) = Observer<UiState> {
-        if (it !is UiState.Loading) binding.shimmerPost.stopShimmer()
-        when (it) {
-            UiState.Loading -> {
-                toggleView(binding.shimmerPost)
-                binding.shimmerPost.startShimmer()
-            }
-            UiState.Success -> {
-                if (viewModel.posts.isEmpty()) {
-                    toggleView(binding.txtNoPost)
-                } else {
-                    toggleView(binding.rvCirclePost)
-                    loadCircleNotices()
-                }
-            }
-            UiState.AuthenticationError -> {
-                sendUserToLoginScreen(parentActivity)
-                showErrorToast(context)
-            }
-            UiState.ServiceError -> {
-                toggleView(binding.llServiceError)
-                showErrorToast(context)
-            }
+    ) {
+        val loadingIndicator =
+            requireParentFragment().requireView().findViewById<CircularProgressIndicator>(R.id.pgbLoading)
+        loadingIndicator.isVisible = event is Event.Loading
+        when (event) {
+            is Event.SendToLoginScreen -> sendUserToLoginScreen(parentActivity)
+            is Event.ShowToast -> showToast(event, context)
+            is Event.ShowDialog -> showDialog(event, context)
             else -> {}
-        }
-    }
-
-    private fun loadCircleNotices() {
-        binding.rvCirclePost.adapter?.let {
-            (it as CirclePostAdapter).update(viewModel.posts) {
-                viewModel.currentScrollState?.let {
-                    binding.rvCirclePost.layoutManager?.onRestoreInstanceState(viewModel.currentScrollState)
-                } ?: binding.rvCirclePost.scrollToPosition(0)
-            }
         }
     }
 
@@ -306,88 +335,65 @@ class CircleDetailPostFragment : Fragment() {
         startActivity(intent)
     }
 
-    private fun showErrorToast(context: Context) {
-        if (SingleMessageToast.previousFinished()) {
-            SingleMessageToast(context, viewModel.error).show()
-        }
-    }
-
-    private fun showErrorDialog(context: Context) {
-        SingleMessageAlertDialog(context, viewModel.error).show()
-    }
-
-    private fun scrollOverObserver() =
-        Observer<Boolean> { completed ->
-            if (completed) {
-                binding.rvCirclePost.removeOnScrollListener(viewModel.scrollListener)
-                binding.rvCirclePost.addOnScrollListener(viewModel.scrollListener)
-                binding.rvCirclePost.adapter?.let {
-                    (it as CirclePostAdapter).update(viewModel.posts) {}
-                }
-            }
-        }
-
-    private fun postStateObserver(
-        parentActivity: Activity,
+    private fun showToast(
+        event: Event.ShowToast,
         context: Context,
-    ) = Observer<UiState> {
-        val loadingIndicator =
-            requireParentFragment().requireView().findViewById<CircularProgressIndicator>(R.id.pgbLoading)
-        loadingIndicator.isVisible = it is UiState.Loading
-        when (it) {
-            UiState.AuthenticationError -> {
-                sendUserToLoginScreen(parentActivity)
-                showErrorToast(context)
-            }
-            UiState.ServiceError -> {
-                showErrorDialog(context)
-            }
-            else -> {}
+    ) {
+        if (SingleMessageToast.previousFinished()) {
+            SingleMessageToast(context, event.message).show()
         }
     }
 
-    private fun initListener() {
-        setRvCirclePostListener()
-        setBtnRetryListener()
+    private fun showDialog(
+        event: Event.ShowDialog,
+        context: Context,
+    ) {
+        SingleMessageAlertDialog(context, event.message).show()
     }
 
-    private fun setRvCirclePostListener() {
-        binding.rvCirclePost.addOnScrollListener(viewModel.scrollListener)
-        (viewModel.scrollListener as RecyclerViewInfiniteScrollListener).setScrollEndListener {
-            if (!viewModel.posts.isLastPage()) {
-                addScrollLoadingItemAndLoad()
-                viewModel.saveScrollState(binding.rvCirclePost.layoutManager?.onSaveInstanceState())
-            }
+    private fun handleScreenFlow(screenFlow: CircleDetailPostScreen) {
+        when (screenFlow) {
+            is CircleDetailPostScreen.SuccessView -> showSuccessView(screenFlow)
+            is CircleDetailPostScreen.LoadingView -> showLoadingView()
+            is CircleDetailPostScreen.ErrorView -> showErrorView()
         }
     }
 
-    private fun addScrollLoadingItemAndLoad() {
+    private fun showSuccessView(screenFlow: CircleDetailPostScreen.SuccessView) {
+        binding.shimmerPost.stopShimmer()
+        if (screenFlow.posts.isEmpty()) {
+            switchView(binding.txtNoPost)
+            return
+        }
+
+        switchView(binding.rvCirclePost)
+        loadCirclePostsAndDoAfter(screenFlow.posts) {}
+    }
+
+    private fun loadCirclePostsAndDoAfter(
+        posts: PostModels,
+        after: () -> Unit,
+    ) {
         binding.rvCirclePost.adapter?.let {
-            (it as CirclePostAdapter).update(viewModel.posts.add(PostModel.emptyInstance())) {}
-        }
-        viewModel.scrollOver()
-    }
-
-    private fun setBtnRetryListener() {
-        binding.btnRetry.setOnClickListener {
-            viewModel.refresh()
+            (it as CirclePostAdapter).update(posts) {
+                after()
+            }
         }
     }
 
-    override fun onDestroyView() {
-        super.onDestroyView()
-
-        viewModel.saveScrollState(binding.rvCirclePost.layoutManager?.onSaveInstanceState())
+    private fun showLoadingView() {
+        switchView(binding.shimmerPost)
+        binding.shimmerPost.startShimmer()
     }
 
-    private fun toggleView(view: View) {
+    private fun showErrorView() {
+        switchView(binding.llServiceError)
+    }
+
+    private fun switchView(view: View) {
         binding.rvCirclePost.isVisible = view == binding.rvCirclePost
         binding.shimmerPost.isVisible = view == binding.shimmerPost
         binding.txtNoPost.isVisible = view == binding.txtNoPost
         binding.llServiceError.isVisible = view == binding.llServiceError
-    }
-
-    companion object {
-        private const val MESSAGE_DELETE_POST = "게시글을 삭제할까요?"
     }
 }

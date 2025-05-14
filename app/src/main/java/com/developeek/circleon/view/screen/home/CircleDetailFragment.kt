@@ -29,10 +29,11 @@ import com.developeek.circleon.domain.model.CircleDetailModel
 import com.developeek.circleon.domain.utils.Const
 import com.developeek.circleon.domain.utils.Utils
 import com.developeek.circleon.domain.utils.glide.GlideProvider
+import com.developeek.circleon.view.Event
 import com.developeek.circleon.view.listener.ItemListenerInitializer
 import com.developeek.circleon.view.screen.login.LoginActivity
 import com.developeek.circleon.view.viewmodel.home.CircleDetailViewModel
-import com.developeek.circleon.view.viewmodelimpl.home.CircleDetailEvent
+import com.developeek.circleon.view.viewmodelimpl.home.CircleDetailScreen
 import com.developeek.circleon.view.viewmodelimpl.home.CircleDetailViewModelImpl
 import com.developeek.circleon.view.viewmodelimpl.home.SelectTab
 import com.developeek.circleon.view.widget.CircleRequestAlertDialog
@@ -78,7 +79,6 @@ class CircleDetailFragment : Fragment() {
         savedInstanceState: Bundle?,
     ): View {
         binding = FragmentCircleDetailBinding.inflate(layoutInflater)
-        // 하위 fragment 에서 circleDetailFragment 를 부모로 인식하기 위해 childFragmentManager 사용
         fragmentManager = childFragmentManager
 
         return binding.root
@@ -101,6 +101,11 @@ class CircleDetailFragment : Fragment() {
                     }
                 }
                 launch {
+                    viewModel.screenFlow.collect {
+                        handleScreenFlow(it, requireContext())
+                    }
+                }
+                launch {
                     viewModel.tabFlow.collect {
                         selectTab(it)
                     }
@@ -117,29 +122,126 @@ class CircleDetailFragment : Fragment() {
         binding.abCircleDetail.setExpanded(viewModel.currentAppBarExpanded)
     }
 
+    private fun initListener() {
+        setBtnBackListener()
+        setAbCircleDetailListener()
+        setTlCircleDetailListener()
+        setBtnRetryListener()
+    }
+
+    private fun setBtnBackListener() {
+        binding.btnBack.setOnClickListener {
+            sendUserToPreviousScreen()
+        }
+    }
+
+    private fun sendUserToPreviousScreen() {
+        findNavController().popBackStack()
+    }
+
+    private fun setAbCircleDetailListener() {
+        binding.abCircleDetail.addOnOffsetChangedListener { _, offset ->
+            if (viewModel.currentAppBarExpanded && offset != 0) {
+                viewModel.setAppBarExpanded(false)
+            } else if (!viewModel.currentAppBarExpanded && offset == 0) {
+                viewModel.setAppBarExpanded(true)
+            }
+        }
+    }
+
+    private fun setTlCircleDetailListener() {
+        binding.tlCircleDetail.addOnTabSelectedListener(
+            object : TabLayout.OnTabSelectedListener {
+                override fun onTabSelected(tab: TabLayout.Tab?) {
+                    viewModel.selectTab(tab?.position!!, false)
+                }
+
+                override fun onTabUnselected(p0: TabLayout.Tab?) {
+                }
+
+                override fun onTabReselected(tab: TabLayout.Tab?) {
+                    viewModel.selectTab(tab?.position!!, true)
+                }
+            },
+        )
+    }
+
+    private fun setBtnRetryListener() {
+        binding.btnRetry.setOnClickListener {
+            viewModel.refresh()
+        }
+    }
+
+    private fun initRefreshObserver() {
+        // 정보 수정 여부 감지
+        findNavController()
+            .currentBackStackEntry
+            ?.savedStateHandle
+            ?.let {
+                it.getLiveData<Boolean>(Const.FLAG_CIRCLE_DATA_CHANGED)
+                    .observe(viewLifecycleOwner) { dataChanged ->
+                        if (dataChanged) {
+                            viewModel.refresh()
+                            it[Const.FLAG_CIRCLE_DATA_CHANGED] = false
+                        }
+                    }
+            }
+    }
+
     private fun handleEvent(
-        event: CircleDetailEvent,
+        event: Event,
         parentActivity: Activity,
         context: Context,
     ) {
-        binding.pgbLoading.isVisible = event is CircleDetailEvent.ShowLoadingView
         when (event) {
-            is CircleDetailEvent.ShowSuccessView -> showSuccessView(context, event)
-            is CircleDetailEvent.ShowErrorView -> showErrorView()
-            is CircleDetailEvent.ShowToast -> showToast(context, event)
-            is CircleDetailEvent.ShowDialog -> showDialog(context, event)
-            is CircleDetailEvent.SendToLoginScreen -> sendUserToLoginScreen(parentActivity)
+            is Event.SendToLoginScreen -> sendUserToLoginScreen(parentActivity)
+            is Event.ShowToast -> showToast(event, context)
+            is Event.ShowDialog -> showDialog(event, context)
+            else -> {}
+        }
+    }
+
+    private fun sendUserToLoginScreen(activity: Activity) {
+        val intent = Intent(activity, LoginActivity::class.java)
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)
+        startActivity(intent)
+    }
+
+    private fun showToast(
+        event: Event.ShowToast,
+        context: Context,
+    ) {
+        if (SingleMessageToast.previousFinished()) {
+            SingleMessageToast(context, event.message).show()
+        }
+    }
+
+    private fun showDialog(
+        event: Event.ShowDialog,
+        context: Context,
+    ) {
+        SingleMessageAlertDialog(context, event.message).show()
+    }
+
+    private fun handleScreenFlow(
+        screenFlow: CircleDetailScreen,
+        context: Context,
+    ) {
+        binding.pgbLoading.isVisible = screenFlow is CircleDetailScreen.LoadingView
+        when (screenFlow) {
+            is CircleDetailScreen.SuccessView -> showSuccessView(screenFlow, context)
+            is CircleDetailScreen.ErrorView -> showErrorView()
             else -> {}
         }
     }
 
     private fun showSuccessView(
+        screenFlow: CircleDetailScreen.SuccessView,
         context: Context,
-        event: CircleDetailEvent.ShowSuccessView,
     ) {
         switchView(binding.flCircleDetail)
         loadCurrentTab(viewModel.currentTabPosition)
-        event.circleDetail.let {
+        screenFlow.circleDetail.let {
             loadCircleDetail(context, it)
             setBtnCircleDetailListener(context, it)
         }
@@ -185,11 +287,11 @@ class CircleDetailFragment : Fragment() {
         circleDetail: CircleDetailModel,
     ) {
         binding.btnCircleOverflow.setOnClickListener {
-            showPopupByUserRole(context, circleDetail)
+            showPopupMenuByUserRole(context, circleDetail)
         }
     }
 
-    private fun showPopupByUserRole(
+    private fun showPopupMenuByUserRole(
         context: Context,
         circleDetail: CircleDetailModel,
     ) {
@@ -305,7 +407,7 @@ class CircleDetailFragment : Fragment() {
             positiveListenerInitializer =
                 object : ItemListenerInitializer<String> {
                     override fun initialize(item: String) {
-                        viewModel.reportCircle(item)
+                        viewModel.requestReport(item)
                     }
 
                     override fun initialize(
@@ -374,32 +476,6 @@ class CircleDetailFragment : Fragment() {
 
     private fun showErrorView() {
         switchView(binding.llServiceError)
-    }
-
-    private fun showToast(
-        context: Context,
-        event: CircleDetailEvent.ShowToast,
-    ) {
-        if (SingleMessageToast.previousFinished() && !event.hasCollected) {
-            SingleMessageToast(context, event.message).show()
-            event.notifyCollected()
-        }
-    }
-
-    private fun showDialog(
-        context: Context,
-        event: CircleDetailEvent.ShowDialog,
-    ) {
-        if (!event.hasCollected) {
-            SingleMessageAlertDialog(context, event.message).show()
-            event.notifyCollected()
-        }
-    }
-
-    private fun sendUserToLoginScreen(activity: Activity) {
-        val intent = Intent(activity, LoginActivity::class.java)
-        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)
-        startActivity(intent)
     }
 
     private fun selectTab(event: SelectTab) {
@@ -480,7 +556,7 @@ class CircleDetailFragment : Fragment() {
         bundle: Bundle,
     ) {
         bundle.putSerializable(Const.TAG_CIRCLE_DETAIL, circleDetail)
-        replaceTo(CircleDetailIntroductionFragment(), bundle)
+        replaceToIfNotSame(CircleDetailIntroductionFragment(), bundle)
     }
 
     private fun replaceToNoticeScreen(
@@ -488,9 +564,8 @@ class CircleDetailFragment : Fragment() {
         bundle: Bundle,
     ) {
         if (circleDetail.isUserJoined()) {
-            bundle.putInt(Const.TAG_CIRCLE_ID, circleDetail.id)
-            bundle.putSerializable(Const.TAG_USER_ROLE, circleDetail.role)
-            replaceTo(CircleDetailNoticeFragment(), bundle)
+            bundle.putSerializable(Const.TAG_CIRCLE_DETAIL, circleDetail)
+            replaceToIfNotSame(CircleDetailNoticeFragment(), bundle)
         } else if (!binding.llNotMember.isVisible) {
             binding.llNotMember.isVisible = true
         }
@@ -501,18 +576,18 @@ class CircleDetailFragment : Fragment() {
         bundle: Bundle,
     ) {
         if (circleDetail.isUserJoined()) {
-            bundle.putInt(Const.TAG_CIRCLE_ID, circleDetail.id)
-            replaceTo(CircleDetailPostFragment(), bundle)
+            bundle.putSerializable(Const.TAG_CIRCLE_DETAIL, circleDetail)
+            replaceToIfNotSame(CircleDetailPostFragment(), bundle)
         } else if (!binding.llNotMember.isVisible) {
             binding.llNotMember.isVisible = true
         }
     }
 
     private fun replaceToPhotoScreen(bundle: Bundle) {
-        replaceTo(CircleDetailActivityPhotoFragment())
+        replaceToIfNotSame(CircleDetailActivityPhotoFragment())
     }
 
-    private fun replaceTo(
+    private fun replaceToIfNotSame(
         fragment: Fragment,
         bundle: Bundle? = null,
     ) {
@@ -520,9 +595,13 @@ class CircleDetailFragment : Fragment() {
             fragment.arguments = bundle
         }
 
+        fragmentManager.findFragmentByTag(fragment::class.java.simpleName)?.let {
+            return
+        }
+
         val transaction = fragmentManager.beginTransaction()
         transaction
-            .replace(binding.flCircleDetail.id, fragment)
+            .replace(binding.flCircleDetail.id, fragment, fragment::class.java.simpleName)
             .runOnCommit { removeNotMemberViewIfVisible() } // 비공개 뷰는 fragment 가 아니기 때문에 커밋 직후 별도로 전환
             .commit()
     }
@@ -565,72 +644,6 @@ class CircleDetailFragment : Fragment() {
         bundle.putSerializable(Const.TAG_POST_TYPE, postType)
         bundle.putBoolean(Const.FLAG_EDIT_SCREEN, false) // 신규 작성 전용 기능 활성화
         findNavController().navigate(R.id.action_circleDetailFragment_to_uploadPostFragment, bundle)
-    }
-
-    private fun initListener() {
-        setBtnBackListener()
-        setAbCircleDetailListener()
-        setTlCircleDetailListener()
-        setBtnRetryListener()
-    }
-
-    private fun setBtnBackListener() {
-        binding.btnBack.setOnClickListener {
-            sendUserToPreviousScreen()
-        }
-    }
-
-    private fun sendUserToPreviousScreen() {
-        findNavController().popBackStack()
-    }
-
-    private fun setAbCircleDetailListener() {
-        binding.abCircleDetail.addOnOffsetChangedListener { _, offset ->
-            if (viewModel.currentAppBarExpanded && offset != 0) {
-                viewModel.setAppBarExpanded(false)
-            } else if (!viewModel.currentAppBarExpanded && offset == 0) {
-                viewModel.setAppBarExpanded(true)
-            }
-        }
-    }
-
-    private fun setTlCircleDetailListener() {
-        binding.tlCircleDetail.addOnTabSelectedListener(
-            object : TabLayout.OnTabSelectedListener {
-                override fun onTabSelected(tab: TabLayout.Tab?) {
-                    viewModel.selectTab(tab?.position!!, false)
-                }
-
-                override fun onTabUnselected(p0: TabLayout.Tab?) {
-                }
-
-                override fun onTabReselected(tab: TabLayout.Tab?) {
-                    viewModel.selectTab(tab?.position!!, true)
-                }
-            },
-        )
-    }
-
-    private fun setBtnRetryListener() {
-        binding.btnRetry.setOnClickListener {
-            viewModel.refresh()
-        }
-    }
-
-    private fun initRefreshObserver() {
-        // 정보 수정 여부 감지
-        findNavController()
-            .currentBackStackEntry
-            ?.savedStateHandle
-            ?.let {
-                it.getLiveData<Boolean>(Const.FLAG_CIRCLE_DATA_CHANGED)
-                    .observe(viewLifecycleOwner) { dataChanged ->
-                        if (dataChanged) {
-                            viewModel.refresh()
-                            it[Const.FLAG_CIRCLE_DATA_CHANGED] = false
-                        }
-                    }
-            }
     }
 
     private fun switchView(view: View) {
