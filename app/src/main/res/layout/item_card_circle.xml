@@ -28,6 +28,7 @@
             android:layout_height="wrap_content"
             android:gravity="center_vertical"
             android:orientation="horizontal"
+            app:layout_constraintBottom_toTopOf="@id/txtCircleComment"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintStart_toStartOf="parent">
 
@@ -38,6 +39,13 @@
                 android:text="동아리 이름"
                 android:textAppearance="@style/content_title"
                 android:textSize="@dimen/text_size_default" />
+
+            <androidx.appcompat.widget.AppCompatImageView
+                android:id="@+id/icOfficial"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/ic_official"
+                android:visibility="gone"/>
 
             <androidx.appcompat.widget.AppCompatTextView
                 android:id="@+id/txtCircleCategory"
@@ -71,9 +79,9 @@
             android:id="@+id/llCircleMember"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/margin_padding_small"
             android:gravity="center_vertical"
             android:orientation="horizontal"
+            app:layout_constraintTop_toBottomOf="@id/txtCircleComment"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent">
 

@@ -59,7 +59,6 @@ class PostDetailAdapter(
 
             loadAuthor(post.author)
             loadContent(post)
-            hideOverflowOrNot(post.author)
             notifyListenerItemChanged(post)
         }
 
@@ -67,7 +66,7 @@ class PostDetailAdapter(
             binding.txtAuthorName.text = author.name
             author.profileImgUrl?.let {
                 glideProvider.fetchImage(it, context, binding.imgAuthorProfile)
-            } ?: binding.imgAuthorProfile.setImageResource(R.drawable.ic_user_profile_default)
+            } ?: binding.imgAuthorProfile.setImageResource(R.drawable.img_user_profile_default)
         }
 
         private fun loadContent(post: PostModel) {
@@ -81,12 +80,6 @@ class PostDetailAdapter(
                         .ofPattern(CREATED_DATE_FORMAT)
                         .withLocale(Locale.KOREAN),
                 )
-        }
-
-        private fun hideOverflowOrNot(author: AuthorModel) {
-            userId?.let {
-                binding.btnPostOverflow.isVisible = author.id == it
-            }
         }
 
         private fun notifyListenerItemChanged(post: PostModel) {
@@ -103,7 +96,6 @@ class PostDetailAdapter(
 
             loadAuthor(comment.author)
             loadComment(comment)
-            hideOverFlowOrNot(comment.author)
             notifyListenerItemChanged(comment)
         }
 
@@ -111,7 +103,7 @@ class PostDetailAdapter(
             binding.txtAuthorName.text = author.name
             author.profileImgUrl?.let {
                 glideProvider.fetchImage(it, context, binding.imgAuthorProfile)
-            } ?: binding.imgAuthorProfile.setImageResource(R.drawable.ic_user_profile_default)
+            } ?: binding.imgAuthorProfile.setImageResource(R.drawable.img_user_profile_small_default)
         }
 
         private fun loadComment(comment: CommentModel) {
@@ -122,12 +114,6 @@ class PostDetailAdapter(
                         .ofPattern(CREATED_DATE_FORMAT)
                         .withLocale(Locale.KOREAN),
                 )
-        }
-
-        private fun hideOverFlowOrNot(author: AuthorModel) {
-            userId?.let {
-                binding.btnCommentOverflow.isVisible = author.id == it
-            }
         }
 
         private fun notifyListenerItemChanged(comment: CommentModel) {
@@ -231,7 +217,7 @@ class PostDetailAdapter(
     }
 
     companion object {
-        private const val CREATED_DATE_FORMAT = "M월 d일 a hh:mm"
+        private const val CREATED_DATE_FORMAT = "M월 d일 HH:mm"
     }
 }
 

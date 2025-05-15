@@ -1,8 +1,10 @@
 <resources>
     <string name="app_name">CircleOn</string>
 
-    <!--Screnn Title-->
-    <string name="screen_title_manage_circle">동아리 관리</string>
+    <!--Common-->
+    <string name="btn_positive">확인</string>
+    <string name="btn_cancel">취소</string>
+    <string name="btn_delete">삭제</string>
 
     <!--Login-->
     <string name="hint_email">학교 이메일</string>
@@ -14,6 +16,7 @@
     <!--Sign Up-->
     <string name="btn_next">다음 단계로</string>
     <string name="sign_up_content_title_1">반가워요! 이름을 알려주세요</string>
+    <string name="info_content_title_1">실명이 아닐 경우 동아리 가입이 제한될 수 있어요</string>
     <string name="sign_up_content_title_2">학교 이메일 인증이 필요해요</string>
     <string name="sign_up_content_title_3">이메일로 인증번호를 전송했어요</string>
     <string name="sign_up_content_title_4">비밀번호를 설정해주세요</string>
@@ -40,16 +43,17 @@
     <string name="tab_name_direct_message">채팅</string>
     <string name="tab_name_my_page">MY</string>
     <string name="message_service_error">앗! 다시 시도해볼까요?</string>
+    <string name="message_not_released">아직 준비중인 기능이에요</string>
 
     <!--Home-->
     <string name="home_content_title_new_circle">새로 개설된 동아리를 소개합니다!</string>
-    <string name="home_content_title_circle">이런 동아리는 어떠신가요?</string>
+    <string name="home_content_title_circle_default">이런 동아리는 어떠신가요?</string>
+    <string name="home_content_title_circle">"%s 님 이런 동아리는 어떠신가요?"</string>
     <string name="message_no_circle">등록된 동아리가 없어요</string>
 
     <!--Search Circle-->
     <string name="message_no_result">검색 결과가 존재하지 않습니다</string>
     <string name="hint_search_circle">동아리 검색</string>
-    <string name="btn_cancel">취소</string>
 
     <!--Circle Detail-->
     <string name="btn_request_join_circle">가입신청</string>
@@ -57,6 +61,8 @@
     <string name="menu_circle_settings_edit">수정하기</string>
     <string name="menu_circle_settings_manage">관리하기</string>
     <string name="menu_circle_settings_request_leave">탈퇴하기</string>
+    <string name="menu_report">신고하기</string>
+    <string name="title_report_dialog">신고하시려는 이유가 무엇인가요?</string>
     <string name="tab_name_introduction">소개글</string>
     <string name="tab_name_notice">공지사항</string>
     <string name="tab_name_post">게시글</string>
@@ -64,31 +70,43 @@
     <string name="message_not_member">동아리 멤버에게만\n공개된 컨텐츠입니다.</string>
     <string name="message_no_notice">등록된 공지사항이 없어요</string>
     <string name="message_no_post">등록된 게시글이 없어요</string>
+    <string name="message_already_leave_requested">탈퇴 요청이 진행중이에요</string>
     <string name="underlined_number">&lt;u>%d&lt;/u></string>
 
     <!--Circle Detail Introduction-->
     <string name="text_recruitment_date">모집기간</string>
+    <string name="message_no_recruitment">현재 모집기간이 아니에요</string>
 
-    <!--Circle Detail Notice-->
+    <!--Circle Detail Post,Notice-->
     <string name="menu_post_settings_pin">고정하기</string>
     <string name="menu_post_settings_remove_pin">고정 해제하기</string>
     <string name="menu_post_settings_edit">수정하기</string>
     <string name="menu_post_settings_delete">삭제하기</string>
+    <string name="btn_pin">고정</string>
+    <string name="btn_remove_pin">해제</string>
+    <string name="message_pin_notice">공지사항을 고정할까요?</string>
+    <string name="message_remove_pin_notice">공지사항 고정을 해제할까요?</string>
+    <string name="message_delete_notice">공지사항을 삭제할까요?</string>
+    <string name="message_delete_post">게시글을 삭제할까요?</string>
 
     <!--Upload Circle-->
+    <string name="btn_upload">생성하기</string>
     <string name="text_circle_name">이름</string>
     <string name="hint_circle_name">동아리 이름</string>
     <string name="text_circle_single_line_introduction">한 줄 소개</string>
-    <string name="hint_circle_single_line_introduction">동아리 한 줄 소개</string>
+    <string name="hint_circle_single_line_introduction">동아리를 한 줄로 간단하게 소개해 주세요</string>
     <string name="text_circle_introduction">동아리 소개글</string>
+    <string name="hint_circle_introduction">사람들에게 가장 먼저 보여지는 글입니다. 자유롭게 동아리를 소개해 주세요!</string>
     <string name="text_circle_introduction_image">소개글 이미지</string>
-    <string name="tip_circle_introduction_image">동아리 홍보 포스터를 추천드려요</string>
+    <string name="tip_circle_introduction_image">동아리 홍보 포스터를 추천드려요!</string>
     <string name="text_circle_category">동아리 카테고리</string>
 
     <!--Manage Circle-->
+    <string name="title_manage_circle">동아리 관리</string>
     <string name="manage_circle_title_circle_member">동아리 멤버</string>
     <string name="manage_circle_title_approve_circle_join">동아리 가입 승인</string>
     <string name="manage_circle_title_approve_circle_leave">동아리 탈퇴 승인</string>
+    <string name="manage_circle_title_request_official_status">동아리 인증 뱃지\n신청하기</string>
     <string name="manage_circle_content_circle_member_default">멤버 0명</string>
     <string name="manage_circle_content_circle_member">멤버 %d명</string>
     <string name="manage_circle_content_join_requested_member_default">대기중인 멤버 0명</string>
@@ -96,16 +114,24 @@
     <string name="manage_circle_content_leave_requested_member_default">대기중인 멤버 0명</string>
     <string name="manage_circle_content_leave_requested_member">대기중인 멤버 %d명</string>
     <string name="message_no_circle_member">등록된 멤버가 없어요</string>
-    <string name="message_no_member_request">처리할 요청이 없어요</string>
+    <string name="message_no_member_join_requested">가입 대기중인 인원이 없어요..</string>
+    <string name="message_no_member_leave_requested">탈퇴 대기중인 인원이 없어요!</string>
+    <string name="message_request_ban_member">해당 멤버를 추방할까요?</string>
+    <string name="message_request_official_status">교내 정식 동아리 인증을 신청하시겠어요?(3~5일 정도 소요돼요)</string>
     <string name="menu_circle_member_settings_edit_role">역할 수정하기</string>
     <string name="menu_circle_member_settings_ban">추방하기</string>
     <string name="btn_edit_circle_member_role">임명하기</string>
-    <string name="btn_reject_join_request">거절</string>
-    <string name="btn_accept_join_request">수락</string>
-    <string name="btn_show_member_message">사유 보기</string>
-    <string name="title_member_message_dialog_for_accept">%s님이 이런 메세지를 남겨주셨어요</string>
-    <string name="title_member_message_dialog">탈퇴 사유를 알려주세요</string>
+    <string name="btn_reject_join_request">거절하기</string>
+    <string name="btn_accept_join_request">수락하기</string>
+    <string name="btn_show_member_join_message">상세 보기</string>
+    <string name="btn_show_member_leave_message">사유 보기</string>
+    <string name="btn_ban_member">추방</string>
+    <string name="title_member_message_dialog_for_join_accept">%s님은 자신을 이렇게 소개해주셨어요</string>
+    <string name="title_member_message_dialog_for_leave_accept">%s님이 이런 탈퇴 사유를 남겨주셨어요</string>
+    <string name="title_member_leave_message_dialog">탈퇴 사유를 알려주세요!</string>
+    <string name="title_member_join_message_dialog">내 자신을 어필해 볼까요?</string>
     <string name="btn_accept_leave_request">승인하기</string>
+    <string name="btn_join_request">신청하기</string>
     <string name="btn_leave_request">탈퇴하기</string>
 
     <!--Post Detail-->
@@ -114,7 +140,25 @@
 
     <!--Upload Post-->
     <string name="btn_finish">완료</string>
+    <string name="btn_save_edit">저장</string>
     <string name="hint_post_content">내용을 입력하세요.</string>
     <string name="add_image">사진 추가하기</string>
+
+    <!--Circle-->
+    <string name="circle_content_title_my_circle">나의 동아리</string>
+    <string name="circle_content_title_join_requested_circle">동아리 가입 신청 목록</string>
+    <string name="circle_content_title_leave_requested_circle">동아리 탈퇴 신청 목록</string>
+    <string name="circle_content_title_upload_circle">동아리\n생성하기</string>
+    <string name="circle_content_my_circle_default">가입중인 동아리 0개</string>
+    <string name="circle_content_my_circle">가입중인 동아리 %d개</string>
+    <string name="circle_content_requested_circle_default">대기중인 동아리 0개</string>
+    <string name="circle_content_requested_circle">대기중인 동아리 %d개</string>
+
+    <!--My Circle-->
+    <string name="message_no_my_circles">앗! 아직 가입하신 동아리가 없네요</string>
+    <string name="btn_move_to_search_circle_screen">둘러보러 가기</string>
+    <string name="btn_cancel_join_request">가입 취소</string>
+    <string name="message_no_join_requested_circles">가입 대기중인 동아리가 없어요!</string>
+    <string name="message_no_leave_requested_circles">탈퇴 대기중인 동아리가 없어요!</string>
 
 </resources>

@@ -1,11 +1,13 @@
 package com.developeek.circleon.view.screen.home
 
+import android.content.Context
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
+import com.developeek.circleon.R
 import com.developeek.circleon.databinding.FragmentCircleDetailIntroductionBinding
 import com.developeek.circleon.domain.model.CircleDetailModel
 import com.developeek.circleon.domain.utils.Const
@@ -48,27 +50,38 @@ class CircleDetailIntroductionFragment : Fragment() {
     ) {
         super.onViewCreated(view, savedInstanceState)
 
-        initView()
+        initView(requireContext())
     }
 
-    private fun initView() {
-        loadIntroductionContent()
-        loadRecruitmentDate()
+    private fun initView(context: Context) {
+        loadIntroductionContent(context)
+        loadRecruitmentDate(context)
     }
 
-    private fun loadIntroductionContent() {
-        binding.txtCircleIntroductionContent.text = circleDetail.introduction
+    private fun loadIntroductionContent(context: Context) {
+        if (circleDetail.introduction == null && circleDetail.introImgUrl == null) {
+            binding.llCircleIntroduction.isVisible = false
+            return
+        }
 
-        if (circleDetail.introImgUrl == null) {
-            binding.imgCircleIntroduction.isVisible = false
+        if (circleDetail.introduction == null) {
+            binding.txtCircleIntroductionContent.isVisible = false
         } else {
-            glideProvider.fetchImage(circleDetail.introImgUrl!!, requireActivity(), binding.imgCircleIntroduction)
+            binding.txtCircleIntroductionContent.text = circleDetail.introduction
+        }
+        if (circleDetail.introImgUrl == null) {
+            binding.cvCircleIntroduction.isVisible = false
+        } else {
+            glideProvider.fetchImage(circleDetail.introImgUrl!!, context, binding.imgCircleIntroduction)
         }
     }
 
-    private fun loadRecruitmentDate() {
-        if (circleDetail.recruitmentStartDate == null || circleDetail.recruitmentEndDate == null) {
-            binding.txtRecruitmentDate.text = NO_RECRUITMENT_MESSAGE
+    private fun loadRecruitmentDate(context: Context) {
+        if (!circleDetail.recruiting ||
+            circleDetail.recruitmentStartDate == null ||
+            circleDetail.recruitmentEndDate == null
+        ) {
+            binding.txtRecruitmentDate.text = context.getString(R.string.message_no_recruitment)
         } else {
             val start = circleDetail.recruitmentStartDate!!.format(DateTimeFormatter.ofPattern(RECRUITMENT_DATE_FORMAT))
             val startDayOfWeek =
@@ -89,7 +102,6 @@ class CircleDetailIntroductionFragment : Fragment() {
     }
 
     companion object {
-        private const val NO_RECRUITMENT_MESSAGE = "예정 없음"
         private const val RECRUITMENT_DATE_FORMAT = "M월 d일"
         private const val DAY_OF_WEEK_UNIT = "(%s)"
         private const val RECRUITMENT_DATE_DIVIDER = " ~ "

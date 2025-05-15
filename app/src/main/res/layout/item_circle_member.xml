@@ -13,6 +13,7 @@
         android:layout_height="40dp"
         app:cardCornerRadius="20dp"
         app:cardElevation="0dp"
+        android:backgroundTint="@color/grey_3"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"
@@ -21,7 +22,8 @@
         <androidx.appcompat.widget.AppCompatImageView
             android:id="@+id/imgMemberProfile"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"/>
+            android:layout_height="match_parent"
+            android:scaleType="center"/>
 
     </androidx.cardview.widget.CardView>
 
@@ -37,13 +39,29 @@
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toBottomOf="parent">
 
-        <androidx.appcompat.widget.AppCompatTextView
-            android:id="@+id/txtMemberName"
+        <androidx.appcompat.widget.LinearLayoutCompat
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textAppearance="@style/default_bold_text"
-            android:textColor="@color/grey_9"
-            tools:text="Name"/>
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/txtMemberName"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textAppearance="@style/default_bold_text"
+                android:textColor="@color/grey_9"
+                tools:text="Name"/>
+
+            <androidx.appcompat.widget.AppCompatImageView
+                android:id="@+id/icRole"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="2dp"
+                android:src="@drawable/ic_president"
+                android:visibility="gone"/>
+
+        </androidx.appcompat.widget.LinearLayoutCompat>
 
         <androidx.appcompat.widget.AppCompatTextView
             android:id="@+id/txtMemberRole"
@@ -58,8 +76,9 @@
     <androidx.appcompat.widget.AppCompatImageView
         android:id="@+id/btnProfileOverflow"
         android:layout_width="24dp"
-        android:layout_height="24dp"
+        android:layout_height="0dp"
         android:src="@drawable/ic_overflow"
+        android:background="?attr/selectableItemBackgroundBorderless"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@id/llMemberName"
         app:layout_constraintTop_toTopOf="parent"

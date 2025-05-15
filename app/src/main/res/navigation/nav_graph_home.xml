@@ -72,7 +72,7 @@
         tools:layout="@layout/fragment_upload_post" />
     <fragment
         android:id="@+id/uploadCircleFragment"
-        android:name="com.developeek.circleon.view.screen.home.UploadCircleFragment"
+        android:name="com.developeek.circleon.view.screen.circle.UploadCircleFragment"
         android:label="fragment_upload_circle"
         tools:layout="@layout/fragment_upload_circle" />
     <fragment

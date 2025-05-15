@@ -49,8 +49,10 @@
         </androidx.appcompat.widget.LinearLayoutCompat>
 
         <androidx.appcompat.widget.LinearLayoutCompat
+            android:id="@+id/llCircleIntroduction"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:paddingBottom="@dimen/margin_padding_large"
             android:orientation="vertical"
             android:background="@color/white">
 
@@ -58,16 +60,18 @@
                 android:id="@+id/txtCircleIntroductionContent"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:padding="@dimen/margin_padding_large"
+                android:layout_marginHorizontal="@dimen/margin_padding_large"
+                android:layout_marginTop="@dimen/margin_padding_large"
                 android:textSize="@dimen/text_size_default"
                 android:textColor="@color/grey_9"
-                android:text="소개글 영역"/>
+                android:text="소개글 영역" />
 
             <androidx.cardview.widget.CardView
+                android:id="@+id/cvCircleIntroduction"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/margin_padding_large"
                 android:layout_marginHorizontal="@dimen/margin_padding_large"
-                android:layout_marginBottom="@dimen/margin_padding_large"
                 app:cardCornerRadius="@dimen/round_default"
                 app:cardElevation="0dp">
 

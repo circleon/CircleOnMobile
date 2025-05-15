@@ -6,11 +6,12 @@ import com.developeek.circleon.domain.enums.MembershipStatus
 import com.developeek.circleon.domain.enums.PostType
 import com.developeek.circleon.domain.enums.Role
 import com.developeek.circleon.domain.model.CircleDetailModel
-import com.developeek.circleon.domain.model.CircleModels
+import com.developeek.circleon.domain.model.CircleModel
 import com.developeek.circleon.domain.model.CircleSummaryModels
 import com.developeek.circleon.domain.model.CommentModels
 import com.developeek.circleon.domain.model.MemberModels
-import com.developeek.circleon.domain.model.PostModels
+import com.developeek.circleon.domain.model.PostModel
+import com.developeek.circleon.view.viewmodelimpl.Page
 import java.io.File
 
 interface CircleRepository {
@@ -19,7 +20,7 @@ interface CircleRepository {
         page: Int,
         size: Int,
         category: Category,
-    ): Result<CircleModels>
+    ): Result<Page<CircleModel>>
 
     suspend fun getCircleSummaries(): Result<CircleSummaryModels>
 
@@ -43,27 +44,61 @@ interface CircleRepository {
         size: Int,
     ): Result<MemberModels>
 
+    suspend fun getCircleJoinRequestedMemberMessage(
+        circleId: Int,
+        memberId: Int,
+    ): Result<String>
+
+    suspend fun getCircleLeaveRequestedMemberMessage(
+        circleId: Int,
+        memberId: Int,
+    ): Result<String>
+
     suspend fun getCirclePosts(
         circleId: Int,
         page: Int,
         size: Int,
-    ): Result<PostModels>
+    ): Result<Page<PostModel>>
 
     suspend fun getCircleNotices(
         circleId: Int,
         page: Int,
         size: Int,
-    ): Result<PostModels>
+    ): Result<Page<PostModel>>
 
-    suspend fun getPostComments(
+    suspend fun getCirclePostComments(
         circleId: Int,
         postId: Int,
         page: Int,
         size: Int,
     ): Result<CommentModels>
 
+    suspend fun getMyCircles(
+        page: Int,
+        size: Int,
+    ): Result<CircleSummaryModels>
+
+    suspend fun getMyJoinRequestedCircles(
+        page: Int,
+        size: Int,
+    ): Result<CircleSummaryModels>
+
+    suspend fun getMyLeaveRequestedCircles(
+        page: Int,
+        size: Int,
+    ): Result<CircleSummaryModels>
+
     // POST
-    suspend fun postMyCircle(circleId: Int): Result<Unit>
+    suspend fun postCircle(
+        circleDetailModel: CircleDetailModel,
+        profileImg: File?,
+        introductionImg: File?,
+    ): Result<Unit>
+
+    suspend fun postMyCircle(
+        circleId: Int,
+        joinMessage: String,
+    ): Result<Unit>
 
     suspend fun postCircleLeaveRequest(
         memberId: Int,
@@ -77,10 +112,27 @@ interface CircleRepository {
         image: File?,
     ): Result<Unit>
 
-    suspend fun postCircleComment(
+    suspend fun postCirclePostComment(
         circleId: Int,
         postId: Int,
         comment: String,
+    ): Result<Unit>
+
+    suspend fun postReportCircle(
+        circleId: Int,
+        content: String,
+    ): Result<Unit>
+
+    suspend fun postReportCirclePost(
+        circleId: Int,
+        postId: Int,
+        content: String,
+    ): Result<Unit>
+
+    suspend fun postReportCirclePostComment(
+        circleId: Int,
+        commentId: Int,
+        content: String,
     ): Result<Unit>
 
     // PUT
@@ -91,6 +143,8 @@ interface CircleRepository {
     ): Result<Unit>
 
     suspend fun putCircle(circleDetailModel: CircleDetailModel): Result<Unit>
+
+    suspend fun putCircleOfficialStatus(circleId: Int): Result<Unit>
 
     suspend fun putCircleImage(
         circleId: Int,
@@ -105,7 +159,7 @@ interface CircleRepository {
         content: String,
     ): Result<Unit>
 
-    suspend fun putCircleComment(
+    suspend fun putCirclePostComment(
         circleId: Int,
         postId: Int,
         commentId: Int,
@@ -136,7 +190,7 @@ interface CircleRepository {
         postId: Int,
     ): Result<Unit>
 
-    suspend fun deletePostComment(
+    suspend fun deleteCirclePostComment(
         circleId: Int,
         postId: Int,
         commentId: Int,
@@ -146,4 +200,6 @@ interface CircleRepository {
         circleId: Int,
         memberId: Int,
     ): Result<Unit>
+
+    suspend fun deleteCircleJoinRequest(memberId: Int): Result<Unit>
 }

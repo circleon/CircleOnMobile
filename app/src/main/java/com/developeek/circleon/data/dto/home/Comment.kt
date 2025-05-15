@@ -20,7 +20,3 @@ data class Comment(
             author.toAuthorModel(),
         )
 }
-
-data class RequestBodyEditComment(
-    val content: String,
-)

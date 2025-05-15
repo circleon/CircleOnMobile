@@ -26,12 +26,11 @@ import com.developeek.circleon.domain.utils.Const
 import com.developeek.circleon.domain.utils.Utils.toJPEG
 import com.developeek.circleon.domain.utils.glide.GlideProvider
 import com.developeek.circleon.view.screen.login.LoginActivity
-import com.developeek.circleon.view.viewmodel.UploadPostViewModel
-import com.developeek.circleon.view.viewmodelimpl.UploadPostViewModelImpl
-import com.developeek.circleon.view.widget.ErrorAlertDialog
-import com.developeek.circleon.view.widget.ErrorToast
+import com.developeek.circleon.view.viewmodel.home.UploadPostViewModel
+import com.developeek.circleon.view.viewmodelimpl.home.UploadPostViewModelImpl
+import com.developeek.circleon.view.widget.SingleMessageAlertDialog
+import com.developeek.circleon.view.widget.SingleMessageToast
 import com.google.android.material.bottomnavigation.BottomNavigationView
-import com.google.android.material.progressindicator.CircularProgressIndicator
 import dagger.hilt.android.AndroidEntryPoint
 import dagger.hilt.android.lifecycle.withCreationCallback
 import javax.inject.Inject
@@ -47,8 +46,8 @@ class UploadPostFragment : Fragment() {
         registerForActivityResult(ActivityResultContracts.PickVisualMedia()) {
                 uri ->
             uri?.let {
-                glideProvider.loadImage(it, requireActivity(), binding.btnAddPostImage)
-                viewModel.setPostImage(it.toJPEG(requireActivity()))
+                glideProvider.loadImage(it, requireContext(), binding.btnAddPostImage)
+                viewModel.setPostImage(it.toJPEG(requireContext()))
                 binding.btnRemovePostImage.isVisible = true
                 binding.txtAddPostImage.isVisible = false
                 binding.btnAddPostImage.background = null
@@ -79,7 +78,7 @@ class UploadPostFragment : Fragment() {
                     }
                 }
         }
-        activity?.window?.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE)
+        requireActivity().window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE)
     }
 
     override fun onCreateView(
@@ -168,8 +167,7 @@ class UploadPostFragment : Fragment() {
         parentActivity: Activity,
         context: Context,
     ) = Observer<UiState> {
-        val loadingIndicator = parentActivity.findViewById<CircularProgressIndicator>(R.id.pgbLoading)
-        loadingIndicator.isVisible = it is UiState.Loading
+        binding.pgbLoading.isVisible = it is UiState.Loading
         when (it) {
             UiState.Success -> {
                 requestRefreshToPreviousScreen()
@@ -177,12 +175,12 @@ class UploadPostFragment : Fragment() {
             }
             UiState.AuthenticationError -> {
                 sendUserToLoginScreen(parentActivity)
-                if (ErrorToast.previousFinished()) {
-                    ErrorToast(context, viewModel.error).show()
+                if (SingleMessageToast.previousFinished()) {
+                    SingleMessageToast(context, viewModel.error).show()
                 }
             }
             UiState.ServiceError -> {
-                ErrorAlertDialog(context, viewModel.error).show()
+                SingleMessageAlertDialog(context, viewModel.error).show()
             }
             else -> {}
         }
@@ -229,9 +227,8 @@ class UploadPostFragment : Fragment() {
         binding.btnAddPostImage.setOnClickListener {
             // 편집 화면에서는 이미지 수정 기능 비활성화
             if (!isEdit) {
-                val mimeType = "image/jpeg"
                 pickMedia.launch(
-                    PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.SingleMimeType(mimeType)),
+                    PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.SingleMimeType(PHOTO_MIME_TYPE)),
                 )
             }
         }
@@ -251,7 +248,7 @@ class UploadPostFragment : Fragment() {
     override fun onDestroyView() {
         super.onDestroyView()
 
-        activity?.window?.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_PAN) // softInputMode 복원
+        requireActivity().window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_PAN) // softInputMode 복원
     }
 
     companion object {
@@ -259,5 +256,6 @@ class UploadPostFragment : Fragment() {
         private const val TITLE_NOTICE_EDIT = "공지사항 수정"
         private const val TITLE_POST = "게시글 작성"
         private const val TITLE_POST_EDIT = "게시글 수정"
+        private const val PHOTO_MIME_TYPE = "image/jpeg"
     }
 }

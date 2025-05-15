@@ -13,6 +13,7 @@
         android:layout_height="40dp"
         app:cardCornerRadius="20dp"
         app:cardElevation="0dp"
+        android:backgroundTint="@color/grey_3"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"
@@ -21,7 +22,8 @@
         <androidx.appcompat.widget.AppCompatImageView
             android:id="@+id/imgMemberProfile"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"/>
+            android:layout_height="match_parent"
+            android:scaleType="center"/>
 
     </androidx.cardview.widget.CardView>
 
@@ -34,46 +36,24 @@
         android:textColor="@color/grey_9"
         tools:text="Name"
         app:layout_constraintStart_toEndOf="@id/cvMemberProfile"
-        app:layout_constraintEnd_toStartOf="@id/llPositiveNegative"
+        app:layout_constraintEnd_toStartOf="@id/btnShowMemberMessage"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"/>
 
-    <LinearLayout
-        android:id="@+id/llPositiveNegative"
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/btnShowMemberMessage"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:gravity="center_vertical"
-        android:orientation="horizontal"
+        android:paddingVertical="6dp"
+        android:paddingHorizontal="@dimen/margin_padding_default"
+        android:background="@drawable/bg_rounded_rectangle"
+        android:backgroundTint="@color/grey_3"
+        android:textColor="@color/grey_6"
+        android:textSize="@dimen/text_size_default"
+        android:text="@string/btn_show_member_join_message"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@id/txtMemberName"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent">
-
-        <androidx.appcompat.widget.AppCompatTextView
-            android:id="@+id/btnRejectJoinRequest"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:paddingVertical="6dp"
-            android:paddingHorizontal="@dimen/margin_padding_default"
-            android:textColor="@color/grey_6"
-            android:textSize="@dimen/text_size_default"
-            android:text="@string/btn_reject_join_request"
-            android:background="@drawable/bg_rounded_rectangle"
-            android:backgroundTint="@color/grey_3"/>
-
-        <androidx.appcompat.widget.AppCompatTextView
-            android:id="@+id/btnAcceptJoinRequest"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="@dimen/margin_padding_small"
-            android:paddingVertical="6dp"
-            android:paddingHorizontal="@dimen/margin_padding_default"
-            android:textColor="@color/white"
-            android:textSize="@dimen/text_size_default"
-            android:text="@string/btn_accept_join_request"
-            android:background="@drawable/bg_rounded_rectangle"
-            android:backgroundTint="@color/purple_5"/>
-
-    </LinearLayout>
+        app:layout_constraintBottom_toBottomOf="parent"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

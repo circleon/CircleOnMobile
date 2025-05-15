@@ -54,13 +54,13 @@ class CircleMemberRoleEditAlertDialog(
         val spinnerAdapter =
             ArrayAdapter(
                 context,
-                android.R.layout.simple_spinner_item,
+                android.R.layout.simple_spinner_dropdown_item,
                 Role.getCircleRoles().map { it.roleName() },
             )
-        spinnerAdapter.setDropDownViewResource(R.layout.item_dropdown)
+
         roleSpinner.adapter = spinnerAdapter
         roleSpinner.post {
-            roleSpinner.dropDownVerticalOffset = roleSpinner.height
+            roleSpinner.dropDownVerticalOffset = (roleSpinner.height * 1.2).toInt()
         }
     }
 
@@ -131,7 +131,7 @@ class CircleMemberRoleEditAlertDialog(
         memberRole.setSelection(Role.indexOf(member.role) - 1) // 비회원 제외 관련 설정
         member.profileImgUrl?.let {
             glideProvider.fetchImage(it, context, memberProfileImage)
-        } ?: memberProfileImage.setImageResource(R.drawable.ic_user_profile_default)
+        } ?: memberProfileImage.setImageResource(R.drawable.img_user_profile_default)
     }
 
     fun show() {

@@ -16,7 +16,6 @@ import okhttp3.OkHttpClient.Builder
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
-import java.util.concurrent.TimeUnit
 import javax.inject.Qualifier
 import javax.inject.Singleton
 
@@ -27,8 +26,6 @@ object RemoteSourceModule {
     annotation class LoginClient
 
     annotation class ServiceClient
-
-    private const val TIMEOUT_LIMIT: Long = 20
 
     @Provides
     @Singleton
@@ -41,11 +38,7 @@ object RemoteSourceModule {
     @Singleton
     fun provideLoginClient(errorInterceptor: ErrorInterceptor): Builder {
         return OkHttpClient().newBuilder()
-            .addInterceptor(HttpLoggingInterceptor().setLevel(HttpLoggingInterceptor.Level.BODY))
             .addInterceptor(errorInterceptor)
-            .connectTimeout(TIMEOUT_LIMIT, TimeUnit.SECONDS)
-            .readTimeout(TIMEOUT_LIMIT, TimeUnit.SECONDS)
-            .writeTimeout(TIMEOUT_LIMIT, TimeUnit.SECONDS)
     }
 
     @ServiceClient
@@ -57,13 +50,10 @@ object RemoteSourceModule {
         tokenAuthenticator: TokenAuthenticator,
     ): Builder {
         return OkHttpClient().newBuilder()
-            .addInterceptor(HttpLoggingInterceptor().setLevel(HttpLoggingInterceptor.Level.BODY))
             .addInterceptor(headerInterceptor)
             .addInterceptor(errorInterceptor)
+            .addInterceptor(HttpLoggingInterceptor().setLevel(HttpLoggingInterceptor.Level.BODY))
             .authenticator(tokenAuthenticator)
-            .connectTimeout(TIMEOUT_LIMIT, TimeUnit.SECONDS)
-            .readTimeout(TIMEOUT_LIMIT, TimeUnit.SECONDS)
-            .writeTimeout(TIMEOUT_LIMIT, TimeUnit.SECONDS)
     }
 
     @Provides

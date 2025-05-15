@@ -3,6 +3,7 @@ package com.developeek.circleon.view.screen.home
 import android.app.Activity
 import android.content.Context
 import android.content.Intent
+import android.os.Build
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -15,6 +16,7 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.developeek.circleon.R
 import com.developeek.circleon.databinding.FragmentManageCircleMemberBinding
 import com.developeek.circleon.domain.enums.MembershipStatus
@@ -31,15 +33,14 @@ import com.developeek.circleon.view.adapter.JoinRequestedMemberAdapter
 import com.developeek.circleon.view.adapter.LeaveRequestedMemberAdapter
 import com.developeek.circleon.view.listener.ItemListenerInitializer
 import com.developeek.circleon.view.screen.login.LoginActivity
-import com.developeek.circleon.view.viewmodel.ManageCircleMemberViewModel
-import com.developeek.circleon.view.viewmodelimpl.ManageCircleMemberViewModelImpl
-import com.developeek.circleon.view.widget.CircleAcceptLeaveRequestAlertDialog
+import com.developeek.circleon.view.viewmodel.home.ManageCircleMemberViewModel
+import com.developeek.circleon.view.viewmodelimpl.home.ManageCircleMemberViewModelImpl
+import com.developeek.circleon.view.widget.CircleAcceptRequestAlertDialog
 import com.developeek.circleon.view.widget.CircleMemberRoleEditAlertDialog
-import com.developeek.circleon.view.widget.ContentDeleteAlertDialog
-import com.developeek.circleon.view.widget.ErrorAlertDialog
-import com.developeek.circleon.view.widget.ErrorToast
+import com.developeek.circleon.view.widget.PositiveAlertDialog
+import com.developeek.circleon.view.widget.SingleMessageAlertDialog
+import com.developeek.circleon.view.widget.SingleMessageToast
 import com.google.android.material.bottomnavigation.BottomNavigationView
-import com.google.android.material.progressindicator.CircularProgressIndicator
 import dagger.hilt.android.AndroidEntryPoint
 import dagger.hilt.android.lifecycle.withCreationCallback
 import javax.inject.Inject
@@ -90,6 +91,7 @@ class ManageCircleMemberFragment : Fragment() {
 
         initView(requireActivity(), requireContext())
         initObserver(requireActivity(), requireContext())
+        initListener()
         load(requireContext(), viewModel.members)
     }
 
@@ -153,6 +155,9 @@ class ManageCircleMemberFragment : Fragment() {
                     },
             )
         binding.rvMember.layoutManager = LinearLayoutManager(context)
+        if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.R) {
+            binding.rvMember.overScrollMode = RecyclerView.OVER_SCROLL_NEVER
+        }
     }
 
     private fun initProfileOverflowMenuAndShow(
@@ -201,9 +206,14 @@ class ManageCircleMemberFragment : Fragment() {
             }
 
             R.id.ban_member -> {
-                ContentDeleteAlertDialog(context, MESSAGE_BAN_MEMBER, BUTTON_NAME_BAN_MEMBER) {
-                    viewModel.banCircleMember(member)
-                }.show()
+                PositiveAlertDialog(
+                    context,
+                    ContextCompat.getString(context, R.string.message_request_ban_member),
+                    ContextCompat.getString(context, R.string.btn_ban_member),
+                    positiveListener = {
+                        viewModel.banCircleMember(member)
+                    },
+                ).show()
             }
         }
         true
@@ -214,21 +224,38 @@ class ManageCircleMemberFragment : Fragment() {
             JoinRequestedMemberAdapter(
                 context,
                 glideProvider,
-                positiveListenerInitializer =
+                showMessageListenerInitializer =
                     object : ItemListenerInitializer<MemberModel> {
                         override fun initialize(item: MemberModel) {
-                            viewModel.acceptJoinRequest(item)
-                        }
+                            CircleAcceptRequestAlertDialog(
+                                context,
+                                title = context.getString(R.string.title_member_message_dialog_for_join_accept),
+                                member = item,
+                                positiveButton = ContextCompat.getString(context, R.string.btn_accept_join_request),
+                                negativeButton = ContextCompat.getString(context, R.string.btn_reject_join_request),
+                                negativeListenerInitializer =
+                                    object : ItemListenerInitializer<MemberModel> {
+                                        override fun initialize(item: MemberModel) {
+                                            viewModel.rejectJoinRequest(item)
+                                        }
 
-                        override fun initialize(
-                            item: MemberModel,
-                            view: View?,
-                        ) {}
-                    },
-                negativeListenerInitializer =
-                    object : ItemListenerInitializer<MemberModel> {
-                        override fun initialize(item: MemberModel) {
-                            viewModel.rejectJoinRequest(item)
+                                        override fun initialize(
+                                            item: MemberModel,
+                                            view: View?,
+                                        ) {}
+                                    },
+                                positiveListenerInitializer =
+                                    object : ItemListenerInitializer<MemberModel> {
+                                        override fun initialize(item: MemberModel) {
+                                            viewModel.acceptJoinRequest(item)
+                                        }
+
+                                        override fun initialize(
+                                            item: MemberModel,
+                                            view: View?,
+                                        ) {}
+                                    },
+                            ).show()
                         }
 
                         override fun initialize(
@@ -248,25 +275,31 @@ class ManageCircleMemberFragment : Fragment() {
                 showMessageListenerInitializer =
                     object : ItemListenerInitializer<MemberModel> {
                         override fun initialize(item: MemberModel) {
-                            CircleAcceptLeaveRequestAlertDialog(
+                            CircleAcceptRequestAlertDialog(
                                 context,
-                                item,
-                                "ㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇ" +
-                                    "ㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇ" +
-                                    "ㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇ" +
-                                    "ㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇ" +
-                                    "ㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇ" +
-                                    "ㅇㅇㅇㅇㅇㅇ",
-                                object : ItemListenerInitializer<MemberModel> {
-                                    override fun initialize(item: MemberModel) {
-                                        viewModel.acceptLeaveRequest(item)
-                                    }
+                                title = context.getString(R.string.title_member_message_dialog_for_leave_accept),
+                                member = item,
+                                positiveButton = ContextCompat.getString(context, R.string.btn_accept_leave_request),
+                                negativeListenerInitializer =
+                                    object : ItemListenerInitializer<MemberModel> {
+                                        override fun initialize(item: MemberModel) {}
 
-                                    override fun initialize(
-                                        item: MemberModel,
-                                        view: View?,
-                                    ) {}
-                                },
+                                        override fun initialize(
+                                            item: MemberModel,
+                                            view: View?,
+                                        ) {}
+                                    },
+                                positiveListenerInitializer =
+                                    object : ItemListenerInitializer<MemberModel> {
+                                        override fun initialize(item: MemberModel) {
+                                            viewModel.acceptLeaveRequest(item)
+                                        }
+
+                                        override fun initialize(
+                                            item: MemberModel,
+                                            view: View?,
+                                        ) {}
+                                    },
                             ).show()
                         }
 
@@ -297,8 +330,7 @@ class ManageCircleMemberFragment : Fragment() {
         parentActivity: Activity,
         context: Context,
     ) = Observer<UiState> {
-        val loadingIndicator = parentActivity.findViewById<CircularProgressIndicator>(R.id.pgbLoading)
-        loadingIndicator.isVisible = it is UiState.Loading
+        binding.pgbLoading.isVisible = it is UiState.Loading
         when (it) {
             UiState.Success -> {
                 requestRefreshToPreviousScreen()
@@ -319,6 +351,20 @@ class ManageCircleMemberFragment : Fragment() {
         findNavController().previousBackStackEntry?.savedStateHandle?.set(Const.FLAG_CIRCLE_DATA_CHANGED, true)
     }
 
+    private fun initListener() {
+        setBtnBackListener()
+    }
+
+    private fun setBtnBackListener() {
+        binding.btnBack.setOnClickListener {
+            sendUserToPreviousScreen()
+        }
+    }
+
+    private fun sendUserToPreviousScreen() {
+        findNavController().navigateUp()
+    }
+
     private fun load(
         context: Context,
         members: MemberModels,
@@ -331,22 +377,29 @@ class ManageCircleMemberFragment : Fragment() {
     }
 
     private fun showNoMemberMessage(context: Context) {
-        binding.txtNoMember.isVisible = true
+        binding.llNoMember.isVisible = true
         binding.rvMember.isVisible = false
 
-        val messageId =
-            if (membershipStatus == MembershipStatus.JOINED) {
-                R.string.message_no_circle_member
-            } else {
-                R.string.message_no_member_request
+        when (membershipStatus) {
+            MembershipStatus.JOINED -> {
+                binding.txtNoMember.text = ContextCompat.getString(context, R.string.message_no_circle_member)
+                binding.icSituation.setImageResource(R.drawable.character_bad_situation)
             }
-        binding.txtNoMember.text =
-            ContextCompat.getString(context, messageId)
+            MembershipStatus.JOIN_REQUESTED -> {
+                binding.txtNoMember.text = ContextCompat.getString(context, R.string.message_no_member_join_requested)
+                binding.icSituation.setImageResource(R.drawable.character_bad_situation)
+            }
+            MembershipStatus.LEAVE_REQUESTED -> {
+                binding.txtNoMember.text = ContextCompat.getString(context, R.string.message_no_member_leave_requested)
+                binding.icSituation.setImageResource(R.drawable.character_good_situation)
+            }
+            else -> {}
+        }
     }
 
     private fun loadMembers(members: MemberModels) {
         binding.rvMember.isVisible = true
-        binding.txtNoMember.isVisible = false
+        binding.llNoMember.isVisible = false
 
         binding.rvMember.adapter?.let {
             when (membershipStatus) {
@@ -371,17 +424,12 @@ class ManageCircleMemberFragment : Fragment() {
     }
 
     private fun showErrorToast(context: Context) {
-        if (ErrorToast.previousFinished()) {
-            ErrorToast(context, viewModel.error).show()
+        if (SingleMessageToast.previousFinished()) {
+            SingleMessageToast(context, viewModel.error).show()
         }
     }
 
     private fun showErrorDialog(context: Context) {
-        ErrorAlertDialog(context, viewModel.error).show()
-    }
-
-    companion object {
-        private const val MESSAGE_BAN_MEMBER = "해당 멤버를 추방할까요?"
-        private const val BUTTON_NAME_BAN_MEMBER = "추방"
+        SingleMessageAlertDialog(context, viewModel.error).show()
     }
 }

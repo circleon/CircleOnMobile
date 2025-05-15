@@ -3,6 +3,7 @@ package com.developeek.circleon.view.screen.home
 import android.app.Activity
 import android.content.Context
 import android.content.Intent
+import android.os.Build
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -17,6 +18,7 @@ import androidx.lifecycle.Observer
 import androidx.navigation.NavOptions
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.developeek.circleon.R
 import com.developeek.circleon.databinding.FragmentSearchCircleBinding
 import com.developeek.circleon.domain.model.CircleSummaryModel
@@ -27,9 +29,9 @@ import com.developeek.circleon.view.adapter.CircleSearchResultAdapter
 import com.developeek.circleon.view.listener.ItemListenerInitializer
 import com.developeek.circleon.view.listener.RecyclerViewHideSoftInputListener
 import com.developeek.circleon.view.screen.login.LoginActivity
-import com.developeek.circleon.view.viewmodel.SearchViewModel
-import com.developeek.circleon.view.viewmodelimpl.SearchViewModelImpl
-import com.developeek.circleon.view.widget.ErrorToast
+import com.developeek.circleon.view.viewmodel.home.SearchViewModel
+import com.developeek.circleon.view.viewmodelimpl.home.SearchViewModelImpl
+import com.developeek.circleon.view.widget.SingleMessageToast
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -63,12 +65,12 @@ class SearchCircleFragment : Fragment() {
         parentActivity: Activity,
         context: Context,
     ) {
-        initRecyclerView()
+        initRecyclerView(context)
         initSoftKeyboard(context)
         hideBtmNav(parentActivity)
     }
 
-    private fun initRecyclerView() {
+    private fun initRecyclerView(context: Context) {
         binding.rvCircle.adapter =
             CircleSearchResultAdapter(
                 object : ItemListenerInitializer<CircleSummaryModel> {
@@ -82,8 +84,11 @@ class SearchCircleFragment : Fragment() {
                     ) { }
                 },
             )
-        binding.rvCircle.layoutManager = LinearLayoutManager(activity)
+        binding.rvCircle.layoutManager = LinearLayoutManager(context)
         binding.rvCircle.itemAnimator = null
+        if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.R) {
+            binding.rvCircle.overScrollMode = RecyclerView.OVER_SCROLL_NEVER
+        }
     }
 
     private fun sendUserToCircleDetailScreen(item: CircleSummaryModel) {
@@ -144,14 +149,14 @@ class SearchCircleFragment : Fragment() {
             }
             UiState.AuthenticationError -> {
                 sendUserToLoginScreen(parentActivity)
-                if (ErrorToast.previousFinished()) {
-                    ErrorToast(context, viewModel.error).show()
+                if (SingleMessageToast.previousFinished()) {
+                    SingleMessageToast(context, viewModel.error).show()
                 }
             }
             UiState.ServiceError -> {
                 toggleView(binding.llServiceError)
-                if (ErrorToast.previousFinished()) {
-                    ErrorToast(context, viewModel.error).show()
+                if (SingleMessageToast.previousFinished()) {
+                    SingleMessageToast(context, viewModel.error).show()
                 }
             }
             else -> {}
@@ -169,8 +174,9 @@ class SearchCircleFragment : Fragment() {
             when (it.isEmpty()) {
                 true -> toggleView(binding.txtNoResult)
                 false -> {
-                    toggleView(binding.rvCircle)
-                    (binding.rvCircle.adapter as CircleSearchResultAdapter).update(it) {}
+                    (binding.rvCircle.adapter as CircleSearchResultAdapter).update(it) {
+                        toggleView(binding.rvCircle)
+                    }
                 }
             }
         }

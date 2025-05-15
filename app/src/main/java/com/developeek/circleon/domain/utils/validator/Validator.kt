@@ -63,9 +63,6 @@ object Validator {
         checkEmpty(data.singleLineIntroduction).also {
             if (it is Invalid) return InputValidationResult.invalid(IOException(it.message()))
         }
-        checkEmpty(data.introduction).also {
-            if (it is Invalid) return InputValidationResult.invalid(IOException(it.message()))
-        }
 
         return InputValidationResult.valid(data)
     }

@@ -1,0 +1,68 @@
+package com.developeek.circleon.view.viewmodelimpl.login
+
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import com.developeek.circleon.data.repository.LoginRepository
+import com.developeek.circleon.data.source.Error
+import com.developeek.circleon.data.source.Success
+import com.developeek.circleon.domain.utils.validator.Invalid
+import com.developeek.circleon.domain.utils.validator.Validator
+import com.developeek.circleon.view.viewmodel.login.LoginViewModel
+import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.SharedFlow
+import kotlinx.coroutines.launch
+import javax.inject.Inject
+
+@HiltViewModel
+class LoginViewModelImpl
+    @Inject
+    constructor(private val repository: LoginRepository) : LoginViewModel, ViewModel() {
+        private val _event = MutableSharedFlow<LoginEvent>()
+        override val event: SharedFlow<LoginEvent> = _event
+
+        private var loginJob: Job? = null
+
+        override fun login(
+            email: String,
+            password: String,
+        ) {
+            loginJob?.let {
+                if (!it.isCompleted) return
+            }
+
+            viewModelScope.launch {
+                if (!checkEmailFormat(email)) return@launch
+
+                _event.emit(LoginEvent.ShowLoadingView)
+
+                loginJob =
+                    launch {
+                        when (val result = repository.login(email, password)) {
+                            is Success -> _event.emit(LoginEvent.SendToHomeScreen)
+                            is Error -> _event.emit(LoginEvent.ShowDialog(result.message()))
+                        }
+                    }
+            }
+        }
+
+        private suspend fun checkEmailFormat(email: String): Boolean {
+            val validation = Validator.checkEmailAsId(email)
+
+            return if (validation is Invalid) {
+                _event.emit(LoginEvent.ShowDialog(validation.message()))
+                false
+            } else {
+                true
+            }
+        }
+    }
+
+sealed class LoginEvent {
+    data object ShowLoadingView : LoginEvent()
+
+    data object SendToHomeScreen : LoginEvent()
+
+    data class ShowDialog(val text: String) : LoginEvent()
+}

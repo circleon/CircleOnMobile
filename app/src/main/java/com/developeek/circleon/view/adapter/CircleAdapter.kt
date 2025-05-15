@@ -4,6 +4,7 @@ import android.content.Context
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.view.isVisible
 import androidx.recyclerview.widget.AsyncListDiffer
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
@@ -55,6 +56,7 @@ class CircleAdapter(
         private fun loadCircle(circle: CircleModel) {
             binding.txtCircleName.text = circle.name
             binding.txtCircleCategory.text = circle.category.categoryName()
+            binding.icOfficial.isVisible = circle.isOfficial()
             binding.txtCircleComment.text = circle.comment
             binding.txtCircleMemberCount.text =
                 String.format(
@@ -64,7 +66,7 @@ class CircleAdapter(
             // 싱글 라인인 경우에는 작동
             circle.thumbnailUrl?.let {
                 glideProvider.fetchImage(it, context, binding.imgCircleThumbnail)
-            } ?: binding.imgCircleThumbnail.setImageResource(R.drawable.ic_circle_thumbnail_default)
+            } ?: binding.imgCircleThumbnail.setImageResource(R.drawable.img_circle_thumbnail_default)
         }
 
         private fun notifyListenerItemChanged(circle: CircleModel) {
@@ -126,6 +128,12 @@ class CircleAdapter(
         commitCallback: Runnable,
     ) {
         diffUtil.submitList(models.get(), commitCallback)
+    }
+
+    fun addLoadingItem() {
+        if (diffUtil.currentList.last() == CircleModel.emptyInstance()) return
+
+        diffUtil.submitList(diffUtil.currentList + CircleModel.emptyInstance())
     }
 
     companion object {

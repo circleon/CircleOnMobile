@@ -3,6 +3,7 @@ package com.developeek.circleon.domain.model
 import com.developeek.circleon.data.dto.home.RequestBodyEditCircleDetail
 import com.developeek.circleon.domain.enums.Category
 import com.developeek.circleon.domain.enums.MembershipStatus
+import com.developeek.circleon.domain.enums.OfficialStatus
 import com.developeek.circleon.domain.enums.Role
 import com.developeek.circleon.domain.utils.Const
 import java.io.Serializable
@@ -11,20 +12,44 @@ import java.time.LocalDateTime
 data class CircleDetailModel(
     val id: Int,
     val name: String,
+    val category: Category,
+    val officialStatus: OfficialStatus,
     val role: Role,
     val memberId: Int,
     val membershipStatus: MembershipStatus,
     val profileImgUrl: String?,
     val thumbnailUrl: String?,
-    val category: Category,
     val singleLineIntroduction: String,
     val memberCount: Int,
-    val members: MemberModels,
     val introImgUrl: String?,
-    val introduction: String,
+    val introduction: String?,
     val recruitmentStartDate: LocalDateTime?,
     val recruitmentEndDate: LocalDateTime?,
+    val recruiting: Boolean,
+    val members: MemberModels = MemberModels.empty(),
 ) : Serializable {
+    constructor(circleDetailModel: CircleDetailModel, members: MemberModels) : this(
+        circleDetailModel.id,
+        circleDetailModel.name,
+        circleDetailModel.category,
+        circleDetailModel.officialStatus,
+        circleDetailModel.role,
+        circleDetailModel.memberId,
+        circleDetailModel.membershipStatus,
+        circleDetailModel.profileImgUrl,
+        circleDetailModel.thumbnailUrl,
+        circleDetailModel.singleLineIntroduction,
+        circleDetailModel.memberCount,
+        circleDetailModel.introImgUrl,
+        circleDetailModel.introduction,
+        circleDetailModel.recruitmentStartDate,
+        circleDetailModel.recruitmentEndDate,
+        circleDetailModel.recruiting,
+        members,
+    )
+
+    fun isOfficial() = officialStatus.isOfficial()
+
     fun isUserJoined() = role.isMember()
 
     fun isUserExecutive() = role.isExecutive()
@@ -34,45 +59,50 @@ data class CircleDetailModel(
     fun fold(
         id: Int = this.id,
         name: String = this.name,
+        category: Category = this.category,
+        officialStatus: OfficialStatus = this.officialStatus,
         role: Role = this.role,
         memberId: Int = this.memberId,
         membershipStatus: MembershipStatus = this.membershipStatus,
         profileImgUrl: String? = this.profileImgUrl,
         thumbnailUrl: String? = this.thumbnailUrl,
-        category: Category = this.category,
         singleLineIntroduction: String = this.singleLineIntroduction,
         memberCount: Int = this.memberCount,
-        members: MemberModels = this.members,
         introImgUrl: String? = this.introImgUrl,
-        introduction: String = this.introduction,
+        introduction: String? = this.introduction,
         recruitmentStartDate: LocalDateTime? = this.recruitmentStartDate,
         recruitmentEndDate: LocalDateTime? = this.recruitmentEndDate,
+        recruiting: Boolean = this.recruiting,
+        members: MemberModels = this.members,
     ) = CircleDetailModel(
         id,
         name,
+        category,
+        officialStatus,
         role,
         memberId,
         membershipStatus,
         profileImgUrl,
         thumbnailUrl,
-        category,
         singleLineIntroduction,
         memberCount,
-        members,
         introImgUrl,
         introduction,
         recruitmentStartDate,
         recruitmentEndDate,
+        recruiting,
+        members,
     )
 
     fun toRequestBodyForEdit() =
         RequestBodyEditCircleDetail(
             this.name,
+            this.category.codeName(),
             this.singleLineIntroduction,
             this.introduction,
-            this.recruitmentStartDate.toString(),
-            this.recruitmentEndDate.toString(),
-            this.category.codeName(),
+            this.recruitmentStartDate?.toString(),
+            this.recruitmentEndDate?.toString(),
+            this.recruiting,
         )
 
     companion object {
@@ -80,19 +110,20 @@ data class CircleDetailModel(
             CircleDetailModel(
                 0,
                 Const.EMPTY_TEXT,
+                Category.ETC,
+                OfficialStatus.UNOFFICIAL,
                 Role.NONE_MEMBER,
                 0,
                 MembershipStatus.NOT_JOINED,
                 null,
                 null,
-                Category.ETC,
                 Const.EMPTY_TEXT,
                 0,
-                MemberModels.empty(),
-                null,
-                Const.EMPTY_TEXT,
                 null,
                 null,
+                LocalDateTime.now(),
+                LocalDateTime.now(),
+                false,
             )
     }
 }

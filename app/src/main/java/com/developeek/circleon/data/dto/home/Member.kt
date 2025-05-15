@@ -29,15 +29,3 @@ data class Member(
             profileImgUrl,
         )
 }
-
-data class RequestBodyEditMemberRole(
-    @SerializedName("circleRole") val role: String,
-)
-
-data class RequestBodyEditMemberStatus(
-    @SerializedName("membershipStatus") val status: String,
-)
-
-data class RequestBodyCircleLeave(
-    @SerializedName("leaveMessage") val message: String,
-)

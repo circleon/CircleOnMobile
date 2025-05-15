@@ -5,11 +5,15 @@
     <color name="grey_1">#FAFAFA</color>
     <color name="grey_2">#F5F5F5</color>
     <color name="grey_3">#EBEBEB</color>
+    <color name="grey_4">#CCCCCC</color>
     <color name="grey_5">#B3B3B3</color>
     <color name="grey_6">#808080</color>
     <color name="grey_7">#595959</color>
     <color name="grey_9">#1A1A1A</color>
     <color name="purple_5">#573CDD</color>
+    <color name="purple_6">#3D22C3</color>
     <color name="green_5">#75e900</color>
     <color name="error">#E83040</color>
+    <color name="shimmer">#CCCCCC</color>
+    <color name="bg_indicator">#70EBEBEB</color>
 </resources>

@@ -13,6 +13,7 @@
         android:layout_height="40dp"
         app:cardCornerRadius="20dp"
         app:cardElevation="0dp"
+        android:backgroundTint="@color/grey_3"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"
@@ -21,7 +22,8 @@
         <androidx.appcompat.widget.AppCompatImageView
             android:id="@+id/imgMemberProfile"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"/>
+            android:layout_height="match_parent"
+            android:scaleType="center"/>
 
     </androidx.cardview.widget.CardView>
 
@@ -48,7 +50,7 @@
         android:backgroundTint="@color/grey_3"
         android:textColor="@color/grey_6"
         android:textSize="@dimen/text_size_default"
-        android:text="@string/btn_show_member_message"
+        android:text="@string/btn_show_member_leave_message"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@id/txtMemberName"
         app:layout_constraintTop_toTopOf="parent"

@@ -18,6 +18,7 @@
             android:name="androidx.navigation.fragment.NavHostFragment"
             android:layout_width="match_parent"
             android:layout_height="0dp"
+            android:background="@color/white"
             app:navGraph="@navigation/nav_graph"
             app:defaultNavHost="true"
             app:layout_constraintBottom_toTopOf="@+id/btmNav"
@@ -27,8 +28,10 @@
         <com.google.android.material.bottomnavigation.BottomNavigationView
             android:id="@+id/btmNav"
             android:layout_width="match_parent"
-            android:layout_height="68dp"
+            android:layout_height="56dp"
             android:paddingHorizontal="40dp"
+            app:itemPaddingTop="@dimen/margin_padding_small"
+            app:itemPaddingBottom="@dimen/margin_padding_small"
             app:itemTextColor="@drawable/selector_bottom_nav"
             app:itemTextAppearanceActive="@style/bottom_nav_title"
             app:itemTextAppearanceInactive="@style/bottom_nav_title"
@@ -44,21 +47,5 @@
             app:menu="@menu/menu_bottom_navigation" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
-
-    <com.google.android.material.progressindicator.CircularProgressIndicator
-        android:id="@+id/pgbLoading"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:padding="@dimen/margin_padding_large"
-        android:background="@drawable/bg_rounded_rectangle"
-        android:backgroundTint="@color/purple_5"
-        android:layout_gravity="center"
-        app:indicatorColor="@color/white"
-        app:trackColor="@color/grey_3"
-        app:trackThickness="4dp"
-        android:indeterminate="true"
-        android:visibility="gone">
-
-    </com.google.android.material.progressindicator.CircularProgressIndicator>
 
 </FrameLayout>

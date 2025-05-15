@@ -22,12 +22,12 @@ import com.developeek.circleon.domain.model.MemberModels
 import com.developeek.circleon.domain.state.UiState
 import com.developeek.circleon.domain.utils.Const
 import com.developeek.circleon.view.screen.login.LoginActivity
-import com.developeek.circleon.view.viewmodel.ManageCircleViewModel
-import com.developeek.circleon.view.viewmodelimpl.ManageCircleViewModelImpl
-import com.developeek.circleon.view.widget.ErrorAlertDialog
-import com.developeek.circleon.view.widget.ErrorToast
+import com.developeek.circleon.view.viewmodel.home.ManageCircleViewModel
+import com.developeek.circleon.view.viewmodelimpl.home.ManageCircleViewModelImpl
+import com.developeek.circleon.view.widget.PositiveAlertDialog
+import com.developeek.circleon.view.widget.SingleMessageAlertDialog
+import com.developeek.circleon.view.widget.SingleMessageToast
 import com.google.android.material.bottomnavigation.BottomNavigationView
-import com.google.android.material.progressindicator.CircularProgressIndicator
 import dagger.hilt.android.AndroidEntryPoint
 import dagger.hilt.android.lifecycle.withCreationCallback
 
@@ -72,15 +72,20 @@ class ManageCircleFragment : Fragment() {
 
         initView(requireActivity())
         initObserver(requireActivity(), requireContext())
-        initListener()
+        initListener(requireContext())
     }
 
     private fun initView(parentActivity: Activity) {
         hideBtmNav(parentActivity)
+        hideBtnRequestOfficialStatusWhenAlreadyOfficial()
     }
 
     private fun hideBtmNav(activity: Activity) {
         activity.findViewById<BottomNavigationView>(R.id.btmNav).isVisible = false
+    }
+
+    private fun hideBtnRequestOfficialStatusWhenAlreadyOfficial() {
+        binding.btnRequestOfficialStatus.isVisible = !circle.isOfficial()
     }
 
     private fun initObserver(
@@ -90,6 +95,10 @@ class ManageCircleFragment : Fragment() {
         viewModel.state.observe(
             viewLifecycleOwner,
             stateObserver(parentActivity, context),
+        )
+        viewModel.officialStatusState.observe(
+            viewLifecycleOwner,
+            officialStatusStateObserver(parentActivity, context),
         )
         // 정보 수정 여부 감지
         findNavController()
@@ -115,8 +124,7 @@ class ManageCircleFragment : Fragment() {
         parentActivity: Activity,
         context: Context,
     ) = Observer<UiState> {
-        val loadingIndicator = parentActivity.findViewById<CircularProgressIndicator>(R.id.pgbLoading)
-        loadingIndicator.isVisible = it is UiState.Loading
+        binding.pgbLoading.isVisible = it is UiState.Loading
         when (it) {
             UiState.Success -> {
                 loadMembers(context)
@@ -172,13 +180,43 @@ class ManageCircleFragment : Fragment() {
             )
     }
 
-    private fun initListener() {
+    private fun officialStatusStateObserver(
+        parentActivity: Activity,
+        context: Context,
+    ) = Observer<UiState> {
+        binding.pgbLoading.isVisible = it is UiState.Loading
+        when (it) {
+            UiState.AuthenticationError -> {
+                sendUserToLoginScreen(parentActivity)
+                showErrorToast(context)
+            }
+            UiState.ServiceError -> {
+                showErrorDialog(context)
+            }
+            else -> {}
+        }
+    }
+
+    private fun initListener(context: Context) {
         setBtnCancelListener()
+        setBtnRequestOfficialStatus(context)
     }
 
     private fun setBtnCancelListener() {
         binding.btnCancel.setOnClickListener {
             sendUserToPreviousScreen()
+        }
+    }
+
+    private fun setBtnRequestOfficialStatus(context: Context) {
+        binding.btnRequestOfficialStatus.setOnClickListener {
+            PositiveAlertDialog(
+                context,
+                ContextCompat.getString(context, R.string.message_request_official_status),
+                positiveListener = {
+                    viewModel.requestOfficialStatus()
+                },
+            ).show()
         }
     }
 
@@ -205,13 +243,13 @@ class ManageCircleFragment : Fragment() {
     }
 
     private fun showErrorToast(context: Context) {
-        if (ErrorToast.previousFinished()) {
-            ErrorToast(context, viewModel.error).show()
+        if (SingleMessageToast.previousFinished()) {
+            SingleMessageToast(context, viewModel.error).show()
         }
     }
 
     private fun showErrorDialog(context: Context) {
-        ErrorAlertDialog(context, viewModel.error).show()
+        SingleMessageAlertDialog(context, viewModel.error).show()
     }
 
     private fun sendUserToMemberListScreen(

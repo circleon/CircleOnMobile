@@ -6,9 +6,8 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:paddingTop="@dimen/margin_padding_default"
-    android:paddingHorizontal="@dimen/margin_padding_large"
     android:background="@color/grey_1"
-    tools:context=".view.screen.home.SearchCricleFragment">
+    tools:context=".view.screen.home.SearchCircleFragment">
 
     <androidx.appcompat.widget.LinearLayoutCompat
         android:id="@+id/llSearchCircle"
@@ -20,6 +19,7 @@
         <androidx.appcompat.widget.LinearLayoutCompat
             android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/margin_padding_large"
             android:layout_weight="1"
             android:gravity="center_vertical"
             android:background="@drawable/bg_rounded_rectangle"
@@ -37,7 +37,7 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:paddingVertical="@dimen/margin_padding_x_small"
+                android:paddingVertical="@dimen/margin_padding_small"
                 android:hint="@string/hint_search_circle"
                 android:textSize="@dimen/text_size_default"
                 android:textColor="@color/grey_9"
@@ -58,7 +58,7 @@
             android:id="@+id/btnCancel"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
-            android:paddingStart="@dimen/margin_padding_small"
+            android:paddingHorizontal="@dimen/margin_padding_large"
             android:gravity="center_vertical"
             android:text="@string/btn_cancel"
             android:textColor="@color/grey_6"
@@ -70,15 +70,17 @@
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_marginTop="@dimen/margin_padding_small"
+        android:layout_marginHorizontal="@dimen/margin_padding_large"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintTop_toBottomOf="@id/llSearchCircle"
-        app:layout_constraintBottom_toBottomOf="parent">
+        app:layout_constraintVertical_bias="0.0"
+        tools:layout_editor_absoluteX="16dp">
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/rvCircle"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:overScrollMode="never"
-            android:visibility="gone"/>
+            android:visibility="gone" />
 
         <androidx.appcompat.widget.AppCompatTextView
             android:id="@+id/txtNoResult"
@@ -87,18 +89,20 @@
             android:gravity="center"
             android:text="@string/message_no_result"
             android:textColor="@color/grey_6"
-            android:visibility="gone"/>
+            android:visibility="gone" />
 
         <com.google.android.material.progressindicator.CircularProgressIndicator
             android:id="@+id/pgbLoading"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_gravity="center"
+            android:indeterminate="true"
+            android:padding="@dimen/margin_padding_large"
+            android:visibility="gone"
             app:indicatorColor="@color/purple_5"
             app:trackColor="@color/grey_3"
-            app:trackThickness="1dp"
-            android:indeterminate="true"
-            android:visibility="gone"/>
+            app:trackCornerRadius="@dimen/round_default"
+            app:trackThickness="8dp" />
 
         <androidx.appcompat.widget.LinearLayoutCompat
             android:id="@+id/llServiceError"
@@ -112,8 +116,8 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/message_service_error"
-                android:textAppearance="@style/large_bold_text"
-                android:textColor="@color/grey_5"/>
+                android:textAppearance="@style/large_text"
+                android:textColor="@color/grey_5" />
 
             <androidx.appcompat.widget.AppCompatImageView
                 android:id="@+id/btnRetry"

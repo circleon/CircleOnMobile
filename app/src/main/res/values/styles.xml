@@ -25,9 +25,17 @@
         <item name="android:textSize">@dimen/text_size_small</item>
         <item name="android:textFontWeight">600</item>
     </style>
+    <style name="default_text">
+        <item name="android:textSize">@dimen/text_size_default</item>
+        <item name="android:textStyle">normal</item>
+    </style>
     <style name="default_bold_text">
         <item name="android:textSize">@dimen/text_size_default</item>
         <item name="android:textFontWeight">600</item>
+    </style>
+    <style name="large_text">
+        <item name="android:textSize">@dimen/text_size_large</item>
+        <item name="android:textStyle">normal</item>
     </style>
     <style name="large_bold_text">
         <item name="android:textSize">@dimen/text_size_large</item>

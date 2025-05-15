@@ -5,7 +5,7 @@
     android:id="@+id/clItemPostComment"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:paddingVertical="@dimen/margin_padding_default"
+    android:paddingVertical="@dimen/margin_padding_large"
     android:background="@color/white">
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -34,13 +34,15 @@
             <androidx.cardview.widget.CardView
                 android:layout_width="24dp"
                 android:layout_height="24dp"
-                app:cardCornerRadius="@dimen/round_default"
+                android:backgroundTint="@color/grey_3"
+                app:cardCornerRadius="12dp"
                 app:cardElevation="0dp">
 
                 <androidx.appcompat.widget.AppCompatImageView
                     android:id="@+id/imgAuthorProfile"
                     android:layout_width="match_parent"
-                    android:layout_height="match_parent" />
+                    android:layout_height="match_parent"
+                    android:scaleType="center"/>
 
             </androidx.cardview.widget.CardView>
 
@@ -96,7 +98,6 @@
         android:background="?attr/selectableItemBackgroundBorderless"
         android:src="@drawable/ic_overflow"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        android:visibility="gone"/>
+        app:layout_constraintTop_toTopOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

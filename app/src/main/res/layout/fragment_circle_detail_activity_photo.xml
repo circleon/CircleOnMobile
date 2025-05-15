@@ -5,10 +5,28 @@
     android:layout_height="match_parent"
     tools:context=".view.screen.home.CircleDetailActivityPhotoFragment">
 
-    <!-- TODO: Update blank fragment layout -->
-    <TextView
+    <androidx.appcompat.widget.LinearLayoutCompat
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:text="activityPhoto" />
+        android:paddingBottom="140dp"
+        android:gravity="center"
+        android:orientation="vertical">
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/txtNotReleased"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:text="@string/message_not_released"
+            android:textAppearance="@style/large_text"
+            android:textColor="@color/grey_5" />
+
+        <androidx.appcompat.widget.AppCompatImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/margin_padding_large"
+            android:src="@drawable/character_default_situation"/>
+
+    </androidx.appcompat.widget.LinearLayoutCompat>
 
 </FrameLayout>
