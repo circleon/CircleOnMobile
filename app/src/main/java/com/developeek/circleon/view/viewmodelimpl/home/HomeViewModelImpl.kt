@@ -60,20 +60,18 @@ class HomeViewModelImpl
                 if (!it.isCompleted) return
             }
 
-            _categories = CategoryModels.selectAndGet(category)
-            viewModelScope.launch {
-                _screenFlow.emit(HomeScreen.LoadingView)
-                scrollOverCircleJob?.cancel()
-                currentPage = DEFAULT_PAGE // 카테고리를 선택할 때는 circles 를 재사용하지 않기 때문에 currentPage 도 초기화
+            fetchCirclesJob =
+                viewModelScope.launch {
+                    _screenFlow.emit(HomeScreen.LoadingView)
+                    scrollOverCircleJob?.cancel()
+                    currentPage = DEFAULT_PAGE // 카테고리를 선택할 때는 circles 를 재사용하지 않기 때문에 currentPage 도 초기화
+                    _categories = CategoryModels.selectAndGet(category)
 
-                fetchCirclesJob =
-                    launch {
-                        when (val result = getCircles(currentPage, SIZE_BY_PAGE, category)) {
-                            is Success -> whenFetchCirclesSuccess(result)
-                            is Error -> whenFetchCirclesFail(result)
-                        }
+                    when (val result = getCircles(currentPage, SIZE_BY_PAGE, category)) {
+                        is Success -> whenFetchCirclesSuccess(result)
+                        is Error -> whenFetchCirclesFail(result)
                     }
-            }
+                }
         }
 
         private suspend fun getCircles(

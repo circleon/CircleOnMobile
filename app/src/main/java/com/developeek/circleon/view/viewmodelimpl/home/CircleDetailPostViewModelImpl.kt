@@ -8,6 +8,8 @@ import com.developeek.circleon.data.source.Success
 import com.developeek.circleon.domain.model.CircleDetailModel
 import com.developeek.circleon.domain.model.PostModel
 import com.developeek.circleon.domain.model.PostModels
+import com.developeek.circleon.domain.utils.validator.Invalid
+import com.developeek.circleon.domain.utils.validator.Validator
 import com.developeek.circleon.view.Event
 import com.developeek.circleon.view.viewmodel.home.CircleDetailPostViewModel
 import com.developeek.circleon.view.viewmodelimpl.Page
@@ -47,15 +49,14 @@ class CircleDetailPostViewModelImpl
         override val isLastPage: Boolean
             get() = _isLastPage
         private var _isLastPage = false
+        private var currentPage = DEFAULT_PAGE
 
         private lateinit var posts: PostModels
 
         private var fetchPostsJob: Job? = null
-        private var deletePostJob: Job? = null
-        private var reportPostJob: Job? = null
-        private var currentPage = DEFAULT_PAGE
-        private val dispatcher = Dispatchers.IO
         private var scrollOverPostJob: Job? = null
+        private var userRequestJob: Job? = null
+        private val dispatcher = Dispatchers.IO
 
         init {
             fetchPosts(currentPage, SIZE_BY_PAGE)
@@ -148,51 +149,84 @@ class CircleDetailPostViewModelImpl
         }
 
         override fun deleteAndFetch(postId: Int) {
-            deletePostJob?.let {
+            userRequestJob?.let {
                 if (!it.isCompleted) return
             }
 
-//            deletePostJob =
-//                viewModelScope.launch {
-//                    val result = repository.deleteCirclePost(circleDetail.id, postId)
-//
-//                    if (result is Success) {
-//                        _postState.postValue(UiState.Success)
-//                        fetchPosts(DEFAULT_PAGE, (currentPage + 1) * SIZE_BY_PAGE)
-//                    } else {
-//                        error = (result as Error).message()
-//                        if (result.isAuthenticationError()) {
-//                            _postState.postValue(UiState.AuthenticationError)
-//                        } else {
-//                            _postState.postValue(UiState.ServiceError)
-//                        }
-//                    }
-//                }
+            userRequestJob =
+                viewModelScope.launch {
+                    _event.emit(Event.Loading)
+
+                    when (val result = deleteCirclePost(circleDetail.id, postId)) {
+                        is Success -> showToastAndFetch(MESSAGE_SUCCESS_REQUEST_REMOVE_POST)
+                        is Error -> whenUserRequestFail(result)
+                    }
+                }
+        }
+
+        private suspend fun deleteCirclePost(
+            circleId: Int,
+            postId: Int,
+        ) = withContext(dispatcher) {
+            repository.deleteCirclePost(circleId, postId)
         }
 
         override fun requestReportPost(
             postId: Int,
             reportMessage: String,
         ) {
-            reportPostJob?.let {
+            userRequestJob?.let {
                 if (!it.isCompleted) return
             }
 
-//            reportPostJob =
-//                viewModelScope.launch {
-//                    val result = repository.postReportCirclePost(circleDetail.id, postId, content)
-//
-//                    if (result is Success) {
-//                        _postState.postValue(UiState.Success)
-//                    } else {
-//                        error = (result as Error).message()
-//                        if (result.isAuthenticationError()) {
-//                            _postState.postValue(UiState.AuthenticationError)
-//                        } else {
-//                            _postState.postValue(UiState.ServiceError)
-//                        }
-//                    }
-//                }
+            userRequestJob =
+                viewModelScope.launch {
+                    if (!checkMessageFormat(reportMessage)) return@launch
+                    _event.emit(Event.Loading)
+
+                    when (val result = postReportCirclePost(circleDetail.id, postId, reportMessage)) {
+                        is Success -> showToast(MESSAGE_SUCCESS_REQUEST_REPORT)
+                        is Error -> whenUserRequestFail(result)
+                    }
+                }
+        }
+
+        private suspend fun postReportCirclePost(
+            circleId: Int,
+            postId: Int,
+            message: String,
+        ) = withContext(dispatcher) {
+            repository.postReportCirclePost(circleId, postId, message)
+        }
+
+        private suspend fun showToastAndFetch(message: String) {
+            showToast(message)
+            fetchPosts(DEFAULT_PAGE, (currentPage + 1) * SIZE_BY_PAGE)
+        }
+
+        private suspend fun showToast(message: String) {
+            _event.emit(Event.ShowToast(message))
+        }
+
+        private suspend fun whenUserRequestFail(result: Error<Unit>) {
+            if (result.isAuthenticationError()) {
+                _event.emit(Event.ShowToast(result.message()))
+                _event.emit(Event.SendToLoginScreen)
+                return
+            }
+
+            _event.emit(Event.ShowDialog(result.message()))
+        }
+
+        private suspend fun checkMessageFormat(message: String): Boolean {
+            val result = Validator.checkMessage(message)
+
+            return if (result is Invalid) {
+                _event.emit(Event.ShowDialog(result.message()))
+                false
+            } else {
+                true
+            }
         }
 
         // 현재는 공지사항용 핀 고정 기능이고, 나중에 게시글 고정 기능 추가 시 사용
@@ -201,6 +235,8 @@ class CircleDetailPostViewModelImpl
         override fun removePinAndFetch(postId: Int) {}
 
         companion object {
+            private const val MESSAGE_SUCCESS_REQUEST_REMOVE_POST = "게시글이 삭제됐어요"
+            private const val MESSAGE_SUCCESS_REQUEST_REPORT = "신고 요청이 완료됐어요"
             private const val SIZE_BY_PAGE = 20
             private const val DEFAULT_PAGE = 0
         }

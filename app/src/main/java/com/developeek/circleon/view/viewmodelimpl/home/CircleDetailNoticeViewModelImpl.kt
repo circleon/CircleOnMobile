@@ -8,6 +8,8 @@ import com.developeek.circleon.data.source.Success
 import com.developeek.circleon.domain.model.CircleDetailModel
 import com.developeek.circleon.domain.model.PostModel
 import com.developeek.circleon.domain.model.PostModels
+import com.developeek.circleon.domain.utils.validator.Invalid
+import com.developeek.circleon.domain.utils.validator.Validator
 import com.developeek.circleon.view.Event
 import com.developeek.circleon.view.viewmodel.home.CircleDetailPostViewModel
 import com.developeek.circleon.view.viewmodelimpl.Page
@@ -47,15 +49,13 @@ class CircleDetailNoticeViewModelImpl
         override val isLastPage: Boolean
             get() = _isLastPage
         private var _isLastPage = false
+        private var currentPage = DEFAULT_PAGE
 
         private lateinit var posts: PostModels
 
         private var fetchNoticesJob: Job? = null
-        private var pinNoticeJob: Job? = null
-        private var deleteNoticeJob: Job? = null
-        private var reportNoticeJob: Job? = null
         private var scrollOverNoticeJob: Job? = null
-        private var currentPage = DEFAULT_PAGE
+        private var userRequestJob: Job? = null
         private val dispatcher = Dispatchers.IO
 
         init {
@@ -160,77 +160,121 @@ class CircleDetailNoticeViewModelImpl
             postId: Int,
             isPinned: Boolean,
         ) {
-            pinNoticeJob?.let {
+            userRequestJob?.let {
                 if (!it.isCompleted) return
             }
 
-//            pinNoticeJob =
-//                viewModelScope.launch {
-//                    val result = repository.putPostPin(circleDetail.id, postId, isPinned)
-//
-//                    if (result is Success) {
-//                        noticeState.postValue(UiState.Success)
-//                        fetchNotices(DEFAULT_PAGE, (currentPage + 1) * SIZE_BY_PAGE)
-//                    } else {
-//                        error = (result as Error).message()
-//                        if (result.isAuthenticationError()) {
-//                            noticeState.postValue(UiState.AuthenticationError)
-//                        } else {
-//                            noticeState.postValue(UiState.ServiceError)
-//                        }
-//                    }
-//                }
+            userRequestJob =
+                viewModelScope.launch {
+                    _event.emit(Event.Loading)
+
+                    when (val result = putPostPin(circleDetail.id, postId, isPinned)) {
+                        is Success ->
+                            showToastAndFetch(
+                                if (isPinned) MESSAGE_SUCCESS_REQUEST_PIN else MESSAGE_SUCCESS_REQUEST_REMOVE_PIN,
+                            )
+                        is Error -> whenUserRequestFail(result)
+                    }
+                }
+        }
+
+        private suspend fun putPostPin(
+            circleId: Int,
+            postId: Int,
+            isPinned: Boolean,
+        ) = withContext(dispatcher) {
+            repository.putPostPin(circleId, postId, isPinned)
         }
 
         override fun deleteAndFetch(postId: Int) {
-            deleteNoticeJob?.let {
+            userRequestJob?.let {
                 if (!it.isCompleted) return
             }
 
-//            deleteNoticeJob =
-//                viewModelScope.launch {
-//                    val result = repository.deleteCirclePost(circleDetail.id, postId)
-//
-//                    if (result is Success) {
-//                        noticeState.postValue(UiState.Success)
-//                        fetchNotices(DEFAULT_PAGE, (currentPage + 1) * SIZE_BY_PAGE)
-//                    } else {
-//                        error = (result as Error).message()
-//                        if (result.isAuthenticationError()) {
-//                            noticeState.postValue(UiState.AuthenticationError)
-//                        } else {
-//                            noticeState.postValue(UiState.ServiceError)
-//                        }
-//                    }
-//                }
+            userRequestJob =
+                viewModelScope.launch {
+                    _event.emit(Event.Loading)
+
+                    userRequestJob =
+                        launch {
+                            when (val result = deleteCirclePost(circleDetail.id, postId)) {
+                                is Success -> showToastAndFetch(MESSAGE_SUCCESS_REQUEST_REMOVE_NOTICE)
+                                is Error -> whenUserRequestFail(result)
+                            }
+                        }
+                }
+        }
+
+        private suspend fun deleteCirclePost(
+            circleId: Int,
+            postId: Int,
+        ) = withContext(dispatcher) {
+            repository.deleteCirclePost(circleId, postId)
         }
 
         override fun requestReportPost(
             postId: Int,
             reportMessage: String,
         ) {
-            reportNoticeJob?.let {
+            userRequestJob?.let {
                 if (!it.isCompleted) return
             }
 
-//            reportNoticeJob =
-//                viewModelScope.launch {
-//                    val result = repository.postReportCirclePost(circleDetail.id, postId, reportMessage)
-//
-//                    if (result is Success) {
-//                        noticeState.postValue(UiState.Success)
-//                    } else {
-//                        error = (result as Error).message()
-//                        if (result.isAuthenticationError()) {
-//                            noticeState.postValue(UiState.AuthenticationError)
-//                        } else {
-//                            noticeState.postValue(UiState.ServiceError)
-//                        }
-//                    }
-//                }
+            userRequestJob =
+                viewModelScope.launch {
+                    if (!checkMessageFormat(reportMessage)) return@launch
+                    _event.emit(Event.Loading)
+
+                    when (val result = postReportCircleNotice(circleDetail.id, postId, reportMessage)) {
+                        is Success -> showToast(MESSAGE_SUCCESS_REQUEST_REPORT)
+                        is Error -> whenUserRequestFail(result)
+                    }
+                }
+        }
+
+        private suspend fun postReportCircleNotice(
+            circleId: Int,
+            postId: Int,
+            message: String,
+        ) = withContext(dispatcher) {
+            repository.postReportCirclePost(circleId, postId, message)
+        }
+
+        private suspend fun showToastAndFetch(message: String) {
+            showToast(message)
+            fetchNotices(DEFAULT_PAGE, (currentPage + 1) * SIZE_BY_PAGE)
+        }
+
+        private suspend fun showToast(message: String) {
+            _event.emit(Event.ShowToast(message))
+        }
+
+        private suspend fun whenUserRequestFail(result: Error<Unit>) {
+            if (result.isAuthenticationError()) {
+                _event.emit(Event.ShowToast(result.message()))
+                _event.emit(Event.SendToLoginScreen)
+                return
+            }
+
+            _event.emit(Event.ShowDialog(result.message()))
+        }
+
+        private suspend fun checkMessageFormat(message: String): Boolean {
+            val result = Validator.checkMessage(message)
+
+            return if (result is Invalid) {
+                _event.emit(Event.ShowDialog(result.message()))
+                false
+            } else {
+                true
+            }
         }
 
         companion object {
+            private const val MESSAGE_SUCCESS_REQUEST_PIN = "공지사항이 고정됐어요"
+            private const val MESSAGE_SUCCESS_REQUEST_REMOVE_PIN = "공지사항이 고정이 해제됐어요"
+            private const val MESSAGE_SUCCESS_REQUEST_REMOVE_NOTICE = "공지사항이 삭제됐어요"
+            private const val MESSAGE_SUCCESS_REQUEST_REPORT = "신고 요청이 완료됐어요"
             private const val SIZE_BY_PAGE = 20
             private const val DEFAULT_PAGE = 0
         }

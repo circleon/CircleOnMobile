@@ -82,6 +82,10 @@
     <string name="menu_post_settings_remove_pin">고정 해제하기</string>
     <string name="menu_post_settings_edit">수정하기</string>
     <string name="menu_post_settings_delete">삭제하기</string>
+    <string name="btn_pin">고정</string>
+    <string name="btn_remove_pin">해제</string>
+    <string name="message_pin_notice">공지사항을 고정할까요?</string>
+    <string name="message_remove_pin_notice">공지사항 고정을 해제할까요?</string>
     <string name="message_delete_notice">공지사항을 삭제할까요?</string>
     <string name="message_delete_post">게시글을 삭제할까요?</string>
 

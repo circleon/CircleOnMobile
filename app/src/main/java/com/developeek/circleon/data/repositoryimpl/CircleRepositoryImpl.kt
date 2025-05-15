@@ -415,10 +415,8 @@ class CircleRepositoryImpl(
         content: String,
     ): Result<Unit> {
         return try {
-            withContext(dispatcher) {
-                service.postReportCirclePost(circleId, postId, RequestBodyReport(content))
-                Result.success(Unit)
-            }
+            service.postReportCirclePost(circleId, postId, RequestBodyReport(content))
+            Result.success(Unit)
         } catch (e: Exception) {
             Result.error(e)
         }
@@ -445,10 +443,8 @@ class CircleRepositoryImpl(
         isPinned: Boolean,
     ): Result<Unit> {
         return try {
-            withContext(dispatcher) {
-                service.putPostPin(circleId, postId, Pin(isPinned))
-                Result.success(Unit)
-            }
+            service.putPostPin(circleId, postId, Pin(isPinned))
+            Result.success(Unit)
         } catch (e: Exception) {
             Result.error(e)
         }
@@ -593,10 +589,8 @@ class CircleRepositoryImpl(
         postId: Int,
     ): Result<Unit> {
         return try {
-            withContext(dispatcher) {
-                service.deleteCirclePost(circleId, postId)
-                Result.success(Unit)
-            }
+            service.deleteCirclePost(circleId, postId)
+            Result.success(Unit)
         } catch (e: Exception) {
             Result.error(e)
         }

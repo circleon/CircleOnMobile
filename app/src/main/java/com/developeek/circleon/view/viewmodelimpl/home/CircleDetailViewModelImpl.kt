@@ -134,18 +134,16 @@ class CircleDetailViewModelImpl
                 if (!it.isCompleted) return
             }
 
-            viewModelScope.launch {
-                if (!checkMessageFormat(joinMessage)) return@launch
-                _event.emit(Event.Loading)
+            userRequestJob =
+                viewModelScope.launch {
+                    if (!checkMessageFormat(joinMessage)) return@launch
+                    _event.emit(Event.Loading)
 
-                userRequestJob =
-                    launch {
-                        when (val result = postMyCircle(circleId, joinMessage)) {
-                            is Success -> showToastAndRefresh(MESSAGE_SUCCESS_REQUEST_JOIN)
-                            is Error -> whenUserRequestFail(result)
-                        }
+                    when (val result = postMyCircle(circleId, joinMessage)) {
+                        is Success -> showToastAndRefresh(MESSAGE_SUCCESS_REQUEST_JOIN)
+                        is Error -> whenUserRequestFail(result)
                     }
-            }
+                }
         }
 
         private suspend fun postMyCircle(
@@ -160,18 +158,16 @@ class CircleDetailViewModelImpl
                 if (!it.isCompleted) return
             }
 
-            viewModelScope.launch {
-                if (!checkMessageFormat(leaveMessage)) return@launch
-                _event.emit(Event.Loading)
+            userRequestJob =
+                viewModelScope.launch {
+                    if (!checkMessageFormat(leaveMessage)) return@launch
+                    _event.emit(Event.Loading)
 
-                userRequestJob =
-                    launch {
-                        when (val result = postCircleLeaveRequest(circleDetail.memberId, leaveMessage)) {
-                            is Success -> showToastAndRefresh(MESSAGE_SUCCESS_REQUEST_LEAVE)
-                            is Error -> whenUserRequestFail(result)
-                        }
+                    when (val result = postCircleLeaveRequest(circleDetail.memberId, leaveMessage)) {
+                        is Success -> showToastAndRefresh(MESSAGE_SUCCESS_REQUEST_LEAVE)
+                        is Error -> whenUserRequestFail(result)
                     }
-            }
+                }
         }
 
         private suspend fun postCircleLeaveRequest(
@@ -186,15 +182,16 @@ class CircleDetailViewModelImpl
                 if (!it.isCompleted) return
             }
 
-            viewModelScope.launch {
-                if (!checkMessageFormat(reportMessage)) return@launch
-                _event.emit(Event.Loading)
+            userRequestJob =
+                viewModelScope.launch {
+                    if (!checkMessageFormat(reportMessage)) return@launch
+                    _event.emit(Event.Loading)
 
-                when (val result = postReportCircle(circleId, reportMessage)) {
-                    is Success -> showToastAndRefresh(MESSAGE_SUCCESS_REQUEST_REPORT)
-                    is Error -> whenUserRequestFail(result)
+                    when (val result = postReportCircle(circleId, reportMessage)) {
+                        is Success -> showToastAndRefresh(MESSAGE_SUCCESS_REQUEST_REPORT)
+                        is Error -> whenUserRequestFail(result)
+                    }
                 }
-            }
         }
 
         private suspend fun postReportCircle(
