@@ -54,6 +54,9 @@ class CircleDetailNoticeFragment : Fragment() {
     private lateinit var binding: FragmentCircleDetailNoticeBinding
     private lateinit var circleDetail: CircleDetailModel
     private val viewModel: CircleDetailPostViewModel by viewModels<CircleDetailNoticeViewModelImpl>(
+        ownerProducer = {
+            requireParentFragment()
+        },
         extrasProducer = {
             defaultViewModelCreationExtras
                 .withCreationCallback<CircleDetailNoticeViewModelImpl.CircleDetailNoticeViewModelFactory> {

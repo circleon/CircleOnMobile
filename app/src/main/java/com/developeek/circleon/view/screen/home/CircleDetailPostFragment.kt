@@ -53,6 +53,9 @@ class CircleDetailPostFragment : Fragment() {
     private lateinit var binding: FragmentCircleDetailPostBinding
     private lateinit var circleDetail: CircleDetailModel
     private val viewModel: CircleDetailPostViewModel by viewModels<CircleDetailPostViewModelImpl>(
+        ownerProducer = {
+            requireParentFragment()
+        },
         extrasProducer = {
             defaultViewModelCreationExtras
                 .withCreationCallback<CircleDetailPostViewModelImpl.CircleDetailPostViewModelFactory> {

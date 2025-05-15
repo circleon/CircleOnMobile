@@ -16,8 +16,10 @@ import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.io.File
 
 @HiltViewModel(assistedFactory = UploadPostViewModelImpl.UploadPostViewModelFactory::class)
@@ -42,6 +44,7 @@ class UploadPostViewModelImpl
 
         private var image: File? = null
         private var uploadPostJob: Job? = null
+        private val dispatcher = Dispatchers.IO
 
         override lateinit var error: String
 
@@ -54,7 +57,7 @@ class UploadPostViewModelImpl
 
             uploadPostJob =
                 viewModelScope.launch {
-                    val result = repository.postCirclePost(circleId, postType, content, image)
+                    val result = postCirclePost(circleId, postType, content, image)
 
                     if (result is Success) {
                         uiState.postValue(UiState.Success)
@@ -69,6 +72,15 @@ class UploadPostViewModelImpl
                 }
         }
 
+        private suspend fun postCirclePost(
+            circleId: Int,
+            postType: PostType,
+            content: String,
+            image: File?,
+        ) = withContext(dispatcher) {
+            repository.postCirclePost(circleId, postType, content, image)
+        }
+
         override fun edit(
             postId: Int,
             content: String,
@@ -81,7 +93,7 @@ class UploadPostViewModelImpl
 
             uploadPostJob =
                 viewModelScope.launch {
-                    val result = repository.putCirclePost(circleId, postId, postType, content)
+                    val result = putCirclePost(circleId, postId, postType, content)
 
                     if (result is Success) {
                         uiState.postValue(UiState.Success)
@@ -94,6 +106,15 @@ class UploadPostViewModelImpl
                         }
                     }
                 }
+        }
+
+        private suspend fun putCirclePost(
+            circleId: Int,
+            postId: Int,
+            postType: PostType,
+            content: String,
+        ) = withContext(dispatcher) {
+            repository.putCirclePost(circleId, postId, postType, content)
         }
 
         private fun isPostFormat(content: String): Boolean {

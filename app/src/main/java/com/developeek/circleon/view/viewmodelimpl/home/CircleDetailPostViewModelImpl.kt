@@ -107,9 +107,6 @@ class CircleDetailPostViewModelImpl
         }
 
         override fun refresh() {
-            viewModelScope.launch {
-                _screenFlow.emit(CircleDetailPostScreen.LoadingView)
-            }
             fetchPosts(DEFAULT_PAGE, (currentPage + 1) * SIZE_BY_PAGE)
         }
 
@@ -158,7 +155,7 @@ class CircleDetailPostViewModelImpl
                     _event.emit(Event.Loading)
 
                     when (val result = deleteCirclePost(circleDetail.id, postId)) {
-                        is Success -> showToastAndFetch(MESSAGE_SUCCESS_REQUEST_REMOVE_POST)
+                        is Success -> showToastAndRefresh(MESSAGE_SUCCESS_REQUEST_REMOVE_POST)
                         is Error -> whenUserRequestFail(result)
                     }
                 }
@@ -199,9 +196,9 @@ class CircleDetailPostViewModelImpl
             repository.postReportCirclePost(circleId, postId, message)
         }
 
-        private suspend fun showToastAndFetch(message: String) {
+        private suspend fun showToastAndRefresh(message: String) {
             showToast(message)
-            fetchPosts(DEFAULT_PAGE, (currentPage + 1) * SIZE_BY_PAGE)
+            refresh()
         }
 
         private suspend fun showToast(message: String) {

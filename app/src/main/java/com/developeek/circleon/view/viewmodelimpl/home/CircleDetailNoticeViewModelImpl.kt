@@ -107,9 +107,6 @@ class CircleDetailNoticeViewModelImpl
         }
 
         override fun refresh() {
-            viewModelScope.launch {
-                _screenFlow.emit(CircleDetailPostScreen.LoadingView)
-            }
             fetchNotices(DEFAULT_PAGE, (currentPage + 1) * SIZE_BY_PAGE)
         }
 
@@ -170,7 +167,7 @@ class CircleDetailNoticeViewModelImpl
 
                     when (val result = putPostPin(circleDetail.id, postId, isPinned)) {
                         is Success ->
-                            showToastAndFetch(
+                            showToastAndRefresh(
                                 if (isPinned) MESSAGE_SUCCESS_REQUEST_PIN else MESSAGE_SUCCESS_REQUEST_REMOVE_PIN,
                             )
                         is Error -> whenUserRequestFail(result)
@@ -198,7 +195,7 @@ class CircleDetailNoticeViewModelImpl
                     userRequestJob =
                         launch {
                             when (val result = deleteCirclePost(circleDetail.id, postId)) {
-                                is Success -> showToastAndFetch(MESSAGE_SUCCESS_REQUEST_REMOVE_NOTICE)
+                                is Success -> showToastAndRefresh(MESSAGE_SUCCESS_REQUEST_REMOVE_NOTICE)
                                 is Error -> whenUserRequestFail(result)
                             }
                         }
@@ -240,9 +237,9 @@ class CircleDetailNoticeViewModelImpl
             repository.postReportCirclePost(circleId, postId, message)
         }
 
-        private suspend fun showToastAndFetch(message: String) {
+        private suspend fun showToastAndRefresh(message: String) {
             showToast(message)
-            fetchNotices(DEFAULT_PAGE, (currentPage + 1) * SIZE_BY_PAGE)
+            refresh()
         }
 
         private suspend fun showToast(message: String) {
