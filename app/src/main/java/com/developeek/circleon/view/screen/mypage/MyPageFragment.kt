@@ -52,7 +52,7 @@ class MyPageFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         // TODO: userManager 유저 삭제, 로그아웃 api 연동
-        binding.btnLogOut.setOnClickListener {
+        binding.btnLogout.setOnClickListener {
             tokenManager.deleteAccessToken()
             tokenManager.deleteRefreshToken()
             userManager.deleteUser()

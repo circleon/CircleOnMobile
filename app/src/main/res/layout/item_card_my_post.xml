@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.appcompat.widget.LinearLayoutCompat xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginBottom="@dimen/margin_padding_small"
+    android:padding="@dimen/margin_padding_large"
+    android:orientation="vertical"
+    android:gravity="start"
+    android:background="@drawable/bg_large_rounded_card">
+
+    <androidx.appcompat.widget.LinearLayoutCompat
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical">
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/txtCircleName"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingVertical="@dimen/margin_padding_x_small"
+            android:paddingHorizontal="@dimen/margin_padding_small"
+            android:background="@drawable/bg_rounded_rectangle"
+            android:backgroundTint="@color/light_purple_5"
+            android:textAppearance="@style/small_text"
+            android:textColor="@color/purple_5"
+            tools:text="동아리 이름"/>
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="@dimen/margin_padding_small"
+            android:textColor="@color/grey_5"
+            android:textStyle="bold"
+            android:text="·"/>
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/txtCreated"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="@style/small_text"
+            android:textColor="@color/grey_6"
+            tools:text="created"/>
+
+    </androidx.appcompat.widget.LinearLayoutCompat>
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/txtContent"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/margin_padding_small"
+        android:maxLines="2"
+        android:ellipsize="end"
+        android:textAppearance="@style/default_text"
+        android:textColor="@color/grey_9"
+        tools:text="content"/>
+
+</androidx.appcompat.widget.LinearLayoutCompat>

@@ -126,6 +126,7 @@
     <string name="btn_show_member_join_message">상세 보기</string>
     <string name="btn_show_member_leave_message">사유 보기</string>
     <string name="btn_ban_member">추방</string>
+    <string name="btn_request">신청</string>
     <string name="title_member_message_dialog_for_join_accept">%s님은 자신을 이렇게 소개해주셨어요</string>
     <string name="title_member_message_dialog_for_leave_accept">%s님이 이런 탈퇴 사유를 남겨주셨어요</string>
     <string name="title_member_leave_message_dialog">탈퇴 사유를 알려주세요!</string>
@@ -161,4 +162,17 @@
     <string name="message_no_join_requested_circles">가입 대기중인 동아리가 없어요!</string>
     <string name="message_no_leave_requested_circles">탈퇴 대기중인 동아리가 없어요!</string>
 
+    <!--My Page-->
+    <string name="title_my_page">마이페이지</string>
+    <string name="my_page_title_my_posts">내가 쓴\n게시글 보기</string>
+    <string name="my_page_title_my_comment_posts">내가 댓글 단\n게시글 보기</string>
+    <string name="text_app_version">앱 버전</string>
+    <string name="text_service_term">서비스 이용 약관</string>
+    <string name="text_privacy_policy">개인정보 처리 방침</string>
+    <string name="btn_send_feedback">피드백 남기기</string>
+    <string name="btn_logout">로그아웃</string>
+    <string name="btn_delete_account">탈퇴하기</string>
+
+    <!--My Post-->
+    <string name="message_no_my_posts">게시글 정보가 존재하지 않아요</string>
 </resources>

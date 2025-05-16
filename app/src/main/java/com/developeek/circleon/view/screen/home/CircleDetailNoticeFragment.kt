@@ -266,8 +266,8 @@ class CircleDetailNoticeFragment : Fragment() {
     ) {
         PositiveAlertDialog(
             context,
-            context.getString(R.string.message_pin_notice),
-            context.getString(R.string.btn_pin),
+            message = context.getString(R.string.message_pin_notice),
+            positiveButton = context.getString(R.string.btn_pin),
             positiveListener = {
                 viewModel.pinAndFetch(notice.id)
             },
@@ -280,8 +280,8 @@ class CircleDetailNoticeFragment : Fragment() {
     ) {
         PositiveAlertDialog(
             context,
-            context.getString(R.string.message_remove_pin_notice),
-            context.getString(R.string.btn_remove_pin),
+            message = context.getString(R.string.message_remove_pin_notice),
+            positiveButton = context.getString(R.string.btn_remove_pin),
             positiveListener = {
                 viewModel.removePinAndFetch(notice.id)
             },

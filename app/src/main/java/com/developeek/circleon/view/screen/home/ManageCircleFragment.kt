@@ -212,7 +212,8 @@ class ManageCircleFragment : Fragment() {
         binding.btnRequestOfficialStatus.setOnClickListener {
             PositiveAlertDialog(
                 context,
-                ContextCompat.getString(context, R.string.message_request_official_status),
+                message = context.getString(R.string.message_request_official_status),
+                positiveButton = context.getString(R.string.btn_request),
                 positiveListener = {
                     viewModel.requestOfficialStatus()
                 },
