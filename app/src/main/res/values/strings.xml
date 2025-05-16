@@ -173,6 +173,10 @@
     <string name="btn_logout">로그아웃</string>
     <string name="btn_delete_account">탈퇴하기</string>
 
+    <!--MY Post-->
+    <string name="title_my_post">내가 쓴 게시글</string>
+    <string name="title_my_comment_post">내가 댓글 단 게시글</string>
+
     <!--My Post-->
     <string name="message_no_my_posts">게시글 정보가 존재하지 않아요</string>
 </resources>

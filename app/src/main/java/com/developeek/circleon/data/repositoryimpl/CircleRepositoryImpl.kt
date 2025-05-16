@@ -1,5 +1,6 @@
 package com.developeek.circleon.data.repositoryimpl
 
+import android.util.Log
 import com.developeek.circleon.data.dto.home.Pin
 import com.developeek.circleon.data.dto.home.RequestBodyEditComment
 import com.developeek.circleon.data.dto.home.RequestBodyEditMemberRole
@@ -22,6 +23,7 @@ import com.developeek.circleon.domain.model.CircleModel
 import com.developeek.circleon.domain.model.CircleSummaryModels
 import com.developeek.circleon.domain.model.CommentModels
 import com.developeek.circleon.domain.model.MemberModels
+import com.developeek.circleon.domain.model.MyPostModel
 import com.developeek.circleon.domain.model.PostModel
 import com.developeek.circleon.view.viewmodelimpl.Page
 import kotlinx.coroutines.CoroutineDispatcher
@@ -45,9 +47,9 @@ class CircleRepositoryImpl(
         return try {
             val response =
                 if (category.isSame(Category.ALL)) {
-                    service.getAllCircles(page, size, SORT_CIRCLE_OLDEST)
+                    service.getAllCircles(page, size, SORT_OLDEST)
                 } else {
-                    service.getCircleScrollContents(page, size, SORT_CIRCLE_OLDEST, category.codeName())
+                    service.getCircleScrollContents(page, size, SORT_OLDEST, category.codeName())
                 }
             Result.success(
                 Page(response.content.map { it.toCircleModel() }).apply {
@@ -280,6 +282,43 @@ class CircleRepositoryImpl(
                 val response = service.getMyCircles(MembershipStatus.LEAVE_REQUESTED.codeName(), page, size)
                 Result.success(CircleSummaryModels(response.content.map { it.toCircleSummaryModel() }))
             }
+        } catch (e: Exception) {
+            Result.error(e)
+        }
+    }
+
+    override suspend fun getMyPosts(
+        page: Int,
+        size: Int,
+    ): Result<Page<MyPostModel>> {
+        return try {
+            val response = service.getMyPosts(page, size, SORT_LATEST)
+            Result.success(
+                Page(response.content.map { it.toMyPostModel() }).apply {
+                    if (response.isLastPage()) {
+                        setAsLast()
+                    }
+                },
+            )
+        } catch (e: Exception) {
+            Log.d("error", e.message.toString())
+            Result.error(e)
+        }
+    }
+
+    override suspend fun getMyCommentPosts(
+        page: Int,
+        size: Int,
+    ): Result<Page<MyPostModel>> {
+        return try {
+            val response = service.getMyCommentPosts(page, size, SORT_LATEST)
+            Result.success(
+                Page(response.content.map { it.toMyPostModel() }).apply {
+                    if (response.isLastPage()) {
+                        setAsLast()
+                    }
+                },
+            )
         } catch (e: Exception) {
             Result.error(e)
         }
@@ -639,8 +678,8 @@ class CircleRepositoryImpl(
     companion object {
         private const val TEXT_CONTENT_TYPE = "text/plain; charset=utf-8"
         private const val IMAGE_CONTENT_TYPE = "image/jpeg; charset=utf-8"
-        private const val SORT_CIRCLE_OLDEST = "createdAt,asc"
-        private const val SORT_CIRCLE_LATEST = "createdAt,desc"
+        private const val SORT_OLDEST = "createdAt,asc"
+        private const val SORT_LATEST = "createdAt,desc"
         private const val SORT_MEMBER_BY_NAME = "username,asc"
         private const val TYPE_POST = "POST"
         private const val TYPE_NOTICE = "NOTICE"

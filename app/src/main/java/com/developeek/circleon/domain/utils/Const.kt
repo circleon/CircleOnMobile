@@ -11,6 +11,7 @@ object Const {
     const val TAG_POST_TYPE = "post_type"
     const val TAG_MEMBERS = "members"
     const val TAG_MEMBERSHIP_STATUS = "membership_status"
+    const val TAGE_MY_POSTS = "my_posts"
 
     const val FLAG_CIRCLE_DATA_CHANGED = "circle_data_changed"
     const val FLAG_CIRCLE_POST_DATA_CHANGED = "circle_post_data_changed"

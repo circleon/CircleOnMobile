@@ -121,20 +121,13 @@ class CircleDetailNoticeViewModelImpl
 
                     if (!isActive) return@launch // 스크롤 작업 캔슬 시 내용을 업데이트하지 않고 작업 종료
                     when (result) {
-                        is Success -> whenScrollOverSuccess(result)
+                        is Success -> {
+                            whenFetchNoticesSuccess(result)
+                            currentPage++
+                        }
                         is Error -> whenScrollOverFail(result)
                     }
                 }
-        }
-
-        private suspend fun whenScrollOverSuccess(result: Success<Page<PostModel>>) {
-            result.data.let {
-                posts = posts.addAllAndGet(it.content)
-                _isLastPage = it.isLastPage
-            }
-            currentPage++
-
-            _screenFlow.emit(CircleDetailPostScreen.SuccessView(posts))
         }
 
         private suspend fun whenScrollOverFail(result: Error<Page<PostModel>>) {

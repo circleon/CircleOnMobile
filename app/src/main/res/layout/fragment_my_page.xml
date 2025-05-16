@@ -95,23 +95,22 @@
 
             </androidx.appcompat.widget.LinearLayoutCompat>
 
-            <androidx.appcompat.widget.LinearLayoutCompat
+            <androidx.constraintlayout.widget.ConstraintLayout
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:weightSum="1">
+                android:layout_height="wrap_content">
 
                 <androidx.constraintlayout.widget.ConstraintLayout
                     android:id="@+id/btnMyPosts"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:layout_weight="0.5"
                     android:background="@drawable/bg_large_rounded_card"
                     android:paddingStart="@dimen/margin_padding_xx_large"
                     android:paddingEnd="@dimen/margin_padding_large"
                     android:paddingVertical="@dimen/margin_padding_xx_large"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintEnd_toStartOf="@id/btnMyCommentPosts"
                     app:layout_constraintTop_toTopOf="parent"
-                    app:layout_constraintBottom_toTopOf="@id/clApproveCircleJoin">
+                    app:layout_constraintBottom_toBottomOf="parent">
 
                     <androidx.appcompat.widget.AppCompatTextView
                         android:id="@+id/txtTitleMyPosts"
@@ -139,13 +138,14 @@
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="@dimen/margin_padding_small"
-                    android:layout_weight="0.5"
                     android:background="@drawable/bg_large_rounded_card"
                     android:paddingStart="@dimen/margin_padding_xx_large"
                     android:paddingEnd="@dimen/margin_padding_large"
                     android:paddingVertical="@dimen/margin_padding_xx_large"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toEndOf="@id/btnMyPosts"
                     app:layout_constraintTop_toTopOf="parent"
-                    app:layout_constraintBottom_toTopOf="@id/clApproveCircleJoin">
+                    app:layout_constraintBottom_toBottomOf="parent">
 
                     <androidx.appcompat.widget.AppCompatTextView
                         android:id="@+id/txtTitleMyCommentPosts"
@@ -168,7 +168,7 @@
 
                 </androidx.constraintlayout.widget.ConstraintLayout>
 
-            </androidx.appcompat.widget.LinearLayoutCompat>
+            </androidx.constraintlayout.widget.ConstraintLayout>
 
             <androidx.appcompat.widget.LinearLayoutCompat
                 android:layout_width="match_parent"

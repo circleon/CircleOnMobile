@@ -8,10 +8,12 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.activity.addCallback
 import androidx.fragment.app.Fragment
+import androidx.navigation.fragment.findNavController
 import com.developeek.circleon.R
 import com.developeek.circleon.data.source.manager.TokenManager
 import com.developeek.circleon.data.source.manager.UserManager
 import com.developeek.circleon.databinding.FragmentMyPageBinding
+import com.developeek.circleon.domain.utils.Const
 import com.developeek.circleon.view.screen.login.LoginActivity
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import dagger.hilt.android.AndroidEntryPoint
@@ -58,11 +60,51 @@ class MyPageFragment : Fragment() {
             userManager.deleteUser()
             sendUserToLoginScreen(requireActivity())
         }
+
+        initView()
+        initListener()
+    }
+
+    private fun initView() {
+        initUserName()
+    }
+
+    private fun initUserName() {
+        userManager.getUser()?.let {
+            binding.txtUserName.text = it.name
+        }
     }
 
     private fun sendUserToLoginScreen(activity: Activity) {
         val intent = Intent(activity, LoginActivity::class.java)
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)
         startActivity(intent)
+    }
+
+    private fun initListener() {
+        setBtnMyPostsListener()
+        setBtnSendFeedbackListener()
+    }
+
+    private fun setBtnMyPostsListener() {
+        binding.btnMyPosts.setOnClickListener {
+            sendUserToMyPostScreen(true)
+        }
+        binding.btnMyCommentPosts.setOnClickListener {
+            sendUserToMyPostScreen(false)
+        }
+    }
+
+    private fun sendUserToMyPostScreen(isMyPosts: Boolean) {
+        val bundle = Bundle()
+
+        bundle.putBoolean(Const.TAGE_MY_POSTS, isMyPosts)
+        findNavController().navigate(R.id.action_myPageFragment_to_myPostFragment, bundle)
+    }
+
+    private fun setBtnSendFeedbackListener() {
+        binding.btnSendFeedback.setOnClickListener {
+            // sendFeedback
+        }
     }
 }

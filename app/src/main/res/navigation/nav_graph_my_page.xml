@@ -9,5 +9,27 @@
         android:id="@+id/myPageFragment"
         android:name="com.developeek.circleon.view.screen.mypage.MyPageFragment"
         android:label="fragment_my_page"
-        tools:layout="@layout/fragment_my_page" />
+        tools:layout="@layout/fragment_my_page" >
+        <action
+            android:id="@+id/action_myPageFragment_to_myPostFragment"
+            app:destination="@id/myPostFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/myPostFragment"
+        android:name="com.developeek.circleon.view.screen.mypage.MyPostFragment"
+        android:label="fragment_my_post"
+        tools:layout="@layout/fragment_my_post" >
+        <action
+            android:id="@+id/action_myPostFragment_to_circleDetailPostDetailFragment2"
+            app:destination="@id/circleDetailPostDetailFragment2"
+            app:enterAnim="@animator/slide_in_right"
+            app:exitAnim="@animator/slide_out_left"
+            app:popExitAnim="@animator/slide_out_right"
+            app:popEnterAnim="@animator/slide_in_left"/>
+    </fragment>
+    <fragment
+        android:id="@+id/circleDetailPostDetailFragment2"
+        android:name="com.developeek.circleon.view.screen.home.CircleDetailPostDetailFragment"
+        android:label="fragment_circle_detail_post_detail"
+        tools:layout="@layout/fragment_circle_detail_post_detail" />
 </navigation>

@@ -6,6 +6,7 @@ import com.developeek.circleon.data.dto.home.CircleSummaries
 import com.developeek.circleon.data.dto.home.CircleSummary
 import com.developeek.circleon.data.dto.home.Comment
 import com.developeek.circleon.data.dto.home.Member
+import com.developeek.circleon.data.dto.home.MyPost
 import com.developeek.circleon.data.dto.home.Page
 import com.developeek.circleon.data.dto.home.Pin
 import com.developeek.circleon.data.dto.home.Post
@@ -95,9 +96,23 @@ interface CircleService {
     @GET("my-circles")
     suspend fun getMyCircles(
         @Query("membershipStatus") membershipStatus: String,
+        @Query("size") size: Int,
+        @Query("page") page: Int,
+    ): Page<CircleSummary>
+
+    @GET("users/me/posts")
+    suspend fun getMyPosts(
         @Query("page") page: Int,
         @Query("size") size: Int,
-    ): Page<CircleSummary>
+        @Query("sort") sort: String,
+    ): Page<MyPost>
+
+    @GET("users/me/commented-posts")
+    suspend fun getMyCommentPosts(
+        @Query("page") page: Int,
+        @Query("size") size: Int,
+        @Query("sort") sort: String,
+    ): Page<MyPost>
 
     // POST
     @Multipart
