@@ -1,5 +1,6 @@
 package com.developeek.circleon.view.viewmodelimpl.home
 
+import android.os.Parcelable
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.developeek.circleon.data.repository.CircleRepository
@@ -52,6 +53,9 @@ class CircleDetailNoticeViewModelImpl
         private var currentPage = DEFAULT_PAGE
 
         private lateinit var posts: PostModels
+        override val currentScrollState: Parcelable?
+            get() = _currentScrollState
+        private var _currentScrollState: Parcelable? = null
 
         private var fetchNoticesJob: Job? = null
         private var scrollOverNoticeJob: Job? = null
@@ -258,6 +262,10 @@ class CircleDetailNoticeViewModelImpl
             } else {
                 true
             }
+        }
+
+        override fun saveScrollState(scrollState: Parcelable?) {
+            _currentScrollState = scrollState
         }
 
         companion object {

@@ -96,8 +96,8 @@ interface CircleService {
     @GET("my-circles")
     suspend fun getMyCircles(
         @Query("membershipStatus") membershipStatus: String,
-        @Query("size") size: Int,
         @Query("page") page: Int,
+        @Query("size") size: Int,
     ): Page<CircleSummary>
 
     @GET("users/me/posts")

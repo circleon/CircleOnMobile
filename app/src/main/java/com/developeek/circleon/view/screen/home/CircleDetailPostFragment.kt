@@ -370,7 +370,15 @@ class CircleDetailPostFragment : Fragment() {
         }
 
         switchView(binding.rvCirclePost)
-        loadCirclePostsAndDoAfter(screenFlow.posts) {}
+        loadCirclePostsAndDoAfter(screenFlow.posts) {
+            if (screenFlow.hasCollected) {
+                viewModel.currentScrollState?.let {
+                    binding.rvCirclePost.layoutManager?.onRestoreInstanceState(it)
+                }
+                return@loadCirclePostsAndDoAfter
+            }
+            screenFlow.notifyCollected()
+        }
     }
 
     private fun loadCirclePostsAndDoAfter(
@@ -398,5 +406,11 @@ class CircleDetailPostFragment : Fragment() {
         binding.shimmerPost.isVisible = view == binding.shimmerPost
         binding.txtNoPost.isVisible = view == binding.txtNoPost
         binding.llServiceError.isVisible = view == binding.llServiceError
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+
+        viewModel.saveScrollState(binding.rvCirclePost.layoutManager?.onSaveInstanceState())
     }
 }

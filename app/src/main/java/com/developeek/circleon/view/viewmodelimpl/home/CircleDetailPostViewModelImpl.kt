@@ -1,5 +1,6 @@
 package com.developeek.circleon.view.viewmodelimpl.home
 
+import android.os.Parcelable
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.developeek.circleon.data.repository.CircleRepository
@@ -52,6 +53,9 @@ class CircleDetailPostViewModelImpl
         private var currentPage = DEFAULT_PAGE
 
         private lateinit var posts: PostModels
+        override val currentScrollState: Parcelable?
+            get() = _currentScrollState
+        private var _currentScrollState: Parcelable? = null
 
         private var fetchPostsJob: Job? = null
         private var scrollOverPostJob: Job? = null
@@ -226,6 +230,10 @@ class CircleDetailPostViewModelImpl
             }
         }
 
+        override fun saveScrollState(scrollState: Parcelable?) {
+            _currentScrollState = scrollState
+        }
+
         // 현재는 공지사항용 핀 고정 기능이고, 나중에 게시글 고정 기능 추가 시 사용
         override fun pinAndFetch(postId: Int) {}
 
@@ -240,6 +248,14 @@ class CircleDetailPostViewModelImpl
     }
 
 sealed class CircleDetailPostScreen {
+    val hasCollected: Boolean
+        get() = _hasCollected
+    private var _hasCollected = false
+
+    fun notifyCollected() {
+        _hasCollected = true
+    }
+
     data class SuccessView(val posts: PostModels) : CircleDetailPostScreen()
 
     data object LoadingView : CircleDetailPostScreen()

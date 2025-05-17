@@ -1,6 +1,5 @@
 package com.developeek.circleon.data.repositoryimpl
 
-import android.util.Log
 import com.developeek.circleon.data.dto.home.Pin
 import com.developeek.circleon.data.dto.home.RequestBodyEditComment
 import com.developeek.circleon.data.dto.home.RequestBodyEditMemberRole
@@ -301,7 +300,6 @@ class CircleRepositoryImpl(
                 },
             )
         } catch (e: Exception) {
-            Log.d("error", e.message.toString())
             Result.error(e)
         }
     }
