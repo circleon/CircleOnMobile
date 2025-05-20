@@ -66,6 +66,10 @@ class CircleDetailNoticeViewModelImpl
             fetchNotices(currentPage, SIZE_BY_PAGE)
         }
 
+        override fun refresh() {
+            fetchNotices(DEFAULT_PAGE, (currentPage + 1) * SIZE_BY_PAGE)
+        }
+
         private fun fetchNotices(
             page: Int,
             size: Int,
@@ -108,10 +112,6 @@ class CircleDetailNoticeViewModelImpl
             if (result.isAuthenticationError()) {
                 _event.emit(Event.SendToLoginScreen)
             }
-        }
-
-        override fun refresh() {
-            fetchNotices(DEFAULT_PAGE, (currentPage + 1) * SIZE_BY_PAGE)
         }
 
         override fun scrollOver() {
@@ -220,7 +220,7 @@ class CircleDetailNoticeViewModelImpl
                     _event.emit(Event.Loading)
 
                     when (val result = postReportCircleNotice(circleDetail.id, postId, reportMessage)) {
-                        is Success -> showToast(MESSAGE_SUCCESS_REQUEST_REPORT)
+                        is Success -> _event.emit(Event.ShowToast(MESSAGE_SUCCESS_REQUEST_REPORT))
                         is Error -> whenUserRequestFail(result)
                     }
                 }
@@ -235,12 +235,8 @@ class CircleDetailNoticeViewModelImpl
         }
 
         private suspend fun showToastAndRefresh(message: String) {
-            showToast(message)
-            refresh()
-        }
-
-        private suspend fun showToast(message: String) {
             _event.emit(Event.ShowToast(message))
+            refresh()
         }
 
         private suspend fun whenUserRequestFail(result: Error<Unit>) {

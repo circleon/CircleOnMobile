@@ -112,17 +112,15 @@ class CircleRepositoryImpl(
         size: Int,
     ): Result<MemberModels> {
         return try {
-            withContext(dispatcher) {
-                val response =
-                    service.getMembers(
-                        circleId,
-                        page,
-                        size,
-                        SORT_MEMBER_BY_NAME,
-                        MembershipStatus.JOIN_REQUESTED.codeName(),
-                    )
-                Result.success(MemberModels(response.content.map { it.toMemberModel() }))
-            }
+            val response =
+                service.getMembers(
+                    circleId,
+                    page,
+                    size,
+                    SORT_MEMBER_BY_NAME,
+                    MembershipStatus.JOIN_REQUESTED.codeName(),
+                )
+            Result.success(MemberModels(response.content.map { it.toMemberModel() }))
         } catch (e: Exception) {
             Result.error(e)
         }
@@ -134,31 +132,15 @@ class CircleRepositoryImpl(
         size: Int,
     ): Result<MemberModels> {
         return try {
-            withContext(dispatcher) {
-                val response =
-                    service.getMembers(
-                        circleId,
-                        page,
-                        size,
-                        SORT_MEMBER_BY_NAME,
-                        MembershipStatus.LEAVE_REQUESTED.codeName(),
-                    )
-                Result.success(MemberModels(response.content.map { it.toMemberModel() }))
-            }
-        } catch (e: Exception) {
-            Result.error(e)
-        }
-    }
-
-    override suspend fun getCircleLeaveRequestedMemberMessage(
-        circleId: Int,
-        memberId: Int,
-    ): Result<String> {
-        return try {
-            withContext(dispatcher) {
-                val response = service.getCircleLeaveRequestedMemberMessage(circleId, memberId)
-                Result.success(response.message)
-            }
+            val response =
+                service.getMembers(
+                    circleId,
+                    page,
+                    size,
+                    SORT_MEMBER_BY_NAME,
+                    MembershipStatus.LEAVE_REQUESTED.codeName(),
+                )
+            Result.success(MemberModels(response.content.map { it.toMemberModel() }))
         } catch (e: Exception) {
             Result.error(e)
         }
@@ -169,10 +151,20 @@ class CircleRepositoryImpl(
         memberId: Int,
     ): Result<String> {
         return try {
-            withContext(dispatcher) {
-                val response = service.getCircleJoinRequestedMemberMessage(circleId, memberId)
-                Result.success(response.message)
-            }
+            val response = service.getCircleJoinRequestedMemberMessage(circleId, memberId)
+            Result.success(response.message)
+        } catch (e: Exception) {
+            Result.error(e)
+        }
+    }
+
+    override suspend fun getCircleLeaveRequestedMemberMessage(
+        circleId: Int,
+        memberId: Int,
+    ): Result<String> {
+        return try {
+            val response = service.getCircleLeaveRequestedMemberMessage(circleId, memberId)
+            Result.success(response.message)
         } catch (e: Exception) {
             Result.error(e)
         }
@@ -500,10 +492,8 @@ class CircleRepositoryImpl(
 
     override suspend fun putCircleOfficialStatus(circleId: Int): Result<Unit> {
         return try {
-            withContext(dispatcher) {
-                service.putCircleOfficialStatus(circleId, OfficialStatus.OFFICIAL_REQUESTED.codeName())
-                Result.success(Unit)
-            }
+            service.putCircleOfficialStatus(circleId, OfficialStatus.OFFICIAL_REQUESTED.codeName())
+            Result.success(Unit)
         } catch (e: Exception) {
             Result.error(e)
         }
@@ -597,10 +587,8 @@ class CircleRepositoryImpl(
         status: MembershipStatus,
     ): Result<Unit> {
         return try {
-            withContext(dispatcher) {
-                service.putCircleMemberStatus(circleId, memberId, RequestBodyEditMemberStatus(status.codeName()))
-                Result.success(Unit)
-            }
+            service.putCircleMemberStatus(circleId, memberId, RequestBodyEditMemberStatus(status.codeName()))
+            Result.success(Unit)
         } catch (e: Exception) {
             Result.error(e)
         }
@@ -653,10 +641,8 @@ class CircleRepositoryImpl(
         memberId: Int,
     ): Result<Unit> {
         return try {
-            withContext(dispatcher) {
-                service.deleteCircleMember(circleId, memberId)
-                Result.success(Unit)
-            }
+            service.deleteCircleMember(circleId, memberId)
+            Result.success(Unit)
         } catch (e: Exception) {
             Result.error(e)
         }

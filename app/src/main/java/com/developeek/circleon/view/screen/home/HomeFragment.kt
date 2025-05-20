@@ -232,6 +232,7 @@ class HomeFragment : Fragment() {
     }
 
     private fun showErrorView() {
+        binding.shimmerCircle.stopShimmer()
         switchView(binding.llServiceError)
     }
 

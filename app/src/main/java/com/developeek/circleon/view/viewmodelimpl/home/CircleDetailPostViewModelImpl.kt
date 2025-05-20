@@ -66,6 +66,10 @@ class CircleDetailPostViewModelImpl
             fetchPosts(currentPage, SIZE_BY_PAGE)
         }
 
+        override fun refresh() {
+            fetchPosts(DEFAULT_PAGE, (currentPage + 1) * SIZE_BY_PAGE)
+        }
+
         private fun fetchPosts(
             page: Int,
             size: Int,
@@ -108,10 +112,6 @@ class CircleDetailPostViewModelImpl
             if (result.isAuthenticationError()) {
                 _event.emit(Event.SendToLoginScreen)
             }
-        }
-
-        override fun refresh() {
-            fetchPosts(DEFAULT_PAGE, (currentPage + 1) * SIZE_BY_PAGE)
         }
 
         override fun scrollOver() {

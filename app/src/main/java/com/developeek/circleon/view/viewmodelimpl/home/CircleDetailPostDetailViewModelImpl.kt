@@ -88,6 +88,10 @@ class CircleDetailPostDetailViewModelImpl
             fetchComments(currentPage, SIZE_BY_PAGE)
         }
 
+        override fun refresh() {
+            fetchComments(DEFAULT_PAGE, (currentPage + 1) * SIZE_BY_PAGE)
+        }
+
         private fun fetchComments(
             page: Int,
             size: Int,
@@ -115,10 +119,6 @@ class CircleDetailPostDetailViewModelImpl
                         }
                     }
                 }
-        }
-
-        override fun refresh() {
-            fetchComments(DEFAULT_PAGE, (currentPage + 1) * SIZE_BY_PAGE)
         }
 
         override fun scrollOver() {

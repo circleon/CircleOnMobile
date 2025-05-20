@@ -1,6 +1,5 @@
 package com.developeek.circleon.view.viewmodelimpl.mypage
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.developeek.circleon.data.repository.CircleRepository
@@ -59,6 +58,10 @@ class MyPostViewModelImpl
             fetchMyPosts(currentPage, SIZE_BY_PAGE)
         }
 
+        override fun refresh() {
+            fetchMyPosts(DEFAULT_PAGE, (currentPage + 1) * SIZE_BY_PAGE)
+        }
+
         private fun fetchMyPosts(
             page: Int,
             size: Int,
@@ -97,7 +100,6 @@ class MyPostViewModelImpl
             result.data.let {
                 posts = MyPostModels(it.content)
                 _isLastPage = it.isLastPage
-                Log.d("isLast", _isLastPage.toString())
             }
             _screenFlow.emit(MyPostScreen.SuccessView(posts))
         }
@@ -109,10 +111,6 @@ class MyPostViewModelImpl
             if (result.isAuthenticationError()) {
                 _event.emit(Event.SendToLoginScreen)
             }
-        }
-
-        override fun refresh() {
-            fetchMyPosts(DEFAULT_PAGE, (currentPage + 1) * SIZE_BY_PAGE)
         }
 
         override fun scrollOver() {

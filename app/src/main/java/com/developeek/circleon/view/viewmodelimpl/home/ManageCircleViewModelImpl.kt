@@ -1,27 +1,28 @@
 package com.developeek.circleon.view.viewmodelimpl.home
 
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.developeek.circleon.data.repository.CircleRepository
 import com.developeek.circleon.data.source.Error
 import com.developeek.circleon.data.source.Success
 import com.developeek.circleon.domain.model.CircleDetailModel
-import com.developeek.circleon.domain.model.MemberModel
 import com.developeek.circleon.domain.model.MemberModels
-import com.developeek.circleon.domain.state.UiState
+import com.developeek.circleon.view.Event
 import com.developeek.circleon.view.viewmodel.home.ManageCircleViewModel
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.Deferred
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
-import kotlinx.coroutines.cancel
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharedFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 @HiltViewModel(assistedFactory = ManageCircleViewModelImpl.ManageCircleViewModelFactory::class)
 class ManageCircleViewModelImpl
@@ -37,28 +38,16 @@ class ManageCircleViewModelImpl
             ): ManageCircleViewModelImpl
         }
 
-        override val state: LiveData<UiState>
-            get() = uiState
-        private val uiState = MutableLiveData<UiState>()
+        private val _event = MutableSharedFlow<Event>()
+        override val event: SharedFlow<Event> = _event
+        private val _screenFlow = MutableStateFlow<ManageCircleScreen>(ManageCircleScreen.LoadingView)
+        override val screenFlow: StateFlow<ManageCircleScreen> = _screenFlow
 
-        override val officialStatusState: LiveData<UiState>
-            get() = _officialStatusState
-        private val _officialStatusState = MutableLiveData<UiState>()
-        private var requestOfficialStatusJob: Job? = null
-
-        override val circleMembers: MemberModels
-            get() = circleMemberModels
-        private var circleMemberModels = MemberModels.empty()
-        override val joinRequestedMembers: MemberModels
-            get() = joinRequestedMembersModels
-        private var joinRequestedMembersModels = MemberModels.empty()
-        override val leaveRequestedMembers: MemberModels
-            get() = leaveRequestedMemberModels
-        private var leaveRequestedMemberModels = MemberModels.empty()
         private var fetchMembersJob: Job? = null
-        private var currentPage = DEFAULT_PAGE
+        private var userRequestJob: Job? = null
+        private val dispatcher = Dispatchers.IO
 
-        override lateinit var error: String
+        private var currentPage = DEFAULT_PAGE
 
         init {
             fetchMembers(currentPage, SIZE_BY_PAGE)
@@ -76,143 +65,167 @@ class ManageCircleViewModelImpl
                 if (!it.isCompleted) return
             }
 
-            uiState.postValue(UiState.Loading)
-
-            var tmpState: UiState = UiState.Success
             fetchMembersJob =
                 viewModelScope.launch {
-                    val fetchCircleMembersJob =
+                    _screenFlow.emit(ManageCircleScreen.LoadingView)
+
+                    val fetchCircleMembers =
                         async {
-                            return@async fetchCircleMembers(page, size)
+                            getCircleMembers(circle.id, page, size)
                         }
-                    val fetchCircleJoinRequestedMembersJob =
+                    val fetchJoinRequestedMembers =
                         async {
-                            val state = fetchCircleJoinRequestedMembers(page, size)
-                            joinRequestedMembers.get().map {
-                                launch { fetchCircleJoinRequestedMemberMessage(it) }
-                            }
-                            return@async state
+                            getJoinRequestedMembersWithMessage(circle.id, page, size)
                         }
-                    val fetchCircleLeaveRequestedMembersJob =
+                    val fetchLeaveRequestedMembers =
                         async {
-                            val state = fetchCircleLeaveRequestedMembers(page, size)
-                            leaveRequestedMemberModels.get().map {
-                                launch { fetchCircleLeaveRequestedMemberMessage(it) }
-                            }
-                            return@async state
+                            getLeaveRequestedMembersWithMessage(circle.id, page, size)
                         }
 
-                    val jobs: List<Deferred<UiState>> =
-                        listOf(
-                            fetchCircleMembersJob,
-                            fetchCircleJoinRequestedMembersJob,
-                            fetchCircleLeaveRequestedMembersJob,
+                    awaitAll(fetchCircleMembers, fetchJoinRequestedMembers, fetchLeaveRequestedMembers)
+                        .find {
+                            it is Error
+                        }?.let {
+                            whenFetchMembersFail(it as Error)
+                        } ?: run {
+                        whenFetchMembersSuccess(
+                            circleMembers = fetchCircleMembers.await() as Success,
+                            joinRequestedMembers = fetchJoinRequestedMembers.await() as Success,
+                            leaveRequestedMembers = fetchLeaveRequestedMembers.await() as Success,
                         )
-                    jobs.map { job ->
-                        job.invokeOnCompletion {
-                            if (job.isCancelled) {
-                                this.cancel()
-                            }
-                        }
-                    }
-
-                    jobs.awaitAll().map {
-                        if (it !is UiState.Success) tmpState = it
-                    }
-                }.apply {
-                    invokeOnCompletion {
-                        uiState.postValue(tmpState)
                     }
                 }
         }
 
-        private suspend fun fetchCircleMembers(
+        private suspend fun getCircleMembers(
+            circleId: Int,
             page: Int,
             size: Int,
-        ): UiState {
-            val result = repository.getCircleMembers(circle.id, page, size)
-
-            if (result is Success) {
-                circleMemberModels = result.data
-                return UiState.Success
-            } else {
-                error = (result as Error).message()
-                return if (result.isAuthenticationError()) UiState.AuthenticationError else UiState.ServiceError
-            }
+        ) = withContext(dispatcher) {
+            repository.getCircleMembers(circleId, page, size)
         }
 
-        private suspend fun fetchCircleJoinRequestedMembers(
+        private suspend fun getJoinRequestedMembersWithMessage(
+            circleId: Int,
             page: Int,
             size: Int,
-        ): UiState {
-            val result = repository.getCircleJoinRequestedMembers(circle.id, page, size)
+        ) = withContext(dispatcher) {
+            val result = repository.getCircleJoinRequestedMembers(circleId, page, size)
 
-            if (result is Success) {
-                joinRequestedMembersModels = result.data
-                return UiState.Success
-            } else {
-                error = (result as Error).message()
-                return if (result.isAuthenticationError()) UiState.AuthenticationError else UiState.ServiceError
+            when (result) {
+                is Success -> {
+                    result.data.get().map {
+                        async {
+                            val message = repository.getCircleJoinRequestedMemberMessage(circleId, it.id)
+
+                            if (message is Success) {
+                                it.setMessage(message.data)
+                            }
+                        }
+                    }.awaitAll()
+                }
             }
+
+            result
         }
 
-        private suspend fun fetchCircleLeaveRequestedMembers(
+        private suspend fun getLeaveRequestedMembersWithMessage(
+            circleId: Int,
             page: Int,
             size: Int,
-        ): UiState {
-            val result = repository.getCircleLeaveRequestedMembers(circle.id, page, size)
+        ) = withContext(dispatcher) {
+            val result = repository.getCircleLeaveRequestedMembers(circleId, page, size)
 
-            if (result is Success) {
-                leaveRequestedMemberModels = result.data
-                return UiState.Success
-            } else {
-                error = (result as Error).message()
-                return if (result.isAuthenticationError()) UiState.AuthenticationError else UiState.ServiceError
+            when (result) {
+                is Success -> {
+                    result.data.get().map {
+                        async {
+                            val message = repository.getCircleLeaveRequestedMemberMessage(circleId, it.id)
+
+                            if (message is Success) {
+                                it.setMessage(message.data)
+                            }
+                        }
+                    }.awaitAll()
+                }
             }
+
+            result
         }
 
-        private suspend fun fetchCircleJoinRequestedMemberMessage(member: MemberModel) {
-            val result = repository.getCircleJoinRequestedMemberMessage(circle.id, member.id)
-
-            if (result is Success) {
-                member.setMessage(result.data)
-            }
+        private suspend fun whenFetchMembersSuccess(
+            circleMembers: Success<MemberModels>,
+            joinRequestedMembers: Success<MemberModels>,
+            leaveRequestedMembers: Success<MemberModels>,
+        ) {
+            _screenFlow.emit(
+                ManageCircleScreen.SuccessView(
+                    circleMembers = circleMembers.data,
+                    joinRequestedMembers = joinRequestedMembers.data,
+                    leaveRequestedMembers = leaveRequestedMembers.data,
+                ),
+            )
         }
 
-        private suspend fun fetchCircleLeaveRequestedMemberMessage(member: MemberModel) {
-            val result = repository.getCircleLeaveRequestedMemberMessage(circle.id, member.id)
+        private suspend fun whenFetchMembersFail(result: Error<MemberModels>) {
+            _event.emit(Event.ShowToast(result.message()))
 
-            if (result is Success) {
-                member.setMessage(result.data)
+            if (result.isAuthenticationError()) {
+                _event.emit(Event.SendToLoginScreen)
             }
         }
 
         override fun requestOfficialStatus() {
-            requestOfficialStatusJob?.let {
+            userRequestJob?.let {
                 if (!it.isCompleted) return
             }
 
-            _officialStatusState.postValue(UiState.Loading)
-
-            requestOfficialStatusJob =
+            userRequestJob =
                 viewModelScope.launch {
-                    val result = repository.putCircleOfficialStatus(circle.id)
+                    _event.emit(Event.Loading)
 
-                    if (result is Success) {
-                        _officialStatusState.postValue(UiState.Success)
-                    } else {
-                        error = (result as Error).message()
-                        if (result.isAuthenticationError()) {
-                            _officialStatusState.postValue(UiState.AuthenticationError)
-                        } else {
-                            _officialStatusState.postValue(UiState.ServiceError)
-                        }
+                    when (val result = putCircleOfficialStatus(circle.id)) {
+                        is Success -> showToastAndRefresh(MESSAGE_SUCCESS_REQUEST_OFFICIAL_STATUS)
+                        is Error -> whenUserRequestFail(result)
                     }
                 }
         }
 
+        private suspend fun putCircleOfficialStatus(circleId: Int) =
+            withContext(dispatcher) {
+                repository.putCircleOfficialStatus(circleId)
+            }
+
+        private suspend fun showToastAndRefresh(message: String) {
+            _event.emit(Event.ShowToast(message))
+            refresh()
+        }
+
+        private suspend fun whenUserRequestFail(result: Error<Unit>) {
+            if (result.isAuthenticationError()) {
+                _event.emit(Event.ShowToast(result.message()))
+                _event.emit(Event.SendToLoginScreen)
+                return
+            }
+
+            _event.emit(Event.ShowDialog(result.message()))
+        }
+
         companion object {
+            private const val MESSAGE_SUCCESS_REQUEST_OFFICIAL_STATUS = "동아리 인증 요청이 전송됐어요"
             private const val SIZE_BY_PAGE = 200 // 멤버 데이터 일괄 호출
             private const val DEFAULT_PAGE = 0
         }
     }
+
+sealed class ManageCircleScreen {
+    data class SuccessView(
+        val circleMembers: MemberModels,
+        val joinRequestedMembers: MemberModels,
+        val leaveRequestedMembers: MemberModels,
+    ) : ManageCircleScreen()
+
+    data object LoadingView : ManageCircleScreen()
+
+    data object NormalView : ManageCircleScreen()
+}

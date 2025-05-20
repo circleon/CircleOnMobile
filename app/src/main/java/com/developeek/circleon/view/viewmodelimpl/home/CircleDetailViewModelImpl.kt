@@ -63,6 +63,10 @@ class CircleDetailViewModelImpl
             fetchCircleDetail()
         }
 
+        override fun refresh() {
+            fetchCircleDetail()
+        }
+
         private fun fetchCircleDetail() {
             fetchCircleDetailJob?.let {
                 if (!it.isCompleted) return
@@ -123,10 +127,6 @@ class CircleDetailViewModelImpl
             if (result.isAuthenticationError()) {
                 _event.emit(Event.SendToLoginScreen)
             }
-        }
-
-        override fun refresh() {
-            fetchCircleDetail()
         }
 
         override fun requestJoin(joinMessage: String) {
