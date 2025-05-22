@@ -1,9 +1,9 @@
-package com.developeek.circleon.view.viewmodelimpl
+package com.developeek.circleon.data.repository
 
 /**
  * Page
  *
- * Pagination 을 통해 가져온 아이템들을 ViewModel 에서 관리하기 위해 작성
+ * Pagination 을 통해 가져온 아이템들을 관리하기 위해 작성
  */
 data class Page<T>(
     val content: List<T>,

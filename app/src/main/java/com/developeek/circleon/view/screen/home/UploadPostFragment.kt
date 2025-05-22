@@ -15,24 +15,29 @@ import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.Observer
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
 import com.developeek.circleon.R
 import com.developeek.circleon.databinding.FragmentUploadPostBinding
 import com.developeek.circleon.domain.enums.PostType
 import com.developeek.circleon.domain.model.PostModel
-import com.developeek.circleon.domain.state.UiState
 import com.developeek.circleon.domain.utils.Const
 import com.developeek.circleon.domain.utils.Utils.toJPEG
 import com.developeek.circleon.domain.utils.glide.GlideProvider
+import com.developeek.circleon.view.Event
 import com.developeek.circleon.view.screen.login.LoginActivity
 import com.developeek.circleon.view.viewmodel.home.UploadPostViewModel
+import com.developeek.circleon.view.viewmodelimpl.home.UploadPostScreen
 import com.developeek.circleon.view.viewmodelimpl.home.UploadPostViewModelImpl
 import com.developeek.circleon.view.widget.SingleMessageAlertDialog
 import com.developeek.circleon.view.widget.SingleMessageToast
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import dagger.hilt.android.AndroidEntryPoint
 import dagger.hilt.android.lifecycle.withCreationCallback
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -57,7 +62,7 @@ class UploadPostFragment : Fragment() {
         extrasProducer = {
             defaultViewModelCreationExtras
                 .withCreationCallback<UploadPostViewModelImpl.UploadPostViewModelFactory> {
-                    it.create(circleId, postType)
+                    it.create(circleId, postType, isEdit)
                 }
         },
     )
@@ -98,36 +103,54 @@ class UploadPostFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         initView(requireActivity(), requireContext())
-        initObserver(requireActivity(), requireContext())
         initListener(requireContext())
+        lifecycleScope.launch {
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                launch {
+                    viewModel.event.collect {
+                        handleEvent(it, requireActivity(), requireContext())
+                    }
+                }
+                launch {
+                    viewModel.screenFlow.collect {
+                        handleScreenFlow(it, requireContext())
+                    }
+                }
+            }
+        }
     }
 
     private fun initView(
         parentActivity: Activity,
         context: Context,
     ) {
-        initToolbar()
+        initToolbar(context)
         hideBtmNav(parentActivity)
         loadPostContentWhenIsEdit(context)
     }
 
-    private fun initToolbar() {
-        var title = Const.EMPTY_TEXT
-
-        if (postType.isNotice() && isEdit) {
-            title = TITLE_NOTICE_EDIT
-        }
-        if (postType.isNotice() && !isEdit) {
-            title = TITLE_NOTICE
-        }
-        if (postType.isPost() && isEdit) {
-            title = TITLE_POST_EDIT
-        }
-        if (postType.isPost() && !isEdit) {
-            title = TITLE_POST
-        }
+    private fun initToolbar(context: Context) {
+        val title =
+            when (postType) {
+                PostType.NOTICE ->
+                    if (isEdit) {
+                        context.getString(R.string.title_edit_notice)
+                    } else {
+                        context.getString(R.string.title_upload_notice)
+                    }
+                PostType.POST ->
+                    if (isEdit) {
+                        context.getString(R.string.title_edit_post)
+                    } else {
+                        context.getString(R.string.title_upload_post)
+                    }
+            }
 
         binding.txtTbTitle.text = title
+    }
+
+    private fun hideBtmNav(activity: Activity) {
+        activity.findViewById<BottomNavigationView>(R.id.btmNav).isVisible = false
     }
 
     private fun loadPostContentWhenIsEdit(context: Context) {
@@ -147,57 +170,6 @@ class UploadPostFragment : Fragment() {
                 binding.btnAddPostImage.background = null
             }
         }
-    }
-
-    private fun hideBtmNav(activity: Activity) {
-        activity.findViewById<BottomNavigationView>(R.id.btmNav).isVisible = false
-    }
-
-    private fun initObserver(
-        parentActivity: Activity,
-        context: Context,
-    ) {
-        viewModel.state.observe(
-            viewLifecycleOwner,
-            stateObserver(parentActivity, context),
-        )
-    }
-
-    private fun stateObserver(
-        parentActivity: Activity,
-        context: Context,
-    ) = Observer<UiState> {
-        binding.pgbLoading.isVisible = it is UiState.Loading
-        when (it) {
-            UiState.Success -> {
-                requestRefreshToPreviousScreen()
-                sendUserToPreviousScreen()
-            }
-            UiState.AuthenticationError -> {
-                sendUserToLoginScreen(parentActivity)
-                if (SingleMessageToast.previousFinished()) {
-                    SingleMessageToast(context, viewModel.error).show()
-                }
-            }
-            UiState.ServiceError -> {
-                SingleMessageAlertDialog(context, viewModel.error).show()
-            }
-            else -> {}
-        }
-    }
-
-    private fun requestRefreshToPreviousScreen() {
-        findNavController().previousBackStackEntry?.savedStateHandle?.set(Const.FLAG_CIRCLE_POST_DATA_CHANGED, true)
-    }
-
-    private fun sendUserToPreviousScreen() {
-        findNavController().navigateUp()
-    }
-
-    private fun sendUserToLoginScreen(activity: Activity) {
-        val intent = Intent(activity, LoginActivity::class.java)
-        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)
-        startActivity(intent)
     }
 
     private fun initListener(context: Context) {
@@ -245,6 +217,63 @@ class UploadPostFragment : Fragment() {
         }
     }
 
+    private fun handleEvent(
+        event: Event,
+        parentActivity: Activity,
+        context: Context,
+    ) {
+        when (event) {
+            is Event.SendToLoginScreen -> sendUserToLoginScreen(parentActivity)
+            is Event.ShowToast -> showToast(event, context)
+            is Event.ShowDialog -> showDialog(event, context)
+            else -> {}
+        }
+    }
+
+    private fun sendUserToLoginScreen(parentActivity: Activity) {
+        val intent = Intent(parentActivity, LoginActivity::class.java)
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)
+        startActivity(intent)
+    }
+
+    private fun showToast(
+        event: Event.ShowToast,
+        context: Context,
+    ) {
+        if (SingleMessageToast.previousFinished()) {
+            SingleMessageToast(context, event.message).show()
+        }
+    }
+
+    private fun showDialog(
+        event: Event.ShowDialog,
+        context: Context,
+    ) {
+        SingleMessageAlertDialog(context, event.message).show()
+    }
+
+    private fun handleScreenFlow(
+        screenFlow: UploadPostScreen,
+        context: Context,
+    ) {
+        binding.pgbLoading.isVisible = screenFlow is UploadPostScreen.LoadingView
+        when (screenFlow) {
+            is UploadPostScreen.SuccessView -> {
+                requestRefreshToPreviousScreen()
+                sendUserToPreviousScreen()
+            }
+            else -> {}
+        }
+    }
+
+    private fun requestRefreshToPreviousScreen() {
+        findNavController().previousBackStackEntry?.savedStateHandle?.set(Const.FLAG_CIRCLE_POST_DATA_CHANGED, true)
+    }
+
+    private fun sendUserToPreviousScreen() {
+        findNavController().popBackStack()
+    }
+
     override fun onDestroyView() {
         super.onDestroyView()
 
@@ -252,10 +281,6 @@ class UploadPostFragment : Fragment() {
     }
 
     companion object {
-        private const val TITLE_NOTICE = "공지사항 작성"
-        private const val TITLE_NOTICE_EDIT = "공지사항 수정"
-        private const val TITLE_POST = "게시글 작성"
-        private const val TITLE_POST_EDIT = "게시글 수정"
         private const val PHOTO_MIME_TYPE = "image/jpeg"
     }
 }

@@ -38,7 +38,7 @@ import com.developeek.circleon.view.screen.login.LoginActivity
 import com.developeek.circleon.view.viewmodel.home.ManageCircleMemberViewModel
 import com.developeek.circleon.view.viewmodelimpl.home.ManageCircleMemberScreen
 import com.developeek.circleon.view.viewmodelimpl.home.ManageCircleMemberViewModelImpl
-import com.developeek.circleon.view.widget.CircleAcceptRequestAlertDialog
+import com.developeek.circleon.view.widget.CircleMemberRequestAlertDialog
 import com.developeek.circleon.view.widget.CircleMemberRoleEditAlertDialog
 import com.developeek.circleon.view.widget.PositiveAlertDialog
 import com.developeek.circleon.view.widget.SingleMessageAlertDialog
@@ -285,7 +285,7 @@ class ManageCircleMemberFragment : Fragment() {
         member: MemberModel,
         context: Context,
     ) {
-        CircleAcceptRequestAlertDialog(
+        CircleMemberRequestAlertDialog(
             context,
             title = context.getString(R.string.title_member_message_dialog_for_join_accept),
             member = member,
@@ -340,7 +340,7 @@ class ManageCircleMemberFragment : Fragment() {
         member: MemberModel,
         context: Context,
     ) {
-        CircleAcceptRequestAlertDialog(
+        CircleMemberRequestAlertDialog(
             context,
             title = context.getString(R.string.title_member_message_dialog_for_leave_accept),
             member = member,
@@ -391,7 +391,7 @@ class ManageCircleMemberFragment : Fragment() {
         parentActivity: Activity,
         context: Context,
     ) {
-        binding.pgbLoading.isVisible = event is Event.Loading
+        binding.pgbLoading.isVisible = event is Event.ShowProcessing
         when (event) {
             is Event.SendToLoginScreen -> sendUserToLoginScreen(parentActivity)
             is Event.ShowToast -> showToast(event, context)

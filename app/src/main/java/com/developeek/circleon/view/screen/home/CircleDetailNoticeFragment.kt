@@ -26,8 +26,8 @@ import com.developeek.circleon.databinding.FragmentCircleDetailNoticeBinding
 import com.developeek.circleon.domain.enums.PostType
 import com.developeek.circleon.domain.enums.Role
 import com.developeek.circleon.domain.model.CircleDetailModel
+import com.developeek.circleon.domain.model.Models
 import com.developeek.circleon.domain.model.PostModel
-import com.developeek.circleon.domain.model.PostModels
 import com.developeek.circleon.domain.utils.Const
 import com.developeek.circleon.domain.utils.Utils
 import com.developeek.circleon.domain.utils.glide.GlideProvider
@@ -351,7 +351,7 @@ class CircleDetailNoticeFragment : Fragment() {
 
     private fun setBtnRetryListener() {
         binding.btnRetry.setOnClickListener {
-            viewModel.refresh()
+            viewModel.showLoadingAndRefresh()
         }
     }
 
@@ -378,7 +378,7 @@ class CircleDetailNoticeFragment : Fragment() {
     ) {
         val loadingIndicator =
             requireParentFragment().requireView().findViewById<CircularProgressIndicator>(R.id.pgbLoading)
-        loadingIndicator.isVisible = event is Event.Loading
+        loadingIndicator.isVisible = event is Event.ShowProcessing
         when (event) {
             is Event.SendToLoginScreen -> sendUserToLoginScreen(parentActivity)
             is Event.ShowToast -> showToast(event, context)
@@ -437,7 +437,7 @@ class CircleDetailNoticeFragment : Fragment() {
     }
 
     private fun loadCircleNoticesAndDoAfter(
-        notices: PostModels,
+        notices: Models<PostModel>,
         after: () -> Unit,
     ) {
         binding.rvCircleNotice.adapter?.let {
@@ -453,6 +453,7 @@ class CircleDetailNoticeFragment : Fragment() {
     }
 
     private fun showErrorView() {
+        binding.shimmerNotice.stopShimmer()
         switchView(binding.llServiceError)
     }
 

@@ -4,16 +4,16 @@ import android.os.Parcelable
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.developeek.circleon.data.repository.CircleRepository
+import com.developeek.circleon.data.repository.Page
 import com.developeek.circleon.data.source.Error
 import com.developeek.circleon.data.source.Success
 import com.developeek.circleon.domain.model.CircleDetailModel
+import com.developeek.circleon.domain.model.Models
 import com.developeek.circleon.domain.model.PostModel
-import com.developeek.circleon.domain.model.PostModels
 import com.developeek.circleon.domain.utils.validator.Invalid
 import com.developeek.circleon.domain.utils.validator.Validator
 import com.developeek.circleon.view.Event
 import com.developeek.circleon.view.viewmodel.home.CircleDetailPostViewModel
-import com.developeek.circleon.view.viewmodelimpl.Page
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
@@ -52,7 +52,7 @@ class CircleDetailNoticeViewModelImpl
         private var _isLastPage = false
         private var currentPage = DEFAULT_PAGE
 
-        private lateinit var posts: PostModels
+        private lateinit var posts: Models<PostModel>
         override val currentScrollState: Parcelable?
             get() = _currentScrollState
         private var _currentScrollState: Parcelable? = null
@@ -64,6 +64,13 @@ class CircleDetailNoticeViewModelImpl
 
         init {
             fetchNotices(currentPage, SIZE_BY_PAGE)
+        }
+
+        override fun showLoadingAndRefresh() {
+            viewModelScope.launch {
+                _screenFlow.emit(CircleDetailPostScreen.LoadingView)
+            }
+            refresh()
         }
 
         override fun refresh() {
@@ -99,10 +106,10 @@ class CircleDetailNoticeViewModelImpl
 
         private suspend fun whenFetchNoticesSuccess(result: Success<Page<PostModel>>) {
             result.data.let {
-                posts = PostModels(it.content)
                 _isLastPage = it.isLastPage
+                posts = Models(it.content)
+                _screenFlow.emit(CircleDetailPostScreen.SuccessView(posts))
             }
-            _screenFlow.emit(CircleDetailPostScreen.SuccessView(posts))
         }
 
         private suspend fun whenFetchNoticesFail(result: Error<Page<PostModel>>) {
@@ -125,13 +132,19 @@ class CircleDetailNoticeViewModelImpl
 
                     if (!isActive) return@launch // 스크롤 작업 캔슬 시 내용을 업데이트하지 않고 작업 종료
                     when (result) {
-                        is Success -> {
-                            whenFetchNoticesSuccess(result)
-                            currentPage++
-                        }
+                        is Success -> whenScrollOverSuccess(result)
                         is Error -> whenScrollOverFail(result)
                     }
                 }
+        }
+
+        private suspend fun whenScrollOverSuccess(result: Success<Page<PostModel>>) {
+            result.data.let {
+                _isLastPage = it.isLastPage
+                posts = posts.addAllAndGet(it.content)
+                _screenFlow.emit(CircleDetailPostScreen.SuccessView(posts))
+            }
+            currentPage++
         }
 
         private suspend fun whenScrollOverFail(result: Error<Page<PostModel>>) {
@@ -160,7 +173,7 @@ class CircleDetailNoticeViewModelImpl
 
             userRequestJob =
                 viewModelScope.launch {
-                    _event.emit(Event.Loading)
+                    _event.emit(Event.ShowProcessing)
 
                     when (val result = putPostPin(circleDetail.id, postId, isPinned)) {
                         is Success ->
@@ -187,7 +200,7 @@ class CircleDetailNoticeViewModelImpl
 
             userRequestJob =
                 viewModelScope.launch {
-                    _event.emit(Event.Loading)
+                    _event.emit(Event.ShowProcessing)
 
                     userRequestJob =
                         launch {
@@ -217,7 +230,7 @@ class CircleDetailNoticeViewModelImpl
             userRequestJob =
                 viewModelScope.launch {
                     if (!checkMessageFormat(reportMessage)) return@launch
-                    _event.emit(Event.Loading)
+                    _event.emit(Event.ShowProcessing)
 
                     when (val result = postReportCircleNotice(circleDetail.id, postId, reportMessage)) {
                         is Success -> _event.emit(Event.ShowToast(MESSAGE_SUCCESS_REQUEST_REPORT))

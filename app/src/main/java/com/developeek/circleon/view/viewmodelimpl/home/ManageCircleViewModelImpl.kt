@@ -169,6 +169,7 @@ class ManageCircleViewModelImpl
 
         private suspend fun whenFetchMembersFail(result: Error<MemberModels>) {
             _event.emit(Event.ShowToast(result.message()))
+            _screenFlow.emit(ManageCircleScreen.NormalView)
 
             if (result.isAuthenticationError()) {
                 _event.emit(Event.SendToLoginScreen)
@@ -182,7 +183,7 @@ class ManageCircleViewModelImpl
 
             userRequestJob =
                 viewModelScope.launch {
-                    _event.emit(Event.Loading)
+                    _event.emit(Event.ShowProcessing)
 
                     when (val result = putCircleOfficialStatus(circle.id)) {
                         is Success -> showToastAndRefresh(MESSAGE_SUCCESS_REQUEST_OFFICIAL_STATUS)

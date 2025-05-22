@@ -3,6 +3,7 @@ package com.developeek.circleon.view.viewmodelimpl.home
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.developeek.circleon.data.repository.CircleRepository
+import com.developeek.circleon.data.repository.Page
 import com.developeek.circleon.data.source.Error
 import com.developeek.circleon.data.source.Success
 import com.developeek.circleon.domain.enums.Category
@@ -11,7 +12,6 @@ import com.developeek.circleon.domain.model.CircleModel
 import com.developeek.circleon.domain.model.CircleModels
 import com.developeek.circleon.view.Event
 import com.developeek.circleon.view.viewmodel.home.HomeViewModel
-import com.developeek.circleon.view.viewmodelimpl.Page
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -83,9 +83,11 @@ class HomeViewModelImpl
         }
 
         private suspend fun whenFetchCirclesSuccess(result: Success<Page<CircleModel>>) {
-            circles = CircleModels(result.data.content)
-            _isLastPage = result.data.isLastPage
-            _screenFlow.emit(HomeScreen.SuccessView(circles))
+            result.data.let {
+                circles = CircleModels(it.content)
+                _isLastPage = it.isLastPage
+                _screenFlow.emit(HomeScreen.SuccessView(circles))
+            }
         }
 
         private suspend fun whenFetchCirclesFail(result: Error<Page<CircleModel>>) {
@@ -116,17 +118,15 @@ class HomeViewModelImpl
 
         private suspend fun whenScrollOverSuccess(result: Success<Page<CircleModel>>) {
             result.data.let {
-                circles = circles.addAllAndGet(it.content)
                 _isLastPage = it.isLastPage
+                circles = circles.addAllAndGet(it.content)
+                _screenFlow.emit(
+                    HomeScreen.SuccessView(circles).apply {
+                        notifyCollected() // 스크롤 초기화 방지를 위해 collect 처리
+                    },
+                )
             }
             currentPage++
-
-            _screenFlow.emit(
-                HomeScreen.SuccessView(circles).apply {
-                    // 페이지 로딩의 경우 스크롤 상단 초기화가 collected 여부로 결정되기 때문에 초기화 방지를 위해 collect 처리
-                    notifyCollected()
-                },
-            )
         }
 
         private suspend fun whenScrollOverFail(result: Error<Page<CircleModel>>) {

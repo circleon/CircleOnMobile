@@ -62,7 +62,7 @@ class ManageCircleMemberViewModelImpl
 
             userRequestJob =
                 viewModelScope.launch {
-                    _event.emit(Event.Loading)
+                    _event.emit(Event.ShowProcessing)
 
                     when (val result = putCircleMemberRole(circle.id, member.id, role)) {
                         is Success ->
@@ -149,7 +149,7 @@ class ManageCircleMemberViewModelImpl
 
             userRequestJob =
                 viewModelScope.launch {
-                    _event.emit(Event.Loading)
+                    _event.emit(Event.ShowProcessing)
 
                     when (val result = deleteCircleMember(circle.id, member.id)) {
                         is Success ->
@@ -194,7 +194,7 @@ class ManageCircleMemberViewModelImpl
 
             userRequestJob =
                 viewModelScope.launch {
-                    _event.emit(Event.Loading)
+                    _event.emit(Event.ShowProcessing)
 
                     when (val result = putCircleMemberStatus(circle.id, member.id, membershipStatus)) {
                         is Success -> {

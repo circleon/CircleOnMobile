@@ -13,8 +13,8 @@ import com.developeek.circleon.databinding.ItemCirclePostBinding
 import com.developeek.circleon.databinding.ItemLoadingBinding
 import com.developeek.circleon.domain.enums.Role
 import com.developeek.circleon.domain.model.AuthorModel
+import com.developeek.circleon.domain.model.Models
 import com.developeek.circleon.domain.model.PostModel
-import com.developeek.circleon.domain.model.PostModels
 import com.developeek.circleon.domain.utils.glide.GlideProvider
 import com.developeek.circleon.view.listener.ItemClickListener
 import com.developeek.circleon.view.listener.ItemListenerInitializer
@@ -164,7 +164,7 @@ class CirclePostAdapter(
     }
 
     fun update(
-        models: PostModels,
+        models: Models<PostModel>,
         commitCallback: Runnable,
     ) {
         diffUtil.submitList(models.get(), commitCallback)

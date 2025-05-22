@@ -5,16 +5,15 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.core.view.isVisible
-import androidx.recyclerview.widget.AsyncListDiffer
-import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.developeek.circleon.R
 import com.developeek.circleon.databinding.ItemLoadingBinding
 import com.developeek.circleon.databinding.ItemPostCommentBinding
 import com.developeek.circleon.databinding.ItemPostContentBinding
 import com.developeek.circleon.domain.model.AuthorModel
+import com.developeek.circleon.domain.model.BaseModel
 import com.developeek.circleon.domain.model.CommentModel
-import com.developeek.circleon.domain.model.Identifiable
+import com.developeek.circleon.domain.model.Models
 import com.developeek.circleon.domain.model.PostModel
 import com.developeek.circleon.domain.utils.glide.GlideProvider
 import com.developeek.circleon.view.adapter.ItemViewType.*
@@ -28,27 +27,8 @@ class PostDetailAdapter(
     private val glideProvider: GlideProvider,
     private val postOverflowListenerInitializer: ItemListenerInitializer<PostModel>,
     private val commentOverflowListenerInitializer: ItemListenerInitializer<CommentModel>,
-    private val userId: Int?,
 ) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
-    private val diffUtil =
-        AsyncListDiffer(
-            this,
-            object : DiffUtil.ItemCallback<Identifiable>() {
-                override fun areItemsTheSame(
-                    oldItem: Identifiable,
-                    newItem: Identifiable,
-                ): Boolean {
-                    return oldItem.isSame(newItem)
-                }
-
-                override fun areContentsTheSame(
-                    oldItem: Identifiable,
-                    newItem: Identifiable,
-                ): Boolean {
-                    return oldItem.areContentsSame(newItem)
-                }
-            },
-        )
+    private val diffUtil = CustomAsyncListDiffer<BaseModel>(this)
 
     inner class PostContentAdapterItemViewHolder(
         private val binding: ItemPostContentBinding,
@@ -210,10 +190,16 @@ class PostDetailAdapter(
     }
 
     fun update(
-        models: List<Identifiable>,
+        models: Models<BaseModel>,
         commitCallback: Runnable,
     ) {
-        diffUtil.submitList(models, commitCallback)
+        diffUtil.submitList(models.get(), commitCallback)
+    }
+
+    fun addLoadingItem() {
+        if (diffUtil.currentList.last() == CommentModel.emptyInstance()) return
+
+        diffUtil.submitList(diffUtil.currentList + CommentModel.emptyInstance())
     }
 
     companion object {

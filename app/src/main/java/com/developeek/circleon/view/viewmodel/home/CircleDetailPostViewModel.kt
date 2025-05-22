@@ -12,6 +12,8 @@ interface CircleDetailPostViewModel {
     val currentScrollState: Parcelable?
     val isLastPage: Boolean
 
+    fun showLoadingAndRefresh()
+
     fun refresh()
 
     fun scrollOver()

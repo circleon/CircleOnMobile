@@ -48,10 +48,10 @@ class LoginViewModelImpl
         }
 
         private suspend fun checkEmailFormat(email: String): Boolean {
-            val validation = Validator.checkEmailAsId(email)
+            val result = Validator.checkEmailAsId(email)
 
-            return if (validation is Invalid) {
-                _event.emit(LoginEvent.ShowDialog(validation.message()))
+            return if (result is Invalid) {
+                _event.emit(LoginEvent.ShowDialog(result.message()))
                 false
             } else {
                 true

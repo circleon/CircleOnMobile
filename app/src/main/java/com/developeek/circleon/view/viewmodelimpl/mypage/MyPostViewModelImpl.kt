@@ -3,13 +3,13 @@ package com.developeek.circleon.view.viewmodelimpl.mypage
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.developeek.circleon.data.repository.CircleRepository
+import com.developeek.circleon.data.repository.Page
 import com.developeek.circleon.data.source.Error
 import com.developeek.circleon.data.source.Success
 import com.developeek.circleon.domain.model.MyPostModel
 import com.developeek.circleon.domain.model.MyPostModels
 import com.developeek.circleon.view.Event
 import com.developeek.circleon.view.viewmodel.mypage.MyPostViewModel
-import com.developeek.circleon.view.viewmodelimpl.Page
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject

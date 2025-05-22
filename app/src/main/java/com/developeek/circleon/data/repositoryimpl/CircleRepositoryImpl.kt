@@ -10,6 +10,7 @@ import com.developeek.circleon.data.dto.home.RequestResponseBodyCircleJoin
 import com.developeek.circleon.data.dto.home.RequestResponseBodyCircleLeave
 import com.developeek.circleon.data.exception.ServiceException
 import com.developeek.circleon.data.repository.CircleRepository
+import com.developeek.circleon.data.repository.Page
 import com.developeek.circleon.data.source.Result
 import com.developeek.circleon.data.source.remote.retrofit.service.CircleService
 import com.developeek.circleon.domain.enums.Category
@@ -20,11 +21,10 @@ import com.developeek.circleon.domain.enums.Role
 import com.developeek.circleon.domain.model.CircleDetailModel
 import com.developeek.circleon.domain.model.CircleModel
 import com.developeek.circleon.domain.model.CircleSummaryModels
-import com.developeek.circleon.domain.model.CommentModels
+import com.developeek.circleon.domain.model.CommentModel
 import com.developeek.circleon.domain.model.MemberModels
 import com.developeek.circleon.domain.model.MyPostModel
 import com.developeek.circleon.domain.model.PostModel
-import com.developeek.circleon.view.viewmodelimpl.Page
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
 import okhttp3.MediaType.Companion.toMediaType
@@ -217,20 +217,18 @@ class CircleRepositoryImpl(
         postId: Int,
         page: Int,
         size: Int,
-    ): Result<CommentModels> {
+    ): Result<Page<CommentModel>> {
         return try {
-            withContext(dispatcher) {
-                val response = service.getCirclePostComments(circleId, postId, page, size)
-                Result.success(
-                    CommentModels(response.content.map { it.toCommentModel() }).apply {
-                        if (response.isLastPage()) {
-                            setAsLast()
-                        }
-                    },
-                )
-            }
+            val response = service.getCirclePostComments(circleId, postId, page, size)
+            Result.success(
+                Page(response.content.map { it.toCommentModel() }).apply {
+                    if (response.isLastPage()) {
+                        setAsLast()
+                    }
+                },
+            )
         } catch (e: ServiceException.NoResultException) {
-            Result.success(CommentModels.emptyInstance())
+            Result.success(Page(emptyList()))
         } catch (e: Exception) {
             Result.error(e)
         }
@@ -393,19 +391,17 @@ class CircleRepositoryImpl(
         image: File?,
     ): Result<Unit> {
         return try {
-            withContext(dispatcher) {
-                val postTypeRequestBody = postType.code().toRequestBody(TEXT_CONTENT_TYPE.toMediaType())
-                val contentRequestBody = content.toRequestBody(TEXT_CONTENT_TYPE.toMediaType())
-                val postImageRequestBody =
-                    if (image == null) {
-                        null
-                    } else {
-                        val imageRequestBody = image.asRequestBody(IMAGE_CONTENT_TYPE.toMediaType())
-                        MultipartBody.Part.createFormData("image", image.name, imageRequestBody)
-                    }
-                service.postCirclePost(circleId, postTypeRequestBody, contentRequestBody, postImageRequestBody)
-                Result.success(Unit)
-            }
+            val postTypeRequestBody = postType.code().toRequestBody(TEXT_CONTENT_TYPE.toMediaType())
+            val contentRequestBody = content.toRequestBody(TEXT_CONTENT_TYPE.toMediaType())
+            val postImageRequestBody =
+                if (image == null) {
+                    null
+                } else {
+                    val imageRequestBody = image.asRequestBody(IMAGE_CONTENT_TYPE.toMediaType())
+                    MultipartBody.Part.createFormData("image", image.name, imageRequestBody)
+                }
+            service.postCirclePost(circleId, postTypeRequestBody, contentRequestBody, postImageRequestBody)
+            Result.success(Unit)
         } catch (e: Exception) {
             Result.error(e)
         }
@@ -417,10 +413,8 @@ class CircleRepositoryImpl(
         comment: String,
     ): Result<Unit> {
         return try {
-            withContext(dispatcher) {
-                service.postCirclePostComment(circleId, postId, RequestBodyEditComment(comment))
-                Result.success(Unit)
-            }
+            service.postCirclePostComment(circleId, postId, RequestBodyEditComment(comment))
+            Result.success(Unit)
         } catch (e: Exception) {
             Result.error(e)
         }
@@ -541,10 +535,8 @@ class CircleRepositoryImpl(
         content: String,
     ): Result<Unit> {
         return try {
-            withContext(dispatcher) {
-                service.putCirclePost(circleId, postId, RequestBodyEditPost(postType.code(), content))
-                Result.success(Unit)
-            }
+            service.putCirclePost(circleId, postId, RequestBodyEditPost(postType.code(), content))
+            Result.success(Unit)
         } catch (e: Exception) {
             Result.error(e)
         }
@@ -557,10 +549,8 @@ class CircleRepositoryImpl(
         content: String,
     ): Result<Unit> {
         return try {
-            withContext(dispatcher) {
-                service.putCirclePostComment(circleId, postId, commentId, RequestBodyEditComment(content))
-                Result.success(Unit)
-            }
+            service.putCirclePostComment(circleId, postId, commentId, RequestBodyEditComment(content))
+            Result.success(Unit)
         } catch (e: Exception) {
             Result.error(e)
         }
@@ -627,10 +617,8 @@ class CircleRepositoryImpl(
         commentId: Int,
     ): Result<Unit> {
         return try {
-            with(dispatcher) {
-                service.deleteCirclePostComment(circleId, postId, commentId)
-                Result.success(Unit)
-            }
+            service.deleteCirclePostComment(circleId, postId, commentId)
+            Result.success(Unit)
         } catch (e: Exception) {
             Result.error(e)
         }

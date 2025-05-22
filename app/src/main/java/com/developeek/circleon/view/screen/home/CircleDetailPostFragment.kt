@@ -25,8 +25,8 @@ import com.developeek.circleon.data.source.manager.UserManager
 import com.developeek.circleon.databinding.FragmentCircleDetailPostBinding
 import com.developeek.circleon.domain.enums.PostType
 import com.developeek.circleon.domain.model.CircleDetailModel
+import com.developeek.circleon.domain.model.Models
 import com.developeek.circleon.domain.model.PostModel
-import com.developeek.circleon.domain.model.PostModels
 import com.developeek.circleon.domain.utils.Const
 import com.developeek.circleon.domain.utils.Utils
 import com.developeek.circleon.domain.utils.glide.GlideProvider
@@ -296,7 +296,7 @@ class CircleDetailPostFragment : Fragment() {
 
     private fun setBtnRetryListener() {
         binding.btnRetry.setOnClickListener {
-            viewModel.refresh()
+            viewModel.showLoadingAndRefresh()
         }
     }
 
@@ -323,7 +323,7 @@ class CircleDetailPostFragment : Fragment() {
     ) {
         val loadingIndicator =
             requireParentFragment().requireView().findViewById<CircularProgressIndicator>(R.id.pgbLoading)
-        loadingIndicator.isVisible = event is Event.Loading
+        loadingIndicator.isVisible = event is Event.ShowProcessing
         when (event) {
             is Event.SendToLoginScreen -> sendUserToLoginScreen(parentActivity)
             is Event.ShowToast -> showToast(event, context)
@@ -382,7 +382,7 @@ class CircleDetailPostFragment : Fragment() {
     }
 
     private fun loadCirclePostsAndDoAfter(
-        posts: PostModels,
+        posts: Models<PostModel>,
         after: () -> Unit,
     ) {
         binding.rvCirclePost.adapter?.let {
@@ -398,6 +398,7 @@ class CircleDetailPostFragment : Fragment() {
     }
 
     private fun showErrorView() {
+        binding.shimmerPost.stopShimmer()
         switchView(binding.llServiceError)
     }
 

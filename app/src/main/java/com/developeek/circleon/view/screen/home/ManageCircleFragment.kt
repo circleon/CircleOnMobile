@@ -159,7 +159,7 @@ class ManageCircleFragment : Fragment() {
         parentActivity: Activity,
         context: Context,
     ) {
-        binding.pgbLoading.isVisible = event is Event.Loading
+        binding.pgbLoading.isVisible = event is Event.ShowProcessing
         when (event) {
             is Event.SendToLoginScreen -> sendUserToLoginScreen(parentActivity)
             is Event.ShowToast -> showToast(event, context)

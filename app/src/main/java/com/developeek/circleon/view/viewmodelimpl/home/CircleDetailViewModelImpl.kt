@@ -137,7 +137,7 @@ class CircleDetailViewModelImpl
             userRequestJob =
                 viewModelScope.launch {
                     if (!checkMessageFormat(joinMessage)) return@launch
-                    _event.emit(Event.Loading)
+                    _event.emit(Event.ShowProcessing)
 
                     when (val result = postMyCircle(circleId, joinMessage)) {
                         is Success -> showToastAndRefresh(MESSAGE_SUCCESS_REQUEST_JOIN)
@@ -161,7 +161,7 @@ class CircleDetailViewModelImpl
             userRequestJob =
                 viewModelScope.launch {
                     if (!checkMessageFormat(leaveMessage)) return@launch
-                    _event.emit(Event.Loading)
+                    _event.emit(Event.ShowProcessing)
 
                     when (val result = postCircleLeaveRequest(circleDetail.memberId, leaveMessage)) {
                         is Success -> showToastAndRefresh(MESSAGE_SUCCESS_REQUEST_LEAVE)
@@ -185,7 +185,7 @@ class CircleDetailViewModelImpl
             userRequestJob =
                 viewModelScope.launch {
                     if (!checkMessageFormat(reportMessage)) return@launch
-                    _event.emit(Event.Loading)
+                    _event.emit(Event.ShowProcessing)
 
                     when (val result = postReportCircle(circleId, reportMessage)) {
                         is Success -> showToastAndRefresh(MESSAGE_SUCCESS_REQUEST_REPORT)

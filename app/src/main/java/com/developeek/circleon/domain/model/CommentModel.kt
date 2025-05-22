@@ -4,24 +4,14 @@ import com.developeek.circleon.domain.utils.Const
 import java.io.Serializable
 import java.time.LocalDateTime
 
-data class CommentModels(private val models: List<CommentModel>) {
+data class CommentModels(val commentModels: List<CommentModel>) : Models<CommentModel>(commentModels) {
     private var isLastPage = false
 
-    fun get() = models
+    fun add(commentModel: CommentModel) = CommentModels(commentModels + commentModel)
 
-    fun get(index: Int) = models[index]
+    fun addAll(commentModels: CommentModels) = CommentModels(this.commentModels + commentModels.get())
 
-    fun last() = models.last()
-
-    fun size() = models.size
-
-    fun isEmpty() = models.isEmpty()
-
-    fun add(commentModel: CommentModel) = CommentModels(models + commentModel)
-
-    fun addAll(commentModels: CommentModels) = CommentModels(models + commentModels.get())
-
-    fun remove(commentId: Int) = CommentModels(models.filter { it.id != commentId })
+    fun remove(commentId: Int) = CommentModels(commentModels.filter { it.id != commentId })
 
     fun setAsLast() {
         isLastPage = true
@@ -35,16 +25,12 @@ data class CommentModels(private val models: List<CommentModel>) {
 }
 
 data class CommentModel(
-    override val id: Int,
+    val commentId: Int,
     val content: String,
     val createdAt: LocalDateTime,
     val updatedAt: LocalDateTime,
     val author: AuthorModel,
-) : Serializable, Identifiable {
-    override fun isSame(target: Identifiable) = this.id == target.id
-
-    override fun areContentsSame(target: Identifiable) = this == target
-
+) : BaseModel(commentId), Serializable {
     companion object {
         fun emptyInstance() =
             CommentModel(
