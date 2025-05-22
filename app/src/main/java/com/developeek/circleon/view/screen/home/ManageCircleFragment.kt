@@ -18,7 +18,8 @@ import com.developeek.circleon.R
 import com.developeek.circleon.databinding.FragmentManageCircleBinding
 import com.developeek.circleon.domain.enums.MembershipStatus
 import com.developeek.circleon.domain.model.CircleDetailModel
-import com.developeek.circleon.domain.model.MemberModels
+import com.developeek.circleon.domain.model.MemberModel
+import com.developeek.circleon.domain.model.Models
 import com.developeek.circleon.domain.utils.Const
 import com.developeek.circleon.view.Event
 import com.developeek.circleon.view.screen.login.LoginActivity
@@ -221,9 +222,9 @@ class ManageCircleFragment : Fragment() {
     }
 
     private fun loadMembers(
-        circleMembers: MemberModels,
-        joinRequestedMembers: MemberModels,
-        leaveRequestedMembers: MemberModels,
+        circleMembers: Models<MemberModel>,
+        joinRequestedMembers: Models<MemberModel>,
+        leaveRequestedMembers: Models<MemberModel>,
         context: Context,
     ) {
         loadCircleMembers(circleMembers, context)
@@ -232,7 +233,7 @@ class ManageCircleFragment : Fragment() {
     }
 
     private fun loadCircleMembers(
-        members: MemberModels,
+        members: Models<MemberModel>,
         context: Context,
     ) {
         binding.txtCircleMember.text =
@@ -243,7 +244,7 @@ class ManageCircleFragment : Fragment() {
     }
 
     private fun loadJoinRequestedMembers(
-        members: MemberModels,
+        members: Models<MemberModel>,
         context: Context,
     ) {
         binding.txtJoinRequestedMember.text =
@@ -254,7 +255,7 @@ class ManageCircleFragment : Fragment() {
     }
 
     private fun loadLeaveRequestedMembers(
-        members: MemberModels,
+        members: Models<MemberModel>,
         context: Context,
     ) {
         binding.txtLeaveRequestedMember.text =
@@ -265,9 +266,9 @@ class ManageCircleFragment : Fragment() {
     }
 
     private fun setMemberCardListener(
-        circleMembers: MemberModels,
-        joinRequestedMembers: MemberModels,
-        leaveRequestedMembers: MemberModels,
+        circleMembers: Models<MemberModel>,
+        joinRequestedMembers: Models<MemberModel>,
+        leaveRequestedMembers: Models<MemberModel>,
     ) {
         binding.clCircleMember.setOnClickListener {
             sendUserToMemberListScreen(circleMembers, MembershipStatus.JOINED)
@@ -281,7 +282,7 @@ class ManageCircleFragment : Fragment() {
     }
 
     private fun sendUserToMemberListScreen(
-        members: MemberModels,
+        members: Models<MemberModel>,
         membershipStatus: MembershipStatus,
     ) {
         val bundle = Bundle()

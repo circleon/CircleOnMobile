@@ -170,7 +170,7 @@ class UploadCircleViewModelImpl
         }
 
         private suspend fun editCircleImage(circle: CircleDetailModel): UiState {
-            val result = repository.putCircleImage(circle.id, profileImage, introductionImage)
+            val result = repository.putCircleImage(circle.circleId, profileImage, introductionImage)
 
             if (result is Success) {
                 return UiState.Success
@@ -181,7 +181,12 @@ class UploadCircleViewModelImpl
         }
 
         private suspend fun deleteCircleImage(circle: CircleDetailModel): UiState {
-            val result = repository.deleteCircleImage(circle.id, isProfileImageRemoved(), isIntroductionImageRemoved())
+            val result =
+                repository.deleteCircleImage(
+                    circle.circleId,
+                    isProfileImageRemoved(),
+                    isIntroductionImageRemoved(),
+                )
 
             if (result is Success) {
                 return UiState.Success

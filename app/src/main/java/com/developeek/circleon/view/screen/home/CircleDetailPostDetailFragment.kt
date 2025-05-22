@@ -216,7 +216,7 @@ class CircleDetailPostDetailFragment : Fragment() {
         user: UserModel,
         context: Context,
     ) {
-        if (user.id == post.author.id) {
+        if (user.id == post.author.authorId) {
             popupMenu.inflate(R.menu.menu_author_post_settings)
             Utils.changeMenuItemTextColor(
                 popupMenu.menu.findItem(R.id.delete_post),
@@ -257,10 +257,9 @@ class CircleDetailPostDetailFragment : Fragment() {
     ) {
         PositiveAlertDialog(
             context,
-            if (post.isNotice()) {
-                context.getString(R.string.message_delete_notice)
-            } else {
-                context.getString(R.string.message_delete_post)
+            when (post.type) {
+                PostType.POST -> context.getString(R.string.message_delete_post)
+                PostType.NOTICE -> context.getString(R.string.message_delete_notice)
             },
             context.getString(R.string.btn_delete),
             positiveListener = {
@@ -321,7 +320,7 @@ class CircleDetailPostDetailFragment : Fragment() {
         user: UserModel,
         context: Context,
     ) {
-        if (user.id == comment.author.id) {
+        if (user.id == comment.author.authorId) {
             popupMenu.inflate(R.menu.menu_author_comment_settings)
             Utils.changeMenuItemTextColor(
                 popupMenu.menu.findItem(R.id.delete_comment),

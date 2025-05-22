@@ -145,7 +145,6 @@ class CircleDetailNoticeFragment : Fragment() {
                             showPopupMenuByUser(context, item, view!!)
                         }
                     },
-                role = circleDetail.role,
             )
         binding.rvCircleNotice.layoutManager = LinearLayoutManager(context)
         if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.R) {
@@ -160,7 +159,7 @@ class CircleDetailNoticeFragment : Fragment() {
                     .navigate(
                         R.id.action_circleDetailFragment_to_circleDetailPostDetailFragment,
                         bundleOf(
-                            Pair(Const.TAG_CIRCLE_ID, circleDetail.id),
+                            Pair(Const.TAG_CIRCLE_ID, circleDetail.circleId),
                             Pair(Const.TAG_CIRCLE_POST, item),
                         ),
                     )
@@ -196,7 +195,7 @@ class CircleDetailNoticeFragment : Fragment() {
                     )
                 }
                 Role.EXECUTIVE, Role.PRESIDENT -> {
-                    if (user.id == item.author.id) {
+                    if (user.id == item.author.authorId) {
                         if (item.isPinned) {
                             popupMenu.inflate(R.menu.menu_pinned_author_notice_settings)
                         } else {
@@ -235,7 +234,7 @@ class CircleDetailNoticeFragment : Fragment() {
                 showRemovePinNoticeRequestDialog(context, notice)
             }
             R.id.edit_post -> {
-                sendUserToEditNoticeScreen(circleDetail.id, notice)
+                sendUserToEditNoticeScreen(circleDetail.circleId, notice)
             }
             R.id.delete_post -> {
                 showDeleteNoticeRequestDialog(context, notice)

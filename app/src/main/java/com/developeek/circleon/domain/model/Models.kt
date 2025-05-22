@@ -1,6 +1,8 @@
 package com.developeek.circleon.domain.model
 
-open class Models<T : BaseModel>(val models: List<T> = emptyList()) {
+import java.io.Serializable
+
+open class Models<T : BaseModel>(private val models: List<T> = emptyList()) : Serializable {
     fun get() = models
 
     fun get(index: Int) = models[index]
@@ -12,4 +14,6 @@ open class Models<T : BaseModel>(val models: List<T> = emptyList()) {
     fun isEmpty() = models.isEmpty()
 
     fun addAllAndGet(target: List<T>) = Models(models + target)
+
+    fun minusAndGet(target: T) = Models(models - target)
 }

@@ -6,7 +6,8 @@ import com.developeek.circleon.data.repository.CircleRepository
 import com.developeek.circleon.data.source.Error
 import com.developeek.circleon.data.source.Success
 import com.developeek.circleon.domain.model.CircleDetailModel
-import com.developeek.circleon.domain.model.MemberModels
+import com.developeek.circleon.domain.model.MemberModel
+import com.developeek.circleon.domain.model.Models
 import com.developeek.circleon.view.Event
 import com.developeek.circleon.view.viewmodel.home.ManageCircleViewModel
 import dagger.assisted.Assisted
@@ -71,15 +72,15 @@ class ManageCircleViewModelImpl
 
                     val fetchCircleMembers =
                         async {
-                            getCircleMembers(circle.id, page, size)
+                            getCircleMembers(circle.circleId, page, size)
                         }
                     val fetchJoinRequestedMembers =
                         async {
-                            getJoinRequestedMembersWithMessage(circle.id, page, size)
+                            getJoinRequestedMembersWithMessage(circle.circleId, page, size)
                         }
                     val fetchLeaveRequestedMembers =
                         async {
-                            getLeaveRequestedMembersWithMessage(circle.id, page, size)
+                            getLeaveRequestedMembersWithMessage(circle.circleId, page, size)
                         }
 
                     awaitAll(fetchCircleMembers, fetchJoinRequestedMembers, fetchLeaveRequestedMembers)
@@ -154,9 +155,9 @@ class ManageCircleViewModelImpl
         }
 
         private suspend fun whenFetchMembersSuccess(
-            circleMembers: Success<MemberModels>,
-            joinRequestedMembers: Success<MemberModels>,
-            leaveRequestedMembers: Success<MemberModels>,
+            circleMembers: Success<Models<MemberModel>>,
+            joinRequestedMembers: Success<Models<MemberModel>>,
+            leaveRequestedMembers: Success<Models<MemberModel>>,
         ) {
             _screenFlow.emit(
                 ManageCircleScreen.SuccessView(
@@ -167,7 +168,7 @@ class ManageCircleViewModelImpl
             )
         }
 
-        private suspend fun whenFetchMembersFail(result: Error<MemberModels>) {
+        private suspend fun whenFetchMembersFail(result: Error<Models<MemberModel>>) {
             _event.emit(Event.ShowToast(result.message()))
             _screenFlow.emit(ManageCircleScreen.NormalView)
 
@@ -185,7 +186,7 @@ class ManageCircleViewModelImpl
                 viewModelScope.launch {
                     _event.emit(Event.ShowProcessing)
 
-                    when (val result = putCircleOfficialStatus(circle.id)) {
+                    when (val result = putCircleOfficialStatus(circle.circleId)) {
                         is Success -> showToastAndRefresh(MESSAGE_SUCCESS_REQUEST_OFFICIAL_STATUS)
                         is Error -> whenUserRequestFail(result)
                     }
@@ -221,9 +222,9 @@ class ManageCircleViewModelImpl
 
 sealed class ManageCircleScreen {
     data class SuccessView(
-        val circleMembers: MemberModels,
-        val joinRequestedMembers: MemberModels,
-        val leaveRequestedMembers: MemberModels,
+        val circleMembers: Models<MemberModel>,
+        val joinRequestedMembers: Models<MemberModel>,
+        val leaveRequestedMembers: Models<MemberModel>,
     ) : ManageCircleScreen()
 
     data object LoadingView : ManageCircleScreen()

@@ -5,13 +5,10 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.core.view.isVisible
-import androidx.recyclerview.widget.AsyncListDiffer
-import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.developeek.circleon.R
 import com.developeek.circleon.databinding.ItemCirclePostBinding
 import com.developeek.circleon.databinding.ItemLoadingBinding
-import com.developeek.circleon.domain.enums.Role
 import com.developeek.circleon.domain.model.AuthorModel
 import com.developeek.circleon.domain.model.Models
 import com.developeek.circleon.domain.model.PostModel
@@ -26,27 +23,8 @@ class CirclePostAdapter(
     private val glideProvider: GlideProvider,
     private val itemListenerInitializer: ItemListenerInitializer<PostModel>,
     private val overflowListenerInitializer: ItemListenerInitializer<PostModel>,
-    private val role: Role = Role.NONE_MEMBER,
 ) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
-    private val diffUtil =
-        AsyncListDiffer(
-            this,
-            object : DiffUtil.ItemCallback<PostModel>() {
-                override fun areItemsTheSame(
-                    oldItem: PostModel,
-                    newItem: PostModel,
-                ): Boolean {
-                    return oldItem.isSame(newItem)
-                }
-
-                override fun areContentsTheSame(
-                    oldItem: PostModel,
-                    newItem: PostModel,
-                ): Boolean {
-                    return oldItem.areContentsSame(newItem)
-                }
-            },
-        )
+    private val diffUtil = CustomAsyncListDiffer<PostModel>(this)
 
     /**
      * CirclePostAdapterItemViewHolder

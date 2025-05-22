@@ -16,9 +16,11 @@ data class PostModel(
     val commentCount: Int,
     val author: AuthorModel,
 ) : BaseModel(postId), Serializable {
-    fun isNotice() = this.type == PostType.NOTICE
+    override fun areContentsSame(target: BaseModel): Boolean {
+        if (target !is PostModel) return false
 
-    fun isPost() = !isNotice()
+        return this == target
+    }
 
     companion object {
         fun emptyInstance() =

@@ -6,8 +6,8 @@ import com.developeek.circleon.data.repository.CircleRepository
 import com.developeek.circleon.data.repository.Page
 import com.developeek.circleon.data.source.Error
 import com.developeek.circleon.data.source.Success
+import com.developeek.circleon.domain.model.Models
 import com.developeek.circleon.domain.model.MyPostModel
-import com.developeek.circleon.domain.model.MyPostModels
 import com.developeek.circleon.view.Event
 import com.developeek.circleon.view.viewmodel.mypage.MyPostViewModel
 import dagger.assisted.Assisted
@@ -48,7 +48,7 @@ class MyPostViewModelImpl
         private var _isLastPage = false
         private var currentPage = DEFAULT_PAGE
 
-        private lateinit var posts: MyPostModels
+        private lateinit var posts: Models<MyPostModel>
 
         private var fetchMyPostsJob: Job? = null
         private var scrollOverMyPostsJob: Job? = null
@@ -98,7 +98,7 @@ class MyPostViewModelImpl
 
         private suspend fun whenFetchMyPostsSuccess(result: Success<Page<MyPostModel>>) {
             result.data.let {
-                posts = MyPostModels(it.content)
+                posts = Models(it.content)
                 _isLastPage = it.isLastPage
             }
             _screenFlow.emit(MyPostScreen.SuccessView(posts))
@@ -163,7 +163,7 @@ class MyPostViewModelImpl
     }
 
 sealed class MyPostScreen {
-    data class SuccessView(val posts: MyPostModels) : MyPostScreen()
+    data class SuccessView(val posts: Models<MyPostModel>) : MyPostScreen()
 
     data object LoadingView : MyPostScreen()
 

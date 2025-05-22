@@ -107,7 +107,7 @@ class SearchCircleFragment : Fragment() {
             .navigate(
                 R.id.action_searchCircleFragment_to_circleDetailFragment,
                 bundleOf(
-                    Pair(Const.TAG_CIRCLE_ID, item.id),
+                    Pair(Const.TAG_CIRCLE_ID, item.circleId),
                     Pair(Const.TAG_CIRCLE_NAME, item.name),
                 ),
                 navOption,
@@ -159,7 +159,6 @@ class SearchCircleFragment : Fragment() {
                     SingleMessageToast(context, viewModel.error).show()
                 }
             }
-            else -> {}
         }
     }
 

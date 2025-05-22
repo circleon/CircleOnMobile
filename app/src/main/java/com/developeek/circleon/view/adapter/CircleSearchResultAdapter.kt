@@ -3,8 +3,6 @@ package com.developeek.circleon.view.adapter
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.recyclerview.widget.AsyncListDiffer
-import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.developeek.circleon.databinding.ItemCircleSearchResultBinding
 import com.developeek.circleon.domain.model.CircleSummaryModel
@@ -13,26 +11,8 @@ import com.developeek.circleon.view.listener.ItemClickListener
 import com.developeek.circleon.view.listener.ItemListenerInitializer
 
 class CircleSearchResultAdapter(private val itemListenerInitializer: ItemListenerInitializer<CircleSummaryModel>) :
-    RecyclerView.Adapter<CircleSearchResultAdapter.CircleSearchResultAdapterViewHolder>() {
-    private val diffUtil =
-        AsyncListDiffer(
-            this,
-            object : DiffUtil.ItemCallback<CircleSummaryModel>() {
-                override fun areItemsTheSame(
-                    oldItem: CircleSummaryModel,
-                    newItem: CircleSummaryModel,
-                ): Boolean {
-                    return oldItem.isSame(newItem)
-                }
-
-                override fun areContentsTheSame(
-                    oldItem: CircleSummaryModel,
-                    newItem: CircleSummaryModel,
-                ): Boolean {
-                    return oldItem.areContentsSame(newItem)
-                }
-            },
-        )
+    RecyclerView.Adapter<RecyclerView.ViewHolder>() {
+    private val diffUtil = CustomAsyncListDiffer<CircleSummaryModel>(this)
 
     inner class CircleSearchResultAdapterViewHolder(
         private val binding: ItemCircleSearchResultBinding,
@@ -45,7 +25,7 @@ class CircleSearchResultAdapter(private val itemListenerInitializer: ItemListene
 
         private fun loadCircleSummary(position: Int) {
             binding.txtCircleName.text = diffUtil.currentList[position].name
-            binding.txtCircleCategory.text = diffUtil.currentList[position].category.categoryName()
+            binding.txtCircleCategory.text = diffUtil.currentList[position].category.categoryName
         }
 
         private fun notifyListenerItemChanged(position: Int) {
@@ -79,10 +59,12 @@ class CircleSearchResultAdapter(private val itemListenerInitializer: ItemListene
     override fun getItemCount() = diffUtil.currentList.size
 
     override fun onBindViewHolder(
-        holder: CircleSearchResultAdapterViewHolder,
+        holder: RecyclerView.ViewHolder,
         position: Int,
     ) {
-        holder.bind(position)
+        if (holder is CircleSearchResultAdapterViewHolder) {
+            holder.bind(position)
+        }
     }
 
     fun update(

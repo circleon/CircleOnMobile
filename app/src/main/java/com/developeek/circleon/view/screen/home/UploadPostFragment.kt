@@ -113,7 +113,7 @@ class UploadPostFragment : Fragment() {
                 }
                 launch {
                     viewModel.screenFlow.collect {
-                        handleScreenFlow(it, requireContext())
+                        handleScreenFlow(it)
                     }
                 }
             }
@@ -252,10 +252,7 @@ class UploadPostFragment : Fragment() {
         SingleMessageAlertDialog(context, event.message).show()
     }
 
-    private fun handleScreenFlow(
-        screenFlow: UploadPostScreen,
-        context: Context,
-    ) {
+    private fun handleScreenFlow(screenFlow: UploadPostScreen) {
         binding.pgbLoading.isVisible = screenFlow is UploadPostScreen.LoadingView
         when (screenFlow) {
             is UploadPostScreen.SuccessView -> {

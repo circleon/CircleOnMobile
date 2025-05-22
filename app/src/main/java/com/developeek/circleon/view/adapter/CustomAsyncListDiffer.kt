@@ -3,9 +3,9 @@ package com.developeek.circleon.view.adapter
 import androidx.recyclerview.widget.AsyncListDiffer
 import androidx.recyclerview.widget.DiffUtil.ItemCallback
 import androidx.recyclerview.widget.RecyclerView
-import com.developeek.circleon.domain.model.Identifiable
+import com.developeek.circleon.domain.model.BaseModel
 
-class CustomAsyncListDiffer<T : Identifiable>(
+class CustomAsyncListDiffer<T : BaseModel>(
     private val adapter: RecyclerView.Adapter<RecyclerView.ViewHolder>,
 ) : AsyncListDiffer<T>(
         adapter,

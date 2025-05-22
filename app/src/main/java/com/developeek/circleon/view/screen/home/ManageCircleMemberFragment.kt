@@ -25,7 +25,7 @@ import com.developeek.circleon.domain.enums.MembershipStatus
 import com.developeek.circleon.domain.enums.Role
 import com.developeek.circleon.domain.model.CircleDetailModel
 import com.developeek.circleon.domain.model.MemberModel
-import com.developeek.circleon.domain.model.MemberModels
+import com.developeek.circleon.domain.model.Models
 import com.developeek.circleon.domain.utils.Const
 import com.developeek.circleon.domain.utils.Utils
 import com.developeek.circleon.domain.utils.glide.GlideProvider
@@ -53,7 +53,7 @@ import javax.inject.Inject
 class ManageCircleMemberFragment : Fragment() {
     private lateinit var binding: FragmentManageCircleMemberBinding
     private lateinit var circle: CircleDetailModel
-    private lateinit var members: MemberModels
+    private lateinit var members: Models<MemberModel>
     private lateinit var membershipStatus: MembershipStatus
     private val viewModel: ManageCircleMemberViewModel by viewModels<ManageCircleMemberViewModelImpl>(
         extrasProducer = {
@@ -72,7 +72,7 @@ class ManageCircleMemberFragment : Fragment() {
 
         arguments?.let {
             circle = it.getSerializable(Const.TAG_CIRCLE_DETAIL) as CircleDetailModel
-            members = it.getSerializable(Const.TAG_MEMBERS) as MemberModels
+            members = it.getSerializable(Const.TAG_MEMBERS) as Models<MemberModel>
             membershipStatus = it.getSerializable(Const.TAG_MEMBERSHIP_STATUS) as MembershipStatus
         }
     }
@@ -446,7 +446,7 @@ class ManageCircleMemberFragment : Fragment() {
     }
 
     private fun load(
-        members: MemberModels,
+        members: Models<MemberModel>,
         context: Context,
     ) {
         if (members.isEmpty()) {
@@ -476,7 +476,7 @@ class ManageCircleMemberFragment : Fragment() {
         }
     }
 
-    private fun loadMembers(members: MemberModels) {
+    private fun loadMembers(members: Models<MemberModel>) {
         switchView(binding.rvMember)
 
         binding.rvMember.adapter?.let {

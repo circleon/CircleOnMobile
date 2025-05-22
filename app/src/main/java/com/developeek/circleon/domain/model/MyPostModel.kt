@@ -3,26 +3,16 @@ package com.developeek.circleon.domain.model
 import com.developeek.circleon.domain.utils.Const
 import java.io.Serializable
 
-data class MyPostModels(private val models: List<MyPostModel>) {
-    fun get() = models
-
-    fun get(index: Int) = models[index]
-
-    fun size() = models.size
-
-    fun isEmpty() = models.isEmpty()
-
-    fun addAllAndGet(myPostModels: List<MyPostModel>) = MyPostModels(models + myPostModels)
-}
-
 data class MyPostModel(
     val circleId: Int,
     val circleName: String,
     val post: PostModel,
-) : Serializable {
-    fun isSame(target: MyPostModel) = post.id == target.post.id
+) : BaseModel(post.postId), Serializable {
+    override fun areContentsSame(target: BaseModel): Boolean {
+        if (target !is MyPostModel) return false
 
-    fun areContentsSame(target: MyPostModel) = this == target
+        return this == target
+    }
 
     companion object {
         fun emptyInstance() =

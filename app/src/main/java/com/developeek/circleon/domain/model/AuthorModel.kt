@@ -1,16 +1,17 @@
 package com.developeek.circleon.domain.model
 
 import com.developeek.circleon.domain.utils.Const
-import java.io.Serializable
 
 data class AuthorModel(
-    val id: Int,
+    val authorId: Int,
     val name: String,
     val profileImgUrl: String?,
-) : Serializable {
-    fun isSame(authorModel: AuthorModel) = this.id == authorModel.id
+) : BaseModel(authorId) {
+    override fun areContentsSame(target: BaseModel): Boolean {
+        if (target !is AuthorModel) return false
 
-    fun areContentsSame(authorModel: AuthorModel) = this == authorModel
+        return this == target
+    }
 
     companion object {
         fun emptyInstance() =

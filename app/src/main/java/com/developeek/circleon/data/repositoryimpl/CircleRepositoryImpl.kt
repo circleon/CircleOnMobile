@@ -22,7 +22,8 @@ import com.developeek.circleon.domain.model.CircleDetailModel
 import com.developeek.circleon.domain.model.CircleModel
 import com.developeek.circleon.domain.model.CircleSummaryModels
 import com.developeek.circleon.domain.model.CommentModel
-import com.developeek.circleon.domain.model.MemberModels
+import com.developeek.circleon.domain.model.MemberModel
+import com.developeek.circleon.domain.model.Models
 import com.developeek.circleon.domain.model.MyPostModel
 import com.developeek.circleon.domain.model.PostModel
 import kotlinx.coroutines.CoroutineDispatcher
@@ -48,7 +49,7 @@ class CircleRepositoryImpl(
                 if (category.isSame(Category.ALL)) {
                     service.getAllCircles(page, size, SORT_OLDEST)
                 } else {
-                    service.getCircleScrollContents(page, size, SORT_OLDEST, category.codeName())
+                    service.getCircleScrollContents(page, size, SORT_OLDEST, category.codeName)
                 }
             Result.success(
                 Page(response.content.map { it.toCircleModel() }).apply {
@@ -90,7 +91,7 @@ class CircleRepositoryImpl(
         circleId: Int,
         page: Int,
         size: Int,
-    ): Result<MemberModels> {
+    ): Result<Models<MemberModel>> {
         return try {
             val response =
                 service.getMembers(
@@ -100,7 +101,7 @@ class CircleRepositoryImpl(
                     SORT_MEMBER_BY_NAME,
                     MembershipStatus.JOINED.codeName(),
                 )
-            Result.success(MemberModels(response.content.map { it.toMemberModel() }))
+            Result.success(Models(response.content.map { it.toMemberModel() }))
         } catch (e: Exception) {
             Result.error(e)
         }
@@ -110,7 +111,7 @@ class CircleRepositoryImpl(
         circleId: Int,
         page: Int,
         size: Int,
-    ): Result<MemberModels> {
+    ): Result<Models<MemberModel>> {
         return try {
             val response =
                 service.getMembers(
@@ -120,7 +121,7 @@ class CircleRepositoryImpl(
                     SORT_MEMBER_BY_NAME,
                     MembershipStatus.JOIN_REQUESTED.codeName(),
                 )
-            Result.success(MemberModels(response.content.map { it.toMemberModel() }))
+            Result.success(Models(response.content.map { it.toMemberModel() }))
         } catch (e: Exception) {
             Result.error(e)
         }
@@ -130,7 +131,7 @@ class CircleRepositoryImpl(
         circleId: Int,
         page: Int,
         size: Int,
-    ): Result<MemberModels> {
+    ): Result<Models<MemberModel>> {
         return try {
             val response =
                 service.getMembers(
@@ -140,7 +141,7 @@ class CircleRepositoryImpl(
                     SORT_MEMBER_BY_NAME,
                     MembershipStatus.LEAVE_REQUESTED.codeName(),
                 )
-            Result.success(MemberModels(response.content.map { it.toMemberModel() }))
+            Result.success(Models(response.content.map { it.toMemberModel() }))
         } catch (e: Exception) {
             Result.error(e)
         }
@@ -326,7 +327,7 @@ class CircleRepositoryImpl(
                     circleDetailModel.singleLineIntroduction.toRequestBody(
                         textMediaType,
                     )
-                val categoryRequestBody = circleDetailModel.category.codeName().toRequestBody(textMediaType)
+                val categoryRequestBody = circleDetailModel.category.codeName.toRequestBody(textMediaType)
                 val introductionRequestBody = circleDetailModel.introduction?.toRequestBody(textMediaType)
                 val recruitmentStartDate =
                     circleDetailModel.recruitmentStartDate?.toString()?.toRequestBody(textMediaType)
@@ -451,10 +452,8 @@ class CircleRepositoryImpl(
         content: String,
     ): Result<Unit> {
         return try {
-            withContext(dispatcher) {
-                service.postReportCirclePostComment(circleId, commentId, RequestBodyReport(content))
-                Result.success(Unit)
-            }
+            service.postReportCirclePostComment(circleId, commentId, RequestBodyReport(content))
+            Result.success(Unit)
         } catch (e: Exception) {
             Result.error(e)
         }
@@ -476,7 +475,7 @@ class CircleRepositoryImpl(
     override suspend fun putCircle(circleDetailModel: CircleDetailModel): Result<Unit> {
         return try {
             withContext(dispatcher) {
-                service.putCircle(circleDetailModel.id, circleDetailModel.toRequestBodyForEdit())
+                service.putCircle(circleDetailModel.circleId, circleDetailModel.toRequestBodyForEdit())
                 Result.success(Unit)
             }
         } catch (e: Exception) {
@@ -562,10 +561,8 @@ class CircleRepositoryImpl(
         role: Role,
     ): Result<Unit> {
         return try {
-            withContext(dispatcher) {
-                service.putCircleMemberRole(circleId, memberId, RequestBodyEditMemberRole(role.codeName()))
-                Result.success(Unit)
-            }
+            service.putCircleMemberRole(circleId, memberId, RequestBodyEditMemberRole(role.codeName()))
+            Result.success(Unit)
         } catch (e: Exception) {
             Result.error(e)
         }

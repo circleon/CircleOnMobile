@@ -9,7 +9,7 @@ import com.developeek.circleon.data.source.Success
 import com.developeek.circleon.domain.enums.Category
 import com.developeek.circleon.domain.model.CategoryModels
 import com.developeek.circleon.domain.model.CircleModel
-import com.developeek.circleon.domain.model.CircleModels
+import com.developeek.circleon.domain.model.Models
 import com.developeek.circleon.view.Event
 import com.developeek.circleon.view.viewmodel.home.HomeViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -35,8 +35,8 @@ class HomeViewModelImpl
 
         override val categories: CategoryModels
             get() = _categories
-        private var _categories = CategoryModels.empty()
-        private lateinit var circles: CircleModels
+        private var _categories = CategoryModels(emptyList())
+        private lateinit var circles: Models<CircleModel>
 
         override val isLastPage: Boolean
             get() = _isLastPage
@@ -84,7 +84,7 @@ class HomeViewModelImpl
 
         private suspend fun whenFetchCirclesSuccess(result: Success<Page<CircleModel>>) {
             result.data.let {
-                circles = CircleModels(it.content)
+                circles = Models(it.content)
                 _isLastPage = it.isLastPage
                 _screenFlow.emit(HomeScreen.SuccessView(circles))
             }
@@ -152,7 +152,7 @@ sealed class HomeScreen {
         _hasCollected = true
     }
 
-    data class SuccessView(val circles: CircleModels) : HomeScreen()
+    data class SuccessView(val circles: Models<CircleModel>) : HomeScreen()
 
     data object LoadingView : HomeScreen()
 

@@ -130,7 +130,7 @@ class MyCircleFragment : Fragment() {
                 itemListenerInitializer =
                     object : ItemListenerInitializer<CircleSummaryModel> {
                         override fun initialize(item: CircleSummaryModel) {
-                            sendUserToCircleDetailScreen(parentActivity, item.id, item.name)
+                            sendUserToCircleDetailScreen(parentActivity, item.circleId, item.name)
                         }
 
                         override fun initialize(

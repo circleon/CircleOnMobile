@@ -29,13 +29,15 @@ data class CircleSummaryModels(private val models: List<CircleSummaryModel>) : S
 }
 
 data class CircleSummaryModel(
-    val id: Int,
+    val circleId: Int,
     val name: String,
     val category: Category,
     val thumbnailUrl: String?,
     val memberId: Int,
-) : Serializable {
-    fun isSame(circleSummaryModel: CircleSummaryModel) = this.id == circleSummaryModel.id
+) : BaseModel(circleId), Serializable {
+    override fun areContentsSame(target: BaseModel): Boolean {
+        if (target !is CircleSummaryModel) return false
 
-    fun areContentsSame(circleSummaryModel: CircleSummaryModel) = this == circleSummaryModel
+        return this == target
+    }
 }

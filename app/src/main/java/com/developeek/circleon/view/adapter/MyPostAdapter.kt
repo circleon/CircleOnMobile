@@ -3,13 +3,11 @@ package com.developeek.circleon.view.adapter
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.recyclerview.widget.AsyncListDiffer
-import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.developeek.circleon.databinding.ItemCardMyPostBinding
 import com.developeek.circleon.databinding.ItemLoadingBinding
+import com.developeek.circleon.domain.model.Models
 import com.developeek.circleon.domain.model.MyPostModel
-import com.developeek.circleon.domain.model.MyPostModels
 import com.developeek.circleon.view.listener.ItemClickListener
 import com.developeek.circleon.view.listener.ItemListenerInitializer
 import java.time.format.DateTimeFormatter
@@ -18,25 +16,7 @@ import java.util.Locale
 class MyPostAdapter(
     private val itemListenerInitializer: ItemListenerInitializer<MyPostModel>,
 ) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
-    private val diffUtil =
-        AsyncListDiffer(
-            this,
-            object : DiffUtil.ItemCallback<MyPostModel>() {
-                override fun areItemsTheSame(
-                    oldItem: MyPostModel,
-                    newItem: MyPostModel,
-                ): Boolean {
-                    return oldItem.isSame(newItem)
-                }
-
-                override fun areContentsTheSame(
-                    oldItem: MyPostModel,
-                    newItem: MyPostModel,
-                ): Boolean {
-                    return oldItem.areContentsSame(newItem)
-                }
-            },
-        )
+    private val diffUtil = CustomAsyncListDiffer<MyPostModel>(this)
 
     inner class MyPostAdapterItemViewHolder(
         private val binding: ItemCardMyPostBinding,
@@ -115,7 +95,7 @@ class MyPostAdapter(
     }
 
     fun update(
-        models: MyPostModels,
+        models: Models<MyPostModel>,
         commitCallback: Runnable,
     ) {
         diffUtil.submitList(models.get(), commitCallback)

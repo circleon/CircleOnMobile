@@ -89,7 +89,7 @@ class CircleDetailNoticeViewModelImpl
                 viewModelScope.launch {
                     scrollOverNoticeJob?.cancel()
 
-                    when (val result = getCircleNotices(circleDetail.id, page, size)) {
+                    when (val result = getCircleNotices(circleDetail.circleId, page, size)) {
                         is Success -> whenFetchNoticesSuccess(result)
                         is Error -> whenFetchNoticesFail(result)
                     }
@@ -128,7 +128,7 @@ class CircleDetailNoticeViewModelImpl
 
             scrollOverNoticeJob =
                 viewModelScope.launch {
-                    val result = getCircleNotices(circleDetail.id, currentPage + 1, SIZE_BY_PAGE)
+                    val result = getCircleNotices(circleDetail.circleId, currentPage + 1, SIZE_BY_PAGE)
 
                     if (!isActive) return@launch // 스크롤 작업 캔슬 시 내용을 업데이트하지 않고 작업 종료
                     when (result) {
@@ -175,7 +175,7 @@ class CircleDetailNoticeViewModelImpl
                 viewModelScope.launch {
                     _event.emit(Event.ShowProcessing)
 
-                    when (val result = putPostPin(circleDetail.id, postId, isPinned)) {
+                    when (val result = putPostPin(circleDetail.circleId, postId, isPinned)) {
                         is Success ->
                             showToastAndRefresh(
                                 if (isPinned) MESSAGE_SUCCESS_REQUEST_PIN else MESSAGE_SUCCESS_REQUEST_REMOVE_PIN,
@@ -204,7 +204,7 @@ class CircleDetailNoticeViewModelImpl
 
                     userRequestJob =
                         launch {
-                            when (val result = deleteCirclePost(circleDetail.id, postId)) {
+                            when (val result = deleteCirclePost(circleDetail.circleId, postId)) {
                                 is Success -> showToastAndRefresh(MESSAGE_SUCCESS_REQUEST_REMOVE_NOTICE)
                                 is Error -> whenUserRequestFail(result)
                             }
@@ -232,7 +232,7 @@ class CircleDetailNoticeViewModelImpl
                     if (!checkMessageFormat(reportMessage)) return@launch
                     _event.emit(Event.ShowProcessing)
 
-                    when (val result = postReportCircleNotice(circleDetail.id, postId, reportMessage)) {
+                    when (val result = postReportCircleNotice(circleDetail.circleId, postId, reportMessage)) {
                         is Success -> _event.emit(Event.ShowToast(MESSAGE_SUCCESS_REQUEST_REPORT))
                         is Error -> whenUserRequestFail(result)
                     }

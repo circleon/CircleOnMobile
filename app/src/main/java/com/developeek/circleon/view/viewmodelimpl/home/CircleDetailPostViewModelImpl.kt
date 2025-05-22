@@ -89,7 +89,7 @@ class CircleDetailPostViewModelImpl
                 viewModelScope.launch {
                     scrollOverPostJob?.cancel()
 
-                    when (val result = getCirclePosts(circleDetail.id, page, size)) {
+                    when (val result = getCirclePosts(circleDetail.circleId, page, size)) {
                         is Success -> whenFetchPostsSuccess(result)
                         is Error -> whenFetchPostsFail(result)
                     }
@@ -128,7 +128,7 @@ class CircleDetailPostViewModelImpl
 
             scrollOverPostJob =
                 viewModelScope.launch {
-                    val result = getCirclePosts(circleDetail.id, currentPage + 1, SIZE_BY_PAGE)
+                    val result = getCirclePosts(circleDetail.circleId, currentPage + 1, SIZE_BY_PAGE)
 
                     if (!isActive) return@launch
                     when (result) {
@@ -164,7 +164,7 @@ class CircleDetailPostViewModelImpl
                 viewModelScope.launch {
                     _event.emit(Event.ShowProcessing)
 
-                    when (val result = deleteCirclePost(circleDetail.id, postId)) {
+                    when (val result = deleteCirclePost(circleDetail.circleId, postId)) {
                         is Success -> showToastAndRefresh(MESSAGE_SUCCESS_REQUEST_REMOVE_POST)
                         is Error -> whenUserRequestFail(result)
                     }
@@ -191,7 +191,7 @@ class CircleDetailPostViewModelImpl
                     if (!checkMessageFormat(reportMessage)) return@launch
                     _event.emit(Event.ShowProcessing)
 
-                    when (val result = postReportCirclePost(circleDetail.id, postId, reportMessage)) {
+                    when (val result = postReportCirclePost(circleDetail.circleId, postId, reportMessage)) {
                         is Success -> showToast(MESSAGE_SUCCESS_REQUEST_REPORT)
                         is Error -> whenUserRequestFail(result)
                     }

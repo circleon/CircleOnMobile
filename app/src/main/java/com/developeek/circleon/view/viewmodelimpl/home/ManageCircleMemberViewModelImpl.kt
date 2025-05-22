@@ -9,7 +9,7 @@ import com.developeek.circleon.domain.enums.MembershipStatus
 import com.developeek.circleon.domain.enums.Role
 import com.developeek.circleon.domain.model.CircleDetailModel
 import com.developeek.circleon.domain.model.MemberModel
-import com.developeek.circleon.domain.model.MemberModels
+import com.developeek.circleon.domain.model.Models
 import com.developeek.circleon.view.Event
 import com.developeek.circleon.view.viewmodel.home.ManageCircleMemberViewModel
 import dagger.assisted.Assisted
@@ -64,7 +64,7 @@ class ManageCircleMemberViewModelImpl
                 viewModelScope.launch {
                     _event.emit(Event.ShowProcessing)
 
-                    when (val result = putCircleMemberRole(circle.id, member.id, role)) {
+                    when (val result = putCircleMemberRole(circle.circleId, member.memberId, role)) {
                         is Success ->
                             showToastAndDoAfter(
                                 MESSAGE_SUCCESS_EDIT_MEMBER_ROLE,
@@ -115,7 +115,7 @@ class ManageCircleMemberViewModelImpl
                 viewModelScope.launch {
                     _screenFlow.emit(ManageCircleMemberScreen.LoadingView)
 
-                    when (val result = getCircleMembers(circle.id, page, size)) {
+                    when (val result = getCircleMembers(circle.circleId, page, size)) {
                         is Success -> whenFetchMembersSuccess(result)
                         is Error -> whenFetchMembersFail(result)
                     }
@@ -130,11 +130,11 @@ class ManageCircleMemberViewModelImpl
             repository.getCircleMembers(circleId, page, size)
         }
 
-        private suspend fun whenFetchMembersSuccess(result: Success<MemberModels>) {
+        private suspend fun whenFetchMembersSuccess(result: Success<Models<MemberModel>>) {
             _screenFlow.emit(ManageCircleMemberScreen.SuccessView(result.data))
         }
 
-        private suspend fun whenFetchMembersFail(result: Error<MemberModels>) {
+        private suspend fun whenFetchMembersFail(result: Error<Models<MemberModel>>) {
             _event.emit(Event.ShowToast(result.message()))
 
             if (result.isAuthenticationError()) {
@@ -151,7 +151,7 @@ class ManageCircleMemberViewModelImpl
                 viewModelScope.launch {
                     _event.emit(Event.ShowProcessing)
 
-                    when (val result = deleteCircleMember(circle.id, member.id)) {
+                    when (val result = deleteCircleMember(circle.circleId, member.memberId)) {
                         is Success ->
                             showToastAndDoAfter(
                                 MESSAGE_SUCCESS_BAN_MEMBER,
@@ -196,7 +196,7 @@ class ManageCircleMemberViewModelImpl
                 viewModelScope.launch {
                     _event.emit(Event.ShowProcessing)
 
-                    when (val result = putCircleMemberStatus(circle.id, member.id, membershipStatus)) {
+                    when (val result = putCircleMemberStatus(circle.circleId, member.memberId, membershipStatus)) {
                         is Success -> {
                             var after = {}
                             if (member.status.isJoinRequested()) {
@@ -239,7 +239,7 @@ class ManageCircleMemberViewModelImpl
                 viewModelScope.launch {
                     _screenFlow.emit(ManageCircleMemberScreen.LoadingView)
 
-                    when (val result = getJoinRequestedMembersWithMessage(circle.id, page, size)) {
+                    when (val result = getJoinRequestedMembersWithMessage(circle.circleId, page, size)) {
                         is Success -> whenFetchMembersSuccess(result)
                         is Error -> whenFetchMembersFail(result)
                     }
@@ -282,7 +282,7 @@ class ManageCircleMemberViewModelImpl
                 viewModelScope.launch {
                     _screenFlow.emit(ManageCircleMemberScreen.LoadingView)
 
-                    when (val result = getLeaveRequestedMembersWithMessage(circle.id, page, size)) {
+                    when (val result = getLeaveRequestedMembersWithMessage(circle.circleId, page, size)) {
                         is Success -> whenFetchMembersSuccess(result)
                         is Error -> whenFetchMembersFail(result)
                     }
@@ -325,7 +325,7 @@ class ManageCircleMemberViewModelImpl
     }
 
 sealed class ManageCircleMemberScreen {
-    data class SuccessView(val members: MemberModels) : ManageCircleMemberScreen()
+    data class SuccessView(val members: Models<MemberModel>) : ManageCircleMemberScreen()
 
     data object LoadingView : ManageCircleMemberScreen()
 

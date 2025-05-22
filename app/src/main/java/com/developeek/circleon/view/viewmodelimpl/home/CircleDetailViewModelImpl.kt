@@ -7,7 +7,8 @@ import com.developeek.circleon.data.source.Error
 import com.developeek.circleon.data.source.Result
 import com.developeek.circleon.data.source.Success
 import com.developeek.circleon.domain.model.CircleDetailModel
-import com.developeek.circleon.domain.model.MemberModels
+import com.developeek.circleon.domain.model.MemberModel
+import com.developeek.circleon.domain.model.Models
 import com.developeek.circleon.domain.utils.validator.Invalid
 import com.developeek.circleon.domain.utils.validator.Validator
 import com.developeek.circleon.view.Event
@@ -77,7 +78,7 @@ class CircleDetailViewModelImpl
                     _screenFlow.emit(CircleDetailScreen.LoadingView)
 
                     val circleDetailResult: Result<CircleDetailModel>
-                    val circleMembersResult: Result<MemberModels>
+                    val circleMembersResult: Result<Models<MemberModel>>
                     withContext(dispatcher) {
                         val circleDetail =
                             async {
@@ -105,7 +106,7 @@ class CircleDetailViewModelImpl
 
         private suspend fun whenFetchCircleDetailAndMembersSuccess(
             circleDetailResult: Success<CircleDetailModel>,
-            circleMembersResult: Success<MemberModels>,
+            circleMembersResult: Success<Models<MemberModel>>,
         ) {
             circleDetail = CircleDetailModel(circleDetailResult.data, circleMembersResult.data)
             _screenFlow.emit(CircleDetailScreen.SuccessView(circleDetail))
@@ -120,7 +121,7 @@ class CircleDetailViewModelImpl
             }
         }
 
-        private suspend fun whenFetchCircleMembersFail(result: Error<MemberModels>) {
+        private suspend fun whenFetchCircleMembersFail(result: Error<Models<MemberModel>>) {
             _event.emit(Event.ShowToast(result.message()))
             _screenFlow.emit(CircleDetailScreen.ErrorView)
 

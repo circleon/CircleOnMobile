@@ -4,13 +4,11 @@ import android.content.Context
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.recyclerview.widget.AsyncListDiffer
-import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.developeek.circleon.R
 import com.developeek.circleon.databinding.ItemJoinRequestedMemberBinding
 import com.developeek.circleon.domain.model.MemberModel
-import com.developeek.circleon.domain.model.MemberModels
+import com.developeek.circleon.domain.model.Models
 import com.developeek.circleon.domain.utils.glide.GlideProvider
 import com.developeek.circleon.view.listener.ItemClickListener
 import com.developeek.circleon.view.listener.ItemListenerInitializer
@@ -20,25 +18,7 @@ class JoinRequestedMemberAdapter(
     private val glideProvider: GlideProvider,
     private val showMessageListenerInitializer: ItemListenerInitializer<MemberModel>,
 ) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
-    private val diffUtil =
-        AsyncListDiffer(
-            this,
-            object : DiffUtil.ItemCallback<MemberModel>() {
-                override fun areItemsTheSame(
-                    oldItem: MemberModel,
-                    newItem: MemberModel,
-                ): Boolean {
-                    return oldItem.isSame(newItem)
-                }
-
-                override fun areContentsTheSame(
-                    oldItem: MemberModel,
-                    newItem: MemberModel,
-                ): Boolean {
-                    return oldItem.areContentsSame(newItem)
-                }
-            },
-        )
+    private val diffUtil = CustomAsyncListDiffer<MemberModel>(this)
 
     inner class JoinRequestedMemberAdapterItemViewHolder(
         private val binding: ItemJoinRequestedMemberBinding,
@@ -96,7 +76,7 @@ class JoinRequestedMemberAdapter(
     }
 
     fun update(
-        models: MemberModels,
+        models: Models<MemberModel>,
         commitCallback: Runnable,
     ) {
         diffUtil.submitList(models.get(), commitCallback)

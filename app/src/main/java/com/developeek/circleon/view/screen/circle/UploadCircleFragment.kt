@@ -308,7 +308,7 @@ class UploadCircleFragment : Fragment() {
         setSwitchRecruitment()
         setBtnEditRecruitmentDate(requireContext())
         setBtnEdtCircleContentListener()
-        setBtnAddOrRemoveCircleThumbnailListener(context)
+        setBtnAddOrRemoveCircleThumbnailListener()
         setBtnRemoveCircleIntroductionImageListener(context)
         setEdtSingleLineIntroductionListener()
     }
@@ -438,7 +438,7 @@ class UploadCircleFragment : Fragment() {
         }
     }
 
-    private fun setBtnAddOrRemoveCircleThumbnailListener(context: Context) {
+    private fun setBtnAddOrRemoveCircleThumbnailListener() {
         if (viewModel.circle.thumbnailUrl == null) {
             binding.btnAddOrRemoveCircleThumbnail.setOnClickListener {
                 pickImage()

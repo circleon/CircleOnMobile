@@ -20,8 +20,8 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.developeek.circleon.R
 import com.developeek.circleon.databinding.FragmentMyPostBinding
+import com.developeek.circleon.domain.model.Models
 import com.developeek.circleon.domain.model.MyPostModel
-import com.developeek.circleon.domain.model.MyPostModels
 import com.developeek.circleon.domain.utils.Const
 import com.developeek.circleon.view.Event
 import com.developeek.circleon.view.adapter.MyPostAdapter
@@ -34,7 +34,6 @@ import com.developeek.circleon.view.viewmodelimpl.mypage.MyPostViewModelImpl
 import com.developeek.circleon.view.widget.SingleMessageToast
 import dagger.hilt.android.AndroidEntryPoint
 import dagger.hilt.android.lifecycle.withCreationCallback
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
@@ -231,7 +230,7 @@ class MyPostFragment : Fragment() {
     }
 
     private fun loadMyPostsAndDoAfter(
-        myPosts: MyPostModels,
+        myPosts: Models<MyPostModel>,
         after: () -> Unit,
     ) {
         binding.rvMyPost.adapter?.let {

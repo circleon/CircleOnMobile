@@ -158,7 +158,7 @@ class CircleDetailPostFragment : Fragment() {
                     .navigate(
                         R.id.action_circleDetailFragment_to_circleDetailPostDetailFragment,
                         bundleOf(
-                            Pair(Const.TAG_CIRCLE_ID, circleDetail.id),
+                            Pair(Const.TAG_CIRCLE_ID, circleDetail.circleId),
                             Pair(Const.TAG_CIRCLE_POST, item),
                         ),
                     )
@@ -184,7 +184,7 @@ class CircleDetailPostFragment : Fragment() {
         item: PostModel,
     ) {
         userManager.getUser()?.let {
-            if (it.id == item.author.id) { // 작성자 본인인 경우
+            if (it.id == item.author.authorId) { // 작성자 본인인 경우
                 popupMenu.inflate(R.menu.menu_author_post_settings)
                 Utils.changeMenuItemTextColor(
                     popupMenu.menu.findItem(R.id.delete_post),
@@ -206,7 +206,7 @@ class CircleDetailPostFragment : Fragment() {
     ) = PopupMenu.OnMenuItemClickListener {
         when (it.itemId) {
             R.id.edit_post -> {
-                sendUserToEditPostScreen(circleDetail.id, postItem)
+                sendUserToEditPostScreen(circleDetail.circleId, postItem)
             }
 
             R.id.delete_post -> {

@@ -2,12 +2,8 @@ package com.developeek.circleon.domain.model
 
 import com.developeek.circleon.domain.enums.Category
 
-data class CategoryModels(private val models: List<CategoryModel>) {
-    fun get() = models
-
-    fun selectedOrFirst() = models.find { it.isSelected } ?: models.first()
-
-    fun minus(category: CategoryModel) = CategoryModels(models - category)
+data class CategoryModels(private val categoryModels: List<CategoryModel>) : Models<CategoryModel>(categoryModels) {
+    fun selectedOrFirst() = categoryModels.find { it.isSelected } ?: categoryModels.first()
 
     companion object {
         fun selectAndGet(target: Category) =
@@ -22,30 +18,28 @@ data class CategoryModels(private val models: List<CategoryModel>) {
         fun selectAndRemoveAndGet(
             selectionTarget: Category,
             removeTarget: Category,
-        ) = selectAndGet(selectionTarget).minus(CategoryModel(removeTarget))
-
-        fun empty() = CategoryModels(emptyList())
+        ) = CategoryModels(selectAndGet(selectionTarget).minusAndGet(CategoryModel(removeTarget)).get())
     }
 }
 
-data class CategoryModel(val category: Category) : Selectable {
+data class CategoryModel(val category: Category) : BaseModel(category.id), Selectable {
     override val isSelected: Boolean
-        get() = selected
-    private var selected = false
+        get() = _isSelected
+    private var _isSelected = false
+
+    override fun areContentsSame(target: BaseModel): Boolean {
+        if (target !is CategoryModel) return false
+
+        return this == target && _isSelected == target.isSelected
+    }
 
     override fun select() {
-        this.selected = true
+        _isSelected = true
     }
 
     override fun unSelect() {
-        this.selected = false
+        _isSelected = false
     }
 
-    fun isSame(target: Category) = this.category.isSame(target)
-
-    fun isSame(target: CategoryModel) = this.category.isSame(target.category)
-
-    fun areContentsSame(target: CategoryModel) = this == target && this.isSelected == target.isSelected
-
-    fun name() = this.category.categoryName()
+    fun name() = this.category.categoryName
 }

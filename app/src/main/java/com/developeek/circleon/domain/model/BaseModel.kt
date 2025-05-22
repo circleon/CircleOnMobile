@@ -1,7 +1,9 @@
 package com.developeek.circleon.domain.model
 
-open class BaseModel(override val id: Int) : Identifiable {
-    override fun isSame(target: Identifiable) = this.id == target.id
+import java.io.Serializable
 
-    override fun areContentsSame(target: Identifiable) = this == target
+abstract class BaseModel(val id: Int) : Serializable {
+    fun isSame(target: BaseModel) = this.id == target.id
+
+    abstract fun areContentsSame(target: BaseModel): Boolean
 }

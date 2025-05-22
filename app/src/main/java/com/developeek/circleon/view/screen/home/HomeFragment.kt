@@ -24,7 +24,7 @@ import com.developeek.circleon.databinding.FragmentHomeBinding
 import com.developeek.circleon.domain.model.CategoryModel
 import com.developeek.circleon.domain.model.CategoryModels
 import com.developeek.circleon.domain.model.CircleModel
-import com.developeek.circleon.domain.model.CircleModels
+import com.developeek.circleon.domain.model.Models
 import com.developeek.circleon.domain.model.UserModel
 import com.developeek.circleon.domain.utils.Const
 import com.developeek.circleon.domain.utils.glide.GlideProvider
@@ -139,7 +139,7 @@ class HomeFragment : Fragment() {
                             .navigate(
                                 R.id.action_homeFragment_to_circleDetailFragment,
                                 bundleOf(
-                                    Pair(Const.TAG_CIRCLE_ID, item.id),
+                                    Pair(Const.TAG_CIRCLE_ID, item.circleId),
                                     Pair(Const.TAG_CIRCLE_NAME, item.name),
                                 ),
                             )
@@ -216,7 +216,7 @@ class HomeFragment : Fragment() {
     }
 
     private fun loadCirclesAndDoAfter(
-        circles: CircleModels,
+        circles: Models<CircleModel>,
         after: () -> Unit,
     ) {
         binding.rvCircle.adapter?.let {
