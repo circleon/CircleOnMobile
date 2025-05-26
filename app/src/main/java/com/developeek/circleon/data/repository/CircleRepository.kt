@@ -7,7 +7,7 @@ import com.developeek.circleon.domain.enums.PostType
 import com.developeek.circleon.domain.enums.Role
 import com.developeek.circleon.domain.model.CircleDetailModel
 import com.developeek.circleon.domain.model.CircleModel
-import com.developeek.circleon.domain.model.CircleSummaryModels
+import com.developeek.circleon.domain.model.CircleSummaryModel
 import com.developeek.circleon.domain.model.CommentModel
 import com.developeek.circleon.domain.model.MemberModel
 import com.developeek.circleon.domain.model.Models
@@ -23,7 +23,7 @@ interface CircleRepository {
         category: Category,
     ): Result<Page<CircleModel>>
 
-    suspend fun getCircleSummaries(): Result<CircleSummaryModels>
+    suspend fun getCircleSummaries(): Result<Models<CircleSummaryModel>>
 
     suspend fun getCircleDetail(circleId: Int): Result<CircleDetailModel>
 
@@ -77,17 +77,17 @@ interface CircleRepository {
     suspend fun getMyCircles(
         page: Int,
         size: Int,
-    ): Result<CircleSummaryModels>
+    ): Result<Models<CircleSummaryModel>>
 
     suspend fun getMyJoinRequestedCircles(
         page: Int,
         size: Int,
-    ): Result<CircleSummaryModels>
+    ): Result<Models<CircleSummaryModel>>
 
     suspend fun getMyLeaveRequestedCircles(
         page: Int,
         size: Int,
-    ): Result<CircleSummaryModels>
+    ): Result<Models<CircleSummaryModel>>
 
     suspend fun getMyPosts(
         page: Int,

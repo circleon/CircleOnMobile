@@ -4,30 +4,6 @@ import com.developeek.circleon.domain.enums.Category
 import java.io.Serializable
 import kotlin.math.absoluteValue
 
-data class CircleSummaryModels(private val models: List<CircleSummaryModel>) : Serializable {
-    fun get() = models
-
-    fun get(index: Int) = models[index]
-
-    fun size() = models.size
-
-    fun isEmpty() = models.isEmpty()
-
-    fun find(keyword: String) =
-        CircleSummaryModels(
-            models.filter { it.name.lowercase().contains(keyword.lowercase()) }
-                .sortedWith(
-                    compareBy<CircleSummaryModel> { it.name.compareTo(keyword).absoluteValue }
-                        .thenBy { it.name }
-                        .thenBy { it.category },
-                ),
-        )
-
-    companion object {
-        fun empty() = CircleSummaryModels(emptyList())
-    }
-}
-
 data class CircleSummaryModel(
     val circleId: Int,
     val name: String,
@@ -39,5 +15,19 @@ data class CircleSummaryModel(
         if (target !is CircleSummaryModel) return false
 
         return this == target
+    }
+
+    companion object {
+        fun findByKeyword(
+            models: Models<CircleSummaryModel>,
+            keyword: String,
+        ) = Models(
+            models.get().filter { it.name.lowercase().contains(keyword.lowercase()) }
+                .sortedWith(
+                    compareBy<CircleSummaryModel> { it.name.compareTo(keyword).absoluteValue }
+                        .thenBy { it.name }
+                        .thenBy { it.category },
+                ),
+        )
     }
 }

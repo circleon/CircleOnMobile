@@ -70,29 +70,29 @@ class ManageCircleViewModelImpl
                 viewModelScope.launch {
                     _screenFlow.emit(ManageCircleScreen.LoadingView)
 
-                    val fetchCircleMembers =
+                    val circleMembers =
                         async {
                             getCircleMembers(circle.circleId, page, size)
                         }
-                    val fetchJoinRequestedMembers =
+                    val joinRequestedMembers =
                         async {
                             getJoinRequestedMembersWithMessage(circle.circleId, page, size)
                         }
-                    val fetchLeaveRequestedMembers =
+                    val leaveRequestedMembers =
                         async {
                             getLeaveRequestedMembersWithMessage(circle.circleId, page, size)
                         }
 
-                    awaitAll(fetchCircleMembers, fetchJoinRequestedMembers, fetchLeaveRequestedMembers)
+                    awaitAll(circleMembers, joinRequestedMembers, leaveRequestedMembers)
                         .find {
                             it is Error
                         }?.let {
                             whenFetchMembersFail(it as Error)
                         } ?: run {
                         whenFetchMembersSuccess(
-                            circleMembers = fetchCircleMembers.await() as Success,
-                            joinRequestedMembers = fetchJoinRequestedMembers.await() as Success,
-                            leaveRequestedMembers = fetchLeaveRequestedMembers.await() as Success,
+                            circleMembers = circleMembers.await() as Success,
+                            joinRequestedMembers = joinRequestedMembers.await() as Success,
+                            leaveRequestedMembers = leaveRequestedMembers.await() as Success,
                         )
                     }
                 }

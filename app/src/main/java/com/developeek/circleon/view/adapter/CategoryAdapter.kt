@@ -9,7 +9,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.developeek.circleon.R
 import com.developeek.circleon.databinding.ItemTagCircleCategoryBinding
 import com.developeek.circleon.domain.model.CategoryModel
-import com.developeek.circleon.domain.model.CategoryModels
+import com.developeek.circleon.domain.model.Models
 import com.developeek.circleon.view.listener.ItemClickListener
 import com.developeek.circleon.view.listener.ItemListenerInitializer
 
@@ -90,7 +90,7 @@ class CategoryAdapter(
     }
 
     fun update(
-        models: CategoryModels,
+        models: Models<CategoryModel>,
         commitCallback: Runnable,
     ) {
         diffUtil.submitList(models.get(), commitCallback)

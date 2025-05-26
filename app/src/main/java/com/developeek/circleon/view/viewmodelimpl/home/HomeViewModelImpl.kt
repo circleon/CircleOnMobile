@@ -7,7 +7,7 @@ import com.developeek.circleon.data.repository.Page
 import com.developeek.circleon.data.source.Error
 import com.developeek.circleon.data.source.Success
 import com.developeek.circleon.domain.enums.Category
-import com.developeek.circleon.domain.model.CategoryModels
+import com.developeek.circleon.domain.model.CategoryModel
 import com.developeek.circleon.domain.model.CircleModel
 import com.developeek.circleon.domain.model.Models
 import com.developeek.circleon.view.Event
@@ -33,9 +33,9 @@ class HomeViewModelImpl
         private val _event = MutableSharedFlow<Event>()
         override val event: SharedFlow<Event> = _event
 
-        override val categories: CategoryModels
+        override val categories: Models<CategoryModel>
             get() = _categories
-        private var _categories = CategoryModels(emptyList())
+        private var _categories: Models<CategoryModel> = Models()
         private lateinit var circles: Models<CircleModel>
 
         override val isLastPage: Boolean
@@ -52,7 +52,7 @@ class HomeViewModelImpl
         }
 
         override fun refresh() {
-            setFilterAndFetch(categories.selectedOrFirst().category)
+            setFilterAndFetch((categories.get().find { it.isSelected } ?: categories.first()).category)
         }
 
         override fun setFilterAndFetch(category: Category) {
@@ -65,7 +65,7 @@ class HomeViewModelImpl
                     _screenFlow.emit(HomeScreen.LoadingView)
                     scrollOverCircleJob?.cancel()
                     currentPage = DEFAULT_PAGE // 카테고리를 선택할 때는 circles 를 재사용하지 않기 때문에 currentPage 도 초기화
-                    _categories = CategoryModels.selectAndGet(category)
+                    _categories = CategoryModel.selectAndGet(category)
 
                     when (val result = getCircles(currentPage, SIZE_BY_PAGE, category)) {
                         is Success -> whenFetchCirclesSuccess(result)
@@ -106,7 +106,12 @@ class HomeViewModelImpl
 
             scrollOverCircleJob =
                 viewModelScope.launch {
-                    val result = getCircles(currentPage + 1, SIZE_BY_PAGE, categories.selectedOrFirst().category)
+                    val result =
+                        getCircles(
+                            currentPage + 1,
+                            SIZE_BY_PAGE,
+                            (categories.get().find { it.isSelected } ?: categories.first()).category,
+                        )
 
                     if (!isActive) return@launch // 스크롤 작업 캔슬 시 내용을 업데이트하지 않고 작업 종료
                     when (result) {

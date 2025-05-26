@@ -1,30 +1,34 @@
 package com.developeek.circleon.view.viewmodelimpl.circle
 
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.developeek.circleon.data.repository.CircleRepository
 import com.developeek.circleon.data.source.Error
+import com.developeek.circleon.data.source.Result
 import com.developeek.circleon.data.source.Success
 import com.developeek.circleon.domain.enums.Category
-import com.developeek.circleon.domain.model.CategoryModels
+import com.developeek.circleon.domain.model.CategoryModel
 import com.developeek.circleon.domain.model.CircleDetailModel
-import com.developeek.circleon.domain.state.UiState
+import com.developeek.circleon.domain.model.Models
 import com.developeek.circleon.domain.utils.Const
 import com.developeek.circleon.domain.utils.validator.Invalid
 import com.developeek.circleon.domain.utils.validator.Validator
+import com.developeek.circleon.view.Event
 import com.developeek.circleon.view.viewmodel.circle.UploadCircleViewModel
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.Deferred
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
-import kotlinx.coroutines.cancel
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharedFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.io.File
 import java.time.LocalDateTime
 
@@ -33,34 +37,29 @@ class UploadCircleViewModelImpl
     @AssistedInject
     constructor(
         @Assisted("origin") private val origin: CircleDetailModel?,
+        @Assisted("isEdit") private val isEdit: Boolean,
         private val repository: CircleRepository,
     ) : UploadCircleViewModel, ViewModel() {
         @AssistedFactory
         interface UploadCircleViewModelFactory {
             fun create(
                 @Assisted("origin") origin: CircleDetailModel?,
+                @Assisted("isEdit") isEdit: Boolean,
             ): UploadCircleViewModelImpl
         }
 
-        override val state: LiveData<UiState>
-            get() = uiState
-        private val uiState = MutableLiveData<UiState>()
-
-        override val recruitmentLocked: LiveData<Boolean>
-            get() = _recruitmentLocked
-        private val _recruitmentLocked = MutableLiveData(false)
+        private val _event = MutableSharedFlow<Event>()
+        override val event: SharedFlow<Event> = _event
+        private val _screenFlow = MutableStateFlow<UploadCircleScreen>(UploadCircleScreen.NormalView)
+        override val screenFlow: StateFlow<UploadCircleScreen> = _screenFlow
+        private val _uploadCircleScreenEvent = MutableSharedFlow<UploadCircleScreenEvent>()
+        override val uploadCircleScreenEvent: SharedFlow<UploadCircleScreenEvent> = _uploadCircleScreenEvent
 
         override lateinit var circle: CircleDetailModel
-        private var uploadJob: Job? = null
-        override val categories: LiveData<CategoryModels>
-            get() = circleCategories
-        private var circleCategories =
-            MutableLiveData(
-                CategoryModels.selectAndRemoveAndGet(
-                    origin?.category ?: Category.ETC,
-                    Category.ALL,
-                ),
-            )
+        private var categories: Models<CategoryModel> = Models()
+
+        private var uploadCircleJob: Job? = null
+        private val dispatcher = Dispatchers.IO
 
         // 동아리 프로필, 소개글 이미지 등 이미지 처리 api 는 별도
         private var profileImage: File? = null
@@ -75,146 +74,135 @@ class UploadCircleViewModelImpl
         private var hasProfileImageChanged = false
         private var hasIntroductionImageChanged = false
 
-        override lateinit var error: String
-
         init {
-            this.circle = origin ?: CircleDetailModel.empty()
+            origin?.let {
+                circle = it
+                categories = CategoryModel.selectAndGetWithoutALL(it.category)
+            } ?: run {
+                circle = CircleDetailModel.empty()
+                categories = CategoryModel.selectAndGetWithoutALL(circle.category)
+            }
+
+            viewModelScope.launch {
+                _uploadCircleScreenEvent.emit(UploadCircleScreenEvent.SelectCategory(categories))
+            }
         }
 
         override fun upload() {
-            if (!isCircleFormat(circle)) return
-            uploadJob?.let {
+            uploadCircleJob?.let {
                 if (!it.isCompleted) return
             }
-            uiState.postValue(UiState.Loading)
 
-            uploadJob =
+            uploadCircleJob =
                 viewModelScope.launch {
-                    val result = repository.postCircle(circle, profileImage, introductionImage)
+                    if (!checkCircleFormat(circle)) return@launch
+                    _screenFlow.emit(UploadCircleScreen.LoadingView)
 
-                    if (result is Success) {
-                        uiState.postValue(UiState.Success)
-                    } else {
-                        error = (result as Error).message()
-                        if (result.isAuthenticationError()) {
-                            uiState.postValue(UiState.AuthenticationError)
-                        } else {
-                            uiState.postValue(UiState.ServiceError)
-                        }
+                    when (val result = postCircle(circle, profileImage, introductionImage)) {
+                        is Success -> whenUploadCircleSuccess()
+                        is Error -> whenUploadCircleFail(result)
                     }
                 }
+        }
+
+        private suspend fun postCircle(
+            circle: CircleDetailModel,
+            profileImage: File?,
+            introductionImage: File?,
+        ) = withContext(dispatcher) {
+            repository.postCircle(circle, profileImage, introductionImage)
+        }
+
+        private suspend fun whenUploadCircleSuccess() {
+            val message = if (isEdit) MESSAGE_SUCCESS_EDIT_CIRCLE else MESSAGE_SUCCESS_UPLOAD_CIRCLE
+
+            _event.emit(Event.ShowToast(message))
+            _screenFlow.emit(UploadCircleScreen.SuccessView)
+        }
+
+        private suspend fun whenUploadCircleFail(result: Error<Unit>) {
+            _event.emit(Event.ShowDialog(result.message()))
+            _screenFlow.emit(UploadCircleScreen.NormalView)
+
+            if (result.isAuthenticationError()) {
+                _event.emit(Event.SendToLoginScreen)
+            }
         }
 
         override fun edit() {
-            if (!isCircleFormat(circle)) return
-            uploadJob?.let {
+            uploadCircleJob?.let {
                 if (!it.isCompleted) return
             }
-            uiState.postValue(UiState.Loading)
 
-            var tmpState: UiState = UiState.Success
-            uploadJob =
+            uploadCircleJob =
                 viewModelScope.launch {
-                    val editCircleJob =
+                    if (!checkCircleFormat(circle)) return@launch
+                    _screenFlow.emit(UploadCircleScreen.LoadingView)
+
+                    val editCircle =
                         async {
-                            return@async editCircle(circle)
+                            editCircle(circle)
                         }
 
-                    // TODO: 서버 설계 문제로 이미지 편집과 삭제 작업은 동기 통신 방식으로 진행
-                    val editCircleImageJob =
+                    // 서버 설계 문제로 이미지 편집과 삭제 작업은 동기 통신 방식으로 진행
+                    val editCircleImage =
                         async {
-                            val editImageState =
+                            val editImage =
                                 if (isAnyImageEdited()) {
-                                    editCircleImage(circle)
+                                    editCircleImage(circle, profileImage, introductionImage)
                                 } else {
-                                    UiState.Success
+                                    Result.success(Unit)
                                 }
-                            val deleteImageState =
+                            val deleteImage =
                                 if (isAnyImageRemoved()) {
                                     deleteCircleImage(circle)
                                 } else {
-                                    UiState.Success
+                                    Result.success(Unit)
                                 }
 
-                            return@async mergeState(editImageState, deleteImageState)
-                        }
-
-                    val jobs: List<Deferred<UiState>> = listOf(editCircleJob, editCircleImageJob)
-                    jobs.map { job ->
-                        job.invokeOnCompletion {
-                            if (job.isCancelled) {
-                                this.cancel() // Error State 가 발생한 경우 부모 코루틴 캔슬
+                            if (editImage is Success && deleteImage is Success) {
+                                editImage
+                            } else if (editImage is Error) {
+                                editImage
+                            } else {
+                                deleteImage
                             }
                         }
-                    }
-                    // 코루틴별 invokeOnCompletion 을 전부 등록해준 이후에 await() 을 해야 자식 코루틴 캔슬이 부모 코루틴에게 즉시 전파됨
-                    jobs.awaitAll().map {
-                        if (it !is UiState.Success) tmpState = it
-                    }
-                }.apply {
-                    invokeOnCompletion {
-                        uiState.postValue(tmpState)
+
+                    awaitAll(editCircle, editCircleImage)
+                        .find {
+                            it is Error
+                        }?.let {
+                            whenUploadCircleFail(it as Error)
+                        } ?: run {
+                        whenUploadCircleSuccess()
                     }
                 }
         }
 
-        private suspend fun editCircle(circle: CircleDetailModel): UiState {
-            val result = repository.putCircle(circle)
-
-            if (result is Success) {
-                return UiState.Success
-            } else {
-                error = (result as Error).message()
-                return if (result.isAuthenticationError()) UiState.AuthenticationError else UiState.ServiceError
+        private suspend fun editCircle(circle: CircleDetailModel) =
+            withContext(dispatcher) {
+                repository.putCircle(circle)
             }
+
+        private suspend fun editCircleImage(
+            circle: CircleDetailModel,
+            profileImage: File?,
+            introductionImage: File?,
+        ) = withContext(dispatcher) {
+            repository.putCircleImage(circle.circleId, profileImage, introductionImage)
         }
 
-        private suspend fun editCircleImage(circle: CircleDetailModel): UiState {
-            val result = repository.putCircleImage(circle.circleId, profileImage, introductionImage)
-
-            if (result is Success) {
-                return UiState.Success
-            } else {
-                error = (result as Error).message()
-                return if (result.isAuthenticationError()) UiState.AuthenticationError else UiState.ServiceError
+        private suspend fun deleteCircleImage(circle: CircleDetailModel) =
+            withContext(dispatcher) {
+                repository.deleteCircleImage(circle.circleId, isProfileImageRemoved(), isIntroductionImageRemoved())
             }
-        }
 
-        private suspend fun deleteCircleImage(circle: CircleDetailModel): UiState {
-            val result =
-                repository.deleteCircleImage(
-                    circle.circleId,
-                    isProfileImageRemoved(),
-                    isIntroductionImageRemoved(),
-                )
+        private suspend fun checkCircleFormat(circle: CircleDetailModel): Boolean {
+            val result = Validator.checkCircle(circle)
 
-            if (result is Success) {
-                return UiState.Success
-            } else {
-                error = (result as Error).message()
-                return if (result.isAuthenticationError()) UiState.AuthenticationError else UiState.ServiceError
-            }
-        }
-
-        private fun mergeState(
-            state1: UiState,
-            state2: UiState,
-        ): UiState {
-            if (state1 == UiState.ServiceError || state2 == UiState.ServiceError) {
-                return UiState.ServiceError
-            }
-            if (state1 == UiState.AuthenticationError || state2 == UiState.AuthenticationError) {
-                return UiState.AuthenticationError
-            }
-            return UiState.Success
-        }
-
-        private fun isCircleFormat(circle: CircleDetailModel): Boolean {
-            val validation = Validator.checkCircle(circle)
-
-            return if (validation is Invalid) {
-                error = validation.message()
-                uiState.postValue(UiState.ServiceError)
+            return if (result is Invalid) {
+                _event.emit(Event.ShowDialog(result.message()))
                 false
             } else {
                 true
@@ -255,12 +243,19 @@ class UploadCircleViewModelImpl
 
         override fun setCategory(category: Category) {
             this.circle = this.circle.fold(category = category)
-            circleCategories.postValue(CategoryModels.selectAndRemoveAndGet(category, Category.ALL))
+            categories = CategoryModel.selectAndGetWithoutALL(category)
+
+            viewModelScope.launch {
+                _uploadCircleScreenEvent.emit(UploadCircleScreenEvent.SelectCategory(categories))
+            }
         }
 
-        override fun toggleRecruitmentLock(state: Boolean) {
-            this.circle = this.circle.fold(recruiting = state)
-            _recruitmentLocked.postValue(state)
+        override fun toggleRecruitmentLock(isRecruiting: Boolean) {
+            this.circle = this.circle.fold(recruiting = isRecruiting)
+
+            viewModelScope.launch {
+                _uploadCircleScreenEvent.emit(UploadCircleScreenEvent.ToggleRecruitmentLock(isRecruiting))
+            }
         }
 
         override fun removeCircleProfileImage() {
@@ -280,4 +275,23 @@ class UploadCircleViewModelImpl
         private fun isProfileImageRemoved() = profileImage == null && hasProfileImageChanged
 
         private fun isIntroductionImageRemoved() = introductionImage == null && hasIntroductionImageChanged
+
+        companion object {
+            private const val MESSAGE_SUCCESS_UPLOAD_CIRCLE = "동아리가 생성됐어요"
+            private const val MESSAGE_SUCCESS_EDIT_CIRCLE = "동아리 정보가 수정됐어요"
+        }
     }
+
+sealed class UploadCircleScreen {
+    data object SuccessView : UploadCircleScreen()
+
+    data object LoadingView : UploadCircleScreen()
+
+    data object NormalView : UploadCircleScreen()
+}
+
+sealed class UploadCircleScreenEvent {
+    data class ToggleRecruitmentLock(val isRecruiting: Boolean) : UploadCircleScreenEvent()
+
+    data class SelectCategory(val categories: Models<CategoryModel>) : UploadCircleScreenEvent()
+}

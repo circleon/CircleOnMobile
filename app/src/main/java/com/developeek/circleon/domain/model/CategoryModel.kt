@@ -2,26 +2,6 @@ package com.developeek.circleon.domain.model
 
 import com.developeek.circleon.domain.enums.Category
 
-data class CategoryModels(private val categoryModels: List<CategoryModel>) : Models<CategoryModel>(categoryModels) {
-    fun selectedOrFirst() = categoryModels.find { it.isSelected } ?: categoryModels.first()
-
-    companion object {
-        fun selectAndGet(target: Category) =
-            CategoryModels(
-                Category.entries.map {
-                    return@map CategoryModel(it).apply {
-                        if (it.isSame(target)) select()
-                    }
-                },
-            )
-
-        fun selectAndRemoveAndGet(
-            selectionTarget: Category,
-            removeTarget: Category,
-        ) = CategoryModels(selectAndGet(selectionTarget).minusAndGet(CategoryModel(removeTarget)).get())
-    }
-}
-
 data class CategoryModel(val category: Category) : BaseModel(category.id), Selectable {
     override val isSelected: Boolean
         get() = _isSelected
@@ -37,9 +17,25 @@ data class CategoryModel(val category: Category) : BaseModel(category.id), Selec
         _isSelected = true
     }
 
-    override fun unSelect() {
-        _isSelected = false
-    }
-
     fun name() = this.category.categoryName
+
+    companion object {
+        fun selectAndGet(target: Category) =
+            Models(
+                Category.entries.map {
+                    return@map CategoryModel(it).apply {
+                        if (it.isSame(target)) select()
+                    }
+                },
+            )
+
+        fun selectAndGetWithoutALL(target: Category) =
+            Models(
+                Category.withoutALL().map {
+                    return@map CategoryModel(it).apply {
+                        if (it.isSame(target)) select()
+                    }
+                },
+            )
+    }
 }

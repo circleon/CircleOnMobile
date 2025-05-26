@@ -8,12 +8,13 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.core.content.ContextCompat
 import androidx.core.os.bundleOf
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.Observer
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -21,25 +22,28 @@ import com.developeek.circleon.R
 import com.developeek.circleon.databinding.FragmentMyCircleBinding
 import com.developeek.circleon.domain.enums.MembershipStatus
 import com.developeek.circleon.domain.model.CircleSummaryModel
-import com.developeek.circleon.domain.model.CircleSummaryModels
-import com.developeek.circleon.domain.state.UiState
+import com.developeek.circleon.domain.model.Models
 import com.developeek.circleon.domain.utils.Const
 import com.developeek.circleon.domain.utils.glide.GlideProvider
+import com.developeek.circleon.view.Event
 import com.developeek.circleon.view.adapter.MyCircleAdapter
 import com.developeek.circleon.view.listener.ItemListenerInitializer
 import com.developeek.circleon.view.screen.login.LoginActivity
 import com.developeek.circleon.view.viewmodel.circle.MyCircleViewModel
+import com.developeek.circleon.view.viewmodelimpl.circle.MyCircleScreen
 import com.developeek.circleon.view.viewmodelimpl.circle.MyCircleViewModelImpl
+import com.developeek.circleon.view.widget.PositiveAlertDialog
 import com.developeek.circleon.view.widget.SingleMessageAlertDialog
 import com.developeek.circleon.view.widget.SingleMessageToast
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @AndroidEntryPoint
 class MyCircleFragment : Fragment() {
     private lateinit var binding: FragmentMyCircleBinding
-    private lateinit var circles: CircleSummaryModels
+    private lateinit var circles: Models<CircleSummaryModel>
     private lateinit var membershipStatus: MembershipStatus
     private val viewModel: MyCircleViewModel by viewModels<MyCircleViewModelImpl>()
 
@@ -50,7 +54,7 @@ class MyCircleFragment : Fragment() {
         super.onCreate(savedInstanceState)
 
         arguments?.let {
-            circles = it.getSerializable(Const.TAG_CIRCLE_SUMMARIES) as CircleSummaryModels
+            circles = it.getSerializable(Const.TAG_CIRCLE_SUMMARIES) as Models<CircleSummaryModel>
             membershipStatus = it.getSerializable(Const.TAG_MEMBERSHIP_STATUS) as MembershipStatus
         }
     }
@@ -72,8 +76,21 @@ class MyCircleFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         initView(requireActivity(), requireContext())
-        initObserver(requireActivity(), requireContext())
         initListener(requireActivity())
+        lifecycleScope.launch {
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                launch {
+                    viewModel.event.collect {
+                        handleEvent(it, requireActivity(), requireContext())
+                    }
+                }
+                launch {
+                    viewModel.screenFlow.collect {
+                        handleScreenFlow(it)
+                    }
+                }
+            }
+        }
     }
 
     private fun initView(
@@ -86,35 +103,44 @@ class MyCircleFragment : Fragment() {
         if (circles.isEmpty()) {
             loadNoCircleView()
         } else {
-            loadCircles(circles)
+            loadCirclesAndDoAfter(
+                circles,
+                after = {
+                    binding.rvCircles.isVisible = true
+                },
+            )
         }
     }
 
     private fun initToolbar(context: Context) {
-        if (membershipStatus == MembershipStatus.JOINED) {
-            binding.txtTitleCircles.text =
-                ContextCompat.getString(context, R.string.circle_content_title_my_circle)
-        }
-        if (membershipStatus == MembershipStatus.JOIN_REQUESTED) {
-            binding.txtTitleCircles.text =
-                ContextCompat.getString(context, R.string.circle_content_title_join_requested_circle)
-        }
-        if (membershipStatus == MembershipStatus.LEAVE_REQUESTED) {
-            binding.txtTitleCircles.text =
-                ContextCompat.getString(context, R.string.circle_content_title_leave_requested_circle)
-        }
+        val title =
+            when (membershipStatus) {
+                MembershipStatus.JOINED ->
+                    context.getString(
+                        R.string.circle_content_title_my_circle,
+                    )
+                MembershipStatus.JOIN_REQUESTED ->
+                    context.getString(
+                        R.string.circle_content_title_join_requested_circle,
+                    )
+                MembershipStatus.LEAVE_REQUESTED ->
+                    context.getString(
+                        R.string.circle_content_title_leave_requested_circle,
+                    )
+                else -> Const.EMPTY_TEXT
+            }
+
+        binding.txtTitleCircles.text = title
     }
 
     private fun loadNoCircleView() {
         if (binding.rvCircles.isVisible) binding.rvCircles.isVisible = false
-        if (membershipStatus == MembershipStatus.JOINED) {
-            binding.llNoMyCircles.isVisible = true
-        }
-        if (membershipStatus == MembershipStatus.JOIN_REQUESTED) {
-            binding.llNoJoinRequestedCircles.isVisible = true
-        }
-        if (membershipStatus == MembershipStatus.LEAVE_REQUESTED) {
-            binding.llNoLeaveRequestedCircles.isVisible = true
+
+        when (membershipStatus) {
+            MembershipStatus.JOINED -> binding.llNoMyCircles.isVisible = true
+            MembershipStatus.JOIN_REQUESTED -> binding.llNoJoinRequestedCircles.isVisible = true
+            MembershipStatus.LEAVE_REQUESTED -> binding.llNoLeaveRequestedCircles.isVisible = true
+            else -> {}
         }
     }
 
@@ -142,7 +168,7 @@ class MyCircleFragment : Fragment() {
                     object : ItemListenerInitializer<CircleSummaryModel> {
                         override fun initialize(item: CircleSummaryModel) {
                             if (membershipStatus.isJoinRequested()) {
-                                viewModel.cancelJoinRequest(item.memberId)
+                                showCancelJoinRequestDialog(item, context)
                             }
                         }
 
@@ -174,59 +200,17 @@ class MyCircleFragment : Fragment() {
         )
     }
 
-    private fun initObserver(
-        parentActivity: Activity,
+    private fun showCancelJoinRequestDialog(
+        circle: CircleSummaryModel,
         context: Context,
     ) {
-        viewModel.state.observe(
-            viewLifecycleOwner,
-            stateObserver(parentActivity, context),
-        )
-    }
-
-    private fun stateObserver(
-        parentActivity: Activity,
-        context: Context,
-    ) = Observer<UiState> {
-        binding.pgbLoading.isVisible = it is UiState.Loading
-        when (it) {
-            UiState.Success -> {
-                if (viewModel.joinRequestedCircles.isEmpty()) {
-                    loadNoCircleView()
-                } else {
-                    loadCircles(viewModel.joinRequestedCircles)
-                }
-            }
-            UiState.AuthenticationError -> {
-                sendUserToLoginScreen(parentActivity)
-                showErrorToast(context)
-            }
-            UiState.ServiceError -> {
-                showErrorDialog(context)
-            }
-            else -> {}
-        }
-    }
-
-    private fun loadCircles(circles: CircleSummaryModels) {
-        if (!binding.rvCircles.isVisible) binding.rvCircles.isVisible = true
-        (binding.rvCircles.adapter as MyCircleAdapter).update(circles) {}
-    }
-
-    private fun sendUserToLoginScreen(activity: Activity) {
-        val intent = Intent(activity, LoginActivity::class.java)
-        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)
-        startActivity(intent)
-    }
-
-    private fun showErrorDialog(context: Context) {
-        SingleMessageAlertDialog(context, viewModel.error).show()
-    }
-
-    private fun showErrorToast(context: Context) {
-        if (SingleMessageToast.previousFinished()) {
-            SingleMessageToast(context, viewModel.error).show()
-        }
+        PositiveAlertDialog(
+            context,
+            context.getString(R.string.message_cancel_join_request),
+            positiveListener = {
+                viewModel.cancelJoinRequest(circle.memberId)
+            },
+        ).show()
     }
 
     private fun initListener(parentActivity: Activity) {
@@ -241,7 +225,7 @@ class MyCircleFragment : Fragment() {
     }
 
     private fun sendUserToPreviousScreen() {
-        findNavController().navigateUp()
+        findNavController().popBackStack()
     }
 
     private fun setBtnMoveToSearchCircleScreenListener(parentActivity: Activity) {
@@ -253,5 +237,72 @@ class MyCircleFragment : Fragment() {
 
     private fun selectHomeTab(parentActivity: Activity) {
         parentActivity.findViewById<BottomNavigationView>(R.id.btmNav).selectedItemId = R.id.nav_graph_home
+    }
+
+    private fun handleEvent(
+        event: Event,
+        parentActivity: Activity,
+        context: Context,
+    ) {
+        binding.pgbLoading.isVisible = event is Event.ShowProcessing
+        when (event) {
+            is Event.SendToLoginScreen -> sendUserToLoginScreen(parentActivity)
+            is Event.ShowToast -> showToast(event, context)
+            is Event.ShowDialog -> showDialog(event, context)
+            else -> {}
+        }
+    }
+
+    private fun sendUserToLoginScreen(activity: Activity) {
+        val intent = Intent(activity, LoginActivity::class.java)
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)
+        startActivity(intent)
+    }
+
+    private fun showToast(
+        event: Event.ShowToast,
+        context: Context,
+    ) {
+        if (SingleMessageToast.previousFinished()) {
+            SingleMessageToast(context, event.message).show()
+        }
+    }
+
+    private fun showDialog(
+        event: Event.ShowDialog,
+        context: Context,
+    ) {
+        SingleMessageAlertDialog(context, event.message).show()
+    }
+
+    private fun handleScreenFlow(screenFlow: MyCircleScreen) {
+        binding.pgbLoading.isVisible = screenFlow is MyCircleScreen.LoadingView
+        when (screenFlow) {
+            is MyCircleScreen.SuccessView -> showSuccessView(screenFlow)
+            else -> {}
+        }
+    }
+
+    private fun showSuccessView(screenFlow: MyCircleScreen.SuccessView) {
+        if (screenFlow.circles.isEmpty()) {
+            loadNoCircleView()
+            return
+        }
+
+        loadCirclesAndDoAfter(
+            screenFlow.circles,
+            after = {
+                binding.rvCircles.isVisible = true
+            },
+        )
+    }
+
+    private fun loadCirclesAndDoAfter(
+        circles: Models<CircleSummaryModel>,
+        after: () -> Unit,
+    ) {
+        (binding.rvCircles.adapter as MyCircleAdapter).update(circles) {
+            after()
+        }
     }
 }

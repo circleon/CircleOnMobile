@@ -1,13 +1,13 @@
 package com.developeek.circleon.view.viewmodel.circle
 
-import androidx.lifecycle.LiveData
-import com.developeek.circleon.domain.model.CircleSummaryModels
-import com.developeek.circleon.domain.state.UiState
+import com.developeek.circleon.view.Event
+import com.developeek.circleon.view.viewmodelimpl.circle.MyCircleScreen
+import kotlinx.coroutines.flow.SharedFlow
+import kotlinx.coroutines.flow.StateFlow
 
 interface MyCircleViewModel {
-    val state: LiveData<UiState>
-    val joinRequestedCircles: CircleSummaryModels
-    val error: String
+    val event: SharedFlow<Event>
+    val screenFlow: StateFlow<MyCircleScreen>
 
     fun cancelJoinRequest(memberId: Int)
 }

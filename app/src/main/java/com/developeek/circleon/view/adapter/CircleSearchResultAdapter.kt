@@ -6,7 +6,7 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.developeek.circleon.databinding.ItemCircleSearchResultBinding
 import com.developeek.circleon.domain.model.CircleSummaryModel
-import com.developeek.circleon.domain.model.CircleSummaryModels
+import com.developeek.circleon.domain.model.Models
 import com.developeek.circleon.view.listener.ItemClickListener
 import com.developeek.circleon.view.listener.ItemListenerInitializer
 
@@ -68,7 +68,7 @@ class CircleSearchResultAdapter(private val itemListenerInitializer: ItemListene
     }
 
     fun update(
-        models: CircleSummaryModels,
+        models: Models<CircleSummaryModel>,
         commitCallback: Runnable,
     ) {
         diffUtil.submitList(models.get(), commitCallback)

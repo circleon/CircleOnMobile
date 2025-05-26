@@ -10,7 +10,7 @@ import com.developeek.circleon.R
 import com.developeek.circleon.databinding.ItemCardCircleSummaryBinding
 import com.developeek.circleon.domain.enums.MembershipStatus
 import com.developeek.circleon.domain.model.CircleSummaryModel
-import com.developeek.circleon.domain.model.CircleSummaryModels
+import com.developeek.circleon.domain.model.Models
 import com.developeek.circleon.domain.utils.glide.GlideProvider
 import com.developeek.circleon.view.listener.ItemClickListener
 import com.developeek.circleon.view.listener.ItemListenerInitializer
@@ -98,7 +98,7 @@ class MyCircleAdapter(
     }
 
     fun update(
-        models: CircleSummaryModels,
+        models: Models<CircleSummaryModel>,
         commitCallback: Runnable,
     ) {
         diffUtil.submitList(models.get(), commitCallback)

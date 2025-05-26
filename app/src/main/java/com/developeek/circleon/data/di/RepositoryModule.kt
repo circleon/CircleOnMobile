@@ -31,6 +31,6 @@ object RepositoryModule {
     @Provides
     @Singleton
     fun provideCircleRepository(service: CircleService): CircleRepository {
-        return CircleRepositoryImpl(service, Dispatchers.IO)
+        return CircleRepositoryImpl(service)
     }
 }

@@ -22,7 +22,6 @@ import com.developeek.circleon.R
 import com.developeek.circleon.data.source.manager.UserManager
 import com.developeek.circleon.databinding.FragmentHomeBinding
 import com.developeek.circleon.domain.model.CategoryModel
-import com.developeek.circleon.domain.model.CategoryModels
 import com.developeek.circleon.domain.model.CircleModel
 import com.developeek.circleon.domain.model.Models
 import com.developeek.circleon.domain.model.UserModel
@@ -190,7 +189,7 @@ class HomeFragment : Fragment() {
         }
     }
 
-    private fun loadCircleCategory(categories: CategoryModels) {
+    private fun loadCircleCategory(categories: Models<CategoryModel>) {
         binding.rvCircleCategory.adapter?.let {
             (it as CategoryAdapter).update(categories) {}
         }

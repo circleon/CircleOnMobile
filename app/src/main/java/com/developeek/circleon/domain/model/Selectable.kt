@@ -4,6 +4,4 @@ interface Selectable {
     val isSelected: Boolean
 
     fun select()
-
-    fun unSelect()
 }

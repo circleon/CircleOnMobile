@@ -122,6 +122,7 @@ interface CircleService {
         @Part("summary") summary: RequestBody,
         @Part("category") category: RequestBody,
         @Part("introduction") introduction: RequestBody?,
+        @Part("recruiting") recruiting: Boolean,
         @Part("recruitmentStartDate") recruitmentStartDate: RequestBody?,
         @Part("recruitmentEndDate") recruitmentEndDate: RequestBody?,
         @Part profileImg: MultipartBody.Part?,
