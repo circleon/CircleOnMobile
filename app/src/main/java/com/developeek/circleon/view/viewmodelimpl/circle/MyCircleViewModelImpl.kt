@@ -9,6 +9,9 @@ import com.developeek.circleon.domain.model.CircleSummaryModel
 import com.developeek.circleon.domain.model.Models
 import com.developeek.circleon.view.Event
 import com.developeek.circleon.view.viewmodel.circle.MyCircleViewModel
+import dagger.assisted.Assisted
+import dagger.assisted.AssistedFactory
+import dagger.assisted.AssistedInject
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -18,24 +21,38 @@ import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import javax.inject.Inject
 
-@HiltViewModel
+@HiltViewModel(assistedFactory = MyCircleViewModelImpl.MyCircleViewModelFactory::class)
 class MyCircleViewModelImpl
-    @Inject
+    @AssistedInject
     constructor(
+        @Assisted("origin") private val origin: Models<CircleSummaryModel>,
         private val repository: CircleRepository,
     ) : MyCircleViewModel, ViewModel() {
+        @AssistedFactory
+        interface MyCircleViewModelFactory {
+            fun create(
+                @Assisted("origin") origin: Models<CircleSummaryModel>,
+            ): MyCircleViewModelImpl
+        }
+
         private val _event = MutableSharedFlow<Event>()
         override val event: SharedFlow<Event> = _event
         private val _screenFlow = MutableStateFlow<MyCircleScreen>(MyCircleScreen.NormalView)
         override val screenFlow: StateFlow<MyCircleScreen> = _screenFlow
 
+        private var myCircles = origin
         private var currentPage = DEFAULT_PAGE
 
         private var fetchCirclesJob: Job? = null
         private var userRequestJob: Job? = null
         private val dispatcher = Dispatchers.IO
+
+        init {
+            viewModelScope.launch {
+                _screenFlow.emit(MyCircleScreen.SuccessView(myCircles))
+            }
+        }
 
         private fun refresh() {
             fetchMyJoinRequestedCircles(currentPage, SIZE_BY_PAGE)

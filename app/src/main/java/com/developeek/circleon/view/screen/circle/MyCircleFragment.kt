@@ -37,6 +37,7 @@ import com.developeek.circleon.view.widget.SingleMessageAlertDialog
 import com.developeek.circleon.view.widget.SingleMessageToast
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import dagger.hilt.android.AndroidEntryPoint
+import dagger.hilt.android.lifecycle.withCreationCallback
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -45,7 +46,14 @@ class MyCircleFragment : Fragment() {
     private lateinit var binding: FragmentMyCircleBinding
     private lateinit var circles: Models<CircleSummaryModel>
     private lateinit var membershipStatus: MembershipStatus
-    private val viewModel: MyCircleViewModel by viewModels<MyCircleViewModelImpl>()
+    private val viewModel: MyCircleViewModel by viewModels<MyCircleViewModelImpl>(
+        extrasProducer = {
+            defaultViewModelCreationExtras
+                .withCreationCallback<MyCircleViewModelImpl.MyCircleViewModelFactory> {
+                    it.create(circles)
+                }
+        },
+    )
 
     @Inject
     lateinit var glideProvider: GlideProvider
@@ -99,17 +107,6 @@ class MyCircleFragment : Fragment() {
     ) {
         initToolbar(context)
         initCircleRecyclerView(parentActivity, context)
-
-        if (circles.isEmpty()) {
-            loadNoCircleView()
-        } else {
-            loadCirclesAndDoAfter(
-                circles,
-                after = {
-                    binding.rvCircles.isVisible = true
-                },
-            )
-        }
     }
 
     private fun initToolbar(context: Context) {

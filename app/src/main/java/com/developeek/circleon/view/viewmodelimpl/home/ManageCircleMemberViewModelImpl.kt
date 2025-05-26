@@ -32,12 +32,14 @@ class ManageCircleMemberViewModelImpl
     @AssistedInject
     constructor(
         @Assisted("circle") private val circle: CircleDetailModel,
+        @Assisted("origin") private val origin: Models<MemberModel>,
         private val repository: CircleRepository,
     ) : ManageCircleMemberViewModel, ViewModel() {
         @AssistedFactory
         interface ManageCircleMemberViewModelFactory {
             fun create(
                 @Assisted("circle") circle: CircleDetailModel,
+                @Assisted("origin") origin: Models<MemberModel>,
             ): ManageCircleMemberViewModelImpl
         }
 
@@ -46,11 +48,19 @@ class ManageCircleMemberViewModelImpl
         private val _screenFlow = MutableStateFlow<ManageCircleMemberScreen>(ManageCircleMemberScreen.NormalView)
         override val screenFlow: StateFlow<ManageCircleMemberScreen> = _screenFlow
 
+        private var members: Models<MemberModel> = origin
+
         private var fetchMembersJob: Job? = null
         private var userRequestJob: Job? = null
         private var dispatcher = Dispatchers.IO
 
         private var currentPage = DEFAULT_PAGE
+
+        init {
+            viewModelScope.launch {
+                _screenFlow.emit(ManageCircleMemberScreen.SuccessView(members))
+            }
+        }
 
         override fun editCircleMemberRole(
             member: MemberModel,
@@ -131,7 +141,8 @@ class ManageCircleMemberViewModelImpl
         }
 
         private suspend fun whenFetchMembersSuccess(result: Success<Models<MemberModel>>) {
-            _screenFlow.emit(ManageCircleMemberScreen.SuccessView(result.data))
+            members = result.data
+            _screenFlow.emit(ManageCircleMemberScreen.SuccessView(members))
         }
 
         private suspend fun whenFetchMembersFail(result: Error<Models<MemberModel>>) {

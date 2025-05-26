@@ -59,7 +59,7 @@ class ManageCircleMemberFragment : Fragment() {
         extrasProducer = {
             defaultViewModelCreationExtras
                 .withCreationCallback<ManageCircleMemberViewModelImpl.ManageCircleMemberViewModelFactory> {
-                    it.create(circle)
+                    it.create(circle, members)
                 }
         },
     )
@@ -118,7 +118,6 @@ class ManageCircleMemberFragment : Fragment() {
         initToolbar(context)
         initMemberRecyclerViewByMembershipStatus(context)
         hideBtmNav(parentActivity)
-        load(members, context)
     }
 
     private fun initToolbar(context: Context) {
@@ -236,6 +235,7 @@ class ManageCircleMemberFragment : Fragment() {
             positiveListenerInitializer =
                 object : ItemListenerInitializer<Role> {
                     override fun initialize(item: Role) {
+                        requestRefreshToPreviousScreen()
                         viewModel.editCircleMemberRole(member, item)
                     }
 
@@ -256,6 +256,7 @@ class ManageCircleMemberFragment : Fragment() {
             context.getString(R.string.message_request_ban_member),
             context.getString(R.string.btn_ban_member),
             positiveListener = {
+                requestRefreshToPreviousScreen()
                 viewModel.banCircleMember(member)
             },
         ).show()
@@ -437,7 +438,6 @@ class ManageCircleMemberFragment : Fragment() {
         screenFlow: ManageCircleMemberScreen.SuccessView,
         context: Context,
     ) {
-        requestRefreshToPreviousScreen()
         load(screenFlow.members, context)
     }
 
