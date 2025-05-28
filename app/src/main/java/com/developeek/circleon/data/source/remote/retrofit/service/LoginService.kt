@@ -4,6 +4,7 @@ import com.developeek.circleon.data.dto.login.Email
 import com.developeek.circleon.data.dto.login.EmailAuthentication
 import com.developeek.circleon.data.dto.login.Login
 import com.developeek.circleon.data.dto.login.LoginResult
+import com.developeek.circleon.data.dto.login.LogoutRequestBody
 import com.developeek.circleon.data.dto.login.SignUp
 import retrofit2.http.Body
 import retrofit2.http.POST
@@ -14,6 +15,11 @@ interface LoginService {
     suspend fun login(
         @Body data: Login,
     ): LoginResult
+
+    @POST("auth/logout")
+    suspend fun logout(
+        @Body data: LogoutRequestBody,
+    )
 
     @POST("auth/signup")
     suspend fun signUp(

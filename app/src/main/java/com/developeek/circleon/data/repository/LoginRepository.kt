@@ -11,6 +11,8 @@ interface LoginRepository {
         password: String,
     ): Result<Unit>
 
+    suspend fun logout(): Result<Unit>
+
     suspend fun signUp(
         email: UserEmail,
         userName: UserName,

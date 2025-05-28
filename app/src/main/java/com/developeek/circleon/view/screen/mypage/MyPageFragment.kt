@@ -1,30 +1,40 @@
 package com.developeek.circleon.view.screen.mypage
 
 import android.app.Activity
+import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.activity.addCallback
+import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
+import com.developeek.circleon.BuildConfig
 import com.developeek.circleon.R
-import com.developeek.circleon.data.source.manager.TokenManager
 import com.developeek.circleon.data.source.manager.UserManager
 import com.developeek.circleon.databinding.FragmentMyPageBinding
 import com.developeek.circleon.domain.utils.Const
+import com.developeek.circleon.view.Event
 import com.developeek.circleon.view.screen.login.LoginActivity
+import com.developeek.circleon.view.viewmodel.mypage.MyPageViewModel
+import com.developeek.circleon.view.viewmodelimpl.mypage.MyPageViewModelImpl
+import com.developeek.circleon.view.widget.SingleMessageToast
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @AndroidEntryPoint
 class MyPageFragment : Fragment() {
     private lateinit var binding: FragmentMyPageBinding
-
-    @Inject
-    lateinit var tokenManager: TokenManager
+    private val viewModel: MyPageViewModel by viewModels<MyPageViewModelImpl>()
 
     @Inject
     lateinit var userManager: UserManager
@@ -53,20 +63,20 @@ class MyPageFragment : Fragment() {
     ) {
         super.onViewCreated(view, savedInstanceState)
 
-        // TODO: userManager 유저 삭제, 로그아웃 api 연동
-        binding.btnLogout.setOnClickListener {
-            tokenManager.deleteAccessToken()
-            tokenManager.deleteRefreshToken()
-            userManager.deleteUser()
-            sendUserToLoginScreen(requireActivity())
-        }
-
-        initView()
+        initView(requireContext())
         initListener()
+        lifecycleScope.launch {
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.event.collect {
+                    handleEvent(it, requireActivity(), requireContext())
+                }
+            }
+        }
     }
 
-    private fun initView() {
+    private fun initView(context: Context) {
         initUserName()
+        initVersionName(context)
     }
 
     private fun initUserName() {
@@ -75,15 +85,15 @@ class MyPageFragment : Fragment() {
         }
     }
 
-    private fun sendUserToLoginScreen(activity: Activity) {
-        val intent = Intent(activity, LoginActivity::class.java)
-        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)
-        startActivity(intent)
+    private fun initVersionName(context: Context) {
+        binding.txtVersionName.text =
+            String.format(context.getString(R.string.version_name), BuildConfig.VERSION_NAME)
     }
 
     private fun initListener() {
         setBtnMyPostsListener()
         setBtnSendFeedbackListener()
+        setBtnLogoutListener()
     }
 
     private fun setBtnMyPostsListener() {
@@ -105,6 +115,40 @@ class MyPageFragment : Fragment() {
     private fun setBtnSendFeedbackListener() {
         binding.btnSendFeedback.setOnClickListener {
             // sendFeedback
+        }
+    }
+
+    private fun setBtnLogoutListener() {
+        binding.btnLogout.setOnClickListener {
+            viewModel.logout()
+        }
+    }
+
+    private fun handleEvent(
+        event: Event,
+        parentActivity: Activity,
+        context: Context,
+    ) {
+        binding.pgbLoading.isVisible = event is Event.ShowProcessing
+        when (event) {
+            is Event.SendToLoginScreen -> sendUserToLoginScreen(parentActivity)
+            is Event.ShowToast -> showToast(event, context)
+            else -> {}
+        }
+    }
+
+    private fun sendUserToLoginScreen(activity: Activity) {
+        val intent = Intent(activity, LoginActivity::class.java)
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)
+        startActivity(intent)
+    }
+
+    private fun showToast(
+        event: Event.ShowToast,
+        context: Context,
+    ) {
+        if (SingleMessageToast.previousFinished()) {
+            SingleMessageToast(context, event.message).show()
         }
     }
 }

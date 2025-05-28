@@ -1,350 +1,371 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/grey_1"
     tools:context=".view.screen.mypage.MyPageFragment">
 
-    <androidx.appcompat.widget.Toolbar
-        android:id="@+id/tbMyPage"
-        android:layout_width="match_parent"
-        android:layout_height="56dp"
-        android:background="@color/grey_1"
-        app:contentInsetStart="0dp"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintBottom_toTopOf="@id/clMyPage">
-
-        <androidx.appcompat.widget.AppCompatTextView
-            android:id="@+id/txtTbTitle"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="@dimen/margin_padding_xx_large"
-            android:textAppearance="@style/large_bold_text"
-            android:textColor="@color/grey_9"
-            android:text="@string/title_my_page"/>
-
-    </androidx.appcompat.widget.Toolbar>
-
     <androidx.constraintlayout.widget.ConstraintLayout
-        android:id="@+id/clMyPage"
         android:layout_width="match_parent"
-        android:layout_height="0dp"
-        app:layout_constraintTop_toBottomOf="@id/tbMyPage"
-        app:layout_constraintBottom_toBottomOf="parent">
+        android:layout_height="match_parent"
+        android:background="@color/grey_1">
 
-        <androidx.appcompat.widget.LinearLayoutCompat
+        <androidx.appcompat.widget.Toolbar
+            android:id="@+id/tbMyPage"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:paddingHorizontal="@dimen/margin_padding_large"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
+            android:layout_height="56dp"
+            android:background="@color/grey_1"
+            app:contentInsetStart="0dp"
+            app:layout_constraintBottom_toTopOf="@id/clMyPage"
             app:layout_constraintEnd_toEndOf="parent"
-            android:orientation="vertical"
-            android:gravity="center_horizontal">
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
 
-            <androidx.appcompat.widget.LinearLayoutCompat
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/txtTbTitle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginVertical="@dimen/margin_padding_xx_large"
+                android:layout_marginStart="@dimen/margin_padding_xx_large"
+                android:text="@string/title_my_page"
+                android:textAppearance="@style/large_bold_text"
+                android:textColor="@color/grey_9" />
+
+        </androidx.appcompat.widget.Toolbar>
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/clMyPage"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/tbMyPage">
+
+            <androidx.appcompat.widget.LinearLayoutCompat
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:gravity="center_horizontal"
                 android:orientation="vertical"
-                android:gravity="center">
+                android:paddingHorizontal="@dimen/margin_padding_large"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent">
 
-                <FrameLayout
-                    android:layout_width="80dp"
-                    android:layout_height="80dp">
-
-                    <androidx.cardview.widget.CardView
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:layout_gravity="start|bottom"
-                        android:backgroundTint="@color/grey_3"
-                        app:cardCornerRadius="40dp"
-                        app:cardElevation="0dp">
-
-                        <androidx.appcompat.widget.AppCompatImageView
-                            android:id="@+id/btnAddUserProfile"
-                            android:layout_width="match_parent"
-                            android:layout_height="match_parent"
-                            android:scaleType="center"
-                            android:src="@drawable/img_user_profile_large_default" />
-
-                    </androidx.cardview.widget.CardView>
-
-                    <androidx.appcompat.widget.AppCompatImageView
-                        android:id="@+id/btnAddOrRemoveUserProfile"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:padding="@dimen/margin_padding_xx_small"
-                        android:layout_gravity="top|end"
-                        android:src="@drawable/ic_add_2" />
-
-                </FrameLayout>
-
-                <androidx.appcompat.widget.AppCompatTextView
-                    android:id="@+id/txtUserName"
+                <androidx.appcompat.widget.LinearLayoutCompat
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:layout_marginVertical="@dimen/margin_padding_xx_large"
+                    android:gravity="center"
+                    android:orientation="vertical">
+
+                    <FrameLayout
+                        android:layout_width="80dp"
+                        android:layout_height="80dp">
+
+                        <androidx.cardview.widget.CardView
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:layout_gravity="start|bottom"
+                            android:backgroundTint="@color/grey_3"
+                            app:cardCornerRadius="40dp"
+                            app:cardElevation="0dp">
+
+                            <androidx.appcompat.widget.AppCompatImageView
+                                android:id="@+id/btnAddUserProfile"
+                                android:layout_width="match_parent"
+                                android:layout_height="match_parent"
+                                android:scaleType="center"
+                                android:src="@drawable/img_user_profile_large_default" />
+
+                        </androidx.cardview.widget.CardView>
+
+                        <androidx.appcompat.widget.AppCompatImageView
+                            android:id="@+id/btnAddOrRemoveUserProfile"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="top|end"
+                            android:padding="@dimen/margin_padding_xx_small"
+                            android:src="@drawable/ic_add_2" />
+
+                    </FrameLayout>
+
+                    <androidx.appcompat.widget.AppCompatTextView
+                        android:id="@+id/txtUserName"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="@dimen/margin_padding_small"
+                        android:textAppearance="@style/large_bold_text"
+                        android:textColor="@color/grey_9"
+                        tools:text="userName" />
+
+                </androidx.appcompat.widget.LinearLayoutCompat>
+
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <androidx.constraintlayout.widget.ConstraintLayout
+                        android:id="@+id/btnMyPosts"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:background="@drawable/bg_large_rounded_card"
+                        android:paddingVertical="@dimen/margin_padding_xx_large"
+                        android:paddingStart="@dimen/margin_padding_xx_large"
+                        android:paddingEnd="@dimen/margin_padding_large"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintEnd_toStartOf="@id/btnMyCommentPosts"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent">
+
+                        <androidx.appcompat.widget.AppCompatTextView
+                            android:id="@+id/txtTitleMyPosts"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/my_page_title_my_posts"
+                            android:textAppearance="@style/default_bold_text"
+                            android:textColor="@color/grey_9"
+                            app:layout_constraintBottom_toBottomOf="parent"
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintTop_toTopOf="parent" />
+
+                        <androidx.appcompat.widget.AppCompatImageView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:src="@drawable/ic_next"
+                            app:layout_constraintBottom_toBottomOf="parent"
+                            app:layout_constraintEnd_toEndOf="parent"
+                            app:layout_constraintTop_toTopOf="parent" />
+
+                    </androidx.constraintlayout.widget.ConstraintLayout>
+
+                    <androidx.constraintlayout.widget.ConstraintLayout
+                        android:id="@+id/btnMyCommentPosts"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="@dimen/margin_padding_small"
+                        android:background="@drawable/bg_large_rounded_card"
+                        android:paddingVertical="@dimen/margin_padding_xx_large"
+                        android:paddingStart="@dimen/margin_padding_xx_large"
+                        android:paddingEnd="@dimen/margin_padding_large"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toEndOf="@id/btnMyPosts"
+                        app:layout_constraintTop_toTopOf="parent">
+
+                        <androidx.appcompat.widget.AppCompatTextView
+                            android:id="@+id/txtTitleMyCommentPosts"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/my_page_title_my_comment_posts"
+                            android:textAppearance="@style/default_bold_text"
+                            android:textColor="@color/grey_9"
+                            app:layout_constraintBottom_toBottomOf="parent"
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintTop_toTopOf="parent" />
+
+                        <androidx.appcompat.widget.AppCompatImageView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:src="@drawable/ic_next"
+                            app:layout_constraintBottom_toBottomOf="parent"
+                            app:layout_constraintEnd_toEndOf="parent"
+                            app:layout_constraintTop_toTopOf="parent" />
+
+                    </androidx.constraintlayout.widget.ConstraintLayout>
+
+                </androidx.constraintlayout.widget.ConstraintLayout>
+
+                <androidx.appcompat.widget.LinearLayoutCompat
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
                     android:layout_marginTop="@dimen/margin_padding_small"
-                    android:textAppearance="@style/large_bold_text"
-                    android:textColor="@color/grey_9"
-                    tools:text="userName"/>
-
-            </androidx.appcompat.widget.LinearLayoutCompat>
-
-            <androidx.constraintlayout.widget.ConstraintLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content">
-
-                <androidx.constraintlayout.widget.ConstraintLayout
-                    android:id="@+id/btnMyPosts"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
                     android:background="@drawable/bg_large_rounded_card"
-                    android:paddingStart="@dimen/margin_padding_xx_large"
-                    android:paddingEnd="@dimen/margin_padding_large"
-                    android:paddingVertical="@dimen/margin_padding_xx_large"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintEnd_toStartOf="@id/btnMyCommentPosts"
-                    app:layout_constraintTop_toTopOf="parent"
-                    app:layout_constraintBottom_toBottomOf="parent">
+                    android:orientation="vertical"
+                    android:paddingVertical="@dimen/margin_padding_small">
 
-                    <androidx.appcompat.widget.AppCompatTextView
-                        android:id="@+id/txtTitleMyPosts"
-                        android:layout_width="wrap_content"
+                    <androidx.constraintlayout.widget.ConstraintLayout
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="@string/my_page_title_my_posts"
-                        android:textAppearance="@style/default_bold_text"
-                        android:textColor="@color/grey_9"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toTopOf="parent"
-                        app:layout_constraintBottom_toBottomOf="parent"/>
+                        android:paddingVertical="@dimen/margin_padding_large"
+                        android:paddingStart="@dimen/margin_padding_xx_large"
+                        android:paddingEnd="@dimen/margin_padding_large">
 
-                    <androidx.appcompat.widget.AppCompatImageView
-                        android:layout_width="wrap_content"
+                        <androidx.appcompat.widget.AppCompatTextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/text_app_version"
+                            android:textAppearance="@style/default_bold_text"
+                            android:textColor="@color/grey_9"
+                            app:layout_constraintBottom_toBottomOf="parent"
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintTop_toTopOf="parent" />
+
+                        <androidx.appcompat.widget.AppCompatTextView
+                            android:id="@+id/txtVersionName"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:textAppearance="@style/default_text"
+                            android:textColor="@color/purple_5"
+                            android:textFontWeight="500"
+                            app:layout_constraintBottom_toBottomOf="parent"
+                            app:layout_constraintEnd_toEndOf="parent"
+                            app:layout_constraintTop_toTopOf="parent" />
+
+                    </androidx.constraintlayout.widget.ConstraintLayout>
+
+                    <androidx.constraintlayout.widget.ConstraintLayout
+                        android:id="@+id/btnServiceTerm"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:src="@drawable/ic_next"
-                        app:layout_constraintBottom_toBottomOf="parent"
-                        app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintTop_toTopOf="parent"/>
+                        android:background="?attr/selectableItemBackground"
+                        android:clickable="true"
+                        android:paddingVertical="@dimen/margin_padding_large"
+                        android:paddingStart="@dimen/margin_padding_xx_large"
+                        android:paddingEnd="@dimen/margin_padding_large">
 
-                </androidx.constraintlayout.widget.ConstraintLayout>
+                        <androidx.appcompat.widget.AppCompatTextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/text_service_term"
+                            android:textAppearance="@style/default_bold_text"
+                            android:textColor="@color/grey_9"
+                            app:layout_constraintBottom_toBottomOf="parent"
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintTop_toTopOf="parent" />
 
-                <androidx.constraintlayout.widget.ConstraintLayout
-                    android:id="@+id/btnMyCommentPosts"
-                    android:layout_width="0dp"
+                        <androidx.appcompat.widget.AppCompatImageView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:src="@drawable/ic_link"
+                            app:layout_constraintBottom_toBottomOf="parent"
+                            app:layout_constraintEnd_toEndOf="parent"
+                            app:layout_constraintTop_toTopOf="parent" />
+
+                    </androidx.constraintlayout.widget.ConstraintLayout>
+
+                    <androidx.constraintlayout.widget.ConstraintLayout
+                        android:id="@+id/btnPrivacyPolicy"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:background="?attr/selectableItemBackground"
+                        android:clickable="true"
+                        android:paddingVertical="@dimen/margin_padding_large"
+                        android:paddingStart="@dimen/margin_padding_xx_large"
+                        android:paddingEnd="@dimen/margin_padding_large">
+
+                        <androidx.appcompat.widget.AppCompatTextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/text_privacy_policy"
+                            android:textAppearance="@style/default_bold_text"
+                            android:textColor="@color/grey_9"
+                            app:layout_constraintBottom_toBottomOf="parent"
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintTop_toTopOf="parent" />
+
+                        <androidx.appcompat.widget.AppCompatImageView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:src="@drawable/ic_link"
+                            app:layout_constraintBottom_toBottomOf="parent"
+                            app:layout_constraintEnd_toEndOf="parent"
+                            app:layout_constraintTop_toTopOf="parent" />
+
+                    </androidx.constraintlayout.widget.ConstraintLayout>
+
+                    <androidx.constraintlayout.widget.ConstraintLayout
+                        android:id="@+id/btnSendFeedback"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:background="?attr/selectableItemBackground"
+                        android:paddingVertical="@dimen/margin_padding_large"
+                        android:paddingStart="@dimen/margin_padding_xx_large"
+                        android:paddingEnd="@dimen/margin_padding_large">
+
+                        <androidx.appcompat.widget.AppCompatTextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/btn_send_feedback"
+                            android:textAppearance="@style/default_bold_text"
+                            android:textColor="@color/grey_9"
+                            app:layout_constraintBottom_toBottomOf="parent"
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintTop_toTopOf="parent" />
+
+                    </androidx.constraintlayout.widget.ConstraintLayout>
+
+                </androidx.appcompat.widget.LinearLayoutCompat>
+
+                <androidx.appcompat.widget.LinearLayoutCompat
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="@dimen/margin_padding_small"
+                    android:layout_marginTop="@dimen/margin_padding_small"
                     android:background="@drawable/bg_large_rounded_card"
-                    android:paddingStart="@dimen/margin_padding_xx_large"
-                    android:paddingEnd="@dimen/margin_padding_large"
-                    android:paddingVertical="@dimen/margin_padding_xx_large"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toEndOf="@id/btnMyPosts"
-                    app:layout_constraintTop_toTopOf="parent"
-                    app:layout_constraintBottom_toBottomOf="parent">
+                    android:orientation="vertical"
+                    android:paddingVertical="@dimen/margin_padding_small">
 
-                    <androidx.appcompat.widget.AppCompatTextView
-                        android:id="@+id/txtTitleMyCommentPosts"
-                        android:layout_width="wrap_content"
+                    <androidx.constraintlayout.widget.ConstraintLayout
+                        android:id="@+id/btnLogout"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="@string/my_page_title_my_comment_posts"
-                        android:textAppearance="@style/default_bold_text"
-                        android:textColor="@color/grey_9"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toTopOf="parent"
-                        app:layout_constraintBottom_toBottomOf="parent"/>
+                        android:background="?attr/selectableItemBackground"
+                        android:paddingVertical="@dimen/margin_padding_large"
+                        android:paddingStart="@dimen/margin_padding_xx_large"
+                        android:paddingEnd="@dimen/margin_padding_large">
 
-                    <androidx.appcompat.widget.AppCompatImageView
-                        android:layout_width="wrap_content"
+                        <androidx.appcompat.widget.AppCompatTextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/btn_logout"
+                            android:textAppearance="@style/default_bold_text"
+                            android:textColor="@color/grey_9"
+                            app:layout_constraintBottom_toBottomOf="parent"
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintTop_toTopOf="parent" />
+
+                    </androidx.constraintlayout.widget.ConstraintLayout>
+
+                    <androidx.constraintlayout.widget.ConstraintLayout
+                        android:id="@+id/btnDeleteAccount"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:src="@drawable/ic_next"
-                        app:layout_constraintBottom_toBottomOf="parent"
-                        app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintTop_toTopOf="parent"/>
+                        android:background="?attr/selectableItemBackground"
+                        android:paddingVertical="@dimen/margin_padding_large"
+                        android:paddingStart="@dimen/margin_padding_xx_large"
+                        android:paddingEnd="@dimen/margin_padding_large">
 
-                </androidx.constraintlayout.widget.ConstraintLayout>
+                        <androidx.appcompat.widget.AppCompatTextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/btn_delete_account"
+                            android:textAppearance="@style/default_bold_text"
+                            android:textColor="@color/grey_9"
+                            app:layout_constraintBottom_toBottomOf="parent"
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintTop_toTopOf="parent" />
 
-            </androidx.constraintlayout.widget.ConstraintLayout>
+                    </androidx.constraintlayout.widget.ConstraintLayout>
 
-            <androidx.appcompat.widget.LinearLayoutCompat
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/margin_padding_small"
-                android:paddingVertical="@dimen/margin_padding_small"
-                android:orientation="vertical"
-                android:background="@drawable/bg_large_rounded_card">
-
-                <androidx.constraintlayout.widget.ConstraintLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:paddingStart="@dimen/margin_padding_xx_large"
-                    android:paddingEnd="@dimen/margin_padding_large"
-                    android:paddingVertical="@dimen/margin_padding_large">
-
-                    <androidx.appcompat.widget.AppCompatTextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:textAppearance="@style/default_bold_text"
-                        android:textColor="@color/grey_9"
-                        android:text="@string/text_app_version"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toTopOf="parent"
-                        app:layout_constraintBottom_toBottomOf="parent"/>
-
-                    <androidx.appcompat.widget.AppCompatTextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:textAppearance="@style/default_text"
-                        android:textFontWeight="500"
-                        android:textColor="@color/purple_5"
-                        android:text="v1.0.0"
-                        app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintTop_toTopOf="parent"
-                        app:layout_constraintBottom_toBottomOf="parent"/>
-
-                </androidx.constraintlayout.widget.ConstraintLayout>
-
-                <androidx.constraintlayout.widget.ConstraintLayout
-                    android:id="@+id/btnServiceTerm"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:paddingStart="@dimen/margin_padding_xx_large"
-                    android:paddingEnd="@dimen/margin_padding_large"
-                    android:background="?attr/selectableItemBackground"
-                    android:clickable="true"
-                    android:paddingVertical="@dimen/margin_padding_large">
-
-                    <androidx.appcompat.widget.AppCompatTextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:textAppearance="@style/default_bold_text"
-                        android:textColor="@color/grey_9"
-                        android:text="@string/text_service_term"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toTopOf="parent"
-                        app:layout_constraintBottom_toBottomOf="parent"/>
-
-                    <androidx.appcompat.widget.AppCompatImageView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:src="@drawable/ic_link"
-                        app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintTop_toTopOf="parent"
-                        app:layout_constraintBottom_toBottomOf="parent"/>
-
-                </androidx.constraintlayout.widget.ConstraintLayout>
-
-                <androidx.constraintlayout.widget.ConstraintLayout
-                    android:id="@+id/btnPrivacyPolicy"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:paddingStart="@dimen/margin_padding_xx_large"
-                    android:paddingEnd="@dimen/margin_padding_large"
-                    android:background="?attr/selectableItemBackground"
-                    android:clickable="true"
-                    android:paddingVertical="@dimen/margin_padding_large">
-
-                    <androidx.appcompat.widget.AppCompatTextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:textAppearance="@style/default_bold_text"
-                        android:textColor="@color/grey_9"
-                        android:text="@string/text_privacy_policy"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toTopOf="parent"
-                        app:layout_constraintBottom_toBottomOf="parent"/>
-
-                    <androidx.appcompat.widget.AppCompatImageView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:src="@drawable/ic_link"
-                        app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintTop_toTopOf="parent"
-                        app:layout_constraintBottom_toBottomOf="parent"/>
-
-                </androidx.constraintlayout.widget.ConstraintLayout>
-
-                <androidx.constraintlayout.widget.ConstraintLayout
-                    android:id="@+id/btnSendFeedback"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:paddingVertical="@dimen/margin_padding_large"
-                    android:paddingStart="@dimen/margin_padding_xx_large"
-                    android:paddingEnd="@dimen/margin_padding_large"
-                    android:background="?attr/selectableItemBackground">
-
-                    <androidx.appcompat.widget.AppCompatTextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:textAppearance="@style/default_bold_text"
-                        android:textColor="@color/grey_9"
-                        android:text="@string/btn_send_feedback"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toTopOf="parent"
-                        app:layout_constraintBottom_toBottomOf="parent"/>
-
-                </androidx.constraintlayout.widget.ConstraintLayout>
+                </androidx.appcompat.widget.LinearLayoutCompat>
 
             </androidx.appcompat.widget.LinearLayoutCompat>
 
-            <androidx.appcompat.widget.LinearLayoutCompat
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/margin_padding_small"
-                android:paddingVertical="@dimen/margin_padding_small"
-                android:orientation="vertical"
-                android:background="@drawable/bg_large_rounded_card">
-
-                <androidx.constraintlayout.widget.ConstraintLayout
-                    android:id="@+id/btnLogout"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:paddingStart="@dimen/margin_padding_xx_large"
-                    android:paddingEnd="@dimen/margin_padding_large"
-                    android:background="?attr/selectableItemBackground"
-                    android:paddingVertical="@dimen/margin_padding_large">
-
-                    <androidx.appcompat.widget.AppCompatTextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:textAppearance="@style/default_bold_text"
-                        android:textColor="@color/grey_9"
-                        android:text="@string/btn_logout"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toTopOf="parent"
-                        app:layout_constraintBottom_toBottomOf="parent"/>
-
-                </androidx.constraintlayout.widget.ConstraintLayout>
-
-                <androidx.constraintlayout.widget.ConstraintLayout
-                    android:id="@+id/btnDeleteAccount"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:paddingStart="@dimen/margin_padding_xx_large"
-                    android:paddingEnd="@dimen/margin_padding_large"
-                    android:background="?attr/selectableItemBackground"
-                    android:paddingVertical="@dimen/margin_padding_large">
-
-                    <androidx.appcompat.widget.AppCompatTextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:textAppearance="@style/default_bold_text"
-                        android:textColor="@color/grey_9"
-                        android:text="@string/btn_delete_account"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toTopOf="parent"
-                        app:layout_constraintBottom_toBottomOf="parent"/>
-
-                </androidx.constraintlayout.widget.ConstraintLayout>
-
-            </androidx.appcompat.widget.LinearLayoutCompat>
-
-        </androidx.appcompat.widget.LinearLayoutCompat>
+        </androidx.constraintlayout.widget.ConstraintLayout>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+    <com.google.android.material.progressindicator.CircularProgressIndicator
+        android:id="@+id/pgbLoading"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_gravity="center"
+        android:indeterminate="true"
+        android:padding="@dimen/margin_padding_large"
+        android:visibility="gone"
+        app:indicatorColor="@color/purple_5"
+        app:trackColor="@color/grey_3"
+        app:trackCornerRadius="@dimen/round_default"
+        app:trackThickness="8dp">
+
+    </com.google.android.material.progressindicator.CircularProgressIndicator>
+
+</FrameLayout>
