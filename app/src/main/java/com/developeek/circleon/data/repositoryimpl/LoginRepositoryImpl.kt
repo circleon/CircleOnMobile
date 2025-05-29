@@ -31,7 +31,7 @@ class LoginRepositoryImpl(
                     val user = it.user
                     val token = it.token
 
-                    userManager.setUser(user.id, user.name, user.univCode)
+                    userManager.setUser(user)
                     tokenManager.setAccessToken(token.accessToken)
                     tokenManager.setRefreshToken(token.refreshToken)
                 }

@@ -2,7 +2,7 @@ package com.developeek.circleon.view.viewmodelimpl.circle
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.developeek.circleon.data.repository.CircleRepository
+import com.developeek.circleon.data.repository.UserRepository
 import com.developeek.circleon.data.source.Error
 import com.developeek.circleon.data.source.Success
 import com.developeek.circleon.domain.model.CircleSummaryModel
@@ -27,7 +27,7 @@ class MyCircleViewModelImpl
     @AssistedInject
     constructor(
         @Assisted("origin") private val origin: Models<CircleSummaryModel>,
-        private val repository: CircleRepository,
+        private val repository: UserRepository,
     ) : MyCircleViewModel, ViewModel() {
         @AssistedFactory
         interface MyCircleViewModelFactory {

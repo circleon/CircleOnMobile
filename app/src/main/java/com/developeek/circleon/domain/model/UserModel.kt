@@ -7,4 +7,5 @@ data class UserModel(
     val id: Int,
     val name: String,
     val univ: University,
+    val profileImage: String?,
 ) : Serializable

@@ -20,13 +20,21 @@
             android:layout_height="wrap_content"
             android:src="@drawable/logo_home"/>
 
-        <androidx.appcompat.widget.AppCompatImageView
-            android:id="@+id/btnProfile"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+        <androidx.cardview.widget.CardView
+            android:layout_width="18dp"
+            android:layout_height="18dp"
             android:layout_marginStart="@dimen/margin_padding_large"
-            android:layout_gravity="end"
-            android:src="@drawable/ic_profile" />
+            app:cardCornerRadius="9dp"
+            app:cardElevation="0dp"
+            android:layout_gravity="end" >
+
+            <androidx.appcompat.widget.AppCompatImageView
+                android:id="@+id/imgUserProfile"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:scaleType="center" />
+
+        </androidx.cardview.widget.CardView>
 
         <androidx.appcompat.widget.AppCompatImageView
             android:id="@+id/btnNotification"

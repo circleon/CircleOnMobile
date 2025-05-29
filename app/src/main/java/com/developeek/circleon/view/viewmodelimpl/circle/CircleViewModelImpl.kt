@@ -2,7 +2,7 @@ package com.developeek.circleon.view.viewmodelimpl.circle
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.developeek.circleon.data.repository.CircleRepository
+import com.developeek.circleon.data.repository.UserRepository
 import com.developeek.circleon.data.source.Error
 import com.developeek.circleon.data.source.Success
 import com.developeek.circleon.domain.model.CircleSummaryModel
@@ -25,7 +25,7 @@ import javax.inject.Inject
 @HiltViewModel
 class CircleViewModelImpl
     @Inject
-    constructor(private val repository: CircleRepository) : CircleViewModel, ViewModel() {
+    constructor(private val repository: UserRepository) : CircleViewModel, ViewModel() {
         private val _event = MutableSharedFlow<Event>()
         override val event: SharedFlow<Event> = _event
         private val _screenFlow = MutableStateFlow<CircleScreen>(CircleScreen.NormalView)

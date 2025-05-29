@@ -8,6 +8,9 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.activity.addCallback
+import androidx.activity.result.ActivityResultLauncher
+import androidx.activity.result.PickVisualMediaRequest
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
@@ -19,25 +22,39 @@ import com.developeek.circleon.BuildConfig
 import com.developeek.circleon.R
 import com.developeek.circleon.data.source.manager.UserManager
 import com.developeek.circleon.databinding.FragmentMyPageBinding
+import com.developeek.circleon.domain.model.UserModel
 import com.developeek.circleon.domain.utils.Const
+import com.developeek.circleon.domain.utils.Utils.toJPEG
+import com.developeek.circleon.domain.utils.glide.GlideProvider
 import com.developeek.circleon.view.Event
 import com.developeek.circleon.view.screen.login.LoginActivity
 import com.developeek.circleon.view.viewmodel.mypage.MyPageViewModel
+import com.developeek.circleon.view.viewmodelimpl.mypage.MyPageScreenEvent
 import com.developeek.circleon.view.viewmodelimpl.mypage.MyPageViewModelImpl
+import com.developeek.circleon.view.widget.PositiveAlertDialog
 import com.developeek.circleon.view.widget.SingleMessageToast
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
+import java.io.File
 import javax.inject.Inject
 
 @AndroidEntryPoint
 class MyPageFragment : Fragment() {
     private lateinit var binding: FragmentMyPageBinding
     private val viewModel: MyPageViewModel by viewModels<MyPageViewModelImpl>()
+    private val userProfilePickMedia: ActivityResultLauncher<PickVisualMediaRequest> =
+        registerForActivityResult(ActivityResultContracts.PickVisualMedia()) { uri ->
+            uri?.let {
+                showSetUserProfileDialog(it.toJPEG(requireContext()), requireContext())
+            }
+        }
 
     @Inject
     lateinit var userManager: UserManager
+
+    @Inject
+    lateinit var glideProvider: GlideProvider
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -64,24 +81,27 @@ class MyPageFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         initView(requireContext())
-        initListener()
+        initListener(requireContext())
         lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
-                viewModel.event.collect {
-                    handleEvent(it, requireActivity(), requireContext())
+                launch {
+                    viewModel.event.collect {
+                        handleEvent(it, requireActivity(), requireContext())
+                    }
+                }
+                launch {
+                    viewModel.myPageScreenEvent.collect {
+                        handleMyPageScreenEvent(it, requireContext())
+                    }
                 }
             }
         }
     }
 
     private fun initView(context: Context) {
-        initUserName()
         initVersionName(context)
-    }
-
-    private fun initUserName() {
         userManager.getUser()?.let {
-            binding.txtUserName.text = it.name
+            loadUserInfo(it, context)
         }
     }
 
@@ -90,8 +110,23 @@ class MyPageFragment : Fragment() {
             String.format(context.getString(R.string.version_name), BuildConfig.VERSION_NAME)
     }
 
-    private fun initListener() {
+    private fun loadUserInfo(
+        user: UserModel,
+        context: Context,
+    ) {
+        binding.txtUserName.text = user.name
+        user.profileImage?.let { url ->
+            glideProvider.fetchImage(url, context, binding.btnAddUserProfile)
+            binding.btnAddOrRemoveUserProfile.setImageResource(R.drawable.ic_cancel_2)
+        } ?: run {
+            binding.btnAddUserProfile.setImageResource(R.drawable.img_user_profile_large_default)
+            binding.btnAddOrRemoveUserProfile.setImageResource(R.drawable.ic_add_2)
+        }
+    }
+
+    private fun initListener(context: Context) {
         setBtnMyPostsListener()
+        setBtnProfileImageListener(context)
         setBtnSendFeedbackListener()
         setBtnLogoutListener()
     }
@@ -112,6 +147,21 @@ class MyPageFragment : Fragment() {
         findNavController().navigate(R.id.action_myPageFragment_to_myPostFragment, bundle)
     }
 
+    private fun setBtnProfileImageListener(context: Context) {
+        userManager.getUser()?.let {
+            it.profileImage?.let { _ ->
+                binding.btnAddOrRemoveUserProfile.setOnClickListener {
+                    showRemoveUserProfileDialog(context)
+                }
+            } ?: binding.btnAddOrRemoveUserProfile.setOnClickListener {
+                pickImage()
+            }
+            binding.btnAddUserProfile.setOnClickListener {
+                pickImage()
+            }
+        }
+    }
+
     private fun setBtnSendFeedbackListener() {
         binding.btnSendFeedback.setOnClickListener {
             // sendFeedback
@@ -122,6 +172,39 @@ class MyPageFragment : Fragment() {
         binding.btnLogout.setOnClickListener {
             viewModel.logout()
         }
+    }
+
+    private fun pickImage() {
+        userProfilePickMedia.launch(
+            PickVisualMediaRequest(
+                ActivityResultContracts.PickVisualMedia.SingleMimeType(
+                    PHOTO_MIME_TYPE,
+                ),
+            ),
+        )
+    }
+
+    private fun showSetUserProfileDialog(
+        image: File?,
+        context: Context,
+    ) {
+        PositiveAlertDialog(
+            context,
+            message = context.getString(R.string.message_set_user_profile_image),
+            positiveListener = {
+                viewModel.setUserProfileImage(image)
+            },
+        ).show()
+    }
+
+    private fun showRemoveUserProfileDialog(context: Context) {
+        PositiveAlertDialog(
+            context,
+            message = context.getString(R.string.message_remove_user_profile_image),
+            positiveListener = {
+                viewModel.removeUserProfileImage()
+            },
+        ).show()
     }
 
     private fun handleEvent(
@@ -150,5 +233,37 @@ class MyPageFragment : Fragment() {
         if (SingleMessageToast.previousFinished()) {
             SingleMessageToast(context, event.message).show()
         }
+    }
+
+    private fun handleMyPageScreenEvent(
+        event: MyPageScreenEvent,
+        context: Context,
+    ) {
+        when (event) {
+            is MyPageScreenEvent.SetUserProfileImage -> setUserProfileImage(context)
+            is MyPageScreenEvent.RemoveUserProfileImage -> removeUserProfileImage()
+        }
+    }
+
+    private fun setUserProfileImage(context: Context) {
+        binding.btnAddOrRemoveUserProfile.setImageResource(R.drawable.ic_cancel_2)
+        binding.btnAddOrRemoveUserProfile.setOnClickListener {
+            showRemoveUserProfileDialog(context)
+        }
+        userManager.getUser()?.profileImage?.let {
+            glideProvider.fetchImage(it, context, binding.btnAddUserProfile)
+        }
+    }
+
+    private fun removeUserProfileImage() {
+        binding.btnAddUserProfile.setImageResource(R.drawable.img_user_profile_large_default)
+        binding.btnAddOrRemoveUserProfile.setImageResource(R.drawable.ic_add_2)
+        binding.btnAddOrRemoveUserProfile.setOnClickListener {
+            pickImage()
+        }
+    }
+
+    companion object {
+        private const val PHOTO_MIME_TYPE = "image/jpeg"
     }
 }

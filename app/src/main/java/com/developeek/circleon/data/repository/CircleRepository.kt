@@ -11,7 +11,6 @@ import com.developeek.circleon.domain.model.CircleSummaryModel
 import com.developeek.circleon.domain.model.CommentModel
 import com.developeek.circleon.domain.model.MemberModel
 import com.developeek.circleon.domain.model.Models
-import com.developeek.circleon.domain.model.MyPostModel
 import com.developeek.circleon.domain.model.PostModel
 import java.io.File
 
@@ -74,46 +73,11 @@ interface CircleRepository {
         size: Int,
     ): Result<Page<CommentModel>>
 
-    suspend fun getMyCircles(
-        page: Int,
-        size: Int,
-    ): Result<Models<CircleSummaryModel>>
-
-    suspend fun getMyJoinRequestedCircles(
-        page: Int,
-        size: Int,
-    ): Result<Models<CircleSummaryModel>>
-
-    suspend fun getMyLeaveRequestedCircles(
-        page: Int,
-        size: Int,
-    ): Result<Models<CircleSummaryModel>>
-
-    suspend fun getMyPosts(
-        page: Int,
-        size: Int,
-    ): Result<Page<MyPostModel>>
-
-    suspend fun getMyCommentPosts(
-        page: Int,
-        size: Int,
-    ): Result<Page<MyPostModel>>
-
     // POST
     suspend fun postCircle(
         circleDetailModel: CircleDetailModel,
         profileImg: File?,
         introductionImg: File?,
-    ): Result<Unit>
-
-    suspend fun postMyCircle(
-        circleId: Int,
-        joinMessage: String,
-    ): Result<Unit>
-
-    suspend fun postCircleLeaveRequest(
-        memberId: Int,
-        leaveMessage: String,
     ): Result<Unit>
 
     suspend fun postCirclePost(
@@ -211,6 +175,4 @@ interface CircleRepository {
         circleId: Int,
         memberId: Int,
     ): Result<Unit>
-
-    suspend fun deleteCircleJoinRequest(memberId: Int): Result<Unit>
 }

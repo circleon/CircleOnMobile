@@ -166,6 +166,9 @@ class HomeFragment : Fragment() {
             String.format(
                 context.getString(R.string.home_content_title_circle), user.name,
             )
+        user.profileImage?.let {
+            glideProvider.fetchImage(it, context, binding.imgUserProfile)
+        } ?: binding.imgUserProfile.setImageResource(R.drawable.ic_profile)
     }
 
     private fun handleEvent(

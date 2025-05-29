@@ -7,6 +7,7 @@ import com.developeek.circleon.data.source.remote.interceptor.TokenAuthenticator
 import com.developeek.circleon.data.source.remote.retrofit.service.CircleService
 import com.developeek.circleon.data.source.remote.retrofit.service.LoginService
 import com.developeek.circleon.data.source.remote.retrofit.service.TokenService
+import com.developeek.circleon.data.source.remote.retrofit.service.UserService
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -92,5 +93,19 @@ object RemoteSourceModule {
             .client(clientBuilder.build())
             .build()
             .create(CircleService::class.java)
+    }
+
+    @Provides
+    @Singleton
+    fun provideUserService(
+        converter: GsonConverterFactory,
+        @ServiceClient clientBuilder: Builder,
+    ): UserService {
+        return Retrofit.Builder()
+            .baseUrl(BuildConfig.SERVICE_API_URL)
+            .addConverterFactory(converter)
+            .client(clientBuilder.build())
+            .build()
+            .create(UserService::class.java)
     }
 }

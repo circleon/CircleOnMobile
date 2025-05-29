@@ -2,8 +2,8 @@ package com.developeek.circleon.view.viewmodelimpl.mypage
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.developeek.circleon.data.repository.CircleRepository
 import com.developeek.circleon.data.repository.Page
+import com.developeek.circleon.data.repository.UserRepository
 import com.developeek.circleon.data.source.Error
 import com.developeek.circleon.data.source.Success
 import com.developeek.circleon.domain.model.Models
@@ -29,7 +29,7 @@ class MyPostViewModelImpl
     @AssistedInject
     constructor(
         @Assisted("isMyPosts") private val isMyPosts: Boolean,
-        private val repository: CircleRepository,
+        private val repository: UserRepository,
     ) : MyPostViewModel, ViewModel() {
         @AssistedFactory
         interface MyPostViewModelFactory {

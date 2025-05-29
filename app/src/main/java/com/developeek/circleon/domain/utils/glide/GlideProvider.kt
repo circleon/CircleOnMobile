@@ -7,6 +7,7 @@ import com.bumptech.glide.Glide
 import com.bumptech.glide.load.model.GlideUrl
 import com.bumptech.glide.load.model.LazyHeaders
 import com.developeek.circleon.data.source.manager.TokenManager
+import java.io.File
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -45,6 +46,16 @@ class GlideProvider
         ) {
             Glide.with(context)
                 .load(uri)
+                .into(view)
+        }
+
+        fun loadImage(
+            file: File?,
+            context: Context,
+            view: ImageView,
+        ) {
+            Glide.with(context)
+                .load(file)
                 .into(view)
         }
 

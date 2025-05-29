@@ -9,10 +9,12 @@ import com.developeek.circleon.domain.utils.validator.Invalid
 import com.developeek.circleon.domain.utils.validator.Validator
 import com.developeek.circleon.view.viewmodel.login.LoginViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 @HiltViewModel
@@ -23,6 +25,7 @@ class LoginViewModelImpl
         override val event: SharedFlow<LoginEvent> = _event
 
         private var loginJob: Job? = null
+        private val dispatcher = Dispatchers.IO
 
         override fun login(
             email: String,
@@ -39,12 +42,19 @@ class LoginViewModelImpl
 
                 loginJob =
                     launch {
-                        when (val result = repository.login(email, password)) {
+                        when (val result = userLogin(email, password)) {
                             is Success -> _event.emit(LoginEvent.SendToHomeScreen)
                             is Error -> _event.emit(LoginEvent.ShowDialog(result.message()))
                         }
                     }
             }
+        }
+
+        private suspend fun userLogin(
+            email: String,
+            password: String,
+        ) = withContext(dispatcher) {
+            repository.login(email, password)
         }
 
         private suspend fun checkEmailFormat(email: String): Boolean {

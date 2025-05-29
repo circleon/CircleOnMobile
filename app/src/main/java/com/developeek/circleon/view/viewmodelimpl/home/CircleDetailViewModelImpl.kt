@@ -3,6 +3,7 @@ package com.developeek.circleon.view.viewmodelimpl.home
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.developeek.circleon.data.repository.CircleRepository
+import com.developeek.circleon.data.repository.UserRepository
 import com.developeek.circleon.data.source.Error
 import com.developeek.circleon.data.source.Result
 import com.developeek.circleon.data.source.Success
@@ -32,7 +33,8 @@ class CircleDetailViewModelImpl
     @AssistedInject
     constructor(
         @Assisted private val circleId: Int,
-        private val repository: CircleRepository,
+        private val CircleRepository: CircleRepository,
+        private val userRepository: UserRepository,
     ) : CircleDetailViewModel, ViewModel() {
         @AssistedFactory
         interface CircleDetailViewModelFactory {
@@ -82,11 +84,11 @@ class CircleDetailViewModelImpl
                     withContext(dispatcher) {
                         val circleDetail =
                             async {
-                                repository.getCircleDetail(circleId)
+                                CircleRepository.getCircleDetail(circleId)
                             }
                         val circleMembers =
                             async {
-                                repository.getCircleMembers(circleId, DEFAULT_PAGE, MEMBER_SIZE_BY_PAGE)
+                                CircleRepository.getCircleMembers(circleId, DEFAULT_PAGE, MEMBER_SIZE_BY_PAGE)
                             }
 
                         circleDetailResult = circleDetail.await()
@@ -151,7 +153,7 @@ class CircleDetailViewModelImpl
             circleId: Int,
             message: String,
         ) = withContext(dispatcher) {
-            repository.postMyCircle(circleId, message)
+            userRepository.postMyCircle(circleId, message)
         }
 
         override fun requestLeave(leaveMessage: String) {
@@ -175,7 +177,7 @@ class CircleDetailViewModelImpl
             memberId: Int,
             message: String,
         ) = withContext(dispatcher) {
-            repository.postCircleLeaveRequest(memberId, message)
+            userRepository.postCircleLeaveRequest(memberId, message)
         }
 
         override fun requestReport(reportMessage: String) {
@@ -199,7 +201,7 @@ class CircleDetailViewModelImpl
             circleId: Int,
             message: String,
         ) = withContext(dispatcher) {
-            repository.postReportCircle(circleId, message)
+            CircleRepository.postReportCircle(circleId, message)
         }
 
         private suspend fun checkMessageFormat(message: String): Boolean {

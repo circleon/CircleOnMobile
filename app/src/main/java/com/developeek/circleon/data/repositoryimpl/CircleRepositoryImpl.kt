@@ -6,8 +6,6 @@ import com.developeek.circleon.data.dto.home.RequestBodyEditMemberRole
 import com.developeek.circleon.data.dto.home.RequestBodyEditMemberStatus
 import com.developeek.circleon.data.dto.home.RequestBodyEditPost
 import com.developeek.circleon.data.dto.home.RequestBodyReport
-import com.developeek.circleon.data.dto.home.RequestResponseBodyCircleJoin
-import com.developeek.circleon.data.dto.home.RequestResponseBodyCircleLeave
 import com.developeek.circleon.data.exception.ServiceException
 import com.developeek.circleon.data.repository.CircleRepository
 import com.developeek.circleon.data.repository.Page
@@ -24,7 +22,6 @@ import com.developeek.circleon.domain.model.CircleSummaryModel
 import com.developeek.circleon.domain.model.CommentModel
 import com.developeek.circleon.domain.model.MemberModel
 import com.developeek.circleon.domain.model.Models
-import com.developeek.circleon.domain.model.MyPostModel
 import com.developeek.circleon.domain.model.PostModel
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.MultipartBody
@@ -228,78 +225,6 @@ class CircleRepositoryImpl(private val service: CircleService) : CircleRepositor
         }
     }
 
-    override suspend fun getMyCircles(
-        page: Int,
-        size: Int,
-    ): Result<Models<CircleSummaryModel>> {
-        return try {
-            val response = service.getMyCircles(MembershipStatus.JOINED.codeName(), page, size)
-            Result.success(Models(response.content.map { it.toCircleSummaryModel() }))
-        } catch (e: Exception) {
-            Result.error(e)
-        }
-    }
-
-    override suspend fun getMyJoinRequestedCircles(
-        page: Int,
-        size: Int,
-    ): Result<Models<CircleSummaryModel>> {
-        return try {
-            val response = service.getMyCircles(MembershipStatus.JOIN_REQUESTED.codeName(), page, size)
-            Result.success(Models(response.content.map { it.toCircleSummaryModel() }))
-        } catch (e: Exception) {
-            Result.error(e)
-        }
-    }
-
-    override suspend fun getMyLeaveRequestedCircles(
-        page: Int,
-        size: Int,
-    ): Result<Models<CircleSummaryModel>> {
-        return try {
-            val response = service.getMyCircles(MembershipStatus.LEAVE_REQUESTED.codeName(), page, size)
-            Result.success(Models(response.content.map { it.toCircleSummaryModel() }))
-        } catch (e: Exception) {
-            Result.error(e)
-        }
-    }
-
-    override suspend fun getMyPosts(
-        page: Int,
-        size: Int,
-    ): Result<Page<MyPostModel>> {
-        return try {
-            val response = service.getMyPosts(page, size, SORT_LATEST)
-            Result.success(
-                Page(response.content.map { it.toMyPostModel() }).apply {
-                    if (response.isLastPage()) {
-                        setAsLast()
-                    }
-                },
-            )
-        } catch (e: Exception) {
-            Result.error(e)
-        }
-    }
-
-    override suspend fun getMyCommentPosts(
-        page: Int,
-        size: Int,
-    ): Result<Page<MyPostModel>> {
-        return try {
-            val response = service.getMyCommentPosts(page, size, SORT_LATEST)
-            Result.success(
-                Page(response.content.map { it.toMyPostModel() }).apply {
-                    if (response.isLastPage()) {
-                        setAsLast()
-                    }
-                },
-            )
-        } catch (e: Exception) {
-            Result.error(e)
-        }
-    }
-
     override suspend fun postCircle(
         circleDetailModel: CircleDetailModel,
         profileImg: File?,
@@ -342,30 +267,6 @@ class CircleRepositoryImpl(private val service: CircleService) : CircleRepositor
                 profileImg = profileImgRequestBody,
                 introductionImg = introductionImgRequestBody,
             )
-            Result.success(Unit)
-        } catch (e: Exception) {
-            Result.error(e)
-        }
-    }
-
-    override suspend fun postMyCircle(
-        circleId: Int,
-        joinMessage: String,
-    ): Result<Unit> {
-        return try {
-            service.postMyCircle(circleId, RequestResponseBodyCircleJoin(joinMessage))
-            Result.success(Unit)
-        } catch (e: Exception) {
-            Result.error(e)
-        }
-    }
-
-    override suspend fun postCircleLeaveRequest(
-        memberId: Int,
-        leaveMessage: String,
-    ): Result<Unit> {
-        return try {
-            service.postCircleLeaveRequest(memberId, RequestResponseBodyCircleLeave(leaveMessage))
             Result.success(Unit)
         } catch (e: Exception) {
             Result.error(e)
@@ -614,20 +515,10 @@ class CircleRepositoryImpl(private val service: CircleService) : CircleRepositor
         }
     }
 
-    override suspend fun deleteCircleJoinRequest(memberId: Int): Result<Unit> {
-        return try {
-            service.deleteCircleJoinRequest(memberId)
-            Result.success(Unit)
-        } catch (e: Exception) {
-            Result.error(e)
-        }
-    }
-
     companion object {
         private const val TEXT_CONTENT_TYPE = "text/plain; charset=utf-8"
         private const val IMAGE_CONTENT_TYPE = "image/jpeg; charset=utf-8"
         private const val SORT_OLDEST = "createdAt,asc"
-        private const val SORT_LATEST = "createdAt,desc"
         private const val SORT_MEMBER_BY_NAME = "username,asc"
         private const val TYPE_POST = "POST"
         private const val TYPE_NOTICE = "NOTICE"
