@@ -2,9 +2,11 @@ package com.developeek.circleon.data.repositoryimpl
 
 import com.developeek.circleon.data.dto.home.RequestResponseBodyCircleJoin
 import com.developeek.circleon.data.dto.home.RequestResponseBodyCircleLeave
+import com.developeek.circleon.data.dto.login.LogoutRequestBody
 import com.developeek.circleon.data.repository.Page
 import com.developeek.circleon.data.repository.UserRepository
 import com.developeek.circleon.data.source.Result
+import com.developeek.circleon.data.source.manager.TokenManager
 import com.developeek.circleon.data.source.manager.UserManager
 import com.developeek.circleon.data.source.remote.retrofit.service.UserService
 import com.developeek.circleon.domain.enums.MembershipStatus
@@ -18,6 +20,7 @@ import java.io.File
 
 class UserRepositoryImpl(
     private val service: UserService,
+    private val tokenManager: TokenManager,
     private val userManager: UserManager,
 ) : UserRepository {
     override suspend fun getMyJoinRequestedCircles(
@@ -154,6 +157,20 @@ class UserRepositoryImpl(
     override suspend fun deleteUserProfileImage(): Result<Unit> {
         return try {
             service.deleteUserProfileImage()
+            Result.success(Unit)
+        } catch (e: Exception) {
+            Result.error(e)
+        }
+    }
+
+    override suspend fun logout(): Result<Unit> {
+        return try {
+            tokenManager.getRefreshToken()?.let {
+                service.logout(LogoutRequestBody(it))
+            }
+            tokenManager.deleteAccessToken()
+            tokenManager.deleteRefreshToken()
+            userManager.deleteUser()
             Result.success(Unit)
         } catch (e: Exception) {
             Result.error(e)

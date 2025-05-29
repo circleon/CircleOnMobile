@@ -40,6 +40,7 @@ object RemoteSourceModule {
     fun provideLoginClient(errorInterceptor: ErrorInterceptor): Builder {
         return OkHttpClient().newBuilder()
             .addInterceptor(errorInterceptor)
+            .addInterceptor(HttpLoggingInterceptor().setLevel(HttpLoggingInterceptor.Level.BODY))
     }
 
     @ServiceClient

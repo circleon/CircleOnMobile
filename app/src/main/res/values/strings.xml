@@ -184,6 +184,7 @@
     <string name="btn_delete_account">탈퇴하기</string>
     <string name="message_set_user_profile_image">프로필 이미지를 설정하시겠어요?</string>
     <string name="message_remove_user_profile_image">프로필 이미지를 삭제할까요?</string>
+    <string name="message_user_logout">로그아웃하시겠어요?</string>
 
     <!--MY Page-->
     <string name="title_my_post">내가 쓴 게시글</string>

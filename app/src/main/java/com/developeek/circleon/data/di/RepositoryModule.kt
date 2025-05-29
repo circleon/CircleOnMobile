@@ -41,8 +41,9 @@ object RepositoryModule {
     @Singleton
     fun provideUserRepository(
         service: UserService,
+        tokenManager: TokenManager,
         userManager: UserManager,
     ): UserRepository {
-        return UserRepositoryImpl(service, userManager)
+        return UserRepositoryImpl(service, tokenManager, userManager)
     }
 }

@@ -5,6 +5,7 @@ import com.developeek.circleon.data.dto.home.MyPost
 import com.developeek.circleon.data.dto.home.Page
 import com.developeek.circleon.data.dto.home.RequestResponseBodyCircleJoin
 import com.developeek.circleon.data.dto.home.RequestResponseBodyCircleLeave
+import com.developeek.circleon.data.dto.login.LogoutRequestBody
 import com.developeek.circleon.data.dto.login.User
 import okhttp3.MultipartBody
 import retrofit2.http.Body
@@ -71,4 +72,9 @@ interface UserService {
 
     @DELETE("users/me/image")
     suspend fun deleteUserProfileImage()
+
+    @POST("auth/logout")
+    suspend fun logout(
+        @Body data: LogoutRequestBody,
+    )
 }

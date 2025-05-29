@@ -2,7 +2,6 @@ package com.developeek.circleon.view.viewmodelimpl.mypage
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.developeek.circleon.data.repository.LoginRepository
 import com.developeek.circleon.data.repository.UserRepository
 import com.developeek.circleon.data.source.Error
 import com.developeek.circleon.data.source.Success
@@ -22,7 +21,6 @@ import javax.inject.Inject
 class MyPageViewModelImpl
     @Inject
     constructor(
-        private val loginRepository: LoginRepository,
         private val userRepository: UserRepository,
     ) : MyPageViewModel, ViewModel() {
         private val _event = MutableSharedFlow<Event>()
@@ -112,7 +110,7 @@ class MyPageViewModelImpl
 
         private suspend fun userLogout() =
             withContext(dispatcher) {
-                loginRepository.logout()
+                userRepository.logout()
             }
 
         private suspend fun whenLogoutSuccess() {
@@ -121,7 +119,7 @@ class MyPageViewModelImpl
         }
 
         private suspend fun whenLogoutFail(result: Error<Unit>) {
-            _event.emit(Event.ShowToast(result.message()))
+            _event.emit(Event.ShowDialog(result.message()))
         }
 
         companion object {

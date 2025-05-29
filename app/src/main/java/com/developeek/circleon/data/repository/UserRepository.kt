@@ -53,4 +53,6 @@ interface UserRepository {
     suspend fun deleteCircleJoinRequest(memberId: Int): Result<Unit>
 
     suspend fun deleteUserProfileImage(): Result<Unit>
+
+    suspend fun logout(): Result<Unit>
 }

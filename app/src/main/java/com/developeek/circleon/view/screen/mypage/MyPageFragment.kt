@@ -32,6 +32,7 @@ import com.developeek.circleon.view.viewmodel.mypage.MyPageViewModel
 import com.developeek.circleon.view.viewmodelimpl.mypage.MyPageScreenEvent
 import com.developeek.circleon.view.viewmodelimpl.mypage.MyPageViewModelImpl
 import com.developeek.circleon.view.widget.PositiveAlertDialog
+import com.developeek.circleon.view.widget.SingleMessageAlertDialog
 import com.developeek.circleon.view.widget.SingleMessageToast
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import dagger.hilt.android.AndroidEntryPoint
@@ -128,7 +129,7 @@ class MyPageFragment : Fragment() {
         setBtnMyPostsListener()
         setBtnProfileImageListener(context)
         setBtnSendFeedbackListener()
-        setBtnLogoutListener()
+        setBtnLogoutListener(context)
     }
 
     private fun setBtnMyPostsListener() {
@@ -168,10 +169,20 @@ class MyPageFragment : Fragment() {
         }
     }
 
-    private fun setBtnLogoutListener() {
+    private fun setBtnLogoutListener(context: Context) {
         binding.btnLogout.setOnClickListener {
-            viewModel.logout()
+            showLogoutDialog(context)
         }
+    }
+
+    private fun showLogoutDialog(context: Context) {
+        PositiveAlertDialog(
+            context,
+            message = context.getString(R.string.message_user_logout),
+            positiveListener = {
+                viewModel.logout()
+            },
+        ).show()
     }
 
     private fun pickImage() {
@@ -216,6 +227,7 @@ class MyPageFragment : Fragment() {
         when (event) {
             is Event.SendToLoginScreen -> sendUserToLoginScreen(parentActivity)
             is Event.ShowToast -> showToast(event, context)
+            is Event.ShowDialog -> showDialog(event, context)
             else -> {}
         }
     }
@@ -233,6 +245,13 @@ class MyPageFragment : Fragment() {
         if (SingleMessageToast.previousFinished()) {
             SingleMessageToast(context, event.message).show()
         }
+    }
+
+    private fun showDialog(
+        event: Event.ShowDialog,
+        context: Context,
+    ) {
+        SingleMessageAlertDialog(context, event.message).show()
     }
 
     private fun handleMyPageScreenEvent(

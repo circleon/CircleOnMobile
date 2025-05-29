@@ -42,10 +42,8 @@ class UserManager
         }
 
         fun deleteUser() {
-            editor.let {
-                it.clear()
-                it.apply()
-            }
+            editor.clear()
+            editor.apply()
         }
 
         companion object {

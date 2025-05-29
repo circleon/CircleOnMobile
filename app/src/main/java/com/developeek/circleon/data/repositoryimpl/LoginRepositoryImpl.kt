@@ -2,7 +2,6 @@ package com.developeek.circleon.data.repositoryimpl
 
 import com.developeek.circleon.data.dto.login.EmailAuthentication
 import com.developeek.circleon.data.dto.login.Login
-import com.developeek.circleon.data.dto.login.LogoutRequestBody
 import com.developeek.circleon.data.dto.login.SignUp
 import com.developeek.circleon.data.repository.LoginRepository
 import com.developeek.circleon.data.source.Result
@@ -37,20 +36,6 @@ class LoginRepositoryImpl(
                 }
                 Result.success(Unit)
             }
-        } catch (e: Exception) {
-            Result.error(e)
-        }
-    }
-
-    override suspend fun logout(): Result<Unit> {
-        return try {
-            tokenManager.getRefreshToken()?.let {
-                service.logout(LogoutRequestBody(it))
-            }
-            tokenManager.deleteAccessToken()
-            tokenManager.deleteRefreshToken()
-            userManager.deleteUser()
-            Result.success(Unit)
         } catch (e: Exception) {
             Result.error(e)
         }
