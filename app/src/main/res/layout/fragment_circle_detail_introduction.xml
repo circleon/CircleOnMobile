@@ -26,7 +26,8 @@
             <androidx.appcompat.widget.AppCompatImageView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:src="@drawable/ic_announcement"/>
+                android:src="@drawable/ic_announcement"
+                app:tint="@color/purple_5"/>
 
             <androidx.appcompat.widget.AppCompatTextView
                 android:layout_width="wrap_content"
