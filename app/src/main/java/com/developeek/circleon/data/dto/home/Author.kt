@@ -13,6 +13,6 @@ data class Author(
         AuthorModel(
             id,
             name,
-            Utils.getPostImageUrlOrNull(profileImgUrl),
+            Utils.getUserImageUrlOrNull(profileImgUrl),
         )
 }

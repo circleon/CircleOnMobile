@@ -3,6 +3,7 @@ package com.developeek.circleon.data.dto.home
 import com.developeek.circleon.domain.enums.MembershipStatus
 import com.developeek.circleon.domain.enums.Role
 import com.developeek.circleon.domain.model.MemberModel
+import com.developeek.circleon.domain.utils.Utils
 import com.google.gson.annotations.SerializedName
 
 /**
@@ -16,8 +17,7 @@ data class Member(
     @SerializedName("memberName") val name: String,
     @SerializedName("membershipStatus") val status: String?,
     @SerializedName("circleRole") val role: String?,
-    // TODO: 회원 수정 기능 제작 이후 프로필 이미지 추가 및 프로필 이미지 전용 url 변환 Utils 에 추가
-    @SerializedName("memberProfileUrl") val profileImgUrl: String?,
+    @SerializedName("memberImgUrl") val profileImgUrl: String?,
     val joinedAt: String?,
 ) {
     fun toMemberModel() =
@@ -26,6 +26,6 @@ data class Member(
             name,
             MembershipStatus.findOrDefault(status),
             Role.findOrDefault(role),
-            profileImgUrl,
+            Utils.getUserImageUrlOrNull(profileImgUrl),
         )
 }

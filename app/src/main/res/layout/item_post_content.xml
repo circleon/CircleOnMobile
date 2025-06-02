@@ -110,7 +110,7 @@
         android:layout_marginEnd="@dimen/margin_padding_x_small"
         android:padding="@dimen/margin_padding_default"
         android:src="@drawable/ic_overflow"
-        app:tint="@color/grey_6"
+        app:tint="@color/purple_5"
         android:background="?attr/selectableItemBackgroundBorderless"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent" />

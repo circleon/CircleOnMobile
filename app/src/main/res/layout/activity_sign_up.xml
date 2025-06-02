@@ -45,7 +45,7 @@
         android:id="@+id/flNext"
         android:layout_width="match_parent"
         android:layout_height="40dp"
-        android:layout_marginBottom="@dimen/margin_padding_large"
+        android:layout_marginBottom="32dp"
         android:background="@drawable/bg_rounded_rectangle"
         android:backgroundTint="@color/purple_5"
         app:layout_constraintBottom_toBottomOf="parent"
