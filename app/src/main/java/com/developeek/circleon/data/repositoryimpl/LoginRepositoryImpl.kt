@@ -25,17 +25,15 @@ class LoginRepositoryImpl(
         password: String,
     ): Result<Unit> {
         return try {
-            withContext(dispatcher) {
-                service.login(Login(email, password)).also {
-                    val user = it.user
-                    val token = it.token
+            service.login(Login(email, password)).also {
+                val user = it.user
+                val token = it.token
 
-                    userManager.setUser(user)
-                    tokenManager.setAccessToken(token.accessToken)
-                    tokenManager.setRefreshToken(token.refreshToken)
-                }
-                Result.success(Unit)
+                userManager.setUser(user)
+                tokenManager.setAccessToken(token.accessToken)
+                tokenManager.setRefreshToken(token.refreshToken)
             }
+            Result.success(Unit)
         } catch (e: Exception) {
             Result.error(e)
         }

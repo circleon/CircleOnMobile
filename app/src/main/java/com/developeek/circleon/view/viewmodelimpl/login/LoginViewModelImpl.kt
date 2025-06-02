@@ -7,6 +7,7 @@ import com.developeek.circleon.data.source.Error
 import com.developeek.circleon.data.source.Success
 import com.developeek.circleon.domain.utils.validator.Invalid
 import com.developeek.circleon.domain.utils.validator.Validator
+import com.developeek.circleon.view.Event
 import com.developeek.circleon.view.viewmodel.login.LoginViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
@@ -21,8 +22,10 @@ import javax.inject.Inject
 class LoginViewModelImpl
     @Inject
     constructor(private val repository: LoginRepository) : LoginViewModel, ViewModel() {
-        private val _event = MutableSharedFlow<LoginEvent>()
-        override val event: SharedFlow<LoginEvent> = _event
+        private val _event = MutableSharedFlow<Event>()
+        override val event: SharedFlow<Event> = _event
+        private val _loginScreenEvent = MutableSharedFlow<LoginScreenEvent>()
+        override val loginScreenEvent: SharedFlow<LoginScreenEvent> = _loginScreenEvent
 
         private var loginJob: Job? = null
         private val dispatcher = Dispatchers.IO
@@ -35,19 +38,16 @@ class LoginViewModelImpl
                 if (!it.isCompleted) return
             }
 
-            viewModelScope.launch {
-                if (!checkEmailFormat(email)) return@launch
+            loginJob =
+                viewModelScope.launch {
+                    if (!checkEmailFormat(email)) return@launch
+                    _event.emit(Event.ShowProcessing)
 
-                _event.emit(LoginEvent.ShowLoadingView)
-
-                loginJob =
-                    launch {
-                        when (val result = userLogin(email, password)) {
-                            is Success -> _event.emit(LoginEvent.SendToHomeScreen)
-                            is Error -> _event.emit(LoginEvent.ShowDialog(result.message()))
-                        }
+                    when (val result = userLogin(email, password)) {
+                        is Success -> whenLoginSuccess()
+                        is Error -> _event.emit(Event.ShowDialog(result.message()))
                     }
-            }
+                }
         }
 
         private suspend fun userLogin(
@@ -57,22 +57,27 @@ class LoginViewModelImpl
             repository.login(email, password)
         }
 
+        private suspend fun whenLoginSuccess() {
+            _event.emit(Event.ShowToast(MESSAGE_LOGIN_SUCCESS))
+            _loginScreenEvent.emit(LoginScreenEvent.SendToHomeScreen)
+        }
+
         private suspend fun checkEmailFormat(email: String): Boolean {
             val result = Validator.checkEmailAsId(email)
 
             return if (result is Invalid) {
-                _event.emit(LoginEvent.ShowDialog(result.message()))
+                _event.emit(Event.ShowDialog(result.message()))
                 false
             } else {
                 true
             }
         }
+
+        companion object {
+            private const val MESSAGE_LOGIN_SUCCESS = "환영합니다"
+        }
     }
 
-sealed class LoginEvent {
-    data object ShowLoadingView : LoginEvent()
-
-    data object SendToHomeScreen : LoginEvent()
-
-    data class ShowDialog(val text: String) : LoginEvent()
+sealed class LoginScreenEvent {
+    data object SendToHomeScreen : LoginScreenEvent()
 }
