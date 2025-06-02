@@ -1,18 +1,19 @@
 package com.developeek.circleon.view.viewmodelimpl.home
 
+import android.os.Parcelable
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.developeek.circleon.data.repository.CircleRepository
+import com.developeek.circleon.data.repository.Page
 import com.developeek.circleon.data.source.Error
 import com.developeek.circleon.data.source.Success
 import com.developeek.circleon.domain.model.CircleDetailModel
+import com.developeek.circleon.domain.model.Models
 import com.developeek.circleon.domain.model.PostModel
-import com.developeek.circleon.domain.model.PostModels
 import com.developeek.circleon.domain.utils.validator.Invalid
 import com.developeek.circleon.domain.utils.validator.Validator
 import com.developeek.circleon.view.Event
 import com.developeek.circleon.view.viewmodel.home.CircleDetailPostViewModel
-import com.developeek.circleon.view.viewmodelimpl.Page
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
@@ -51,7 +52,10 @@ class CircleDetailNoticeViewModelImpl
         private var _isLastPage = false
         private var currentPage = DEFAULT_PAGE
 
-        private lateinit var posts: PostModels
+        private lateinit var posts: Models<PostModel>
+        override val currentScrollState: Parcelable?
+            get() = _currentScrollState
+        private var _currentScrollState: Parcelable? = null
 
         private var fetchNoticesJob: Job? = null
         private var scrollOverNoticeJob: Job? = null
@@ -60,6 +64,17 @@ class CircleDetailNoticeViewModelImpl
 
         init {
             fetchNotices(currentPage, SIZE_BY_PAGE)
+        }
+
+        override fun showLoadingAndRefresh() {
+            viewModelScope.launch {
+                _screenFlow.emit(CircleDetailPostScreen.LoadingView)
+            }
+            refresh()
+        }
+
+        override fun refresh() {
+            fetchNotices(DEFAULT_PAGE, (currentPage + 1) * SIZE_BY_PAGE)
         }
 
         private fun fetchNotices(
@@ -74,7 +89,7 @@ class CircleDetailNoticeViewModelImpl
                 viewModelScope.launch {
                     scrollOverNoticeJob?.cancel()
 
-                    when (val result = getCircleNotices(circleDetail.id, page, size)) {
+                    when (val result = getCircleNotices(circleDetail.circleId, page, size)) {
                         is Success -> whenFetchNoticesSuccess(result)
                         is Error -> whenFetchNoticesFail(result)
                     }
@@ -91,10 +106,10 @@ class CircleDetailNoticeViewModelImpl
 
         private suspend fun whenFetchNoticesSuccess(result: Success<Page<PostModel>>) {
             result.data.let {
-                posts = PostModels(it.content)
                 _isLastPage = it.isLastPage
+                posts = Models(it.content)
+                _screenFlow.emit(CircleDetailPostScreen.SuccessView(posts))
             }
-            _screenFlow.emit(CircleDetailPostScreen.SuccessView(posts))
         }
 
         private suspend fun whenFetchNoticesFail(result: Error<Page<PostModel>>) {
@@ -106,10 +121,6 @@ class CircleDetailNoticeViewModelImpl
             }
         }
 
-        override fun refresh() {
-            fetchNotices(DEFAULT_PAGE, (currentPage + 1) * SIZE_BY_PAGE)
-        }
-
         override fun scrollOver() {
             scrollOverNoticeJob?.let {
                 if (!it.isCompleted) return
@@ -117,7 +128,7 @@ class CircleDetailNoticeViewModelImpl
 
             scrollOverNoticeJob =
                 viewModelScope.launch {
-                    val result = getCircleNotices(circleDetail.id, currentPage + 1, SIZE_BY_PAGE)
+                    val result = getCircleNotices(circleDetail.circleId, currentPage + 1, SIZE_BY_PAGE)
 
                     if (!isActive) return@launch // 스크롤 작업 캔슬 시 내용을 업데이트하지 않고 작업 종료
                     when (result) {
@@ -129,12 +140,11 @@ class CircleDetailNoticeViewModelImpl
 
         private suspend fun whenScrollOverSuccess(result: Success<Page<PostModel>>) {
             result.data.let {
-                posts = posts.addAllAndGet(it.content)
                 _isLastPage = it.isLastPage
+                posts = posts.addAllAndGet(it.content)
+                _screenFlow.emit(CircleDetailPostScreen.SuccessView(posts))
             }
             currentPage++
-
-            _screenFlow.emit(CircleDetailPostScreen.SuccessView(posts))
         }
 
         private suspend fun whenScrollOverFail(result: Error<Page<PostModel>>) {
@@ -163,9 +173,9 @@ class CircleDetailNoticeViewModelImpl
 
             userRequestJob =
                 viewModelScope.launch {
-                    _event.emit(Event.Loading)
+                    _event.emit(Event.ShowProcessing)
 
-                    when (val result = putPostPin(circleDetail.id, postId, isPinned)) {
+                    when (val result = putPostPin(circleDetail.circleId, postId, isPinned)) {
                         is Success ->
                             showToastAndRefresh(
                                 if (isPinned) MESSAGE_SUCCESS_REQUEST_PIN else MESSAGE_SUCCESS_REQUEST_REMOVE_PIN,
@@ -190,11 +200,11 @@ class CircleDetailNoticeViewModelImpl
 
             userRequestJob =
                 viewModelScope.launch {
-                    _event.emit(Event.Loading)
+                    _event.emit(Event.ShowProcessing)
 
                     userRequestJob =
                         launch {
-                            when (val result = deleteCirclePost(circleDetail.id, postId)) {
+                            when (val result = deleteCirclePost(circleDetail.circleId, postId)) {
                                 is Success -> showToastAndRefresh(MESSAGE_SUCCESS_REQUEST_REMOVE_NOTICE)
                                 is Error -> whenUserRequestFail(result)
                             }
@@ -220,10 +230,10 @@ class CircleDetailNoticeViewModelImpl
             userRequestJob =
                 viewModelScope.launch {
                     if (!checkMessageFormat(reportMessage)) return@launch
-                    _event.emit(Event.Loading)
+                    _event.emit(Event.ShowProcessing)
 
-                    when (val result = postReportCircleNotice(circleDetail.id, postId, reportMessage)) {
-                        is Success -> showToast(MESSAGE_SUCCESS_REQUEST_REPORT)
+                    when (val result = postReportCircleNotice(circleDetail.circleId, postId, reportMessage)) {
+                        is Success -> _event.emit(Event.ShowToast(MESSAGE_SUCCESS_REQUEST_REPORT))
                         is Error -> whenUserRequestFail(result)
                     }
                 }
@@ -238,12 +248,8 @@ class CircleDetailNoticeViewModelImpl
         }
 
         private suspend fun showToastAndRefresh(message: String) {
-            showToast(message)
-            refresh()
-        }
-
-        private suspend fun showToast(message: String) {
             _event.emit(Event.ShowToast(message))
+            refresh()
         }
 
         private suspend fun whenUserRequestFail(result: Error<Unit>) {
@@ -265,6 +271,10 @@ class CircleDetailNoticeViewModelImpl
             } else {
                 true
             }
+        }
+
+        override fun saveScrollState(scrollState: Parcelable?) {
+            _currentScrollState = scrollState
         }
 
         companion object {

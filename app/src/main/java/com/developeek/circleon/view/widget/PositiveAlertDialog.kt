@@ -2,13 +2,12 @@ package com.developeek.circleon.view.widget
 
 import android.app.AlertDialog
 import android.content.Context
-import androidx.core.content.ContextCompat
 import com.developeek.circleon.R
 
 class PositiveAlertDialog(
     private val context: Context,
     private val message: String,
-    private val positiveButton: String = ContextCompat.getString(context, R.string.btn_positive),
+    private val positiveButton: String = context.getString(R.string.btn_positive),
     private val positiveListener: Runnable,
 ) {
     private lateinit var dialog: AlertDialog
@@ -21,7 +20,7 @@ class PositiveAlertDialog(
                     positiveListener.run()
                     dialog.dismiss()
                 }
-                setNegativeButton(ContextCompat.getString(context, R.string.btn_cancel)) { dialog, _ ->
+                setNegativeButton(context.getString(R.string.btn_cancel)) { dialog, _ ->
                     dialog.dismiss()
                 }
             }.create()

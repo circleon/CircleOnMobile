@@ -3,11 +3,13 @@ package com.developeek.circleon.view.viewmodelimpl.home
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.developeek.circleon.data.repository.CircleRepository
+import com.developeek.circleon.data.repository.UserRepository
 import com.developeek.circleon.data.source.Error
 import com.developeek.circleon.data.source.Result
 import com.developeek.circleon.data.source.Success
 import com.developeek.circleon.domain.model.CircleDetailModel
-import com.developeek.circleon.domain.model.MemberModels
+import com.developeek.circleon.domain.model.MemberModel
+import com.developeek.circleon.domain.model.Models
 import com.developeek.circleon.domain.utils.validator.Invalid
 import com.developeek.circleon.domain.utils.validator.Validator
 import com.developeek.circleon.view.Event
@@ -31,7 +33,8 @@ class CircleDetailViewModelImpl
     @AssistedInject
     constructor(
         @Assisted private val circleId: Int,
-        private val repository: CircleRepository,
+        private val CircleRepository: CircleRepository,
+        private val userRepository: UserRepository,
     ) : CircleDetailViewModel, ViewModel() {
         @AssistedFactory
         interface CircleDetailViewModelFactory {
@@ -63,6 +66,10 @@ class CircleDetailViewModelImpl
             fetchCircleDetail()
         }
 
+        override fun refresh() {
+            fetchCircleDetail()
+        }
+
         private fun fetchCircleDetail() {
             fetchCircleDetailJob?.let {
                 if (!it.isCompleted) return
@@ -73,15 +80,15 @@ class CircleDetailViewModelImpl
                     _screenFlow.emit(CircleDetailScreen.LoadingView)
 
                     val circleDetailResult: Result<CircleDetailModel>
-                    val circleMembersResult: Result<MemberModels>
+                    val circleMembersResult: Result<Models<MemberModel>>
                     withContext(dispatcher) {
                         val circleDetail =
                             async {
-                                repository.getCircleDetail(circleId)
+                                CircleRepository.getCircleDetail(circleId)
                             }
                         val circleMembers =
                             async {
-                                repository.getCircleMembers(circleId, DEFAULT_PAGE, MEMBER_SIZE_BY_PAGE)
+                                CircleRepository.getCircleMembers(circleId, DEFAULT_PAGE, MEMBER_SIZE_BY_PAGE)
                             }
 
                         circleDetailResult = circleDetail.await()
@@ -101,7 +108,7 @@ class CircleDetailViewModelImpl
 
         private suspend fun whenFetchCircleDetailAndMembersSuccess(
             circleDetailResult: Success<CircleDetailModel>,
-            circleMembersResult: Success<MemberModels>,
+            circleMembersResult: Success<Models<MemberModel>>,
         ) {
             circleDetail = CircleDetailModel(circleDetailResult.data, circleMembersResult.data)
             _screenFlow.emit(CircleDetailScreen.SuccessView(circleDetail))
@@ -116,17 +123,13 @@ class CircleDetailViewModelImpl
             }
         }
 
-        private suspend fun whenFetchCircleMembersFail(result: Error<MemberModels>) {
+        private suspend fun whenFetchCircleMembersFail(result: Error<Models<MemberModel>>) {
             _event.emit(Event.ShowToast(result.message()))
             _screenFlow.emit(CircleDetailScreen.ErrorView)
 
             if (result.isAuthenticationError()) {
                 _event.emit(Event.SendToLoginScreen)
             }
-        }
-
-        override fun refresh() {
-            fetchCircleDetail()
         }
 
         override fun requestJoin(joinMessage: String) {
@@ -137,7 +140,7 @@ class CircleDetailViewModelImpl
             userRequestJob =
                 viewModelScope.launch {
                     if (!checkMessageFormat(joinMessage)) return@launch
-                    _event.emit(Event.Loading)
+                    _event.emit(Event.ShowProcessing)
 
                     when (val result = postMyCircle(circleId, joinMessage)) {
                         is Success -> showToastAndRefresh(MESSAGE_SUCCESS_REQUEST_JOIN)
@@ -150,7 +153,7 @@ class CircleDetailViewModelImpl
             circleId: Int,
             message: String,
         ) = withContext(dispatcher) {
-            repository.postMyCircle(circleId, message)
+            userRepository.postMyCircle(circleId, message)
         }
 
         override fun requestLeave(leaveMessage: String) {
@@ -161,7 +164,7 @@ class CircleDetailViewModelImpl
             userRequestJob =
                 viewModelScope.launch {
                     if (!checkMessageFormat(leaveMessage)) return@launch
-                    _event.emit(Event.Loading)
+                    _event.emit(Event.ShowProcessing)
 
                     when (val result = postCircleLeaveRequest(circleDetail.memberId, leaveMessage)) {
                         is Success -> showToastAndRefresh(MESSAGE_SUCCESS_REQUEST_LEAVE)
@@ -174,7 +177,7 @@ class CircleDetailViewModelImpl
             memberId: Int,
             message: String,
         ) = withContext(dispatcher) {
-            repository.postCircleLeaveRequest(memberId, message)
+            userRepository.postCircleLeaveRequest(memberId, message)
         }
 
         override fun requestReport(reportMessage: String) {
@@ -185,7 +188,7 @@ class CircleDetailViewModelImpl
             userRequestJob =
                 viewModelScope.launch {
                     if (!checkMessageFormat(reportMessage)) return@launch
-                    _event.emit(Event.Loading)
+                    _event.emit(Event.ShowProcessing)
 
                     when (val result = postReportCircle(circleId, reportMessage)) {
                         is Success -> showToastAndRefresh(MESSAGE_SUCCESS_REQUEST_REPORT)
@@ -198,7 +201,7 @@ class CircleDetailViewModelImpl
             circleId: Int,
             message: String,
         ) = withContext(dispatcher) {
-            repository.postReportCircle(circleId, message)
+            CircleRepository.postReportCircle(circleId, message)
         }
 
         private suspend fun checkMessageFormat(message: String): Boolean {

@@ -1,12 +1,14 @@
 package com.developeek.circleon.view.viewmodel.home
 
-import androidx.lifecycle.LiveData
-import com.developeek.circleon.domain.state.UiState
+import com.developeek.circleon.view.Event
+import com.developeek.circleon.view.viewmodelimpl.home.UploadPostScreen
+import kotlinx.coroutines.flow.SharedFlow
+import kotlinx.coroutines.flow.StateFlow
 import java.io.File
 
 interface UploadPostViewModel {
-    val state: LiveData<UiState>
-    val error: String
+    val event: SharedFlow<Event>
+    val screenFlow: StateFlow<UploadPostScreen>
 
     fun upload(content: String)
 

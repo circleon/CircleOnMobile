@@ -22,9 +22,8 @@ import com.developeek.circleon.R
 import com.developeek.circleon.data.source.manager.UserManager
 import com.developeek.circleon.databinding.FragmentHomeBinding
 import com.developeek.circleon.domain.model.CategoryModel
-import com.developeek.circleon.domain.model.CategoryModels
 import com.developeek.circleon.domain.model.CircleModel
-import com.developeek.circleon.domain.model.CircleModels
+import com.developeek.circleon.domain.model.Models
 import com.developeek.circleon.domain.model.UserModel
 import com.developeek.circleon.domain.utils.Const
 import com.developeek.circleon.domain.utils.glide.GlideProvider
@@ -139,7 +138,7 @@ class HomeFragment : Fragment() {
                             .navigate(
                                 R.id.action_homeFragment_to_circleDetailFragment,
                                 bundleOf(
-                                    Pair(Const.TAG_CIRCLE_ID, item.id),
+                                    Pair(Const.TAG_CIRCLE_ID, item.circleId),
                                     Pair(Const.TAG_CIRCLE_NAME, item.name),
                                 ),
                             )
@@ -167,6 +166,9 @@ class HomeFragment : Fragment() {
             String.format(
                 context.getString(R.string.home_content_title_circle), user.name,
             )
+        user.profileImage?.let {
+            glideProvider.fetchImage(it, context, binding.imgUserProfile)
+        } ?: binding.imgUserProfile.setImageResource(R.drawable.ic_profile)
     }
 
     private fun handleEvent(
@@ -190,7 +192,7 @@ class HomeFragment : Fragment() {
         }
     }
 
-    private fun loadCircleCategory(categories: CategoryModels) {
+    private fun loadCircleCategory(categories: Models<CategoryModel>) {
         binding.rvCircleCategory.adapter?.let {
             (it as CategoryAdapter).update(categories) {}
         }
@@ -216,7 +218,7 @@ class HomeFragment : Fragment() {
     }
 
     private fun loadCirclesAndDoAfter(
-        circles: CircleModels,
+        circles: Models<CircleModel>,
         after: () -> Unit,
     ) {
         binding.rvCircle.adapter?.let {
@@ -232,6 +234,7 @@ class HomeFragment : Fragment() {
     }
 
     private fun showErrorView() {
+        binding.shimmerCircle.stopShimmer()
         switchView(binding.llServiceError)
     }
 

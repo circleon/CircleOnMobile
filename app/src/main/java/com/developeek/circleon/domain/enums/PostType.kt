@@ -10,10 +10,6 @@ enum class PostType(
 
     fun code() = this.codeName
 
-    fun isPost() = this == POST
-
-    fun isNotice() = this == NOTICE
-
     companion object {
         private val default = POST
 

@@ -12,7 +12,7 @@ import com.developeek.circleon.domain.model.MemberModel
 import com.developeek.circleon.view.listener.ItemClickListener
 import com.developeek.circleon.view.listener.ItemListenerInitializer
 
-class CircleAcceptRequestAlertDialog(
+class CircleMemberRequestAlertDialog(
     private val context: Context,
     private val title: String,
     private val member: MemberModel,
@@ -21,7 +21,7 @@ class CircleAcceptRequestAlertDialog(
     private val positiveListenerInitializer: ItemListenerInitializer<MemberModel>,
     private val negativeListenerInitializer: ItemListenerInitializer<MemberModel>,
 ) {
-    private lateinit var alertDialog: AlertDialog
+    private val alertDialog: AlertDialog
 
     init {
         val layoutInflater = LayoutInflater.from(context)

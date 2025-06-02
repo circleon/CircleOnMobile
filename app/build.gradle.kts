@@ -16,12 +16,16 @@ android {
         minSdk = 30
         targetSdk = 34
         versionCode = 1
-        versionName = "1.0"
+        versionName = "1.0.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         buildConfigField("String", "TOKEN_PREFERENCE_KEY", getLocalValue("token.preference.key"))
         buildConfigField("String", "USER_PREFERENCE_KEY", getLocalValue("user.preference.key"))
         buildConfigField("String", "SERVICE_API_URL", getLocalValue("service.api.url"))
+        buildConfigField("String", "SERVICE_IMAGE_API_URL", getLocalValue("service.image.api.url"))
+        buildConfigField("String", "CIRCLE_IMAGE_PATH", getLocalValue("circle.image.path"))
+        buildConfigField("String", "POST_IMAGE_PATH", getLocalValue("post.image.path"))
+        buildConfigField("String", "USER_IMAGE_PATH", getLocalValue("user.image.path"))
     }
 
     buildTypes {

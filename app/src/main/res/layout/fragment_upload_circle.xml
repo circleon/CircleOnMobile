@@ -185,7 +185,7 @@
                         android:layout_height="wrap_content"
                         android:layout_weight="0.45"
                         android:paddingVertical="10dp"
-                        android:paddingHorizontal="@dimen/margin_padding_large"
+                        android:paddingHorizontal="@dimen/margin_padding_small"
                         android:background="@drawable/bg_edit_content"
                         android:gravity="center_vertical"
                         android:orientation="horizontal">
@@ -194,7 +194,7 @@
                             android:id="@+id/imgCalendar"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:src="@drawable/ic_calendar_2"/>
+                            android:src="@drawable/ic_calendar"/>
 
                         <androidx.appcompat.widget.AppCompatTextView
                             android:id="@+id/txtRecruitmentStartDate"
@@ -227,7 +227,7 @@
                         android:layout_height="wrap_content"
                         android:layout_weight="0.45"
                         android:paddingVertical="10dp"
-                        android:paddingHorizontal="@dimen/margin_padding_large"
+                        android:paddingHorizontal="@dimen/margin_padding_small"
                         android:background="@drawable/bg_edit_content"
                         android:gravity="center_vertical"
                         android:orientation="horizontal">
@@ -235,7 +235,7 @@
                         <androidx.appcompat.widget.AppCompatImageView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:src="@drawable/ic_calendar_2"/>
+                            android:src="@drawable/ic_calendar"/>
 
                         <androidx.appcompat.widget.AppCompatTextView
                             android:id="@+id/txtRecruitmentEndDate"
@@ -379,6 +379,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="@dimen/margin_padding_xx_large"
+                    android:gravity="center_vertical"
                     android:orientation="horizontal">
 
                     <androidx.appcompat.widget.AppCompatTextView
@@ -390,13 +391,16 @@
                         android:textSize="@dimen/text_size_small"
                         android:translationY="-0.91sp" />
 
-                    <androidx.appcompat.widget.AppCompatImageView
+                    <androidx.appcompat.widget.AppCompatTextView
                         android:layout_width="wrap_content"
                         android:layout_height="match_parent"
                         android:layout_marginStart="@dimen/margin_padding_small"
                         android:layout_marginEnd="@dimen/margin_padding_xx_small"
-                        android:src="@drawable/ic_info"
-                        app:tint="@color/purple_5"/>
+                        android:lineSpacingExtra="2sp"
+                        android:text="*"
+                        android:textColor="@color/purple_5"
+                        android:textSize="@dimen/text_size_small"
+                        android:translationY="1sp" />
 
                     <androidx.appcompat.widget.AppCompatTextView
                         android:layout_width="wrap_content"

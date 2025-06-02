@@ -19,25 +19,31 @@ import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.Observer
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.developeek.circleon.R
 import com.developeek.circleon.data.source.manager.UserManager
 import com.developeek.circleon.databinding.FragmentCircleDetailPostDetailBinding
+import com.developeek.circleon.domain.enums.PostType
+import com.developeek.circleon.domain.model.BaseModel
 import com.developeek.circleon.domain.model.CommentModel
+import com.developeek.circleon.domain.model.Models
 import com.developeek.circleon.domain.model.PostModel
-import com.developeek.circleon.domain.state.UiState
+import com.developeek.circleon.domain.model.UserModel
 import com.developeek.circleon.domain.utils.Const
 import com.developeek.circleon.domain.utils.Utils
 import com.developeek.circleon.domain.utils.glide.GlideProvider
+import com.developeek.circleon.view.Event
 import com.developeek.circleon.view.adapter.PostDetailAdapter
 import com.developeek.circleon.view.listener.ItemListenerInitializer
-import com.developeek.circleon.view.listener.RecyclerViewHideSoftInputListener
 import com.developeek.circleon.view.listener.RecyclerViewInfiniteScrollListener
 import com.developeek.circleon.view.screen.login.LoginActivity
 import com.developeek.circleon.view.viewmodel.home.CircleDetailPostDetailViewModel
+import com.developeek.circleon.view.viewmodelimpl.home.CircleDetailPostDetailScreen
 import com.developeek.circleon.view.viewmodelimpl.home.CircleDetailPostDetailViewModelImpl
 import com.developeek.circleon.view.widget.CircleRequestAlertDialog
 import com.developeek.circleon.view.widget.EditCommentAlertDialog
@@ -47,6 +53,7 @@ import com.developeek.circleon.view.widget.SingleMessageToast
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import dagger.hilt.android.AndroidEntryPoint
 import dagger.hilt.android.lifecycle.withCreationCallback
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -77,7 +84,6 @@ class CircleDetailPostDetailFragment : Fragment() {
             post = it.getSerializable(Const.TAG_CIRCLE_POST) as PostModel
         }
 
-        // post 상세 화면에서만 adjust resize mode 로 전환
         activity?.window?.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE)
     }
 
@@ -99,6 +105,12 @@ class CircleDetailPostDetailFragment : Fragment() {
         return super.onCreateAnimator(transit, enter, nextAnim)
     }
 
+    private fun hideBtmNavWhenVisible(parentActivity: Activity) {
+        val btmNav = parentActivity.findViewById<BottomNavigationView>(R.id.btmNav)
+
+        if (btmNav.isVisible) btmNav.isVisible = false
+    }
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -116,25 +128,38 @@ class CircleDetailPostDetailFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         postponeEnterTransition()
 
-        initView(requireActivity(), requireContext())
-        initObserver(requireActivity(), requireContext())
-        initListener(requireContext())
+        initView(requireActivity())
+        initRefreshObserver()
+        initListener()
+        lifecycleScope.launch {
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                launch {
+                    viewModel.event.collect {
+                        handleEvent(it, requireActivity(), requireContext())
+                    }
+                }
+                launch {
+                    viewModel.screenFlow.collect {
+                        handleScreenFlow(it, requireContext())
+                    }
+                }
+            }
+        }
     }
 
-    private fun initView(
-        parentActivity: Activity,
-        context: Context,
-    ) {
-        initToolbar()
+    private fun initView(context: Context) {
+        initToolbar(context)
         initRecyclerView(context)
     }
 
-    private fun initToolbar() {
-        if (post.isNotice()) {
-            binding.txtTbTitle.text = TITLE_NOTICE
-        } else {
-            binding.txtTbTitle.text = TITLE_POST
-        }
+    private fun initToolbar(context: Context) {
+        val title =
+            when (post.type) {
+                PostType.POST -> context.getString(R.string.title_post_detail)
+                PostType.NOTICE -> context.getString(R.string.title_notice_detail)
+            }
+
+        binding.txtTbTitle.text = title
     }
 
     private fun initRecyclerView(context: Context) {
@@ -164,7 +189,6 @@ class CircleDetailPostDetailFragment : Fragment() {
                             initCommentOverflowMenuAndShow(context, item, view!!)
                         }
                     },
-                userId = userManager.getUser()?.id,
             )
         binding.rvPostDetail.layoutManager = LinearLayoutManager(context)
         if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.R) {
@@ -178,26 +202,33 @@ class CircleDetailPostDetailFragment : Fragment() {
         view: View,
     ) {
         val popupMenu = object : PopupMenu(context, view) {}
-        val userId = userManager.getUser()?.id
 
-        userId?.let {
-            if (it == post.author.id) {
-                popupMenu.inflate(R.menu.menu_author_post_settings)
-                Utils.changeMenuItemTextColor(
-                    popupMenu.menu.findItem(R.id.delete_post),
-                    ContextCompat.getColor(context, R.color.error),
-                )
-            } else {
-                popupMenu.inflate(R.menu.menu_post_settings)
-                Utils.changeMenuItemTextColor(
-                    popupMenu.menu.findItem(R.id.report_post),
-                    ContextCompat.getColor(context, R.color.error),
-                )
-            }
+        userManager.getUser()?.let {
+            inflatePostPopupByUser(popupMenu, post, it, context)
         }
-
         popupMenu.setOnMenuItemClickListener(postOverflowMenuItemClickListener(context, post))
         popupMenu.show()
+    }
+
+    private fun inflatePostPopupByUser(
+        popupMenu: PopupMenu,
+        post: PostModel,
+        user: UserModel,
+        context: Context,
+    ) {
+        if (user.id == post.author.authorId) {
+            popupMenu.inflate(R.menu.menu_author_post_settings)
+            Utils.changeMenuItemTextColor(
+                popupMenu.menu.findItem(R.id.delete_post),
+                ContextCompat.getColor(context, R.color.error),
+            )
+        } else {
+            popupMenu.inflate(R.menu.menu_post_settings)
+            Utils.changeMenuItemTextColor(
+                popupMenu.menu.findItem(R.id.report_post),
+                ContextCompat.getColor(context, R.color.error),
+            )
+        }
     }
 
     private fun postOverflowMenuItemClickListener(
@@ -210,36 +241,50 @@ class CircleDetailPostDetailFragment : Fragment() {
             }
 
             R.id.delete_post -> {
-                PositiveAlertDialog(
-                    context,
-                    if (item.isNotice()) MESSAGE_DELETE_NOTICE else MESSAGE_DELETE_POST,
-                    ContextCompat.getString(context, R.string.btn_delete),
-                    positiveListener = {
-                        viewModel.delete()
-                    },
-                ).show()
+                showDeletePostDialog(item, context)
             }
 
             R.id.report_post -> {
-                CircleRequestAlertDialog(
-                    context,
-                    title = ContextCompat.getString(context, R.string.title_report_dialog),
-                    positiveButton = ContextCompat.getString(context, R.string.menu_report),
-                    positiveListenerInitializer =
-                        object : ItemListenerInitializer<String> {
-                            override fun initialize(item: String) {
-                                viewModel.reportPost(item)
-                            }
-
-                            override fun initialize(
-                                item: String,
-                                view: View?,
-                            ) {}
-                        },
-                ).show()
+                showReportPostDialog(context)
             }
         }
         true
+    }
+
+    private fun showDeletePostDialog(
+        post: PostModel,
+        context: Context,
+    ) {
+        PositiveAlertDialog(
+            context,
+            when (post.type) {
+                PostType.POST -> context.getString(R.string.message_delete_post)
+                PostType.NOTICE -> context.getString(R.string.message_delete_notice)
+            },
+            context.getString(R.string.btn_delete),
+            positiveListener = {
+                viewModel.delete()
+            },
+        ).show()
+    }
+
+    private fun showReportPostDialog(context: Context) {
+        CircleRequestAlertDialog(
+            context,
+            title = context.getString(R.string.title_report_dialog),
+            positiveButton = context.getString(R.string.menu_report),
+            positiveListenerInitializer =
+                object : ItemListenerInitializer<String> {
+                    override fun initialize(item: String) {
+                        viewModel.reportPost(item)
+                    }
+
+                    override fun initialize(
+                        item: String,
+                        view: View?,
+                    ) {}
+                },
+        ).show()
     }
 
     private fun sendUserToEditPostScreen(
@@ -261,115 +306,112 @@ class CircleDetailPostDetailFragment : Fragment() {
         view: View,
     ) {
         val popupMenu = object : PopupMenu(context, view) {}
-        val userId = userManager.getUser()?.id
 
-        userId?.let {
-            if (it == comment.author.id) {
-                popupMenu.inflate(R.menu.menu_author_comment_settings)
-                Utils.changeMenuItemTextColor(
-                    popupMenu.menu.findItem(R.id.delete_comment),
-                    ContextCompat.getColor(context, R.color.error),
-                )
-            } else {
-                popupMenu.inflate(R.menu.menu_comment_settings)
-                Utils.changeMenuItemTextColor(
-                    popupMenu.menu.findItem(R.id.report_comment),
-                    ContextCompat.getColor(context, R.color.error),
-                )
-            }
+        userManager.getUser()?.let {
+            inflateCommentPopupByUser(popupMenu, comment, it, context)
         }
         popupMenu.setOnMenuItemClickListener(commentOverflowMenuItemClickListener(context, comment))
         popupMenu.show()
+    }
+
+    private fun inflateCommentPopupByUser(
+        popupMenu: PopupMenu,
+        comment: CommentModel,
+        user: UserModel,
+        context: Context,
+    ) {
+        if (user.id == comment.author.authorId) {
+            popupMenu.inflate(R.menu.menu_author_comment_settings)
+            Utils.changeMenuItemTextColor(
+                popupMenu.menu.findItem(R.id.delete_comment),
+                ContextCompat.getColor(context, R.color.error),
+            )
+        } else {
+            popupMenu.inflate(R.menu.menu_comment_settings)
+            Utils.changeMenuItemTextColor(
+                popupMenu.menu.findItem(R.id.report_comment),
+                ContextCompat.getColor(context, R.color.error),
+            )
+        }
     }
 
     private fun commentOverflowMenuItemClickListener(
         context: Context,
         comment: CommentModel,
     ) = PopupMenu.OnMenuItemClickListener {
-        viewModel.saveScrollState(binding.rvPostDetail.layoutManager?.onSaveInstanceState())
         when (it.itemId) {
             R.id.edit_comment -> {
-                EditCommentAlertDialog(
-                    context,
-                    comment.content,
-                    object : ItemListenerInitializer<String> {
-                        override fun initialize(item: String) {
-                            viewModel.editComment(comment.id, item)
-                        }
-
-                        override fun initialize(
-                            item: String,
-                            view: View?,
-                        ) {}
-                    },
-                ).show()
+                showEditCommentDialog(comment, context)
             }
 
             R.id.delete_comment -> {
-                PositiveAlertDialog(
-                    context,
-                    MESSAGE_DELETE_COMMENT,
-                    ContextCompat.getString(context, R.string.btn_delete),
-                    positiveListener = {
-                        viewModel.deleteComment(comment.id)
-                    },
-                ).show()
+                showDeleteCommentDialog(comment, context)
             }
 
             R.id.report_comment -> {
-                CircleRequestAlertDialog(
-                    context,
-                    title = ContextCompat.getString(context, R.string.title_report_dialog),
-                    positiveButton = ContextCompat.getString(context, R.string.menu_report),
-                    positiveListenerInitializer =
-                        object : ItemListenerInitializer<String> {
-                            override fun initialize(item: String) {
-                                viewModel.reportComment(comment.id, item)
-                            }
-
-                            override fun initialize(
-                                item: String,
-                                view: View?,
-                            ) {}
-                        },
-                ).show()
+                showReportCommentDialog(comment, context)
             }
         }
         true
     }
 
-    private fun initObserver(
-        parentActivity: Activity,
+    private fun showEditCommentDialog(
+        comment: CommentModel,
         context: Context,
     ) {
-        viewModel.state.observe(
-            viewLifecycleOwner,
-            stateObserver(parentActivity, context),
-        )
-        viewModel.uploadCommentState.observe(
-            viewLifecycleOwner,
-            uploadCommentStateObserver(parentActivity, context),
-        )
-        viewModel.editCommentState.observe(
-            viewLifecycleOwner,
-            editCommentStateObserver(parentActivity, context),
-        )
-        viewModel.deleteCommentState.observe(
-            viewLifecycleOwner,
-            deleteCommentStateObserver(parentActivity, context),
-        )
-        viewModel.deletePostState.observe(
-            viewLifecycleOwner,
-            deletePostStateObserver(parentActivity, context),
-        )
-        viewModel.scrollOver.observe(
-            viewLifecycleOwner,
-            scrollOverObserver(),
-        )
-        viewModel.reportState.observe(
-            viewLifecycleOwner,
-            reportStateObserver(parentActivity, context),
-        )
+        EditCommentAlertDialog(
+            context,
+            comment.content,
+            object : ItemListenerInitializer<String> {
+                override fun initialize(item: String) {
+                    viewModel.editComment(comment.id, item)
+                }
+
+                override fun initialize(
+                    item: String,
+                    view: View?,
+                ) {}
+            },
+        ).show()
+    }
+
+    private fun showDeleteCommentDialog(
+        comment: CommentModel,
+        context: Context,
+    ) {
+        PositiveAlertDialog(
+            context,
+            context.getString(R.string.message_delete_comment),
+            context.getString(R.string.btn_delete),
+            positiveListener = {
+                viewModel.deleteComment(comment.id)
+            },
+        ).show()
+    }
+
+    private fun showReportCommentDialog(
+        comment: CommentModel,
+        context: Context,
+    ) {
+        CircleRequestAlertDialog(
+            context,
+            title = context.getString(R.string.title_report_dialog),
+            positiveButton = context.getString(R.string.menu_report),
+            positiveListenerInitializer =
+                object : ItemListenerInitializer<String> {
+                    override fun initialize(item: String) {
+                        viewModel.reportComment(comment.id, item)
+                    }
+
+                    override fun initialize(
+                        item: String,
+                        view: View?,
+                    ) {}
+                },
+        ).show()
+    }
+
+    private fun initRefreshObserver() {
         // 정보 수정 여부 감지
         findNavController()
             .currentBackStackEntry
@@ -383,45 +425,67 @@ class CircleDetailPostDetailFragment : Fragment() {
             }
     }
 
-    private fun stateObserver(
+    private fun initListener() {
+        setRvCircleCommentListener()
+        setBtnBackListener()
+        setBtnRegisterCommentListener()
+        setBtnRetryListener()
+    }
+
+    private fun setRvCircleCommentListener() {
+        val scrollListener =
+            RecyclerViewInfiniteScrollListener().apply {
+                setScrollEndListener {
+                    if (!viewModel.isLastPage) {
+                        addScrollLoadingItemAndLoad()
+                    }
+                }
+            }
+
+        binding.rvPostDetail.addOnScrollListener(scrollListener)
+    }
+
+    private fun addScrollLoadingItemAndLoad() {
+        binding.rvPostDetail.adapter?.let {
+            (it as PostDetailAdapter).addLoadingItem()
+            viewModel.scrollOver()
+        }
+    }
+
+    private fun setBtnBackListener() {
+        binding.btnBack.setOnClickListener {
+            sendUserToPreviousScreen()
+        }
+    }
+
+    private fun sendUserToPreviousScreen() {
+        findNavController().popBackStack()
+    }
+
+    private fun setBtnRegisterCommentListener() {
+        binding.btnUploadComment.setOnClickListener {
+            viewModel.uploadComment(binding.edtComment.text.toString())
+        }
+    }
+
+    private fun setBtnRetryListener() {
+        binding.btnRetry.setOnClickListener {
+            viewModel.showLoadingAndRefresh()
+        }
+    }
+
+    private fun handleEvent(
+        event: Event,
         parentActivity: Activity,
         context: Context,
-    ) = Observer<UiState> {
-        binding.pgbLoading.isVisible = it is UiState.Loading
-        if (it !is UiState.Loading && it !is UiState.Success) {
-            startPostponedEnterTransition()
-        }
-        when (it) {
-            UiState.Success -> {
-                toggleView(binding.rvPostDetail)
-                loadContents(parentActivity)
-            }
-            UiState.AuthenticationError -> {
-                sendUserToLoginScreen(parentActivity)
-                showErrorToast(context)
-            }
-            UiState.ServiceError -> {
-                toggleView(binding.llServiceError)
-                showErrorDialog(context)
-            }
+    ) {
+        binding.pgbLoading.isVisible = event is Event.ShowProcessing
+        when (event) {
+            is Event.SendToLoginScreen -> sendUserToLoginScreen(parentActivity)
+            is Event.ShowToast -> showToast(event, context)
+            is Event.ShowDialog -> showDialog(event, context)
             else -> {}
         }
-    }
-
-    private fun hideBtmNavWhenVisible(parentActivity: Activity) {
-        val btmNav = parentActivity.findViewById<BottomNavigationView>(R.id.btmNav)
-
-        if (btmNav.isVisible) btmNav.isVisible = false
-    }
-
-    private fun showErrorToast(context: Context) {
-        if (SingleMessageToast.previousFinished()) {
-            SingleMessageToast(context, viewModel.error).show()
-        }
-    }
-
-    private fun showErrorDialog(context: Context) {
-        SingleMessageAlertDialog(context, viewModel.error).show()
     }
 
     private fun sendUserToLoginScreen(activity: Activity) {
@@ -430,80 +494,52 @@ class CircleDetailPostDetailFragment : Fragment() {
         startActivity(intent)
     }
 
-    private fun loadContents(parentActivity: Activity) {
-        binding.rvPostDetail.adapter?.let {
-            (it as PostDetailAdapter).update(viewModel.contents) {
-                viewModel.currentScrollState?.let {
-                    binding.rvPostDetail.layoutManager?.onRestoreInstanceState(viewModel.currentScrollState)
-                } ?: binding.rvPostDetail.scrollToPosition(0)
+    private fun showToast(
+        event: Event.ShowToast,
+        context: Context,
+    ) {
+        if (SingleMessageToast.previousFinished()) {
+            SingleMessageToast(context, event.message).show()
+        }
+    }
+
+    private fun showDialog(
+        event: Event.ShowDialog,
+        context: Context,
+    ) {
+        SingleMessageAlertDialog(context, event.message).show()
+    }
+
+    private fun handleScreenFlow(
+        screenFlow: CircleDetailPostDetailScreen,
+        context: Context,
+    ) {
+        when (screenFlow) {
+            is CircleDetailPostDetailScreen.SuccessView -> showSuccessView(screenFlow, context)
+            is CircleDetailPostDetailScreen.LoadingView -> showLoadingView()
+            is CircleDetailPostDetailScreen.ErrorView -> showErrorView()
+        }
+    }
+
+    private fun showSuccessView(
+        screenFlow: CircleDetailPostDetailScreen.SuccessView,
+        context: Context,
+    ) {
+        if (screenFlow.hasDeleted) {
+            requestRefreshToPreviousScreen()
+            sendUserToPreviousScreen()
+            return
+        }
+
+        switchView(binding.rvPostDetail)
+        hideSoftInput(context, binding.edtComment)
+        binding.edtComment.setText(Const.EMPTY_TEXT)
+        loadContentsAndDoAfter(
+            screenFlow.contents,
+            after = {
                 startPostponedEnterTransition()
-            }
-        }
-    }
-
-    private fun uploadCommentStateObserver(
-        parentActivity: Activity,
-        context: Context,
-    ) = Observer<UiState> {
-        binding.pgbLoading.isVisible = it is UiState.Loading
-        when (it) {
-            UiState.Success -> {
-                requestRefreshToPreviousScreen()
-                loadContents(parentActivity)
-                hideSoftInput(context, binding.edtComment)
-                binding.edtComment.text?.clear()
-            }
-            UiState.AuthenticationError -> {
-                sendUserToLoginScreen(parentActivity)
-                showErrorToast(context)
-            }
-            UiState.ServiceError -> {
-                showErrorDialog(context)
-            }
-            else -> {}
-        }
-    }
-
-    private fun editCommentStateObserver(
-        parentActivity: Activity,
-        context: Context,
-    ) = Observer<UiState> {
-        binding.pgbLoading.isVisible = it is UiState.Loading
-        when (it) {
-            UiState.Success -> {
-                loadContents(parentActivity)
-                hideSoftInput(context, binding.edtComment)
-            }
-            UiState.AuthenticationError -> {
-                sendUserToLoginScreen(parentActivity)
-                showErrorToast(context)
-            }
-            UiState.ServiceError -> {
-                showErrorDialog(context)
-            }
-            else -> {}
-        }
-    }
-
-    private fun deleteCommentStateObserver(
-        parentActivity: Activity,
-        context: Context,
-    ) = Observer<UiState> {
-        binding.pgbLoading.isVisible = it is UiState.Loading
-        when (it) {
-            UiState.Success -> {
-                requestRefreshToPreviousScreen()
-                loadContents(parentActivity)
-            }
-            UiState.AuthenticationError -> {
-                sendUserToLoginScreen(parentActivity)
-                showErrorToast(context)
-            }
-            UiState.ServiceError -> {
-                SingleMessageAlertDialog(context, viewModel.error).show()
-            }
-            else -> {}
-        }
+            },
+        )
     }
 
     private fun hideSoftInput(
@@ -514,106 +550,28 @@ class CircleDetailPostDetailFragment : Fragment() {
         imm.hideSoftInputFromWindow(view.windowToken, 0)
     }
 
-    private fun deletePostStateObserver(
-        parentActivity: Activity,
-        context: Context,
-    ) = Observer<UiState> {
-        binding.pgbLoading.isVisible = it is UiState.Loading
-        when (it) {
-            UiState.Success -> {
-                requestRefreshToPreviousScreen()
-                sendUserToPreviousScreen()
-            }
-            UiState.AuthenticationError -> {
-                sendUserToLoginScreen(parentActivity)
-                showErrorToast(context)
-            }
-            UiState.ServiceError -> {
-                SingleMessageAlertDialog(context, viewModel.error).show()
-            }
-            else -> {}
-        }
+    private fun showLoadingView() {
+        switchView(binding.contentLoading)
     }
 
-    private fun scrollOverObserver() =
-        Observer<Boolean> { completed ->
-            if (completed) {
-                binding.rvPostDetail.removeOnScrollListener(viewModel.scrollListener)
-                binding.rvPostDetail.addOnScrollListener(viewModel.scrollListener)
-                binding.rvPostDetail.adapter?.let {
-                    (it as PostDetailAdapter).update(viewModel.contents) {}
-                }
-            }
-        }
+    private fun showErrorView() {
+        switchView(binding.llServiceError)
+        startPostponedEnterTransition()
+    }
 
-    private fun reportStateObserver(
-        parentActivity: Activity,
-        context: Context,
-    ) = Observer<UiState> {
-        binding.pgbLoading.isVisible = it is UiState.Loading
-        when (it) {
-            UiState.AuthenticationError -> {
-                sendUserToLoginScreen(parentActivity)
-                showErrorToast(context)
+    private fun loadContentsAndDoAfter(
+        contents: Models<BaseModel>,
+        after: () -> Unit,
+    ) {
+        binding.rvPostDetail.adapter?.let {
+            (it as PostDetailAdapter).update(contents) {
+                after()
             }
-            UiState.ServiceError -> {
-                showErrorDialog(context)
-            }
-            else -> {}
         }
     }
 
     private fun requestRefreshToPreviousScreen() {
         findNavController().previousBackStackEntry?.savedStateHandle?.set(Const.FLAG_CIRCLE_POST_DATA_CHANGED, true)
-    }
-
-    private fun initListener(context: Context) {
-        setRvCircleCommentListener(context)
-        setBtnBackListener()
-        setBtnRegisterCommentListener()
-        setBtnRetryListener()
-    }
-
-    private fun setRvCircleCommentListener(context: Context) {
-        binding.rvPostDetail.addOnScrollListener(viewModel.scrollListener)
-        binding.rvPostDetail.addOnScrollListener(RecyclerViewHideSoftInputListener(context))
-        (viewModel.scrollListener as RecyclerViewInfiniteScrollListener).setScrollEndListener {
-            if (!viewModel.comments.isLastPage()) {
-                addScrollLoadingItemAndLoad()
-                // scrollOver 시 문제가 발생하더라도 정상으로 돌아온 경우 스크롤 복원하기 위함
-                viewModel.saveScrollState(binding.rvPostDetail.layoutManager?.onSaveInstanceState())
-            }
-        }
-    }
-
-    private fun addScrollLoadingItemAndLoad() {
-        binding.rvPostDetail.adapter?.let {
-            (it as PostDetailAdapter).update(viewModel.contents + CommentModel.emptyInstance()) {}
-        }
-        viewModel.scrollOver()
-    }
-
-    private fun setBtnBackListener() {
-        binding.btnBack.setOnClickListener {
-            sendUserToPreviousScreen()
-        }
-    }
-
-    private fun sendUserToPreviousScreen() {
-        findNavController().navigateUp()
-    }
-
-    private fun setBtnRegisterCommentListener() {
-        binding.btnUploadComment.setOnClickListener {
-            viewModel.saveScrollState(binding.rvPostDetail.layoutManager?.onSaveInstanceState())
-            viewModel.uploadComment(binding.edtComment.text.toString())
-        }
-    }
-
-    private fun setBtnRetryListener() {
-        binding.btnRetry.setOnClickListener {
-            viewModel.refresh()
-        }
     }
 
     override fun onDestroyView() {
@@ -622,16 +580,9 @@ class CircleDetailPostDetailFragment : Fragment() {
         activity?.window?.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_PAN) // softInputMode 복원
     }
 
-    private fun toggleView(view: View) {
+    private fun switchView(view: View) {
         binding.rvPostDetail.isVisible = view == binding.rvPostDetail
+        binding.contentLoading.isVisible = view == binding.contentLoading
         binding.llServiceError.isVisible = view == binding.llServiceError
-    }
-
-    companion object {
-        private const val TITLE_NOTICE = "공지사항 상세보기"
-        private const val TITLE_POST = "게시글 상세보기"
-        private const val MESSAGE_DELETE_NOTICE = "공지사항을 삭제할까요?"
-        private const val MESSAGE_DELETE_POST = "게시글을 삭제할까요?"
-        private const val MESSAGE_DELETE_COMMENT = "댓글을 삭제할까요?"
     }
 }

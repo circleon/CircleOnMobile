@@ -17,21 +17,25 @@ import androidx.core.view.isVisible
 import androidx.core.widget.doAfterTextChanged
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.Observer
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
 import com.developeek.circleon.R
 import com.developeek.circleon.databinding.FragmentUploadCircleBinding
 import com.developeek.circleon.domain.model.CategoryModel
-import com.developeek.circleon.domain.model.CategoryModels
 import com.developeek.circleon.domain.model.CircleDetailModel
-import com.developeek.circleon.domain.state.UiState
+import com.developeek.circleon.domain.model.Models
 import com.developeek.circleon.domain.utils.Const
 import com.developeek.circleon.domain.utils.Utils.toJPEG
 import com.developeek.circleon.domain.utils.glide.GlideProvider
+import com.developeek.circleon.view.Event
 import com.developeek.circleon.view.adapter.CategoryAdapter
 import com.developeek.circleon.view.listener.ItemListenerInitializer
 import com.developeek.circleon.view.screen.login.LoginActivity
 import com.developeek.circleon.view.viewmodel.circle.UploadCircleViewModel
+import com.developeek.circleon.view.viewmodelimpl.circle.UploadCircleScreen
+import com.developeek.circleon.view.viewmodelimpl.circle.UploadCircleScreenEvent
 import com.developeek.circleon.view.viewmodelimpl.circle.UploadCircleViewModelImpl
 import com.developeek.circleon.view.widget.SingleMessageAlertDialog
 import com.developeek.circleon.view.widget.SingleMessageToast
@@ -40,6 +44,7 @@ import com.google.android.flexbox.FlexboxLayoutManager
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import dagger.hilt.android.AndroidEntryPoint
 import dagger.hilt.android.lifecycle.withCreationCallback
+import kotlinx.coroutines.launch
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 import javax.inject.Inject
@@ -48,18 +53,17 @@ import javax.inject.Inject
 class UploadCircleFragment : Fragment() {
     private lateinit var binding: FragmentUploadCircleBinding
     private var isEdit = false
-    private var origin: CircleDetailModel? = null
+    private var origin: CircleDetailModel = CircleDetailModel.empty()
     private val viewModel: UploadCircleViewModel by viewModels<UploadCircleViewModelImpl>(
         extrasProducer = {
             defaultViewModelCreationExtras
                 .withCreationCallback<UploadCircleViewModelImpl.UploadCircleViewModelFactory> {
-                    it.create(origin)
+                    it.create(origin, isEdit)
                 }
         },
     )
     private val circleThumbnailPickMedia: ActivityResultLauncher<PickVisualMediaRequest> =
-        registerForActivityResult(ActivityResultContracts.PickVisualMedia()) {
-                uri ->
+        registerForActivityResult(ActivityResultContracts.PickVisualMedia()) { uri ->
             uri?.let {
                 glideProvider.loadImage(it, requireContext(), binding.btnAddCircleThumbnail)
                 viewModel.setCircleProfileImage(it.toJPEG(requireContext()))
@@ -70,8 +74,7 @@ class UploadCircleFragment : Fragment() {
             }
         }
     private val circleIntroductionImagePickMedia: ActivityResultLauncher<PickVisualMediaRequest> =
-        registerForActivityResult(ActivityResultContracts.PickVisualMedia()) {
-                uri ->
+        registerForActivityResult(ActivityResultContracts.PickVisualMedia()) { uri ->
             uri?.let {
                 glideProvider.loadImage(it, requireContext(), binding.btnAddCircleIntroductionImage)
                 viewModel.setCircleIntroductionImage(it.toJPEG(requireContext()))
@@ -114,21 +117,39 @@ class UploadCircleFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         initView(requireActivity(), requireContext())
-        initObserver(requireActivity(), requireContext())
         initListener(requireContext())
+        lifecycleScope.launch {
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                launch {
+                    viewModel.event.collect {
+                        handleEvent(it, requireActivity(), requireContext())
+                    }
+                }
+                launch {
+                    viewModel.screenFlow.collect {
+                        handleScreenFlow(it)
+                    }
+                }
+                launch {
+                    viewModel.uploadCircleScreenEvent.collect {
+                        handleUploadCircleScreenEvent(it, requireContext())
+                    }
+                }
+            }
+        }
     }
 
     private fun initView(
         parentActivity: Activity,
         context: Context,
     ) {
+        initToolbar(context)
         initCategoryRecyclerView(context)
-        initToolbar()
         hideBtmNav(parentActivity)
         setBtnSaveEditOrUpload()
-        loadCircleContent(viewModel.circle)
-        loadCircleThumbnailWhenIsNotNull(context, viewModel.circle)
-        loadCircleIntroductionImageWhenIsNotNull(context, viewModel.circle)
+        loadCircleContent(origin, context)
+        loadCircleThumbnailWhenIsNotNull(context, origin)
+        loadCircleIntroductionImageWhenIsNotNull(context, origin)
     }
 
     private fun hideBtmNav(activity: Activity) {
@@ -138,13 +159,19 @@ class UploadCircleFragment : Fragment() {
     private fun setBtnSaveEditOrUpload() {
         if (isEdit) {
             binding.btnSaveEdit.isVisible = true
-        } else {
-            binding.btnUpload.isVisible = true
+            return
         }
+
+        binding.btnUpload.isVisible = true
     }
 
-    private fun initToolbar() {
-        val title = if (isEdit) TITLE_CIRCLE_EDIT else TITLE_CIRCLE_NEW
+    private fun initToolbar(context: Context) {
+        val title =
+            if (isEdit) {
+                context.getString(R.string.title_edit_circle)
+            } else {
+                context.getString(R.string.title_upload_circle)
+            }
 
         binding.txtTbTitle.text = title
     }
@@ -169,9 +196,11 @@ class UploadCircleFragment : Fragment() {
         binding.rvCircleCategory.itemAnimator = null
     }
 
-    private fun loadCircleContent(circle: CircleDetailModel) {
+    private fun loadCircleContent(
+        circle: CircleDetailModel,
+        context: Context,
+    ) {
         binding.edtCircleName.setText(circle.name)
-        viewModel.toggleRecruitmentLock(circle.recruiting)
         binding.switchRecruitment.isChecked = circle.recruiting
         circle.recruitmentStartDate?.let {
             binding.txtRecruitmentStartDate.text =
@@ -193,6 +222,8 @@ class UploadCircleFragment : Fragment() {
         binding.txtCurrentCircleSingleIntroductionSize.text =
             circle.singleLineIntroduction.length.toString()
         binding.edtCircleIntroduction.setText(circle.introduction)
+        selectCategory(CategoryModel.selectAndGetWithoutALL(circle.category))
+        toggleRecruitmentLock(circle.recruiting, context)
     }
 
     private fun loadCircleThumbnailWhenIsNotNull(
@@ -224,55 +255,81 @@ class UploadCircleFragment : Fragment() {
         }
     }
 
-    private fun initObserver(
+    private fun handleEvent(
+        event: Event,
         parentActivity: Activity,
         context: Context,
     ) {
-        viewModel.state.observe(
-            viewLifecycleOwner,
-            stateObserver(parentActivity, context),
-        )
-        viewModel.recruitmentLocked.observe(
-            viewLifecycleOwner,
-            recruitmentLockedObserver(context),
-        )
-        viewModel.categories.observe(
-            viewLifecycleOwner,
-            categoriesObserver(),
-        )
+        when (event) {
+            is Event.SendToLoginScreen -> sendUserToLoginScreen(parentActivity)
+            is Event.ShowToast -> showToast(event, context)
+            is Event.ShowDialog -> showDialog(event, context)
+            else -> {}
+        }
     }
 
-    private fun stateObserver(
-        parentActivity: Activity,
+    private fun sendUserToLoginScreen(activity: Activity) {
+        val intent = Intent(activity, LoginActivity::class.java)
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)
+        startActivity(intent)
+    }
+
+    private fun showToast(
+        event: Event.ShowToast,
         context: Context,
-    ) = Observer<UiState> {
-        binding.pgbLoading.isVisible = it is UiState.Loading
-        when (it) {
-            UiState.Success -> {
+    ) {
+        if (SingleMessageToast.previousFinished()) {
+            SingleMessageToast(context, event.message).show()
+        }
+    }
+
+    private fun showDialog(
+        event: Event.ShowDialog,
+        context: Context,
+    ) {
+        SingleMessageAlertDialog(context, event.message).show()
+    }
+
+    private fun handleScreenFlow(screenFlow: UploadCircleScreen) {
+        binding.pgbLoading.isVisible = screenFlow is UploadCircleScreen.LoadingView
+        when (screenFlow) {
+            is UploadCircleScreen.SuccessView -> {
                 requestRefreshToPreviousScreen()
                 sendUserToPreviousScreen()
-            }
-            UiState.AuthenticationError -> {
-                sendUserToLoginScreen(parentActivity)
-                if (SingleMessageToast.previousFinished()) {
-                    SingleMessageToast(context, viewModel.error).show()
-                }
-            }
-            UiState.ServiceError -> {
-                SingleMessageAlertDialog(context, viewModel.error).show()
             }
             else -> {}
         }
     }
 
-    private fun recruitmentLockedObserver(context: Context) =
-        Observer<Boolean> {
-            if (it) {
-                unlockRecruitment(context)
-            } else {
-                lockRecruitment(context)
-            }
+    private fun requestRefreshToPreviousScreen() {
+        findNavController().previousBackStackEntry?.savedStateHandle?.set(Const.FLAG_CIRCLE_DATA_CHANGED, true)
+    }
+
+    private fun sendUserToPreviousScreen() {
+        findNavController().popBackStack()
+    }
+
+    private fun handleUploadCircleScreenEvent(
+        event: UploadCircleScreenEvent,
+        context: Context,
+    ) {
+        when (event) {
+            is UploadCircleScreenEvent.ToggleRecruitmentLock -> toggleRecruitmentLock(event.isRecruiting, context)
+            is UploadCircleScreenEvent.SelectCategory -> selectCategory(event.categories)
         }
+    }
+
+    private fun toggleRecruitmentLock(
+        isRecruiting: Boolean,
+        context: Context,
+    ) {
+        if (isRecruiting) {
+            unlockRecruitment(context)
+            return
+        }
+
+        lockRecruitment(context)
+    }
 
     private fun lockRecruitment(context: Context) {
         binding.btnEditRecruitmentStartDate.isClickable = false
@@ -288,15 +345,10 @@ class UploadCircleFragment : Fragment() {
         binding.txtRecruitmentEndDate.setTextColor(context.getColor(R.color.grey_9))
     }
 
-    private fun categoriesObserver() =
-        Observer<CategoryModels> { categories ->
-            binding.rvCircleCategory.adapter?.let {
-                (it as CategoryAdapter).update(categories) {}
-            }
+    private fun selectCategory(categories: Models<CategoryModel>) {
+        binding.rvCircleCategory.adapter?.let {
+            (it as CategoryAdapter).update(categories) {}
         }
-
-    private fun requestRefreshToPreviousScreen() {
-        findNavController().previousBackStackEntry?.savedStateHandle?.set(Const.FLAG_CIRCLE_DATA_CHANGED, true)
     }
 
     private fun initListener(context: Context) {
@@ -308,7 +360,7 @@ class UploadCircleFragment : Fragment() {
         setSwitchRecruitment()
         setBtnEditRecruitmentDate(requireContext())
         setBtnEdtCircleContentListener()
-        setBtnAddOrRemoveCircleThumbnailListener(context)
+        setBtnAddOrRemoveCircleThumbnailListener()
         setBtnRemoveCircleIntroductionImageListener(context)
         setEdtSingleLineIntroductionListener()
     }
@@ -363,13 +415,10 @@ class UploadCircleFragment : Fragment() {
     private fun setBtnEditRecruitmentStartDate(context: Context) {
         val onDataSetListener =
             DatePickerDialog.OnDateSetListener { _, y, m, d ->
-                viewModel.setRecruitmentStartDate(LocalDateTime.of(y, m + 1, d, 0, 0))
-                binding.txtRecruitmentStartDate.text =
-                    viewModel.circle.recruitmentStartDate!!.format(
-                        DateTimeFormatter.ofPattern(
-                            RECRUITMENT_DATE_FORMAT,
-                        ),
-                    )
+                val date = LocalDateTime.of(y, m + 1, d, 0, 0)
+
+                binding.txtRecruitmentStartDate.text = date.format(DateTimeFormatter.ofPattern(RECRUITMENT_DATE_FORMAT))
+                viewModel.setRecruitmentStartDate(date)
             }
         binding.btnEditRecruitmentStartDate.setOnClickListener {
             showDatePickerDialog(context, onDataSetListener, viewModel.circle.recruitmentStartDate)
@@ -379,13 +428,10 @@ class UploadCircleFragment : Fragment() {
     private fun setBtnEditRecruitmentEndDate(context: Context) {
         val onDataSetListener =
             DatePickerDialog.OnDateSetListener { _, y, m, d ->
-                viewModel.setRecruitmentEndDate(LocalDateTime.of(y, m + 1, d, 0, 0))
-                binding.txtRecruitmentEndDate.text =
-                    viewModel.circle.recruitmentEndDate!!.format(
-                        DateTimeFormatter.ofPattern(
-                            RECRUITMENT_DATE_FORMAT,
-                        ),
-                    )
+                val date = LocalDateTime.of(y, m + 1, d, 0, 0)
+
+                binding.txtRecruitmentEndDate.text = date.format(DateTimeFormatter.ofPattern(RECRUITMENT_DATE_FORMAT))
+                viewModel.setRecruitmentEndDate(date)
             }
         binding.btnEditRecruitmentEndDate.setOnClickListener {
             showDatePickerDialog(context, onDataSetListener, viewModel.circle.recruitmentEndDate)
@@ -438,7 +484,7 @@ class UploadCircleFragment : Fragment() {
         }
     }
 
-    private fun setBtnAddOrRemoveCircleThumbnailListener(context: Context) {
+    private fun setBtnAddOrRemoveCircleThumbnailListener() {
         if (viewModel.circle.thumbnailUrl == null) {
             binding.btnAddOrRemoveCircleThumbnail.setOnClickListener {
                 pickImage()
@@ -494,16 +540,6 @@ class UploadCircleFragment : Fragment() {
         }
     }
 
-    private fun sendUserToPreviousScreen() {
-        findNavController().navigateUp()
-    }
-
-    private fun sendUserToLoginScreen(activity: Activity) {
-        val intent = Intent(activity, LoginActivity::class.java)
-        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)
-        startActivity(intent)
-    }
-
     override fun onDestroyView() {
         super.onDestroyView()
 
@@ -512,8 +548,6 @@ class UploadCircleFragment : Fragment() {
 
     companion object {
         private const val RECRUITMENT_DATE_FORMAT = "yyyy.MM.dd"
-        private const val TITLE_CIRCLE_NEW = "동아리 생성"
-        private const val TITLE_CIRCLE_EDIT = "동아리 수정"
         private const val PHOTO_MIME_TYPE = "image/jpeg"
     }
 }

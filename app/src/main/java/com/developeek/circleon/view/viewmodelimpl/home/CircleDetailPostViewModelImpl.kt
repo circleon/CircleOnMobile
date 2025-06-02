@@ -1,18 +1,19 @@
 package com.developeek.circleon.view.viewmodelimpl.home
 
+import android.os.Parcelable
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.developeek.circleon.data.repository.CircleRepository
+import com.developeek.circleon.data.repository.Page
 import com.developeek.circleon.data.source.Error
 import com.developeek.circleon.data.source.Success
 import com.developeek.circleon.domain.model.CircleDetailModel
+import com.developeek.circleon.domain.model.Models
 import com.developeek.circleon.domain.model.PostModel
-import com.developeek.circleon.domain.model.PostModels
 import com.developeek.circleon.domain.utils.validator.Invalid
 import com.developeek.circleon.domain.utils.validator.Validator
 import com.developeek.circleon.view.Event
 import com.developeek.circleon.view.viewmodel.home.CircleDetailPostViewModel
-import com.developeek.circleon.view.viewmodelimpl.Page
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
@@ -51,7 +52,10 @@ class CircleDetailPostViewModelImpl
         private var _isLastPage = false
         private var currentPage = DEFAULT_PAGE
 
-        private lateinit var posts: PostModels
+        private lateinit var posts: Models<PostModel>
+        override val currentScrollState: Parcelable?
+            get() = _currentScrollState
+        private var _currentScrollState: Parcelable? = null
 
         private var fetchPostsJob: Job? = null
         private var scrollOverPostJob: Job? = null
@@ -60,6 +64,17 @@ class CircleDetailPostViewModelImpl
 
         init {
             fetchPosts(currentPage, SIZE_BY_PAGE)
+        }
+
+        override fun showLoadingAndRefresh() {
+            viewModelScope.launch {
+                _screenFlow.emit(CircleDetailPostScreen.LoadingView)
+            }
+            refresh()
+        }
+
+        override fun refresh() {
+            fetchPosts(DEFAULT_PAGE, (currentPage + 1) * SIZE_BY_PAGE)
         }
 
         private fun fetchPosts(
@@ -74,7 +89,7 @@ class CircleDetailPostViewModelImpl
                 viewModelScope.launch {
                     scrollOverPostJob?.cancel()
 
-                    when (val result = getCirclePosts(circleDetail.id, page, size)) {
+                    when (val result = getCirclePosts(circleDetail.circleId, page, size)) {
                         is Success -> whenFetchPostsSuccess(result)
                         is Error -> whenFetchPostsFail(result)
                     }
@@ -91,10 +106,10 @@ class CircleDetailPostViewModelImpl
 
         private suspend fun whenFetchPostsSuccess(result: Success<Page<PostModel>>) {
             result.data.let {
-                posts = PostModels(it.content)
                 _isLastPage = it.isLastPage
+                posts = Models(it.content)
+                _screenFlow.emit(CircleDetailPostScreen.SuccessView(posts))
             }
-            _screenFlow.emit(CircleDetailPostScreen.SuccessView(posts))
         }
 
         private suspend fun whenFetchPostsFail(result: Error<Page<PostModel>>) {
@@ -106,10 +121,6 @@ class CircleDetailPostViewModelImpl
             }
         }
 
-        override fun refresh() {
-            fetchPosts(DEFAULT_PAGE, (currentPage + 1) * SIZE_BY_PAGE)
-        }
-
         override fun scrollOver() {
             scrollOverPostJob?.let {
                 if (!it.isCompleted) return
@@ -117,7 +128,7 @@ class CircleDetailPostViewModelImpl
 
             scrollOverPostJob =
                 viewModelScope.launch {
-                    val result = getCirclePosts(circleDetail.id, currentPage + 1, SIZE_BY_PAGE)
+                    val result = getCirclePosts(circleDetail.circleId, currentPage + 1, SIZE_BY_PAGE)
 
                     if (!isActive) return@launch
                     when (result) {
@@ -129,12 +140,11 @@ class CircleDetailPostViewModelImpl
 
         private suspend fun whenScrollOverSuccess(result: Success<Page<PostModel>>) {
             result.data.let {
-                posts = posts.addAllAndGet(it.content)
                 _isLastPage = it.isLastPage
+                posts = posts.addAllAndGet(it.content)
+                _screenFlow.emit(CircleDetailPostScreen.SuccessView(posts))
             }
             currentPage++
-
-            _screenFlow.emit(CircleDetailPostScreen.SuccessView(posts))
         }
 
         private suspend fun whenScrollOverFail(result: Error<Page<PostModel>>) {
@@ -152,9 +162,9 @@ class CircleDetailPostViewModelImpl
 
             userRequestJob =
                 viewModelScope.launch {
-                    _event.emit(Event.Loading)
+                    _event.emit(Event.ShowProcessing)
 
-                    when (val result = deleteCirclePost(circleDetail.id, postId)) {
+                    when (val result = deleteCirclePost(circleDetail.circleId, postId)) {
                         is Success -> showToastAndRefresh(MESSAGE_SUCCESS_REQUEST_REMOVE_POST)
                         is Error -> whenUserRequestFail(result)
                     }
@@ -179,9 +189,9 @@ class CircleDetailPostViewModelImpl
             userRequestJob =
                 viewModelScope.launch {
                     if (!checkMessageFormat(reportMessage)) return@launch
-                    _event.emit(Event.Loading)
+                    _event.emit(Event.ShowProcessing)
 
-                    when (val result = postReportCirclePost(circleDetail.id, postId, reportMessage)) {
+                    when (val result = postReportCirclePost(circleDetail.circleId, postId, reportMessage)) {
                         is Success -> showToast(MESSAGE_SUCCESS_REQUEST_REPORT)
                         is Error -> whenUserRequestFail(result)
                     }
@@ -226,6 +236,10 @@ class CircleDetailPostViewModelImpl
             }
         }
 
+        override fun saveScrollState(scrollState: Parcelable?) {
+            _currentScrollState = scrollState
+        }
+
         // 현재는 공지사항용 핀 고정 기능이고, 나중에 게시글 고정 기능 추가 시 사용
         override fun pinAndFetch(postId: Int) {}
 
@@ -240,7 +254,15 @@ class CircleDetailPostViewModelImpl
     }
 
 sealed class CircleDetailPostScreen {
-    data class SuccessView(val posts: PostModels) : CircleDetailPostScreen()
+    val hasCollected: Boolean
+        get() = _hasCollected
+    private var _hasCollected = false
+
+    fun notifyCollected() {
+        _hasCollected = true
+    }
+
+    data class SuccessView(val posts: Models<PostModel>) : CircleDetailPostScreen()
 
     data object LoadingView : CircleDetailPostScreen()
 

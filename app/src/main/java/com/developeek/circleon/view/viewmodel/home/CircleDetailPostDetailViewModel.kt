@@ -1,31 +1,18 @@
 package com.developeek.circleon.view.viewmodel.home
 
-import android.os.Parcelable
-import androidx.lifecycle.LiveData
-import androidx.recyclerview.widget.RecyclerView
-import com.developeek.circleon.domain.model.CommentModels
-import com.developeek.circleon.domain.model.Identifiable
-import com.developeek.circleon.domain.state.UiState
+import com.developeek.circleon.view.Event
+import com.developeek.circleon.view.viewmodelimpl.home.CircleDetailPostDetailScreen
+import kotlinx.coroutines.flow.SharedFlow
+import kotlinx.coroutines.flow.StateFlow
 
 interface CircleDetailPostDetailViewModel {
-    val state: LiveData<UiState>
-    val uploadCommentState: LiveData<UiState>
-    val editCommentState: LiveData<UiState>
-    val deleteCommentState: LiveData<UiState>
-    val deletePostState: LiveData<UiState>
-    val reportState: LiveData<UiState>
-    val contents: List<Identifiable>
-    val comments: CommentModels
-    val scrollOver: LiveData<Boolean>
-    val scrollListener: RecyclerView.OnScrollListener
-    val currentScrollState: Parcelable?
-    val error: String
+    val event: SharedFlow<Event>
+    val screenFlow: StateFlow<CircleDetailPostDetailScreen>
+    val isLastPage: Boolean
 
-    fun refresh()
+    fun showLoadingAndRefresh()
 
     fun scrollOver()
-
-    fun saveScrollState(scrollState: Parcelable?)
 
     fun uploadComment(content: String)
 
@@ -38,10 +25,10 @@ interface CircleDetailPostDetailViewModel {
 
     fun delete()
 
-    fun reportPost(content: String)
+    fun reportPost(message: String)
 
     fun reportComment(
         commentId: Int,
-        content: String,
+        message: String,
     )
 }

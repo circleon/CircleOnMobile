@@ -25,8 +25,8 @@ import com.developeek.circleon.data.source.manager.UserManager
 import com.developeek.circleon.databinding.FragmentCircleDetailPostBinding
 import com.developeek.circleon.domain.enums.PostType
 import com.developeek.circleon.domain.model.CircleDetailModel
+import com.developeek.circleon.domain.model.Models
 import com.developeek.circleon.domain.model.PostModel
-import com.developeek.circleon.domain.model.PostModels
 import com.developeek.circleon.domain.utils.Const
 import com.developeek.circleon.domain.utils.Utils
 import com.developeek.circleon.domain.utils.glide.GlideProvider
@@ -158,7 +158,7 @@ class CircleDetailPostFragment : Fragment() {
                     .navigate(
                         R.id.action_circleDetailFragment_to_circleDetailPostDetailFragment,
                         bundleOf(
-                            Pair(Const.TAG_CIRCLE_ID, circleDetail.id),
+                            Pair(Const.TAG_CIRCLE_ID, circleDetail.circleId),
                             Pair(Const.TAG_CIRCLE_POST, item),
                         ),
                     )
@@ -184,7 +184,7 @@ class CircleDetailPostFragment : Fragment() {
         item: PostModel,
     ) {
         userManager.getUser()?.let {
-            if (it.id == item.author.id) { // 작성자 본인인 경우
+            if (it.id == item.author.authorId) { // 작성자 본인인 경우
                 popupMenu.inflate(R.menu.menu_author_post_settings)
                 Utils.changeMenuItemTextColor(
                     popupMenu.menu.findItem(R.id.delete_post),
@@ -206,7 +206,7 @@ class CircleDetailPostFragment : Fragment() {
     ) = PopupMenu.OnMenuItemClickListener {
         when (it.itemId) {
             R.id.edit_post -> {
-                sendUserToEditPostScreen(circleDetail.id, postItem)
+                sendUserToEditPostScreen(circleDetail.circleId, postItem)
             }
 
             R.id.delete_post -> {
@@ -296,7 +296,7 @@ class CircleDetailPostFragment : Fragment() {
 
     private fun setBtnRetryListener() {
         binding.btnRetry.setOnClickListener {
-            viewModel.refresh()
+            viewModel.showLoadingAndRefresh()
         }
     }
 
@@ -323,7 +323,7 @@ class CircleDetailPostFragment : Fragment() {
     ) {
         val loadingIndicator =
             requireParentFragment().requireView().findViewById<CircularProgressIndicator>(R.id.pgbLoading)
-        loadingIndicator.isVisible = event is Event.Loading
+        loadingIndicator.isVisible = event is Event.ShowProcessing
         when (event) {
             is Event.SendToLoginScreen -> sendUserToLoginScreen(parentActivity)
             is Event.ShowToast -> showToast(event, context)
@@ -370,11 +370,19 @@ class CircleDetailPostFragment : Fragment() {
         }
 
         switchView(binding.rvCirclePost)
-        loadCirclePostsAndDoAfter(screenFlow.posts) {}
+        loadCirclePostsAndDoAfter(screenFlow.posts) {
+            if (screenFlow.hasCollected) {
+                viewModel.currentScrollState?.let {
+                    binding.rvCirclePost.layoutManager?.onRestoreInstanceState(it)
+                }
+                return@loadCirclePostsAndDoAfter
+            }
+            screenFlow.notifyCollected()
+        }
     }
 
     private fun loadCirclePostsAndDoAfter(
-        posts: PostModels,
+        posts: Models<PostModel>,
         after: () -> Unit,
     ) {
         binding.rvCirclePost.adapter?.let {
@@ -390,6 +398,7 @@ class CircleDetailPostFragment : Fragment() {
     }
 
     private fun showErrorView() {
+        binding.shimmerPost.stopShimmer()
         switchView(binding.llServiceError)
     }
 
@@ -398,5 +407,11 @@ class CircleDetailPostFragment : Fragment() {
         binding.shimmerPost.isVisible = view == binding.shimmerPost
         binding.txtNoPost.isVisible = view == binding.txtNoPost
         binding.llServiceError.isVisible = view == binding.llServiceError
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+
+        viewModel.saveScrollState(binding.rvCirclePost.layoutManager?.onSaveInstanceState())
     }
 }

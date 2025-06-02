@@ -1,19 +1,20 @@
 package com.developeek.circleon.view.viewmodel.circle
 
-import androidx.lifecycle.LiveData
 import com.developeek.circleon.domain.enums.Category
-import com.developeek.circleon.domain.model.CategoryModels
 import com.developeek.circleon.domain.model.CircleDetailModel
-import com.developeek.circleon.domain.state.UiState
+import com.developeek.circleon.view.Event
+import com.developeek.circleon.view.viewmodelimpl.circle.UploadCircleScreen
+import com.developeek.circleon.view.viewmodelimpl.circle.UploadCircleScreenEvent
+import kotlinx.coroutines.flow.SharedFlow
+import kotlinx.coroutines.flow.StateFlow
 import java.io.File
 import java.time.LocalDateTime
 
 interface UploadCircleViewModel {
-    val state: LiveData<UiState>
-    val recruitmentLocked: LiveData<Boolean>
+    val event: SharedFlow<Event>
+    val screenFlow: StateFlow<UploadCircleScreen>
+    val uploadCircleScreenEvent: SharedFlow<UploadCircleScreenEvent>
     val circle: CircleDetailModel
-    val categories: LiveData<CategoryModels>
-    val error: String
 
     fun upload()
 
@@ -35,7 +36,7 @@ interface UploadCircleViewModel {
 
     fun setCategory(category: Category)
 
-    fun toggleRecruitmentLock(state: Boolean)
+    fun toggleRecruitmentLock(isRecruiting: Boolean)
 
     fun removeCircleProfileImage()
 

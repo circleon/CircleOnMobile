@@ -262,7 +262,7 @@ class CircleDetailFragment : Fragment() {
             it.thumbnailUrl?.let {
                 glideProvider.fetchImage(it, context, binding.imgCircleThumbnail)
             } ?: binding.imgCircleThumbnail.setImageResource(R.drawable.img_circle_profile_default)
-            binding.txtCircleCategory.text = it.category.categoryName()
+            binding.txtCircleCategory.text = it.category.categoryName
             binding.txtCircleMemberCount.text =
                 Html.fromHtml(
                     String.format(

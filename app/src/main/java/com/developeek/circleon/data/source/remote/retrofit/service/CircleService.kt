@@ -3,7 +3,6 @@ package com.developeek.circleon.data.source.remote.retrofit.service
 import com.developeek.circleon.data.dto.home.Circle
 import com.developeek.circleon.data.dto.home.CircleDetail
 import com.developeek.circleon.data.dto.home.CircleSummaries
-import com.developeek.circleon.data.dto.home.CircleSummary
 import com.developeek.circleon.data.dto.home.Comment
 import com.developeek.circleon.data.dto.home.Member
 import com.developeek.circleon.data.dto.home.Page
@@ -92,13 +91,6 @@ interface CircleService {
         @Query("size") size: Int,
     ): Page<Comment>
 
-    @GET("my-circles")
-    suspend fun getMyCircles(
-        @Query("membershipStatus") membershipStatus: String,
-        @Query("page") page: Int,
-        @Query("size") size: Int,
-    ): Page<CircleSummary>
-
     // POST
     @Multipart
     @POST("circles")
@@ -107,22 +99,11 @@ interface CircleService {
         @Part("summary") summary: RequestBody,
         @Part("category") category: RequestBody,
         @Part("introduction") introduction: RequestBody?,
+        @Part("recruiting") recruiting: Boolean,
         @Part("recruitmentStartDate") recruitmentStartDate: RequestBody?,
         @Part("recruitmentEndDate") recruitmentEndDate: RequestBody?,
         @Part profileImg: MultipartBody.Part?,
         @Part introductionImg: MultipartBody.Part?,
-    )
-
-    @POST("my-circles/{circleId}")
-    suspend fun postMyCircle(
-        @Path("circleId") circleId: Int,
-        @Body data: RequestResponseBodyCircleJoin,
-    )
-
-    @POST("my-circles/{memberId}/leave-request")
-    suspend fun postCircleLeaveRequest(
-        @Path("memberId") memberId: Int,
-        @Body data: RequestResponseBodyCircleLeave,
     )
 
     @Multipart
@@ -242,11 +223,6 @@ interface CircleService {
     @DELETE("circles/{circleId}/members/{memberId}")
     suspend fun deleteCircleMember(
         @Path("circleId") circleId: Int,
-        @Path("memberId") memberId: Int,
-    )
-
-    @DELETE("my-circles/{memberId}/application")
-    suspend fun deleteCircleJoinRequest(
         @Path("memberId") memberId: Int,
     )
 }

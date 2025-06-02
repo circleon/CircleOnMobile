@@ -13,11 +13,5 @@ sealed class Event {
 
     data class ShowDialog(val message: String) : Event()
 
-    /**
-     * Loading
-     *
-     * ScreenFlow LoadingView: 화면별 특정 로딩 뷰 컨트롤 용도 (ex. shimmer)
-     * Event Loading: 그 외 공통 로딩 컨트롤 용도
-     */
-    data object Loading : Event()
+    data object ShowProcessing : Event()
 }

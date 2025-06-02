@@ -18,22 +18,22 @@ import java.time.LocalDateTime
 import kotlin.math.max
 
 object Utils {
-    // TODO: local properties 로 이동
-    private const val CIRCLE_IMAGE_PATH = "circles/images/"
-    private const val POST_IMAGE_PATH = "posts/images/"
     private const val MAX_IMAGE_WIDTH = 800f
 
-    fun getCircleImageUrlOrNull(url: String?): String? {
-        url ?: return null
+    fun getCircleImageUrlOrNull(url: String?) =
+        url?.let {
+            BuildConfig.SERVICE_IMAGE_API_URL + BuildConfig.CIRCLE_IMAGE_PATH + it
+        }
 
-        return BuildConfig.SERVICE_API_URL + CIRCLE_IMAGE_PATH + url
-    }
+    fun getPostImageUrlOrNull(url: String?) =
+        url?.let {
+            BuildConfig.SERVICE_IMAGE_API_URL + BuildConfig.POST_IMAGE_PATH + it
+        }
 
-    fun getPostImageUrlOrNull(url: String?): String? {
-        url ?: return null
-
-        return BuildConfig.SERVICE_API_URL + POST_IMAGE_PATH + url
-    }
+    fun getUserImageUrlOrNull(url: String?) =
+        url?.let {
+            BuildConfig.SERVICE_IMAGE_API_URL + BuildConfig.USER_IMAGE_PATH + it
+        }
 
     fun getLocalDateTimeOrDefault(dateTime: String): LocalDateTime {
         val default = LocalDateTime.of(1, 1, 1, 1, 1)

@@ -54,6 +54,19 @@
                 android:layout_height="match_parent"
                 android:visibility="gone"/>
 
+            <com.google.android.material.progressindicator.CircularProgressIndicator
+                android:id="@+id/contentLoading"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:padding="@dimen/margin_padding_large"
+                android:layout_gravity="center"
+                app:indicatorColor="@color/purple_5"
+                app:trackColor="@color/grey_3"
+                app:trackThickness="8dp"
+                app:trackCornerRadius="@dimen/round_default"
+                android:visibility="gone"
+                android:indeterminate="true"/>
+
             <androidx.appcompat.widget.LinearLayoutCompat
                 android:id="@+id/llServiceError"
                 android:layout_width="match_parent"

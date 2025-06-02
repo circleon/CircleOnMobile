@@ -26,8 +26,8 @@ import com.developeek.circleon.databinding.FragmentCircleDetailNoticeBinding
 import com.developeek.circleon.domain.enums.PostType
 import com.developeek.circleon.domain.enums.Role
 import com.developeek.circleon.domain.model.CircleDetailModel
+import com.developeek.circleon.domain.model.Models
 import com.developeek.circleon.domain.model.PostModel
-import com.developeek.circleon.domain.model.PostModels
 import com.developeek.circleon.domain.utils.Const
 import com.developeek.circleon.domain.utils.Utils
 import com.developeek.circleon.domain.utils.glide.GlideProvider
@@ -145,7 +145,6 @@ class CircleDetailNoticeFragment : Fragment() {
                             showPopupMenuByUser(context, item, view!!)
                         }
                     },
-                role = circleDetail.role,
             )
         binding.rvCircleNotice.layoutManager = LinearLayoutManager(context)
         if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.R) {
@@ -160,7 +159,7 @@ class CircleDetailNoticeFragment : Fragment() {
                     .navigate(
                         R.id.action_circleDetailFragment_to_circleDetailPostDetailFragment,
                         bundleOf(
-                            Pair(Const.TAG_CIRCLE_ID, circleDetail.id),
+                            Pair(Const.TAG_CIRCLE_ID, circleDetail.circleId),
                             Pair(Const.TAG_CIRCLE_POST, item),
                         ),
                     )
@@ -196,7 +195,7 @@ class CircleDetailNoticeFragment : Fragment() {
                     )
                 }
                 Role.EXECUTIVE, Role.PRESIDENT -> {
-                    if (user.id == item.author.id) {
+                    if (user.id == item.author.authorId) {
                         if (item.isPinned) {
                             popupMenu.inflate(R.menu.menu_pinned_author_notice_settings)
                         } else {
@@ -235,7 +234,7 @@ class CircleDetailNoticeFragment : Fragment() {
                 showRemovePinNoticeRequestDialog(context, notice)
             }
             R.id.edit_post -> {
-                sendUserToEditNoticeScreen(circleDetail.id, notice)
+                sendUserToEditNoticeScreen(circleDetail.circleId, notice)
             }
             R.id.delete_post -> {
                 showDeleteNoticeRequestDialog(context, notice)
@@ -266,8 +265,8 @@ class CircleDetailNoticeFragment : Fragment() {
     ) {
         PositiveAlertDialog(
             context,
-            context.getString(R.string.message_pin_notice),
-            context.getString(R.string.btn_pin),
+            message = context.getString(R.string.message_pin_notice),
+            positiveButton = context.getString(R.string.btn_pin),
             positiveListener = {
                 viewModel.pinAndFetch(notice.id)
             },
@@ -280,8 +279,8 @@ class CircleDetailNoticeFragment : Fragment() {
     ) {
         PositiveAlertDialog(
             context,
-            context.getString(R.string.message_remove_pin_notice),
-            context.getString(R.string.btn_remove_pin),
+            message = context.getString(R.string.message_remove_pin_notice),
+            positiveButton = context.getString(R.string.btn_remove_pin),
             positiveListener = {
                 viewModel.removePinAndFetch(notice.id)
             },
@@ -351,7 +350,7 @@ class CircleDetailNoticeFragment : Fragment() {
 
     private fun setBtnRetryListener() {
         binding.btnRetry.setOnClickListener {
-            viewModel.refresh()
+            viewModel.showLoadingAndRefresh()
         }
     }
 
@@ -378,7 +377,7 @@ class CircleDetailNoticeFragment : Fragment() {
     ) {
         val loadingIndicator =
             requireParentFragment().requireView().findViewById<CircularProgressIndicator>(R.id.pgbLoading)
-        loadingIndicator.isVisible = event is Event.Loading
+        loadingIndicator.isVisible = event is Event.ShowProcessing
         when (event) {
             is Event.SendToLoginScreen -> sendUserToLoginScreen(parentActivity)
             is Event.ShowToast -> showToast(event, context)
@@ -425,11 +424,19 @@ class CircleDetailNoticeFragment : Fragment() {
         }
 
         switchView(binding.rvCircleNotice)
-        loadCircleNoticesAndDoAfter(screenFlow.posts) {}
+        loadCircleNoticesAndDoAfter(screenFlow.posts) {
+            if (screenFlow.hasCollected) {
+                viewModel.currentScrollState?.let {
+                    binding.rvCircleNotice.layoutManager?.onRestoreInstanceState(it)
+                }
+                return@loadCircleNoticesAndDoAfter
+            }
+            screenFlow.notifyCollected()
+        }
     }
 
     private fun loadCircleNoticesAndDoAfter(
-        notices: PostModels,
+        notices: Models<PostModel>,
         after: () -> Unit,
     ) {
         binding.rvCircleNotice.adapter?.let {
@@ -445,6 +452,7 @@ class CircleDetailNoticeFragment : Fragment() {
     }
 
     private fun showErrorView() {
+        binding.shimmerNotice.stopShimmer()
         switchView(binding.llServiceError)
     }
 
@@ -453,5 +461,11 @@ class CircleDetailNoticeFragment : Fragment() {
         binding.shimmerNotice.isVisible = view == binding.shimmerNotice
         binding.txtNoNotice.isVisible = view == binding.txtNoNotice
         binding.llServiceError.isVisible = view == binding.llServiceError
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+
+        viewModel.saveScrollState(binding.rvCircleNotice.layoutManager?.onSaveInstanceState())
     }
 }

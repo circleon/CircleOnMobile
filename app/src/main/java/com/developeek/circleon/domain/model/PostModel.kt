@@ -5,34 +5,8 @@ import com.developeek.circleon.domain.utils.Const
 import java.io.Serializable
 import java.time.LocalDateTime
 
-data class PostModels(private val models: List<PostModel>) {
-    private var isLastPage = false
-
-    fun get() = models
-
-    fun get(index: Int) = models[index]
-
-    fun size() = models.size
-
-    fun isEmpty() = models.isEmpty()
-
-    fun add(postModel: PostModel) = PostModels(models + postModel)
-
-    fun addAllAndGet(postModels: List<PostModel>) = PostModels(models + postModels)
-
-    fun setAsLast() {
-        isLastPage = true
-    }
-
-    fun isLastPage() = isLastPage
-
-    companion object {
-        fun empty() = PostModels(emptyList())
-    }
-}
-
 data class PostModel(
-    override val id: Int,
+    val postId: Int,
     val type: PostType,
     val isPinned: Boolean,
     val imgUrl: String?,
@@ -41,16 +15,12 @@ data class PostModel(
     val updatedAt: LocalDateTime,
     val commentCount: Int,
     val author: AuthorModel,
-) : Serializable, Identifiable {
-    override fun isSame(target: Identifiable) = this.id == target.id
+) : BaseModel(postId), Serializable {
+    override fun areContentsSame(target: BaseModel): Boolean {
+        if (target !is PostModel) return false
 
-    override fun areContentsSame(target: Identifiable) = this == target
-
-    fun isNotice() = this.type.isNotice()
-
-    fun isPost() = !isNotice()
-
-    fun areContentsSame(postModel: PostModel) = this == postModel
+        return this == target
+    }
 
     companion object {
         fun emptyInstance() =

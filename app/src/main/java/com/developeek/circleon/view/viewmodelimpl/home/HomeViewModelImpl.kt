@@ -3,15 +3,15 @@ package com.developeek.circleon.view.viewmodelimpl.home
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.developeek.circleon.data.repository.CircleRepository
+import com.developeek.circleon.data.repository.Page
 import com.developeek.circleon.data.source.Error
 import com.developeek.circleon.data.source.Success
 import com.developeek.circleon.domain.enums.Category
-import com.developeek.circleon.domain.model.CategoryModels
+import com.developeek.circleon.domain.model.CategoryModel
 import com.developeek.circleon.domain.model.CircleModel
-import com.developeek.circleon.domain.model.CircleModels
+import com.developeek.circleon.domain.model.Models
 import com.developeek.circleon.view.Event
 import com.developeek.circleon.view.viewmodel.home.HomeViewModel
-import com.developeek.circleon.view.viewmodelimpl.Page
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -33,10 +33,10 @@ class HomeViewModelImpl
         private val _event = MutableSharedFlow<Event>()
         override val event: SharedFlow<Event> = _event
 
-        override val categories: CategoryModels
+        override val categories: Models<CategoryModel>
             get() = _categories
-        private var _categories = CategoryModels.empty()
-        private lateinit var circles: CircleModels
+        private var _categories: Models<CategoryModel> = Models()
+        private lateinit var circles: Models<CircleModel>
 
         override val isLastPage: Boolean
             get() = _isLastPage
@@ -52,7 +52,7 @@ class HomeViewModelImpl
         }
 
         override fun refresh() {
-            setFilterAndFetch(categories.selectedOrFirst().category)
+            setFilterAndFetch((categories.get().find { it.isSelected } ?: categories.first()).category)
         }
 
         override fun setFilterAndFetch(category: Category) {
@@ -65,7 +65,7 @@ class HomeViewModelImpl
                     _screenFlow.emit(HomeScreen.LoadingView)
                     scrollOverCircleJob?.cancel()
                     currentPage = DEFAULT_PAGE // 카테고리를 선택할 때는 circles 를 재사용하지 않기 때문에 currentPage 도 초기화
-                    _categories = CategoryModels.selectAndGet(category)
+                    _categories = CategoryModel.selectAndGet(category)
 
                     when (val result = getCircles(currentPage, SIZE_BY_PAGE, category)) {
                         is Success -> whenFetchCirclesSuccess(result)
@@ -83,9 +83,11 @@ class HomeViewModelImpl
         }
 
         private suspend fun whenFetchCirclesSuccess(result: Success<Page<CircleModel>>) {
-            circles = CircleModels(result.data.content)
-            _isLastPage = result.data.isLastPage
-            _screenFlow.emit(HomeScreen.SuccessView(circles))
+            result.data.let {
+                circles = Models(it.content)
+                _isLastPage = it.isLastPage
+                _screenFlow.emit(HomeScreen.SuccessView(circles))
+            }
         }
 
         private suspend fun whenFetchCirclesFail(result: Error<Page<CircleModel>>) {
@@ -104,7 +106,12 @@ class HomeViewModelImpl
 
             scrollOverCircleJob =
                 viewModelScope.launch {
-                    val result = getCircles(currentPage + 1, SIZE_BY_PAGE, categories.selectedOrFirst().category)
+                    val result =
+                        getCircles(
+                            currentPage + 1,
+                            SIZE_BY_PAGE,
+                            (categories.get().find { it.isSelected } ?: categories.first()).category,
+                        )
 
                     if (!isActive) return@launch // 스크롤 작업 캔슬 시 내용을 업데이트하지 않고 작업 종료
                     when (result) {
@@ -116,17 +123,15 @@ class HomeViewModelImpl
 
         private suspend fun whenScrollOverSuccess(result: Success<Page<CircleModel>>) {
             result.data.let {
-                circles = circles.addAllAndGet(it.content)
                 _isLastPage = it.isLastPage
+                circles = circles.addAllAndGet(it.content)
+                _screenFlow.emit(
+                    HomeScreen.SuccessView(circles).apply {
+                        notifyCollected() // 스크롤 초기화 방지를 위해 collect 처리
+                    },
+                )
             }
             currentPage++
-
-            _screenFlow.emit(
-                HomeScreen.SuccessView(circles).apply {
-                    // 페이지 로딩의 경우 스크롤 상단 초기화가 collected 여부로 결정되기 때문에 초기화 방지를 위해 collect 처리
-                    notifyCollected()
-                },
-            )
         }
 
         private suspend fun whenScrollOverFail(result: Error<Page<CircleModel>>) {
@@ -152,7 +157,7 @@ sealed class HomeScreen {
         _hasCollected = true
     }
 
-    data class SuccessView(val circles: CircleModels) : HomeScreen()
+    data class SuccessView(val circles: Models<CircleModel>) : HomeScreen()
 
     data object LoadingView : HomeScreen()
 

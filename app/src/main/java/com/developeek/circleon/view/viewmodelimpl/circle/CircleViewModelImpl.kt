@@ -1,45 +1,40 @@
 package com.developeek.circleon.view.viewmodelimpl.circle
 
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.developeek.circleon.data.repository.CircleRepository
+import com.developeek.circleon.data.repository.UserRepository
 import com.developeek.circleon.data.source.Error
 import com.developeek.circleon.data.source.Success
-import com.developeek.circleon.domain.model.CircleSummaryModels
-import com.developeek.circleon.domain.state.UiState
+import com.developeek.circleon.domain.model.CircleSummaryModel
+import com.developeek.circleon.domain.model.Models
+import com.developeek.circleon.view.Event
 import com.developeek.circleon.view.viewmodel.circle.CircleViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.Deferred
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
-import kotlinx.coroutines.cancel
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharedFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 @HiltViewModel
 class CircleViewModelImpl
     @Inject
-    constructor(private val repository: CircleRepository) : CircleViewModel, ViewModel() {
-        override val state: LiveData<UiState>
-            get() = uiState
-        private val uiState = MutableLiveData<UiState>()
+    constructor(private val repository: UserRepository) : CircleViewModel, ViewModel() {
+        private val _event = MutableSharedFlow<Event>()
+        override val event: SharedFlow<Event> = _event
+        private val _screenFlow = MutableStateFlow<CircleScreen>(CircleScreen.NormalView)
+        override val screenFlow: StateFlow<CircleScreen> = _screenFlow
 
-        override val myCircles: CircleSummaryModels
-            get() = _myCircles
-        private var _myCircles = CircleSummaryModels.empty()
-        override val joinRequestedCircles: CircleSummaryModels
-            get() = _joinRequestedCircles
-        private var _joinRequestedCircles = CircleSummaryModels.empty()
-        override val leaveRequestedCircles: CircleSummaryModels
-            get() = _leaveRequestedCircles
-        private var _leaveRequestedCircles = CircleSummaryModels.empty()
-        private var fetchUserCirclesJob: Job? = null
         private var currentPage = DEFAULT_PAGE
 
-        override lateinit var error: String
+        private var fetchUserCirclesJob: Job? = null
+        private val dispatcher = Dispatchers.IO
 
         init {
             fetchUserCircles(currentPage, SIZE_BY_PAGE)
@@ -57,90 +52,80 @@ class CircleViewModelImpl
                 if (!it.isCompleted) return
             }
 
-            uiState.postValue(UiState.Loading)
-
-            var tmpState: UiState = UiState.Success
             fetchUserCirclesJob =
                 viewModelScope.launch {
-                    val fetchMyCirclesJob =
+                    _screenFlow.emit(CircleScreen.LoadingView)
+
+                    val myCircles =
                         async {
-                            return@async fetchMyCircles(page, size)
+                            getMyCircles(page, size)
                         }
-                    val fetchMyJoinRequestedCirclesJob =
+                    val myJoinRequestedCircles =
                         async {
-                            return@async fetchMyJoinRequestedCircles(page, size)
+                            getMyJoinRequestedCircles(page, size)
                         }
-                    val fetchMyLeaveRequestedCirclesJob =
+                    val myLeaveRequestedCircles =
                         async {
-                            return@async fetchMyLeaveRequestedCircles(page, size)
+                            getMyLeaveRequestedCircles(page, size)
                         }
 
-                    val jobs: List<Deferred<UiState>> =
-                        listOf(
-                            fetchMyCirclesJob,
-                            fetchMyJoinRequestedCirclesJob,
-                            fetchMyLeaveRequestedCirclesJob,
+                    awaitAll(myCircles, myJoinRequestedCircles, myLeaveRequestedCircles)
+                        .find {
+                            it is Error
+                        }?.let {
+                            whenFetchMyCirclesFail(it as Error)
+                        } ?: run {
+                        whenFetchMyCirclesSuccess(
+                            myCircles = myCircles.await() as Success,
+                            joinRequestedCircles = myJoinRequestedCircles.await() as Success,
+                            leaveRequestedCircles = myLeaveRequestedCircles.await() as Success,
                         )
-                    jobs.map { job ->
-                        job.invokeOnCompletion {
-                            if (job.isCancelled) {
-                                this.cancel()
-                            }
-                        }
-                    }
-                    jobs.awaitAll().map {
-                        if (it !is UiState.Success) tmpState = it
-                    }
-                }.apply {
-                    invokeOnCompletion {
-                        uiState.postValue(tmpState)
                     }
                 }
         }
 
-        private suspend fun fetchMyCircles(
-            page: Int,
-            size: Int,
-        ): UiState {
-            val result = repository.getMyCircles(page, size)
+        private suspend fun whenFetchMyCirclesSuccess(
+            myCircles: Success<Models<CircleSummaryModel>>,
+            joinRequestedCircles: Success<Models<CircleSummaryModel>>,
+            leaveRequestedCircles: Success<Models<CircleSummaryModel>>,
+        ) {
+            _screenFlow.emit(
+                CircleScreen.SuccessView(
+                    myCircles = myCircles.data,
+                    joinRequestedCircles = joinRequestedCircles.data,
+                    leaveRequestedCircles = leaveRequestedCircles.data,
+                ),
+            )
+        }
 
-            if (result is Success) {
-                _myCircles = result.data
-                return UiState.Success
-            } else {
-                error = (result as Error).message()
-                return if (result.isAuthenticationError()) UiState.AuthenticationError else UiState.ServiceError
+        private suspend fun whenFetchMyCirclesFail(result: Error<Models<CircleSummaryModel>>) {
+            _event.emit(Event.ShowToast(result.message()))
+            _screenFlow.emit(CircleScreen.NormalView)
+
+            if (result.isAuthenticationError()) {
+                _event.emit(Event.SendToLoginScreen)
             }
         }
 
-        private suspend fun fetchMyJoinRequestedCircles(
+        private suspend fun getMyCircles(
             page: Int,
             size: Int,
-        ): UiState {
-            val result = repository.getMyJoinRequestedCircles(page, size)
-
-            if (result is Success) {
-                _joinRequestedCircles = result.data
-                return UiState.Success
-            } else {
-                error = (result as Error).message()
-                return if (result.isAuthenticationError()) UiState.AuthenticationError else UiState.ServiceError
-            }
+        ) = withContext(dispatcher) {
+            repository.getMyCircles(page, size)
         }
 
-        private suspend fun fetchMyLeaveRequestedCircles(
+        private suspend fun getMyJoinRequestedCircles(
             page: Int,
             size: Int,
-        ): UiState {
-            val result = repository.getMyLeaveRequestedCircles(page, size)
+        ) = withContext(dispatcher) {
+            repository.getMyJoinRequestedCircles(page, size)
+        }
 
-            if (result is Success) {
-                _leaveRequestedCircles = result.data
-                return UiState.Success
-            } else {
-                error = (result as Error).message()
-                return if (result.isAuthenticationError()) UiState.AuthenticationError else UiState.ServiceError
-            }
+        private suspend fun getMyLeaveRequestedCircles(
+            page: Int,
+            size: Int,
+        ) = withContext(dispatcher) {
+            repository.getMyLeaveRequestedCircles(page, size)
         }
 
         companion object {
@@ -148,3 +133,15 @@ class CircleViewModelImpl
             private const val DEFAULT_PAGE = 0
         }
     }
+
+sealed class CircleScreen {
+    data class SuccessView(
+        val myCircles: Models<CircleSummaryModel>,
+        val joinRequestedCircles: Models<CircleSummaryModel>,
+        val leaveRequestedCircles: Models<CircleSummaryModel>,
+    ) : CircleScreen()
+
+    data object LoadingView : CircleScreen()
+
+    data object NormalView : CircleScreen()
+}

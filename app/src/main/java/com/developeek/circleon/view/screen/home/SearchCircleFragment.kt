@@ -14,7 +14,9 @@ import androidx.core.view.isVisible
 import androidx.core.widget.doOnTextChanged
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.Observer
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.NavOptions
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -22,23 +24,25 @@ import androidx.recyclerview.widget.RecyclerView
 import com.developeek.circleon.R
 import com.developeek.circleon.databinding.FragmentSearchCircleBinding
 import com.developeek.circleon.domain.model.CircleSummaryModel
-import com.developeek.circleon.domain.model.CircleSummaryModels
-import com.developeek.circleon.domain.state.UiState
+import com.developeek.circleon.domain.model.Models
 import com.developeek.circleon.domain.utils.Const
+import com.developeek.circleon.view.Event
 import com.developeek.circleon.view.adapter.CircleSearchResultAdapter
 import com.developeek.circleon.view.listener.ItemListenerInitializer
 import com.developeek.circleon.view.listener.RecyclerViewHideSoftInputListener
 import com.developeek.circleon.view.screen.login.LoginActivity
-import com.developeek.circleon.view.viewmodel.home.SearchViewModel
+import com.developeek.circleon.view.viewmodel.home.SearchCircleViewModel
+import com.developeek.circleon.view.viewmodelimpl.home.SearchCircleScreen
 import com.developeek.circleon.view.viewmodelimpl.home.SearchViewModelImpl
 import com.developeek.circleon.view.widget.SingleMessageToast
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
 class SearchCircleFragment : Fragment() {
     private lateinit var binding: FragmentSearchCircleBinding
-    private val viewModel: SearchViewModel by viewModels<SearchViewModelImpl>()
+    private val viewModel: SearchCircleViewModel by viewModels<SearchViewModelImpl>()
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -57,8 +61,21 @@ class SearchCircleFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         initView(requireActivity(), requireContext())
-        initObserver(requireActivity(), requireContext())
         initListener(requireContext())
+        lifecycleScope.launch {
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                launch {
+                    viewModel.event.collect {
+                        handleEvent(it, requireActivity(), requireContext())
+                    }
+                }
+                launch {
+                    viewModel.screenFlow.collect {
+                        handleScreenFlow(it)
+                    }
+                }
+            }
+        }
     }
 
     private fun initView(
@@ -107,7 +124,7 @@ class SearchCircleFragment : Fragment() {
             .navigate(
                 R.id.action_searchCircleFragment_to_circleDetailFragment,
                 bundleOf(
-                    Pair(Const.TAG_CIRCLE_ID, item.id),
+                    Pair(Const.TAG_CIRCLE_ID, item.circleId),
                     Pair(Const.TAG_CIRCLE_NAME, item.name),
                 ),
                 navOption,
@@ -121,65 +138,6 @@ class SearchCircleFragment : Fragment() {
     private fun hideBtmNav(parentActivity: Activity) {
         parentActivity.findViewById<BottomNavigationView>(R.id.btmNav).isVisible = false
     }
-
-    private fun initObserver(
-        parentActivity: Activity,
-        context: Context,
-    ) {
-        viewModel.state.observe(
-            viewLifecycleOwner,
-            stateObserver(parentActivity, context),
-        )
-        viewModel.circles.observe(
-            viewLifecycleOwner,
-            circlesObserver(),
-        )
-    }
-
-    private fun stateObserver(
-        parentActivity: Activity,
-        context: Context,
-    ) = Observer<UiState> {
-        when (it) {
-            UiState.Loading -> {
-                toggleView(binding.pgbLoading)
-            }
-            UiState.Success -> {
-                viewModel.setKeywordAndFind(binding.edtSearchCircle.text.toString())
-            }
-            UiState.AuthenticationError -> {
-                sendUserToLoginScreen(parentActivity)
-                if (SingleMessageToast.previousFinished()) {
-                    SingleMessageToast(context, viewModel.error).show()
-                }
-            }
-            UiState.ServiceError -> {
-                toggleView(binding.llServiceError)
-                if (SingleMessageToast.previousFinished()) {
-                    SingleMessageToast(context, viewModel.error).show()
-                }
-            }
-            else -> {}
-        }
-    }
-
-    private fun sendUserToLoginScreen(activity: Activity) {
-        val intent = Intent(activity, LoginActivity::class.java)
-        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)
-        startActivity(intent)
-    }
-
-    private fun circlesObserver() =
-        Observer<CircleSummaryModels> {
-            when (it.isEmpty()) {
-                true -> toggleView(binding.txtNoResult)
-                false -> {
-                    (binding.rvCircle.adapter as CircleSearchResultAdapter).update(it) {
-                        toggleView(binding.rvCircle)
-                    }
-                }
-            }
-        }
 
     private fun initListener(context: Context) {
         setEdtSearchCircleListener()
@@ -229,7 +187,65 @@ class SearchCircleFragment : Fragment() {
         }
     }
 
-    private fun toggleView(view: View) {
+    private fun handleEvent(
+        event: Event,
+        parentActivity: Activity,
+        context: Context,
+    ) {
+        when (event) {
+            is Event.SendToLoginScreen -> sendUserToLoginScreen(parentActivity)
+            is Event.ShowToast -> showToast(event, context)
+            else -> {}
+        }
+    }
+
+    private fun sendUserToLoginScreen(activity: Activity) {
+        val intent = Intent(activity, LoginActivity::class.java)
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)
+        startActivity(intent)
+    }
+
+    private fun showToast(
+        event: Event.ShowToast,
+        context: Context,
+    ) {
+        if (SingleMessageToast.previousFinished()) {
+            SingleMessageToast(context, event.message).show()
+        }
+    }
+
+    private fun handleScreenFlow(screenFlow: SearchCircleScreen) {
+        when (screenFlow) {
+            is SearchCircleScreen.SuccessView -> showSuccessView(screenFlow)
+            is SearchCircleScreen.LoadingView -> switchView(binding.pgbLoading)
+            is SearchCircleScreen.ErrorView -> switchView(binding.llServiceError)
+        }
+    }
+
+    private fun showSuccessView(screenFlow: SearchCircleScreen.SuccessView) {
+        if (screenFlow.circles.isEmpty()) {
+            switchView(binding.txtNoResult)
+            return
+        }
+
+        loadCirclesAndDoAfter(
+            screenFlow.circles,
+            after = {
+                switchView(binding.rvCircle)
+            },
+        )
+    }
+
+    private fun loadCirclesAndDoAfter(
+        circles: Models<CircleSummaryModel>,
+        after: () -> Unit,
+    ) {
+        (binding.rvCircle.adapter as CircleSearchResultAdapter).update(circles) {
+            after()
+        }
+    }
+
+    private fun switchView(view: View) {
         binding.rvCircle.isVisible = view == binding.rvCircle
         binding.pgbLoading.isVisible = view == binding.pgbLoading
         binding.txtNoResult.isVisible = view == binding.txtNoResult

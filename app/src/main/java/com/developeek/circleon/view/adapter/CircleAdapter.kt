@@ -5,14 +5,12 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.core.view.isVisible
-import androidx.recyclerview.widget.AsyncListDiffer
-import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.developeek.circleon.R
 import com.developeek.circleon.databinding.ItemCardCircleBinding
 import com.developeek.circleon.databinding.ItemLoadingBinding
 import com.developeek.circleon.domain.model.CircleModel
-import com.developeek.circleon.domain.model.CircleModels
+import com.developeek.circleon.domain.model.Models
 import com.developeek.circleon.domain.utils.glide.GlideProvider
 import com.developeek.circleon.view.listener.ItemClickListener
 import com.developeek.circleon.view.listener.ItemListenerInitializer
@@ -22,25 +20,7 @@ class CircleAdapter(
     private val glideProvider: GlideProvider,
     private val itemListenerInitializer: ItemListenerInitializer<CircleModel>,
 ) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
-    private val diffUtil =
-        AsyncListDiffer(
-            this,
-            object : DiffUtil.ItemCallback<CircleModel>() {
-                override fun areItemsTheSame(
-                    oldItem: CircleModel,
-                    newItem: CircleModel,
-                ): Boolean {
-                    return oldItem.isSame(newItem)
-                }
-
-                override fun areContentsTheSame(
-                    oldItem: CircleModel,
-                    newItem: CircleModel,
-                ): Boolean {
-                    return oldItem.areContentsSame(newItem)
-                }
-            },
-        )
+    private val diffUtil = CustomAsyncListDiffer<CircleModel>(this)
 
     inner class CircleAdapterItemViewHolder(
         private val binding: ItemCardCircleBinding,
@@ -55,7 +35,7 @@ class CircleAdapter(
 
         private fun loadCircle(circle: CircleModel) {
             binding.txtCircleName.text = circle.name
-            binding.txtCircleCategory.text = circle.category.categoryName()
+            binding.txtCircleCategory.text = circle.category.categoryName
             binding.icOfficial.isVisible = circle.isOfficial()
             binding.txtCircleComment.text = circle.comment
             binding.txtCircleMemberCount.text =
@@ -124,7 +104,7 @@ class CircleAdapter(
     }
 
     fun update(
-        models: CircleModels,
+        models: Models<CircleModel>,
         commitCallback: Runnable,
     ) {
         diffUtil.submitList(models.get(), commitCallback)

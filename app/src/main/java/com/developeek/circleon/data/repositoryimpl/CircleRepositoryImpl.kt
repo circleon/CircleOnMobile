@@ -6,10 +6,9 @@ import com.developeek.circleon.data.dto.home.RequestBodyEditMemberRole
 import com.developeek.circleon.data.dto.home.RequestBodyEditMemberStatus
 import com.developeek.circleon.data.dto.home.RequestBodyEditPost
 import com.developeek.circleon.data.dto.home.RequestBodyReport
-import com.developeek.circleon.data.dto.home.RequestResponseBodyCircleJoin
-import com.developeek.circleon.data.dto.home.RequestResponseBodyCircleLeave
 import com.developeek.circleon.data.exception.ServiceException
 import com.developeek.circleon.data.repository.CircleRepository
+import com.developeek.circleon.data.repository.Page
 import com.developeek.circleon.data.source.Result
 import com.developeek.circleon.data.source.remote.retrofit.service.CircleService
 import com.developeek.circleon.domain.enums.Category
@@ -19,13 +18,11 @@ import com.developeek.circleon.domain.enums.PostType
 import com.developeek.circleon.domain.enums.Role
 import com.developeek.circleon.domain.model.CircleDetailModel
 import com.developeek.circleon.domain.model.CircleModel
-import com.developeek.circleon.domain.model.CircleSummaryModels
-import com.developeek.circleon.domain.model.CommentModels
-import com.developeek.circleon.domain.model.MemberModels
+import com.developeek.circleon.domain.model.CircleSummaryModel
+import com.developeek.circleon.domain.model.CommentModel
+import com.developeek.circleon.domain.model.MemberModel
+import com.developeek.circleon.domain.model.Models
 import com.developeek.circleon.domain.model.PostModel
-import com.developeek.circleon.view.viewmodelimpl.Page
-import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.withContext
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
@@ -33,10 +30,7 @@ import okhttp3.RequestBody.Companion.asRequestBody
 import okhttp3.RequestBody.Companion.toRequestBody
 import java.io.File
 
-class CircleRepositoryImpl(
-    private val service: CircleService,
-    private val dispatcher: CoroutineDispatcher,
-) : CircleRepository {
+class CircleRepositoryImpl(private val service: CircleService) : CircleRepository {
     override suspend fun getCircles(
         page: Int,
         size: Int,
@@ -45,9 +39,9 @@ class CircleRepositoryImpl(
         return try {
             val response =
                 if (category.isSame(Category.ALL)) {
-                    service.getAllCircles(page, size, SORT_CIRCLE_OLDEST)
+                    service.getAllCircles(page, size, SORT_OLDEST)
                 } else {
-                    service.getCircleScrollContents(page, size, SORT_CIRCLE_OLDEST, category.codeName())
+                    service.getCircleScrollContents(page, size, SORT_OLDEST, category.codeName)
                 }
             Result.success(
                 Page(response.content.map { it.toCircleModel() }).apply {
@@ -63,14 +57,12 @@ class CircleRepositoryImpl(
         }
     }
 
-    override suspend fun getCircleSummaries(): Result<CircleSummaryModels> {
+    override suspend fun getCircleSummaries(): Result<Models<CircleSummaryModel>> {
         return try {
-            withContext(dispatcher) {
-                val response = service.getCircleSummaries()
-                Result.success(CircleSummaryModels(response.content.map { it.toCircleSummaryModel() }))
-            }
+            val response = service.getCircleSummaries()
+            Result.success(Models(response.content.map { it.toCircleSummaryModel() }))
         } catch (e: ServiceException.NoResultException) {
-            Result.success(CircleSummaryModels.empty())
+            Result.success(Models())
         } catch (e: Exception) {
             Result.error(e)
         }
@@ -89,7 +81,7 @@ class CircleRepositoryImpl(
         circleId: Int,
         page: Int,
         size: Int,
-    ): Result<MemberModels> {
+    ): Result<Models<MemberModel>> {
         return try {
             val response =
                 service.getMembers(
@@ -99,7 +91,7 @@ class CircleRepositoryImpl(
                     SORT_MEMBER_BY_NAME,
                     MembershipStatus.JOINED.codeName(),
                 )
-            Result.success(MemberModels(response.content.map { it.toMemberModel() }))
+            Result.success(Models(response.content.map { it.toMemberModel() }))
         } catch (e: Exception) {
             Result.error(e)
         }
@@ -109,19 +101,17 @@ class CircleRepositoryImpl(
         circleId: Int,
         page: Int,
         size: Int,
-    ): Result<MemberModels> {
+    ): Result<Models<MemberModel>> {
         return try {
-            withContext(dispatcher) {
-                val response =
-                    service.getMembers(
-                        circleId,
-                        page,
-                        size,
-                        SORT_MEMBER_BY_NAME,
-                        MembershipStatus.JOIN_REQUESTED.codeName(),
-                    )
-                Result.success(MemberModels(response.content.map { it.toMemberModel() }))
-            }
+            val response =
+                service.getMembers(
+                    circleId,
+                    page,
+                    size,
+                    SORT_MEMBER_BY_NAME,
+                    MembershipStatus.JOIN_REQUESTED.codeName(),
+                )
+            Result.success(Models(response.content.map { it.toMemberModel() }))
         } catch (e: Exception) {
             Result.error(e)
         }
@@ -131,33 +121,17 @@ class CircleRepositoryImpl(
         circleId: Int,
         page: Int,
         size: Int,
-    ): Result<MemberModels> {
+    ): Result<Models<MemberModel>> {
         return try {
-            withContext(dispatcher) {
-                val response =
-                    service.getMembers(
-                        circleId,
-                        page,
-                        size,
-                        SORT_MEMBER_BY_NAME,
-                        MembershipStatus.LEAVE_REQUESTED.codeName(),
-                    )
-                Result.success(MemberModels(response.content.map { it.toMemberModel() }))
-            }
-        } catch (e: Exception) {
-            Result.error(e)
-        }
-    }
-
-    override suspend fun getCircleLeaveRequestedMemberMessage(
-        circleId: Int,
-        memberId: Int,
-    ): Result<String> {
-        return try {
-            withContext(dispatcher) {
-                val response = service.getCircleLeaveRequestedMemberMessage(circleId, memberId)
-                Result.success(response.message)
-            }
+            val response =
+                service.getMembers(
+                    circleId,
+                    page,
+                    size,
+                    SORT_MEMBER_BY_NAME,
+                    MembershipStatus.LEAVE_REQUESTED.codeName(),
+                )
+            Result.success(Models(response.content.map { it.toMemberModel() }))
         } catch (e: Exception) {
             Result.error(e)
         }
@@ -168,10 +142,20 @@ class CircleRepositoryImpl(
         memberId: Int,
     ): Result<String> {
         return try {
-            withContext(dispatcher) {
-                val response = service.getCircleJoinRequestedMemberMessage(circleId, memberId)
-                Result.success(response.message)
-            }
+            val response = service.getCircleJoinRequestedMemberMessage(circleId, memberId)
+            Result.success(response.message)
+        } catch (e: Exception) {
+            Result.error(e)
+        }
+    }
+
+    override suspend fun getCircleLeaveRequestedMemberMessage(
+        circleId: Int,
+        memberId: Int,
+    ): Result<String> {
+        return try {
+            val response = service.getCircleLeaveRequestedMemberMessage(circleId, memberId)
+            Result.success(response.message)
         } catch (e: Exception) {
             Result.error(e)
         }
@@ -224,62 +208,18 @@ class CircleRepositoryImpl(
         postId: Int,
         page: Int,
         size: Int,
-    ): Result<CommentModels> {
+    ): Result<Page<CommentModel>> {
         return try {
-            withContext(dispatcher) {
-                val response = service.getCirclePostComments(circleId, postId, page, size)
-                Result.success(
-                    CommentModels(response.content.map { it.toCommentModel() }).apply {
-                        if (response.isLastPage()) {
-                            setAsLast()
-                        }
-                    },
-                )
-            }
+            val response = service.getCirclePostComments(circleId, postId, page, size)
+            Result.success(
+                Page(response.content.map { it.toCommentModel() }).apply {
+                    if (response.isLastPage()) {
+                        setAsLast()
+                    }
+                },
+            )
         } catch (e: ServiceException.NoResultException) {
-            Result.success(CommentModels.emptyInstance())
-        } catch (e: Exception) {
-            Result.error(e)
-        }
-    }
-
-    override suspend fun getMyCircles(
-        page: Int,
-        size: Int,
-    ): Result<CircleSummaryModels> {
-        return try {
-            withContext(dispatcher) {
-                val response = service.getMyCircles(MembershipStatus.JOINED.codeName(), page, size)
-                Result.success(CircleSummaryModels(response.content.map { it.toCircleSummaryModel() }))
-            }
-        } catch (e: Exception) {
-            Result.error(e)
-        }
-    }
-
-    override suspend fun getMyJoinRequestedCircles(
-        page: Int,
-        size: Int,
-    ): Result<CircleSummaryModels> {
-        return try {
-            withContext(dispatcher) {
-                val response = service.getMyCircles(MembershipStatus.JOIN_REQUESTED.codeName(), page, size)
-                Result.success(CircleSummaryModels(response.content.map { it.toCircleSummaryModel() }))
-            }
-        } catch (e: Exception) {
-            Result.error(e)
-        }
-    }
-
-    override suspend fun getMyLeaveRequestedCircles(
-        page: Int,
-        size: Int,
-    ): Result<CircleSummaryModels> {
-        return try {
-            withContext(dispatcher) {
-                val response = service.getMyCircles(MembershipStatus.LEAVE_REQUESTED.codeName(), page, size)
-                Result.success(CircleSummaryModels(response.content.map { it.toCircleSummaryModel() }))
-            }
+            Result.success(Page(emptyList()))
         } catch (e: Exception) {
             Result.error(e)
         }
@@ -291,66 +231,42 @@ class CircleRepositoryImpl(
         introductionImg: File?,
     ): Result<Unit> {
         return try {
-            withContext(dispatcher) {
-                val textMediaType = TEXT_CONTENT_TYPE.toMediaType()
+            val textMediaType = TEXT_CONTENT_TYPE.toMediaType()
 
-                val nameRequestBody = circleDetailModel.name.toRequestBody(textMediaType)
-                val singleLineIntroductionRequestBody =
-                    circleDetailModel.singleLineIntroduction.toRequestBody(
-                        textMediaType,
-                    )
-                val categoryRequestBody = circleDetailModel.category.codeName().toRequestBody(textMediaType)
-                val introductionRequestBody = circleDetailModel.introduction?.toRequestBody(textMediaType)
-                val recruitmentStartDate =
-                    circleDetailModel.recruitmentStartDate?.toString()?.toRequestBody(textMediaType)
-                val recruitmentEndDate =
-                    circleDetailModel.recruitmentEndDate?.toString()?.toRequestBody(textMediaType)
-                val profileImgRequestBody =
-                    profileImg?.let {
-                        val imgRequestBody = it.asRequestBody(IMAGE_CONTENT_TYPE.toMediaType())
-                        MultipartBody.Part.createFormData("profileImg", profileImg.name, imgRequestBody)
-                    }
-                val introductionImgRequestBody =
-                    introductionImg?.let {
-                        val imgRequestBody = it.asRequestBody(IMAGE_CONTENT_TYPE.toMediaType())
-                        MultipartBody.Part.createFormData("introductionImg", introductionImg.name, imgRequestBody)
-                    }
-
-                service.postCircle(
-                    nameRequestBody,
-                    singleLineIntroductionRequestBody,
-                    categoryRequestBody,
-                    introductionRequestBody,
-                    recruitmentStartDate,
-                    recruitmentEndDate,
-                    profileImgRequestBody,
-                    introductionImgRequestBody,
+            val nameRequestBody = circleDetailModel.name.toRequestBody(textMediaType)
+            val singleLineIntroductionRequestBody =
+                circleDetailModel.singleLineIntroduction.toRequestBody(
+                    textMediaType,
                 )
-                Result.success(Unit)
-            }
-        } catch (e: Exception) {
-            Result.error(e)
-        }
-    }
+            val categoryRequestBody = circleDetailModel.category.codeName.toRequestBody(textMediaType)
+            val introductionRequestBody = circleDetailModel.introduction?.toRequestBody(textMediaType)
+            val recruitingRequestBody = circleDetailModel.recruiting
+            val recruitmentStartDate =
+                circleDetailModel.recruitmentStartDate?.toString()?.toRequestBody(textMediaType)
+            val recruitmentEndDate =
+                circleDetailModel.recruitmentEndDate?.toString()?.toRequestBody(textMediaType)
+            val profileImgRequestBody =
+                profileImg?.let {
+                    val imgRequestBody = it.asRequestBody(IMAGE_CONTENT_TYPE.toMediaType())
+                    MultipartBody.Part.createFormData("profileImg", profileImg.name, imgRequestBody)
+                }
+            val introductionImgRequestBody =
+                introductionImg?.let {
+                    val imgRequestBody = it.asRequestBody(IMAGE_CONTENT_TYPE.toMediaType())
+                    MultipartBody.Part.createFormData("introductionImg", introductionImg.name, imgRequestBody)
+                }
 
-    override suspend fun postMyCircle(
-        circleId: Int,
-        joinMessage: String,
-    ): Result<Unit> {
-        return try {
-            service.postMyCircle(circleId, RequestResponseBodyCircleJoin(joinMessage))
-            Result.success(Unit)
-        } catch (e: Exception) {
-            Result.error(e)
-        }
-    }
-
-    override suspend fun postCircleLeaveRequest(
-        memberId: Int,
-        leaveMessage: String,
-    ): Result<Unit> {
-        return try {
-            service.postCircleLeaveRequest(memberId, RequestResponseBodyCircleLeave(leaveMessage))
+            service.postCircle(
+                circleName = nameRequestBody,
+                summary = singleLineIntroductionRequestBody,
+                category = categoryRequestBody,
+                introduction = introductionRequestBody,
+                recruiting = recruitingRequestBody,
+                recruitmentStartDate = recruitmentStartDate,
+                recruitmentEndDate = recruitmentEndDate,
+                profileImg = profileImgRequestBody,
+                introductionImg = introductionImgRequestBody,
+            )
             Result.success(Unit)
         } catch (e: Exception) {
             Result.error(e)
@@ -364,19 +280,17 @@ class CircleRepositoryImpl(
         image: File?,
     ): Result<Unit> {
         return try {
-            withContext(dispatcher) {
-                val postTypeRequestBody = postType.code().toRequestBody(TEXT_CONTENT_TYPE.toMediaType())
-                val contentRequestBody = content.toRequestBody(TEXT_CONTENT_TYPE.toMediaType())
-                val postImageRequestBody =
-                    if (image == null) {
-                        null
-                    } else {
-                        val imageRequestBody = image.asRequestBody(IMAGE_CONTENT_TYPE.toMediaType())
-                        MultipartBody.Part.createFormData("image", image.name, imageRequestBody)
-                    }
-                service.postCirclePost(circleId, postTypeRequestBody, contentRequestBody, postImageRequestBody)
-                Result.success(Unit)
-            }
+            val postTypeRequestBody = postType.code().toRequestBody(TEXT_CONTENT_TYPE.toMediaType())
+            val contentRequestBody = content.toRequestBody(TEXT_CONTENT_TYPE.toMediaType())
+            val postImageRequestBody =
+                if (image == null) {
+                    null
+                } else {
+                    val imageRequestBody = image.asRequestBody(IMAGE_CONTENT_TYPE.toMediaType())
+                    MultipartBody.Part.createFormData("image", image.name, imageRequestBody)
+                }
+            service.postCirclePost(circleId, postTypeRequestBody, contentRequestBody, postImageRequestBody)
+            Result.success(Unit)
         } catch (e: Exception) {
             Result.error(e)
         }
@@ -388,10 +302,8 @@ class CircleRepositoryImpl(
         comment: String,
     ): Result<Unit> {
         return try {
-            withContext(dispatcher) {
-                service.postCirclePostComment(circleId, postId, RequestBodyEditComment(comment))
-                Result.success(Unit)
-            }
+            service.postCirclePostComment(circleId, postId, RequestBodyEditComment(comment))
+            Result.success(Unit)
         } catch (e: Exception) {
             Result.error(e)
         }
@@ -428,10 +340,8 @@ class CircleRepositoryImpl(
         content: String,
     ): Result<Unit> {
         return try {
-            withContext(dispatcher) {
-                service.postReportCirclePostComment(circleId, commentId, RequestBodyReport(content))
-                Result.success(Unit)
-            }
+            service.postReportCirclePostComment(circleId, commentId, RequestBodyReport(content))
+            Result.success(Unit)
         } catch (e: Exception) {
             Result.error(e)
         }
@@ -452,10 +362,8 @@ class CircleRepositoryImpl(
 
     override suspend fun putCircle(circleDetailModel: CircleDetailModel): Result<Unit> {
         return try {
-            withContext(dispatcher) {
-                service.putCircle(circleDetailModel.id, circleDetailModel.toRequestBodyForEdit())
-                Result.success(Unit)
-            }
+            service.putCircle(circleDetailModel.circleId, circleDetailModel.toRequestBodyForEdit())
+            Result.success(Unit)
         } catch (e: Exception) {
             Result.error(e)
         }
@@ -463,10 +371,8 @@ class CircleRepositoryImpl(
 
     override suspend fun putCircleOfficialStatus(circleId: Int): Result<Unit> {
         return try {
-            withContext(dispatcher) {
-                service.putCircleOfficialStatus(circleId, OfficialStatus.OFFICIAL_REQUESTED.codeName())
-                Result.success(Unit)
-            }
+            service.putCircleOfficialStatus(circleId, OfficialStatus.OFFICIAL_REQUESTED.codeName())
+            Result.success(Unit)
         } catch (e: Exception) {
             Result.error(e)
         }
@@ -478,30 +384,28 @@ class CircleRepositoryImpl(
         circleIntroductionImage: File?,
     ): Result<Unit> {
         return try {
-            withContext(dispatcher) {
-                var imageRequestBody: RequestBody
-                val thumbnail =
-                    if (circleThumbnail == null) {
-                        null
-                    } else {
-                        imageRequestBody = circleThumbnail.asRequestBody(IMAGE_CONTENT_TYPE.toMediaType())
-                        MultipartBody.Part.createFormData("profileImg", circleThumbnail.name, imageRequestBody)
-                    }
-                val introductionImage =
-                    if (circleIntroductionImage == null) {
-                        null
-                    } else {
-                        imageRequestBody =
-                            circleIntroductionImage.asRequestBody(IMAGE_CONTENT_TYPE.toMediaType())
-                        MultipartBody.Part.createFormData(
-                            "introImg",
-                            circleIntroductionImage.name,
-                            imageRequestBody,
-                        )
-                    }
-                service.putCircleImage(circleId, thumbnail, introductionImage)
-                Result.success(Unit)
-            }
+            var imageRequestBody: RequestBody
+            val thumbnail =
+                if (circleThumbnail == null) {
+                    null
+                } else {
+                    imageRequestBody = circleThumbnail.asRequestBody(IMAGE_CONTENT_TYPE.toMediaType())
+                    MultipartBody.Part.createFormData("profileImg", circleThumbnail.name, imageRequestBody)
+                }
+            val introductionImage =
+                if (circleIntroductionImage == null) {
+                    null
+                } else {
+                    imageRequestBody =
+                        circleIntroductionImage.asRequestBody(IMAGE_CONTENT_TYPE.toMediaType())
+                    MultipartBody.Part.createFormData(
+                        "introImg",
+                        circleIntroductionImage.name,
+                        imageRequestBody,
+                    )
+                }
+            service.putCircleImage(circleId, thumbnail, introductionImage)
+            Result.success(Unit)
         } catch (e: Exception) {
             Result.error(e)
         }
@@ -514,10 +418,8 @@ class CircleRepositoryImpl(
         content: String,
     ): Result<Unit> {
         return try {
-            withContext(dispatcher) {
-                service.putCirclePost(circleId, postId, RequestBodyEditPost(postType.code(), content))
-                Result.success(Unit)
-            }
+            service.putCirclePost(circleId, postId, RequestBodyEditPost(postType.code(), content))
+            Result.success(Unit)
         } catch (e: Exception) {
             Result.error(e)
         }
@@ -530,10 +432,8 @@ class CircleRepositoryImpl(
         content: String,
     ): Result<Unit> {
         return try {
-            withContext(dispatcher) {
-                service.putCirclePostComment(circleId, postId, commentId, RequestBodyEditComment(content))
-                Result.success(Unit)
-            }
+            service.putCirclePostComment(circleId, postId, commentId, RequestBodyEditComment(content))
+            Result.success(Unit)
         } catch (e: Exception) {
             Result.error(e)
         }
@@ -545,10 +445,8 @@ class CircleRepositoryImpl(
         role: Role,
     ): Result<Unit> {
         return try {
-            withContext(dispatcher) {
-                service.putCircleMemberRole(circleId, memberId, RequestBodyEditMemberRole(role.codeName()))
-                Result.success(Unit)
-            }
+            service.putCircleMemberRole(circleId, memberId, RequestBodyEditMemberRole(role.codeName()))
+            Result.success(Unit)
         } catch (e: Exception) {
             Result.error(e)
         }
@@ -560,10 +458,8 @@ class CircleRepositoryImpl(
         status: MembershipStatus,
     ): Result<Unit> {
         return try {
-            withContext(dispatcher) {
-                service.putCircleMemberStatus(circleId, memberId, RequestBodyEditMemberStatus(status.codeName()))
-                Result.success(Unit)
-            }
+            service.putCircleMemberStatus(circleId, memberId, RequestBodyEditMemberStatus(status.codeName()))
+            Result.success(Unit)
         } catch (e: Exception) {
             Result.error(e)
         }
@@ -575,10 +471,8 @@ class CircleRepositoryImpl(
         deleteIntroductionImage: Boolean,
     ): Result<Unit> {
         return try {
-            withContext(dispatcher) {
-                service.deleteCircleImage(circleId, deleteThumbnail, deleteIntroductionImage)
-                Result.success(Unit)
-            }
+            service.deleteCircleImage(circleId, deleteThumbnail, deleteIntroductionImage)
+            Result.success(Unit)
         } catch (e: Exception) {
             Result.error(e)
         }
@@ -602,10 +496,8 @@ class CircleRepositoryImpl(
         commentId: Int,
     ): Result<Unit> {
         return try {
-            with(dispatcher) {
-                service.deleteCirclePostComment(circleId, postId, commentId)
-                Result.success(Unit)
-            }
+            service.deleteCirclePostComment(circleId, postId, commentId)
+            Result.success(Unit)
         } catch (e: Exception) {
             Result.error(e)
         }
@@ -616,21 +508,8 @@ class CircleRepositoryImpl(
         memberId: Int,
     ): Result<Unit> {
         return try {
-            withContext(dispatcher) {
-                service.deleteCircleMember(circleId, memberId)
-                Result.success(Unit)
-            }
-        } catch (e: Exception) {
-            Result.error(e)
-        }
-    }
-
-    override suspend fun deleteCircleJoinRequest(memberId: Int): Result<Unit> {
-        return try {
-            withContext(dispatcher) {
-                service.deleteCircleJoinRequest(memberId)
-                Result.success(Unit)
-            }
+            service.deleteCircleMember(circleId, memberId)
+            Result.success(Unit)
         } catch (e: Exception) {
             Result.error(e)
         }
@@ -639,8 +518,7 @@ class CircleRepositoryImpl(
     companion object {
         private const val TEXT_CONTENT_TYPE = "text/plain; charset=utf-8"
         private const val IMAGE_CONTENT_TYPE = "image/jpeg; charset=utf-8"
-        private const val SORT_CIRCLE_OLDEST = "createdAt,asc"
-        private const val SORT_CIRCLE_LATEST = "createdAt,desc"
+        private const val SORT_OLDEST = "createdAt,asc"
         private const val SORT_MEMBER_BY_NAME = "username,asc"
         private const val TYPE_POST = "POST"
         private const val TYPE_NOTICE = "NOTICE"

@@ -10,7 +10,7 @@ import java.io.Serializable
 import java.time.LocalDateTime
 
 data class CircleDetailModel(
-    val id: Int,
+    val circleId: Int,
     val name: String,
     val category: Category,
     val officialStatus: OfficialStatus,
@@ -26,9 +26,9 @@ data class CircleDetailModel(
     val recruitmentStartDate: LocalDateTime?,
     val recruitmentEndDate: LocalDateTime?,
     val recruiting: Boolean,
-    val members: MemberModels = MemberModels.empty(),
-) : Serializable {
-    constructor(circleDetailModel: CircleDetailModel, members: MemberModels) : this(
+    val members: Models<MemberModel> = Models(),
+) : BaseModel(circleId), Serializable {
+    constructor(circleDetailModel: CircleDetailModel, members: Models<MemberModel>) : this(
         circleDetailModel.id,
         circleDetailModel.name,
         circleDetailModel.category,
@@ -47,6 +47,12 @@ data class CircleDetailModel(
         circleDetailModel.recruiting,
         members,
     )
+
+    override fun areContentsSame(target: BaseModel): Boolean {
+        if (target !is CircleDetailModel) return false
+
+        return this == target
+    }
 
     fun isOfficial() = officialStatus.isOfficial()
 
@@ -73,7 +79,7 @@ data class CircleDetailModel(
         recruitmentStartDate: LocalDateTime? = this.recruitmentStartDate,
         recruitmentEndDate: LocalDateTime? = this.recruitmentEndDate,
         recruiting: Boolean = this.recruiting,
-        members: MemberModels = this.members,
+        members: Models<MemberModel> = this.members,
     ) = CircleDetailModel(
         id,
         name,
@@ -97,7 +103,7 @@ data class CircleDetailModel(
     fun toRequestBodyForEdit() =
         RequestBodyEditCircleDetail(
             this.name,
-            this.category.codeName(),
+            this.category.codeName,
             this.singleLineIntroduction,
             this.introduction,
             this.recruitmentStartDate?.toString(),

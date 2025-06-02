@@ -5,39 +5,19 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.core.content.ContextCompat
-import androidx.recyclerview.widget.AsyncListDiffer
-import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.developeek.circleon.R
 import com.developeek.circleon.databinding.ItemTagCircleCategoryBinding
 import com.developeek.circleon.domain.model.CategoryModel
-import com.developeek.circleon.domain.model.CategoryModels
+import com.developeek.circleon.domain.model.Models
 import com.developeek.circleon.view.listener.ItemClickListener
 import com.developeek.circleon.view.listener.ItemListenerInitializer
 
 class CategoryAdapter(
     private val context: Context,
     private val itemListenerInitializer: ItemListenerInitializer<CategoryModel>,
-) : RecyclerView.Adapter<CategoryAdapter.CategoryAdapterViewHolder>() {
-    private val diffUtil =
-        AsyncListDiffer(
-            this,
-            object : DiffUtil.ItemCallback<CategoryModel>() {
-                override fun areItemsTheSame(
-                    oldItem: CategoryModel,
-                    newItem: CategoryModel,
-                ): Boolean {
-                    return oldItem.isSame(newItem)
-                }
-
-                override fun areContentsTheSame(
-                    oldItem: CategoryModel,
-                    newItem: CategoryModel,
-                ): Boolean {
-                    return oldItem.areContentsSame(newItem)
-                }
-            },
-        )
+) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
+    private val diffUtil = CustomAsyncListDiffer<CategoryModel>(this)
 
     inner class CategoryAdapterViewHolder(
         private val binding: ItemTagCircleCategoryBinding,
@@ -101,14 +81,16 @@ class CategoryAdapter(
     override fun getItemCount() = diffUtil.currentList.size
 
     override fun onBindViewHolder(
-        holder: CategoryAdapterViewHolder,
+        holder: RecyclerView.ViewHolder,
         position: Int,
     ) {
-        holder.bind(position)
+        if (holder is CategoryAdapterViewHolder) {
+            holder.bind(position)
+        }
     }
 
     fun update(
-        models: CategoryModels,
+        models: Models<CategoryModel>,
         commitCallback: Runnable,
     ) {
         diffUtil.submitList(models.get(), commitCallback)
