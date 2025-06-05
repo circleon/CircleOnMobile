@@ -4,8 +4,8 @@ import com.developeek.circleon.BuildConfig
 import com.developeek.circleon.data.source.remote.interceptor.ErrorInterceptor
 import com.developeek.circleon.data.source.remote.interceptor.HeaderInterceptor
 import com.developeek.circleon.data.source.remote.interceptor.TokenAuthenticator
+import com.developeek.circleon.data.source.remote.retrofit.service.AuthService
 import com.developeek.circleon.data.source.remote.retrofit.service.CircleService
-import com.developeek.circleon.data.source.remote.retrofit.service.LoginService
 import com.developeek.circleon.data.source.remote.retrofit.service.TokenService
 import com.developeek.circleon.data.source.remote.retrofit.service.UserService
 import dagger.Module
@@ -24,7 +24,7 @@ import javax.inject.Singleton
 @Module
 object RemoteSourceModule {
     @Qualifier
-    annotation class LoginClient
+    annotation class AuthClient
 
     annotation class ServiceClient
 
@@ -34,10 +34,10 @@ object RemoteSourceModule {
         return GsonConverterFactory.create()
     }
 
-    @LoginClient
+    @AuthClient
     @Provides
     @Singleton
-    fun provideLoginClient(errorInterceptor: ErrorInterceptor): Builder {
+    fun provideAuthClient(errorInterceptor: ErrorInterceptor): Builder {
         return OkHttpClient().newBuilder()
             .addInterceptor(errorInterceptor)
             .addInterceptor(HttpLoggingInterceptor().setLevel(HttpLoggingInterceptor.Level.BODY))
@@ -70,16 +70,16 @@ object RemoteSourceModule {
 
     @Provides
     @Singleton
-    fun provideLoginService(
+    fun provideAuthService(
         converter: GsonConverterFactory,
-        @LoginClient clientBuilder: Builder,
-    ): LoginService {
+        @AuthClient clientBuilder: Builder,
+    ): AuthService {
         return Retrofit.Builder()
             .baseUrl(BuildConfig.SERVICE_API_URL)
             .addConverterFactory(converter)
             .client(clientBuilder.build())
             .build()
-            .create(LoginService::class.java)
+            .create(AuthService::class.java)
     }
 
     @Provides

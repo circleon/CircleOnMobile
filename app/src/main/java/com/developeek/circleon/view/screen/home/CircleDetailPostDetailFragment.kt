@@ -41,7 +41,7 @@ import com.developeek.circleon.view.Event
 import com.developeek.circleon.view.adapter.PostDetailAdapter
 import com.developeek.circleon.view.listener.ItemListenerInitializer
 import com.developeek.circleon.view.listener.RecyclerViewInfiniteScrollListener
-import com.developeek.circleon.view.screen.login.LoginActivity
+import com.developeek.circleon.view.screen.auth.LoginActivity
 import com.developeek.circleon.view.viewmodel.home.CircleDetailPostDetailViewModel
 import com.developeek.circleon.view.viewmodelimpl.home.CircleDetailPostDetailScreen
 import com.developeek.circleon.view.viewmodelimpl.home.CircleDetailPostDetailViewModelImpl

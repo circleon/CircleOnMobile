@@ -32,7 +32,7 @@ import com.developeek.circleon.domain.utils.glide.GlideProvider
 import com.developeek.circleon.view.Event
 import com.developeek.circleon.view.adapter.CategoryAdapter
 import com.developeek.circleon.view.listener.ItemListenerInitializer
-import com.developeek.circleon.view.screen.login.LoginActivity
+import com.developeek.circleon.view.screen.auth.LoginActivity
 import com.developeek.circleon.view.viewmodel.circle.UploadCircleViewModel
 import com.developeek.circleon.view.viewmodelimpl.circle.UploadCircleScreen
 import com.developeek.circleon.view.viewmodelimpl.circle.UploadCircleScreenEvent

@@ -1,7 +1,7 @@
-package com.developeek.circleon.view.viewmodel.login
+package com.developeek.circleon.view.viewmodel.auth
 
 import com.developeek.circleon.view.Event
-import com.developeek.circleon.view.viewmodelimpl.login.LoginScreenEvent
+import com.developeek.circleon.view.viewmodelimpl.auth.LoginScreenEvent
 import kotlinx.coroutines.flow.SharedFlow
 
 interface LoginViewModel {

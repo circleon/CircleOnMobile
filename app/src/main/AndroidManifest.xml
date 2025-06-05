@@ -15,10 +15,10 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.CircleOn">
         <activity
-            android:name=".view.screen.login.SignUpActivity"
+            android:name=".view.screen.auth.SignUpActivity"
             android:exported="false" />
         <activity
-            android:name=".view.screen.login.LoginActivity"
+            android:name=".view.screen.auth.LoginActivity"
             android:exported="false" />
         <activity
             android:name=".view.screen.HomeActivity"

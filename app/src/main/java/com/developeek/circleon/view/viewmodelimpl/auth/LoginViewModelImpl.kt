@@ -1,14 +1,14 @@
-package com.developeek.circleon.view.viewmodelimpl.login
+package com.developeek.circleon.view.viewmodelimpl.auth
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.developeek.circleon.data.repository.LoginRepository
+import com.developeek.circleon.data.repository.AuthRepository
 import com.developeek.circleon.data.source.Error
 import com.developeek.circleon.data.source.Success
 import com.developeek.circleon.domain.utils.validator.Invalid
 import com.developeek.circleon.domain.utils.validator.Validator
 import com.developeek.circleon.view.Event
-import com.developeek.circleon.view.viewmodel.login.LoginViewModel
+import com.developeek.circleon.view.viewmodel.auth.LoginViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -21,7 +21,7 @@ import javax.inject.Inject
 @HiltViewModel
 class LoginViewModelImpl
     @Inject
-    constructor(private val repository: LoginRepository) : LoginViewModel, ViewModel() {
+    constructor(private val repository: AuthRepository) : LoginViewModel, ViewModel() {
         private val _event = MutableSharedFlow<Event>()
         override val event: SharedFlow<Event> = _event
         private val _loginScreenEvent = MutableSharedFlow<LoginScreenEvent>()

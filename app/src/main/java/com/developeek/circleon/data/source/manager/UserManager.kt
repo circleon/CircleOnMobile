@@ -2,7 +2,7 @@ package com.developeek.circleon.data.source.manager
 
 import android.content.SharedPreferences
 import com.developeek.circleon.data.di.UserSharedPreferences
-import com.developeek.circleon.data.dto.login.User
+import com.developeek.circleon.data.dto.auth.User
 import com.developeek.circleon.domain.model.UserModel
 import javax.inject.Inject
 import javax.inject.Singleton

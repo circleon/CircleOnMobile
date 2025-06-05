@@ -106,6 +106,7 @@ class ErrorInterceptor
 
         companion object {
             private const val PARAM_NAME_ERROR_CODE = "errorCode"
+            private const val PARAM_NAME_ERROR_MESSAGE = "errorMessage"
             private const val PARAM_NAME_CONTENT_TYPE = "content-type"
         }
     }

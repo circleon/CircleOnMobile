@@ -28,7 +28,7 @@ import com.developeek.circleon.domain.utils.glide.GlideProvider
 import com.developeek.circleon.view.Event
 import com.developeek.circleon.view.adapter.MyCircleAdapter
 import com.developeek.circleon.view.listener.ItemListenerInitializer
-import com.developeek.circleon.view.screen.login.LoginActivity
+import com.developeek.circleon.view.screen.auth.LoginActivity
 import com.developeek.circleon.view.viewmodel.circle.MyCircleViewModel
 import com.developeek.circleon.view.viewmodelimpl.circle.MyCircleScreen
 import com.developeek.circleon.view.viewmodelimpl.circle.MyCircleViewModelImpl

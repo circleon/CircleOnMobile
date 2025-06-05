@@ -5,7 +5,7 @@ import com.developeek.circleon.domain.vo.Password
 import com.developeek.circleon.domain.vo.UserEmail
 import com.developeek.circleon.domain.vo.UserName
 
-interface LoginRepository {
+interface AuthRepository {
     suspend fun login(
         email: String,
         password: String,

@@ -1,4 +1,4 @@
-package com.developeek.circleon.data.dto.login
+package com.developeek.circleon.data.dto.auth
 
 import com.developeek.circleon.domain.enums.University
 import com.developeek.circleon.domain.model.UserModel

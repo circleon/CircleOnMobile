@@ -27,7 +27,7 @@ import com.developeek.circleon.domain.utils.Const
 import com.developeek.circleon.domain.utils.Utils.toJPEG
 import com.developeek.circleon.domain.utils.glide.GlideProvider
 import com.developeek.circleon.view.Event
-import com.developeek.circleon.view.screen.login.LoginActivity
+import com.developeek.circleon.view.screen.auth.LoginActivity
 import com.developeek.circleon.view.viewmodel.mypage.MyPageViewModel
 import com.developeek.circleon.view.viewmodelimpl.mypage.MyPageScreenEvent
 import com.developeek.circleon.view.viewmodelimpl.mypage.MyPageViewModelImpl

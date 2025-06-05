@@ -22,7 +22,7 @@ import com.developeek.circleon.domain.model.MemberModel
 import com.developeek.circleon.domain.model.Models
 import com.developeek.circleon.domain.utils.Const
 import com.developeek.circleon.view.Event
-import com.developeek.circleon.view.screen.login.LoginActivity
+import com.developeek.circleon.view.screen.auth.LoginActivity
 import com.developeek.circleon.view.viewmodel.home.ManageCircleViewModel
 import com.developeek.circleon.view.viewmodelimpl.home.ManageCircleScreen
 import com.developeek.circleon.view.viewmodelimpl.home.ManageCircleViewModelImpl

@@ -1,4 +1,4 @@
-package com.developeek.circleon.view.screen.login
+package com.developeek.circleon.view.screen.auth
 
 import android.app.Activity
 import android.content.Context
@@ -16,9 +16,9 @@ import androidx.lifecycle.repeatOnLifecycle
 import com.developeek.circleon.databinding.ActivityLoginBinding
 import com.developeek.circleon.view.Event
 import com.developeek.circleon.view.screen.HomeActivity
-import com.developeek.circleon.view.viewmodel.login.LoginViewModel
-import com.developeek.circleon.view.viewmodelimpl.login.LoginScreenEvent
-import com.developeek.circleon.view.viewmodelimpl.login.LoginViewModelImpl
+import com.developeek.circleon.view.viewmodel.auth.LoginViewModel
+import com.developeek.circleon.view.viewmodelimpl.auth.LoginScreenEvent
+import com.developeek.circleon.view.viewmodelimpl.auth.LoginViewModelImpl
 import com.developeek.circleon.view.widget.SingleMessageAlertDialog
 import com.developeek.circleon.view.widget.SingleMessageToast
 import dagger.hilt.android.AndroidEntryPoint
@@ -53,17 +53,16 @@ class LoginActivity : AppCompatActivity() {
 
     private fun handleEvent(
         event: Event,
-        activity: Activity,
+        context: Context,
     ) {
         if (event is Event.ShowProcessing) {
             switchView(binding.pgbLoading)
         } else {
             switchView(binding.btnLogin)
         }
-
         when (event) {
-            is Event.ShowToast -> showToast(event, activity)
-            is Event.ShowDialog -> showDialog(event, activity)
+            is Event.ShowToast -> showToast(event, context)
+            is Event.ShowDialog -> showDialog(event, context)
             else -> {}
         }
     }

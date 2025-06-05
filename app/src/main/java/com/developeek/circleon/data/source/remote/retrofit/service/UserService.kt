@@ -1,12 +1,12 @@
 package com.developeek.circleon.data.source.remote.retrofit.service
 
+import com.developeek.circleon.data.dto.auth.LogoutRequestBody
+import com.developeek.circleon.data.dto.auth.User
 import com.developeek.circleon.data.dto.home.CircleSummary
 import com.developeek.circleon.data.dto.home.MyPost
 import com.developeek.circleon.data.dto.home.Page
 import com.developeek.circleon.data.dto.home.RequestResponseBodyCircleJoin
 import com.developeek.circleon.data.dto.home.RequestResponseBodyCircleLeave
-import com.developeek.circleon.data.dto.login.LogoutRequestBody
-import com.developeek.circleon.data.dto.login.User
 import okhttp3.MultipartBody
 import retrofit2.http.Body
 import retrofit2.http.DELETE
