@@ -78,8 +78,7 @@
                 android:gravity="center"
                 android:textSize="@dimen/text_size_default"
                 android:textColor="@color/purple_5"
-                android:text="@string/btn_authenticate"
-                android:background="?attr/selectableItemBackground"/>
+                android:text="@string/btn_authenticate" />
 
         </androidx.appcompat.widget.LinearLayoutCompat>
 

@@ -12,13 +12,11 @@ import com.developeek.circleon.data.source.remote.retrofit.service.AuthService
 import com.developeek.circleon.domain.vo.Password
 import com.developeek.circleon.domain.vo.UserEmail
 import com.developeek.circleon.domain.vo.UserName
-import kotlinx.coroutines.CoroutineDispatcher
 
 class AuthRepositoryImpl(
     private val service: AuthService,
     private val tokenManager: TokenManager,
     private val userManager: UserManager,
-    private val dispatcher: CoroutineDispatcher,
 ) : AuthRepository {
     override suspend fun login(
         email: String,

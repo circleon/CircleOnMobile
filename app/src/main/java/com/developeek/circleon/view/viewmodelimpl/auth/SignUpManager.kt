@@ -41,6 +41,11 @@ class SignUpManager {
     private var passwordCheckCondition = false
     private var passwordValidationMessage = Const.EMPTY_TEXT
 
+    val hasAgreedAllTerms: Boolean
+        get() = _hasAgreedAllTerms
+    private var _hasAgreedAllTerms = false
+    private var termsCondition = false
+
     fun validateAndSetName(name: String) {
         _nameStringValue = name
 
@@ -70,6 +75,10 @@ class SignUpManager {
                 emailCondition = false
             }
         }
+    }
+
+    fun setAsEmailAuthenticated() {
+        emailAuthenticated = true
     }
 
     fun validateAndSetPassword(password: String) {
@@ -104,25 +113,27 @@ class SignUpManager {
         }
     }
 
-    fun setAsEmailAuthenticated() {
-        emailAuthenticated = true
+    fun toggleAllTermsAgreement() {
+        _hasAgreedAllTerms = !_hasAgreedAllTerms
+
+        termsCondition = _hasAgreedAllTerms // TODO: 약관 설정 이후 condition 수정 필요
     }
 
     fun getConditionBySignUpStep(step: SignUpStep) =
         when (step) {
-            SignUpStep.NAME -> true
-            SignUpStep.EMAIL -> true
-            SignUpStep.EMAIL_AUTHENTICATION -> true
+            SignUpStep.NAME -> nameCondition
+            SignUpStep.EMAIL -> emailCondition
+            SignUpStep.EMAIL_AUTHENTICATION -> emailAuthenticated
             SignUpStep.PASSWORD -> passwordCondition && passwordCheckCondition
-            SignUpStep.TERMS -> TODO()
+            SignUpStep.TERMS -> termsCondition
         }
 
     fun getValidationMessageBySignUpStep(step: SignUpStep) =
         when (step) {
             SignUpStep.NAME -> nameValidationMessage
             SignUpStep.EMAIL -> emailValidationMessage
-            SignUpStep.EMAIL_AUTHENTICATION -> "*인증을 완료해주세요"
+            SignUpStep.EMAIL_AUTHENTICATION -> Const.EMPTY_TEXT
             SignUpStep.PASSWORD -> passwordValidationMessage
-            SignUpStep.TERMS -> TODO()
+            SignUpStep.TERMS -> Const.EMPTY_TEXT
         }
 }

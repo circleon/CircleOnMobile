@@ -23,7 +23,6 @@ import com.developeek.circleon.view.viewmodel.auth.SignUpViewModel
 import com.developeek.circleon.view.viewmodelimpl.auth.SignUpScreenEvent
 import com.developeek.circleon.view.viewmodelimpl.auth.SignUpStep
 import com.developeek.circleon.view.viewmodelimpl.auth.SignUpViewModelImpl
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 
 class SignUpPasswordFragment : Fragment() {

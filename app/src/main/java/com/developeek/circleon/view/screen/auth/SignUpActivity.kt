@@ -101,7 +101,11 @@ class SignUpActivity : AppCompatActivity() {
     }
 
     private fun handleScreenFlow(screenFlow: SignUpScreen) {
-        binding.pgbLoading.isVisible = screenFlow is SignUpScreen.LoadingView
+        if (screenFlow is SignUpScreen.LoadingView) {
+            switchView(binding.pgbProcessing)
+        } else {
+            switchView(binding.btnBottom)
+        }
         when (screenFlow) {
             is SignUpScreen.SuccessView -> finish()
             else -> {}
@@ -124,7 +128,8 @@ class SignUpActivity : AppCompatActivity() {
         event.let {
             binding.vpgSignUp.currentItem = it.step.getIndex()
             toggleBtnBottomByStepCondition(it.stepCondition, context)
-            if (it.stepCondition) setBtnBottomListenerByCurrentStep(it.step, context)
+            switchBtnBottomTextByStep(it.step, context)
+            if (it.stepCondition) setBtnBottomListenerByCurrentStep(it.step)
         }
     }
 
@@ -153,27 +158,35 @@ class SignUpActivity : AppCompatActivity() {
         binding.btnBottom.setTextColor(context.getColor(R.color.grey_5))
     }
 
-    private fun setBtnBottomListenerByCurrentStep(
+    private fun switchBtnBottomTextByStep(
         step: SignUpStep,
         context: Context,
     ) {
-        when (step) {
-            SignUpStep.TERMS -> {}
-            else -> setBtnBottomAsNext(context)
-        }
+        val btnBottom =
+            when (step) {
+                SignUpStep.TERMS -> context.getString(R.string.btn_sign_up)
+                else -> context.getString(R.string.btn_next)
+            }
+
+        binding.btnBottom.text = btnBottom
     }
 
-    private fun setBtnBottomAsNext(context: Context) {
-        binding.btnBottom.text = context.getString(R.string.btn_next)
-
-        binding.btnBottom.setOnClickListener {
-            viewModel.next()
+    private fun setBtnBottomListenerByCurrentStep(step: SignUpStep) {
+        when (step) {
+            SignUpStep.TERMS -> setBtnBottomAsSignUp()
+            else -> setBtnBottomAsNext()
         }
     }
 
     private fun setBtnBottomAsSignUp() {
         binding.btnBottom.setOnClickListener {
             viewModel.signUp()
+        }
+    }
+
+    private fun setBtnBottomAsNext() {
+        binding.btnBottom.setOnClickListener {
+            viewModel.next()
         }
     }
 

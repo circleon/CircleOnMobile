@@ -15,7 +15,6 @@ import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
-import kotlinx.coroutines.Dispatchers
 import javax.inject.Singleton
 
 @InstallIn(SingletonComponent::class)
@@ -28,7 +27,7 @@ object RepositoryModule {
         tokenManager: TokenManager,
         userManager: UserManager,
     ): AuthRepository {
-        return AuthRepositoryImpl(service, tokenManager, userManager, Dispatchers.IO)
+        return AuthRepositoryImpl(service, tokenManager, userManager)
     }
 
     @Provides

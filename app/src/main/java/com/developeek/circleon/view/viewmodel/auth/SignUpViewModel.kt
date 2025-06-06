@@ -1,7 +1,6 @@
 package com.developeek.circleon.view.viewmodel.auth
 
 import androidx.lifecycle.LiveData
-import com.developeek.circleon.domain.state.UiState
 import com.developeek.circleon.view.Event
 import com.developeek.circleon.view.viewmodelimpl.auth.SignUpManager
 import com.developeek.circleon.view.viewmodelimpl.auth.SignUpScreen
@@ -14,10 +13,7 @@ interface SignUpViewModel {
     val screenFlow: StateFlow<SignUpScreen>
     val signUpScreenEvent: SharedFlow<SignUpScreenEvent>
     val signUpManager: SignUpManager
-    val state: LiveData<UiState>
-    val validation: LiveData<String>
     val emailAuthenticationTimer: LiveData<Long>
-    val error: String
 
     fun signUp()
 
@@ -25,15 +21,17 @@ interface SignUpViewModel {
 
     fun setEmail(email: String)
 
+    fun requestEmailCode()
+
     fun authenticateEmail(code: String)
 
     fun setPassword(password: String)
 
     fun checkPassword(password: String)
 
+    fun toggleAllTermsAgreement()
+
     fun next()
 
     fun previous()
-
-    fun requestEmailCode()
 }

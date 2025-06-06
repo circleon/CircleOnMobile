@@ -17,12 +17,14 @@
     <string name="btn_next">다음 단계로</string>
     <string name="btn_sign_up">회원가입하기</string>
     <string name="btn_authenticate">인증</string>
+    <string name="btn_agree_all_terms">약관 전체동의</string>
     <string name="sign_up_content_title_1">반가워요! 이름을 알려주세요</string>
     <string name="info_content_title_1">실명이 아닐 경우 동아리 가입이 제한될 수 있어요</string>
     <string name="sign_up_content_title_2">학교 이메일 인증이 필요해요</string>
     <string name="sign_up_content_title_3">이메일로 인증번호를 전송했어요</string>
     <string name="sign_up_content_title_4">비밀번호를 설정해주세요</string>
-    <string name="message_authentication_fail">*인증을 완료해주세요</string>
+    <string name="sign_up_content_title_5">약관 동의가 필요해요</string>
+        <string name="message_authentication_fail">*인증을 완료해주세요</string>
     <string name="message_message_check_fail">*비밀번호가 일치하지 않습니다</string>
     <string name="text_name">이름</string>
     <string name="hint_name">이름 입력</string>

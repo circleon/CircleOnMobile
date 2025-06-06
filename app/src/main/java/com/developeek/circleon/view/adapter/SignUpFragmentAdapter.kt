@@ -8,6 +8,7 @@ import com.developeek.circleon.view.screen.auth.SignUpEmailAuthenticationFragmen
 import com.developeek.circleon.view.screen.auth.SignUpEmailFragment
 import com.developeek.circleon.view.screen.auth.SignUpNameFragment
 import com.developeek.circleon.view.screen.auth.SignUpPasswordFragment
+import com.developeek.circleon.view.screen.auth.SignUpTermsFragment
 
 class SignUpFragmentAdapter(
     fragmentManager: FragmentManager,
@@ -19,6 +20,7 @@ class SignUpFragmentAdapter(
             SignUpEmailFragment(),
             SignUpEmailAuthenticationFragment(),
             SignUpPasswordFragment(),
+            SignUpTermsFragment(),
         )
 
     override fun getItemCount() = fragments.size

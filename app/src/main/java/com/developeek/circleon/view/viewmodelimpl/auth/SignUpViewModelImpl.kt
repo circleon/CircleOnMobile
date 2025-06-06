@@ -7,8 +7,6 @@ import androidx.lifecycle.viewModelScope
 import com.developeek.circleon.data.repository.AuthRepository
 import com.developeek.circleon.data.source.Error
 import com.developeek.circleon.data.source.Success
-import com.developeek.circleon.domain.state.UiState
-import com.developeek.circleon.domain.vo.Password
 import com.developeek.circleon.domain.vo.UserEmail
 import com.developeek.circleon.view.Event
 import com.developeek.circleon.view.viewmodel.auth.SignUpViewModel
@@ -39,27 +37,10 @@ class SignUpViewModelImpl
         override val signUpManager: SignUpManager = SignUpManager()
         private var currentStep = SignUpStep.entries.first()
 
-        override val state: LiveData<UiState>
-            get() = uiState
-        private val uiState = MutableLiveData<UiState>()
-
-        override val validation: LiveData<String>
-            get() = validationMessage
-        private val validationMessage = MutableLiveData<String>()
-
         override val emailAuthenticationTimer: LiveData<Long>
             get() = timer
         private val timer = MutableLiveData(TIMER_INIT)
         private var emailCodeRequested = false
-
-        private var email: UserEmail? = null
-        private var requestEmailCodeJob: Job? = null
-        private var emailCode: String? = null
-        private var password: Password? = null
-        private var passwordMatched: Boolean = false
-        private var emailAuthenticated: Boolean = false
-        private var authenticateEmailJob: Job? = null
-        private var signUpJob: Job? = null
 
         private var userRequestJob: Job? = null
         private var validateDataJob: Job? = null
@@ -67,50 +48,50 @@ class SignUpViewModelImpl
         private val ioDispatcher = Dispatchers.IO
         private val defaultDispatcher = Dispatchers.Default
 
-        override lateinit var error: String
-
         init {
             viewModelScope.launch {
-                updateSignUpProcess()
+                updateSignUpProcess(currentStep)
             }
         }
 
         override fun signUp() {
-//            if (!signUpCondition()) return
-            signUpJob?.let {
+            userRequestJob?.let {
                 if (!it.isCompleted) return
             }
 
-            uiState.postValue(UiState.Loading)
-
-            signUpJob =
+            userRequestJob =
                 viewModelScope.launch {
-                    val result =
-                        repository.signUp(
-                            userName = signUpManager.name,
-                            email = signUpManager.email,
-                            password = signUpManager.password,
-                        )
+                    _screenFlow.emit(SignUpScreen.LoadingView)
 
-                    if (result is Success) {
-                        uiState.postValue(UiState.Success)
-                        validationMessage.postValue(SIGN_UP_COMPLETED)
-                    } else {
-                        error = (result as Error).message()
-                        uiState.postValue(UiState.ServiceError)
+                    when (
+                        val result =
+                            repository.signUp(
+                                userName = signUpManager.name,
+                                email = signUpManager.email,
+                                password = signUpManager.password,
+                            )
+                    ) {
+                        is Success -> whenSignUpSuccess()
+                        is Error -> whenSignUpFail(result)
                     }
                 }
         }
 
-//        private fun signUpCondition() =
-//            name != null && email != null && password != null &&
-//                emailAuthenticated && passwordMatched
+        private suspend fun whenSignUpSuccess() {
+            _event.emit(Event.ShowToast(MESSAGE_SUCCESS_SIGN_UP))
+            _screenFlow.emit(SignUpScreen.SuccessView)
+        }
+
+        private suspend fun whenSignUpFail(result: Error<Unit>) {
+            _event.emit(Event.ShowDialog(result.message()))
+            _screenFlow.emit(SignUpScreen.NormalView)
+        }
 
         override fun setName(name: String) {
             validateDataJob =
                 viewModelScope.launch {
                     validateAndSetName(name)
-                    updateSignUpProcess()
+                    updateSignUpProcess(currentStep)
                 }
         }
 
@@ -124,7 +105,7 @@ class SignUpViewModelImpl
                 viewModelScope.launch {
                     emailCodeRequested = false // 이메일 인증 초기화
                     validateAndSetEmail(email)
-                    updateSignUpProcess()
+                    updateSignUpProcess(currentStep)
                 }
         }
 
@@ -184,7 +165,7 @@ class SignUpViewModelImpl
                         is Success -> whenEmailAuthenticationSuccess()
                         is Error -> _event.emit(Event.ShowDialog(result.message()))
                     }
-                    updateSignUpProcess()
+                    updateSignUpProcess(currentStep)
                 }
         }
 
@@ -204,7 +185,7 @@ class SignUpViewModelImpl
             validateDataJob =
                 viewModelScope.launch {
                     validateAndSetPassword(password)
-                    updateSignUpProcess()
+                    updateSignUpProcess(currentStep)
                 }
         }
 
@@ -216,7 +197,14 @@ class SignUpViewModelImpl
         override fun checkPassword(password: String) {
             viewModelScope.launch {
                 signUpManager.setPasswordCheck(password)
-                updateSignUpProcess()
+                updateSignUpProcess(currentStep)
+            }
+        }
+
+        override fun toggleAllTermsAgreement() {
+            viewModelScope.launch {
+                signUpManager.toggleAllTermsAgreement()
+                updateSignUpProcess(currentStep)
             }
         }
 
@@ -228,7 +216,7 @@ class SignUpViewModelImpl
             userRequestJob =
                 viewModelScope.launch {
                     when (currentStep) {
-                        SignUpStep.EMAIL -> goNext()
+                        SignUpStep.EMAIL -> requestEmailCodeAndGoNext()
                         else -> goNext()
                     }
                 }
@@ -237,7 +225,7 @@ class SignUpViewModelImpl
         private suspend fun requestEmailCodeAndGoNext() {
             if (emailCodeRequested) {
                 currentStep = currentStep.getNext()
-                updateSignUpProcess()
+                updateSignUpProcess(currentStep)
                 return
             }
 
@@ -265,35 +253,28 @@ class SignUpViewModelImpl
 
         private suspend fun goNext() {
             currentStep = currentStep.getNext()
-            updateSignUpProcess()
+            updateSignUpProcess(currentStep)
         }
 
         private suspend fun goPrevious() {
             currentStep = currentStep.getPrevious()
-            updateSignUpProcess()
+            updateSignUpProcess(currentStep)
         }
 
-        private suspend fun updateSignUpProcess() {
+        private suspend fun updateSignUpProcess(step: SignUpStep) {
             _signUpScreenEvent.emit(
                 SignUpScreenEvent.UpdateSignUpProcess(
-                    step = currentStep,
-                    stepCondition = signUpManager.getConditionBySignUpStep(currentStep),
-                    validationMessage = signUpManager.getValidationMessageBySignUpStep(currentStep),
+                    step = step,
+                    stepCondition = signUpManager.getConditionBySignUpStep(step),
+                    validationMessage = signUpManager.getValidationMessageBySignUpStep(step),
                 ),
             )
         }
 
         companion object {
-            private const val NAME_VALIDATED = "1"
-            private const val EMAIL_VALIDATED = "2"
-            private const val EMAIL_CODE_REQUESTED = "3"
-            private const val EMAIL_AUTHENTICATED = "4"
-            private const val PASSWORD_VALIDATED = "5"
-            private const val PASSWORD_CHECK_VALIDATED = "6"
-            private const val SIGN_UP_COMPLETED = "7"
-
             private const val MESSAGE_SUCCESS_REQUEST_EMAIL_CODE = "이메일 주소로 인증번호를 전송했어요"
             private const val MESSAGE_SUCCESS_EMAIL_AUTHENTICATION = "인증에 성공했어요"
+            private const val MESSAGE_SUCCESS_SIGN_UP = "회원가입이 완료됐어요"
 
             private const val TIMER_INIT = 300000L
             private const val TIMER_INTERVAL = 1000L
