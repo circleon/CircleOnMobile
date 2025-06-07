@@ -36,7 +36,6 @@ class SignUpPasswordFragment : Fragment() {
     ): View {
         binding = FragmentSignUpPasswordBinding.inflate(layoutInflater)
 
-        initView()
         initListener()
         lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
@@ -49,15 +48,6 @@ class SignUpPasswordFragment : Fragment() {
         return binding.root
     }
 
-    private fun initView() {
-        loadPassword()
-    }
-
-    private fun loadPassword() {
-        binding.edtPassword.setText(viewModel.signUpManager.passwordStringValue)
-        binding.edtPasswordCheck.setText(viewModel.signUpManager.passwordCheckStringValue)
-    }
-
     private fun initListener() {
         setEdtPasswordListener()
         setEdtPasswordCheckListener()
@@ -65,13 +55,13 @@ class SignUpPasswordFragment : Fragment() {
 
     private fun setEdtPasswordListener() {
         binding.edtPassword.doOnTextChanged { text, _, _, _ ->
-            viewModel.setPassword(text.toString())
+            viewModel.setPassword(text.toString(), binding.edtPasswordCheck.text.toString())
         }
     }
 
     private fun setEdtPasswordCheckListener() {
         binding.edtPasswordCheck.doOnTextChanged { text, _, _, _ ->
-            viewModel.checkPassword(text.toString())
+            viewModel.checkPassword(binding.edtPassword.text.toString(), text.toString())
         }
     }
 

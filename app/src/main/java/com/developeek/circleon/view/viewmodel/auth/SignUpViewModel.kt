@@ -25,9 +25,15 @@ interface SignUpViewModel {
 
     fun authenticateEmail(code: String)
 
-    fun setPassword(password: String)
+    fun setPassword(
+        password: String,
+        passwordCheck: String,
+    )
 
-    fun checkPassword(password: String)
+    fun checkPassword(
+        password: String,
+        passwordCheck: String,
+    )
 
     fun toggleAllTermsAgreement()
 

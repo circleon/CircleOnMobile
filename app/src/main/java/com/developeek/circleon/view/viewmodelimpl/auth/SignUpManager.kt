@@ -12,18 +12,12 @@ class SignUpManager {
     val name: UserName
         get() = _name
     private lateinit var _name: UserName
-    val nameStringValue: String
-        get() = _nameStringValue
-    private var _nameStringValue = Const.EMPTY_TEXT
     private var nameCondition = false
     private var nameValidationMessage = Const.EMPTY_TEXT
 
     val email: UserEmail
         get() = _email
     private lateinit var _email: UserEmail
-    val emailStringValue: String
-        get() = _emailStringValue
-    private var _emailStringValue = Const.EMPTY_TEXT
     private var emailCondition = false
     private var emailAuthenticated = false
     private var emailValidationMessage = Const.EMPTY_TEXT
@@ -31,12 +25,6 @@ class SignUpManager {
     val password: Password
         get() = _password
     private lateinit var _password: Password
-    val passwordStringValue: String
-        get() = _passwordStringValue
-    private var _passwordStringValue = Const.EMPTY_TEXT
-    val passwordCheckStringValue: String
-        get() = _passwordCheckStringValue
-    private var _passwordCheckStringValue = Const.EMPTY_TEXT
     private var passwordCondition = false
     private var passwordCheckCondition = false
     private var passwordValidationMessage = Const.EMPTY_TEXT
@@ -47,8 +35,6 @@ class SignUpManager {
     private var termsCondition = false
 
     fun validateAndSetName(name: String) {
-        _nameStringValue = name
-
         when (val result = Validator.checkName(name)) {
             is Valid -> {
                 _name = result.data
@@ -62,7 +48,6 @@ class SignUpManager {
     }
 
     fun validateAndSetEmail(email: String) {
-        _emailStringValue = email
         emailAuthenticated = false
 
         when (val result = Validator.checkEmail(email)) {
@@ -82,7 +67,6 @@ class SignUpManager {
     }
 
     fun validateAndSetPassword(password: String) {
-        _passwordStringValue = password
         passwordCheckCondition = false
 
         when (val result = Validator.checkPassword(password)) {
@@ -96,14 +80,13 @@ class SignUpManager {
                 passwordCondition = false
             }
         }
-
-        setPasswordCheck(passwordCheckStringValue)
     }
 
-    fun setPasswordCheck(password: String) {
-        _passwordCheckStringValue = password
-
-        when (Validator.checkPasswordMatch(passwordStringValue, password)) {
+    fun setPasswordCheck(
+        password: String,
+        passwordCheck: String,
+    ) {
+        when (Validator.checkPasswordMatch(password, passwordCheck)) {
             is Valid -> {
                 passwordCheckCondition = true
             }

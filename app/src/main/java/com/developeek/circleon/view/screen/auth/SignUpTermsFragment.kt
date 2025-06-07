@@ -39,7 +39,6 @@ class SignUpTermsFragment : Fragment() {
     ) {
         super.onViewCreated(view, savedInstanceState)
 
-        initView(requireContext())
         initListener()
         lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
@@ -48,22 +47,6 @@ class SignUpTermsFragment : Fragment() {
                 }
             }
         }
-    }
-
-    private fun initView(context: Context) {
-        loadTermsAgreement(context)
-    }
-
-    private fun loadTermsAgreement(context: Context) {
-        val color =
-            if (viewModel.signUpManager.hasAgreedAllTerms) {
-                context.getColor(
-                    R.color.purple_5,
-                )
-            } else {
-                context.getColor(R.color.grey_5)
-            }
-        binding.btnAgreeAllTerms.imageTintList = ColorStateList.valueOf(color)
     }
 
     private fun initListener() {
@@ -92,5 +75,17 @@ class SignUpTermsFragment : Fragment() {
         if (event.step != SignUpStep.TERMS) return
 
         loadTermsAgreement(context)
+    }
+
+    private fun loadTermsAgreement(context: Context) {
+        val color =
+            if (viewModel.signUpManager.hasAgreedAllTerms) {
+                context.getColor(
+                    R.color.purple_5,
+                )
+            } else {
+                context.getColor(R.color.grey_5)
+            }
+        binding.btnAgreeAllTerms.imageTintList = ColorStateList.valueOf(color)
     }
 }

@@ -181,10 +181,14 @@ class SignUpViewModelImpl
             signUpManager.setAsEmailAuthenticated()
         }
 
-        override fun setPassword(password: String) {
+        override fun setPassword(
+            password: String,
+            passwordCheck: String,
+        ) {
             validateDataJob =
                 viewModelScope.launch {
                     validateAndSetPassword(password)
+                    setPasswordCheck(password, passwordCheck)
                     updateSignUpProcess(currentStep)
                 }
         }
@@ -194,11 +198,21 @@ class SignUpViewModelImpl
                 signUpManager.validateAndSetPassword(password)
             }
 
-        override fun checkPassword(password: String) {
+        override fun checkPassword(
+            password: String,
+            passwordCheck: String,
+        ) {
             viewModelScope.launch {
-                signUpManager.setPasswordCheck(password)
+                signUpManager.setPasswordCheck(password, passwordCheck)
                 updateSignUpProcess(currentStep)
             }
+        }
+
+        private suspend fun setPasswordCheck(
+            password: String,
+            passwordCheck: String,
+        ) = withContext(defaultDispatcher) {
+            signUpManager.setPasswordCheck(password, passwordCheck)
         }
 
         override fun toggleAllTermsAgreement() {

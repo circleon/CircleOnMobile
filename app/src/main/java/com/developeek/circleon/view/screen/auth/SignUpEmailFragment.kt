@@ -44,7 +44,6 @@ class SignUpEmailFragment : Fragment() {
     ) {
         super.onViewCreated(view, savedInstanceState)
 
-        initView()
         initListener()
         lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
@@ -53,14 +52,6 @@ class SignUpEmailFragment : Fragment() {
                 }
             }
         }
-    }
-
-    private fun initView() {
-        loadEmail(viewModel.signUpManager.emailStringValue)
-    }
-
-    private fun loadEmail(email: String) {
-        binding.edtEmail.setText(email)
     }
 
     private fun initListener() {

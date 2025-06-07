@@ -44,7 +44,6 @@ class SignUpNameFragment : Fragment() {
     ) {
         super.onViewCreated(view, savedInstanceState)
 
-        initView()
         initListener()
         lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
@@ -53,14 +52,6 @@ class SignUpNameFragment : Fragment() {
                 }
             }
         }
-    }
-
-    private fun initView() {
-        loadName(viewModel.signUpManager.nameStringValue)
-    }
-
-    private fun loadName(name: String) {
-        binding.edtName.setText(name)
     }
 
     private fun initListener() {
