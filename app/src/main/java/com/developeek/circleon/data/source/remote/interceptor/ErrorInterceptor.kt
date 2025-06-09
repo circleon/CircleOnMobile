@@ -31,9 +31,12 @@ class ErrorInterceptor
             val responseString = response.peekBody(Long.MAX_VALUE).string()
             val contentType = response.header(PARAM_NAME_CONTENT_TYPE)
 
-            if (responseString.isNotEmpty()) {
-                val jsonObject = JSONTokener(responseString).nextValue() as JSONObject
+            if (responseString.isEmpty()) {
+                throw IOException(ServiceExceptionMessage.MESSAGE_NO_RESPONSE_BODY)
+            }
 
+            try {
+                val jsonObject = JSONTokener(responseString).nextValue() as JSONObject
                 val statusCode = findStatusCode(responseCode, jsonObject)
 
                 errorLog(statusCode)
@@ -41,8 +44,8 @@ class ErrorInterceptor
 
                 val newResponseBody = responseString.toResponseBody(contentType!!.toMediaType())
                 return response.newBuilder().body(newResponseBody).build()
-            } else {
-                throw IOException(ServiceExceptionMessage.MESSAGE_NO_RESPONSE_BODY)
+            } catch (e: ClassCastException) {
+                throw IOException(String.format(ServiceExceptionMessage.MESSAGE_FAIL_REQUEST, responseCode))
             }
         }
 
@@ -106,7 +109,6 @@ class ErrorInterceptor
 
         companion object {
             private const val PARAM_NAME_ERROR_CODE = "errorCode"
-            private const val PARAM_NAME_ERROR_MESSAGE = "errorMessage"
             private const val PARAM_NAME_CONTENT_TYPE = "content-type"
         }
     }
