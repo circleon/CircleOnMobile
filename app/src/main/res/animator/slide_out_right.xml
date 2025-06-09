@@ -4,7 +4,7 @@
     <objectAnimator
         android:propertyName="translationX"
         android:valueFrom="0"
-        android:valueTo="1100"
+        android:valueTo="1200"
         android:valueType="floatType"
         android:duration="250" />
 </set>

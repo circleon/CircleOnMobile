@@ -596,6 +596,7 @@ class CircleDetailFragment : Fragment() {
         }
 
         fragmentManager.findFragmentByTag(fragment::class.java.simpleName)?.let {
+            removeNotMemberViewIfVisible()
             return
         }
 

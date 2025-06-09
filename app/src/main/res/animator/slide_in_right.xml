@@ -2,7 +2,7 @@
 
     <objectAnimator
         android:propertyName="translationX"
-        android:valueFrom="1100"
+        android:valueFrom="1200"
         android:valueTo="0"
         android:duration="250"
         android:valueType="floatType" />
