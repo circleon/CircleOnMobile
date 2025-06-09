@@ -295,6 +295,7 @@ class ManageCircleMemberFragment : Fragment() {
             negativeListenerInitializer =
                 object : ItemListenerInitializer<MemberModel> {
                     override fun initialize(item: MemberModel) {
+                        requestRefreshToPreviousScreen()
                         viewModel.rejectJoinRequest(item)
                     }
 
@@ -306,6 +307,7 @@ class ManageCircleMemberFragment : Fragment() {
             positiveListenerInitializer =
                 object : ItemListenerInitializer<MemberModel> {
                     override fun initialize(item: MemberModel) {
+                        requestRefreshToPreviousScreen()
                         viewModel.acceptJoinRequest(item)
                     }
 
@@ -358,6 +360,7 @@ class ManageCircleMemberFragment : Fragment() {
             positiveListenerInitializer =
                 object : ItemListenerInitializer<MemberModel> {
                     override fun initialize(item: MemberModel) {
+                        requestRefreshToPreviousScreen()
                         viewModel.acceptLeaveRequest(item)
                     }
 
