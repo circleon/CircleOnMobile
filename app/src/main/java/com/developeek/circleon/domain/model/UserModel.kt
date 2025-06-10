@@ -1,11 +1,16 @@
 package com.developeek.circleon.domain.model
 
 import com.developeek.circleon.domain.enums.University
-import java.io.Serializable
 
 data class UserModel(
-    val id: Int,
+    val userId: Int,
     val name: String,
     val univ: University,
     val profileImage: String?,
-) : Serializable
+) : BaseModel(userId) {
+    override fun areContentsSame(target: BaseModel): Boolean {
+        if (target !is UserModel) return false
+
+        return this == target
+    }
+}

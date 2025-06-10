@@ -3,7 +3,6 @@ package com.developeek.circleon.domain.model
 import com.developeek.circleon.domain.enums.Category
 import com.developeek.circleon.domain.enums.OfficialStatus
 import com.developeek.circleon.domain.utils.Const
-import java.io.Serializable
 
 data class CircleModel(
     val circleId: Int,
@@ -14,7 +13,7 @@ data class CircleModel(
     val thumbnailUrl: String?,
     val comment: String,
     val memberCount: Int,
-) : BaseModel(circleId), Serializable {
+) : BaseModel(circleId) {
     override fun areContentsSame(target: BaseModel): Boolean {
         if (target !is CircleModel) return false
 

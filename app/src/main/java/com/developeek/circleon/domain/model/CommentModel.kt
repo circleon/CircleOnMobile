@@ -1,7 +1,6 @@
 package com.developeek.circleon.domain.model
 
 import com.developeek.circleon.domain.utils.Const
-import java.io.Serializable
 import java.time.LocalDateTime
 
 data class CommentModel(
@@ -10,7 +9,7 @@ data class CommentModel(
     val createdAt: LocalDateTime,
     val updatedAt: LocalDateTime,
     val author: AuthorModel,
-) : BaseModel(commentId), Serializable {
+) : BaseModel(commentId) {
     override fun areContentsSame(target: BaseModel): Boolean {
         if (target !is CommentModel) return false
 

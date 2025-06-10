@@ -6,7 +6,6 @@ import com.developeek.circleon.domain.enums.MembershipStatus
 import com.developeek.circleon.domain.enums.OfficialStatus
 import com.developeek.circleon.domain.enums.Role
 import com.developeek.circleon.domain.utils.Const
-import java.io.Serializable
 import java.time.LocalDateTime
 
 data class CircleDetailModel(
@@ -27,7 +26,7 @@ data class CircleDetailModel(
     val recruitmentEndDate: LocalDateTime?,
     val recruiting: Boolean,
     val members: Models<MemberModel> = Models(),
-) : BaseModel(circleId), Serializable {
+) : BaseModel(circleId) {
     constructor(circleDetailModel: CircleDetailModel, members: Models<MemberModel>) : this(
         circleDetailModel.id,
         circleDetailModel.name,

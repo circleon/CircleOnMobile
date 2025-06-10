@@ -184,7 +184,7 @@ class CircleDetailPostFragment : Fragment() {
         item: PostModel,
     ) {
         userManager.getUser()?.let {
-            if (it.id == item.author.authorId) { // 작성자 본인인 경우
+            if (it.userId == item.author.authorId) { // 작성자 본인인 경우
                 popupMenu.inflate(R.menu.menu_author_post_settings)
                 Utils.changeMenuItemTextColor(
                     popupMenu.menu.findItem(R.id.delete_post),
