@@ -34,7 +34,7 @@ import com.developeek.circleon.view.adapter.CircleMemberAdapter
 import com.developeek.circleon.view.adapter.JoinRequestedMemberAdapter
 import com.developeek.circleon.view.adapter.LeaveRequestedMemberAdapter
 import com.developeek.circleon.view.listener.ItemListenerInitializer
-import com.developeek.circleon.view.screen.login.LoginActivity
+import com.developeek.circleon.view.screen.auth.LoginActivity
 import com.developeek.circleon.view.viewmodel.home.ManageCircleMemberViewModel
 import com.developeek.circleon.view.viewmodelimpl.home.ManageCircleMemberScreen
 import com.developeek.circleon.view.viewmodelimpl.home.ManageCircleMemberViewModelImpl
@@ -295,6 +295,7 @@ class ManageCircleMemberFragment : Fragment() {
             negativeListenerInitializer =
                 object : ItemListenerInitializer<MemberModel> {
                     override fun initialize(item: MemberModel) {
+                        requestRefreshToPreviousScreen()
                         viewModel.rejectJoinRequest(item)
                     }
 
@@ -306,6 +307,7 @@ class ManageCircleMemberFragment : Fragment() {
             positiveListenerInitializer =
                 object : ItemListenerInitializer<MemberModel> {
                     override fun initialize(item: MemberModel) {
+                        requestRefreshToPreviousScreen()
                         viewModel.acceptJoinRequest(item)
                     }
 
@@ -358,6 +360,7 @@ class ManageCircleMemberFragment : Fragment() {
             positiveListenerInitializer =
                 object : ItemListenerInitializer<MemberModel> {
                     override fun initialize(item: MemberModel) {
+                        requestRefreshToPreviousScreen()
                         viewModel.acceptLeaveRequest(item)
                     }
 

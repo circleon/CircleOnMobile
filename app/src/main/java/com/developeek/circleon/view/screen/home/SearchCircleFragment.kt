@@ -30,7 +30,7 @@ import com.developeek.circleon.view.Event
 import com.developeek.circleon.view.adapter.CircleSearchResultAdapter
 import com.developeek.circleon.view.listener.ItemListenerInitializer
 import com.developeek.circleon.view.listener.RecyclerViewHideSoftInputListener
-import com.developeek.circleon.view.screen.login.LoginActivity
+import com.developeek.circleon.view.screen.auth.LoginActivity
 import com.developeek.circleon.view.viewmodel.home.SearchCircleViewModel
 import com.developeek.circleon.view.viewmodelimpl.home.SearchCircleScreen
 import com.developeek.circleon.view.viewmodelimpl.home.SearchViewModelImpl

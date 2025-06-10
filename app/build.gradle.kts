@@ -76,6 +76,7 @@ dependencies {
     implementation(libs.androidx.navigation.ui.ktx)
     implementation(libs.google.android.flexbox)
     implementation(libs.facebook.shimmer)
+    implementation(libs.androidx.swiperefresh)
     kapt(libs.google.dagger.hilt.android.compiler)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)

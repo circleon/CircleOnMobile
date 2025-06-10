@@ -1,21 +1,20 @@
 package com.developeek.circleon.data.di
 
+import com.developeek.circleon.data.repository.AuthRepository
 import com.developeek.circleon.data.repository.CircleRepository
-import com.developeek.circleon.data.repository.LoginRepository
 import com.developeek.circleon.data.repository.UserRepository
+import com.developeek.circleon.data.repositoryimpl.AuthRepositoryImpl
 import com.developeek.circleon.data.repositoryimpl.CircleRepositoryImpl
-import com.developeek.circleon.data.repositoryimpl.LoginRepositoryImpl
 import com.developeek.circleon.data.repositoryimpl.UserRepositoryImpl
 import com.developeek.circleon.data.source.manager.TokenManager
 import com.developeek.circleon.data.source.manager.UserManager
+import com.developeek.circleon.data.source.remote.retrofit.service.AuthService
 import com.developeek.circleon.data.source.remote.retrofit.service.CircleService
-import com.developeek.circleon.data.source.remote.retrofit.service.LoginService
 import com.developeek.circleon.data.source.remote.retrofit.service.UserService
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
-import kotlinx.coroutines.Dispatchers
 import javax.inject.Singleton
 
 @InstallIn(SingletonComponent::class)
@@ -23,12 +22,12 @@ import javax.inject.Singleton
 object RepositoryModule {
     @Provides
     @Singleton
-    fun provideLoginRepository(
-        service: LoginService,
+    fun provideAuthRepository(
+        service: AuthService,
         tokenManager: TokenManager,
         userManager: UserManager,
-    ): LoginRepository {
-        return LoginRepositoryImpl(service, tokenManager, userManager, Dispatchers.IO)
+    ): AuthRepository {
+        return AuthRepositoryImpl(service, tokenManager, userManager)
     }
 
     @Provides

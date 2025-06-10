@@ -1,4 +1,4 @@
-package com.developeek.circleon.data.dto.login
+package com.developeek.circleon.data.dto.auth
 
 data class LoginResult(
     val user: User,

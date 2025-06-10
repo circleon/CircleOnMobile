@@ -1,8 +1,8 @@
 package com.developeek.circleon.data.repositoryimpl
 
+import com.developeek.circleon.data.dto.auth.LogoutRequestBody
 import com.developeek.circleon.data.dto.home.RequestResponseBodyCircleJoin
 import com.developeek.circleon.data.dto.home.RequestResponseBodyCircleLeave
-import com.developeek.circleon.data.dto.login.LogoutRequestBody
 import com.developeek.circleon.data.repository.Page
 import com.developeek.circleon.data.repository.UserRepository
 import com.developeek.circleon.data.source.Result

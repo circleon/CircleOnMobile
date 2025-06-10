@@ -1,9 +1,10 @@
-package com.developeek.circleon.view.screen.login
+package com.developeek.circleon.view.screen.auth
 
 import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.view.View
 import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
 import androidx.activity.viewModels
@@ -13,11 +14,13 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import com.developeek.circleon.databinding.ActivityLoginBinding
+import com.developeek.circleon.view.Event
 import com.developeek.circleon.view.screen.HomeActivity
-import com.developeek.circleon.view.viewmodel.login.LoginViewModel
-import com.developeek.circleon.view.viewmodelimpl.login.LoginEvent
-import com.developeek.circleon.view.viewmodelimpl.login.LoginViewModelImpl
+import com.developeek.circleon.view.viewmodel.auth.LoginViewModel
+import com.developeek.circleon.view.viewmodelimpl.auth.LoginScreenEvent
+import com.developeek.circleon.view.viewmodelimpl.auth.LoginViewModelImpl
 import com.developeek.circleon.view.widget.SingleMessageAlertDialog
+import com.developeek.circleon.view.widget.SingleMessageToast
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 
@@ -34,23 +37,61 @@ class LoginActivity : AppCompatActivity() {
         initListener(this)
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
-                viewModel.event.collect {
-                    handleEvent(it, this@LoginActivity)
+                launch {
+                    viewModel.event.collect {
+                        handleEvent(it, this@LoginActivity)
+                    }
+                }
+                launch {
+                    viewModel.loginScreenEvent.collect {
+                        handleLoginScreenEvent(it, this@LoginActivity)
+                    }
                 }
             }
         }
     }
 
     private fun handleEvent(
-        event: LoginEvent,
+        event: Event,
+        context: Context,
+    ) {
+        if (event is Event.ShowProcessing) {
+            switchView(binding.pgbLoading)
+        } else {
+            switchView(binding.btnLogin)
+        }
+        when (event) {
+            is Event.ShowToast -> showToast(event, context)
+            is Event.ShowDialog -> showDialog(event, context)
+            else -> {}
+        }
+    }
+
+    private fun showToast(
+        event: Event.ShowToast,
+        context: Context,
+    ) {
+        if (SingleMessageToast.previousFinished()) {
+            SingleMessageToast(context, event.message).show()
+        }
+    }
+
+    private fun showDialog(
+        event: Event.ShowDialog,
+        context: Context,
+    ) {
+        SingleMessageAlertDialog(
+            context,
+            event.message,
+        ).show()
+    }
+
+    private fun handleLoginScreenEvent(
+        event: LoginScreenEvent,
         activity: Activity,
     ) {
-        binding.pgbLoading.isVisible = event is LoginEvent.ShowLoadingView
-        binding.btnLogin.isVisible = event !is LoginEvent.ShowLoadingView
         when (event) {
-            is LoginEvent.SendToHomeScreen -> sendUserToHomeScreen(activity)
-            is LoginEvent.ShowDialog -> showDialog(activity, event.text)
-            else -> {}
+            is LoginScreenEvent.SendToHomeScreen -> sendUserToHomeScreen(activity)
         }
     }
 
@@ -59,16 +100,6 @@ class LoginActivity : AppCompatActivity() {
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)
 
         startActivity(intent)
-    }
-
-    private fun showDialog(
-        context: Context,
-        text: String,
-    ) {
-        SingleMessageAlertDialog(
-            context,
-            text,
-        ).show()
     }
 
     private fun initListener(activity: Activity) {
@@ -112,5 +143,10 @@ class LoginActivity : AppCompatActivity() {
         val intent = Intent(activity, SignUpActivity::class.java)
 
         startActivity(intent)
+    }
+
+    private fun switchView(view: View) {
+        binding.pgbLoading.isVisible = view == binding.pgbLoading
+        binding.btnLogin.isVisible = view == binding.btnLogin
     }
 }
