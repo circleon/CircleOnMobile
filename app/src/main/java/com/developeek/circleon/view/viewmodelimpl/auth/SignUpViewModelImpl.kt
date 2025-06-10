@@ -55,6 +55,11 @@ class SignUpViewModelImpl
         }
 
         override fun signUp() {
+            viewModelScope.launch {
+                whenSignUpSuccess()
+            }
+            return
+
             userRequestJob?.let {
                 if (!it.isCompleted) return
             }
@@ -218,6 +223,27 @@ class SignUpViewModelImpl
         override fun toggleAllTermsAgreement() {
             viewModelScope.launch {
                 signUpManager.toggleAllTermsAgreement()
+                updateSignUpProcess(currentStep)
+            }
+        }
+
+        override fun toggleServiceTermsAgreement() {
+            viewModelScope.launch {
+                signUpManager.toggleServiceTermsAgreement()
+                updateSignUpProcess(currentStep)
+            }
+        }
+
+        override fun togglePrivacyPolicyAgreement() {
+            viewModelScope.launch {
+                signUpManager.togglePrivacyPolicyAgreement()
+                updateSignUpProcess(currentStep)
+            }
+        }
+
+        override fun toggleCommunityRulesAgreement() {
+            viewModelScope.launch {
+                signUpManager.toggleCommunityRulesAgreement()
                 updateSignUpProcess(currentStep)
             }
         }

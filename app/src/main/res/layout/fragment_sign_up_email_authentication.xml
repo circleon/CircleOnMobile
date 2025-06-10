@@ -78,7 +78,8 @@
                 android:gravity="center"
                 android:textSize="@dimen/text_size_default"
                 android:textColor="@color/purple_5"
-                android:text="@string/btn_authenticate" />
+                android:text="@string/btn_authenticate"
+                android:background="?attr/selectableItemBackground"/>
 
         </androidx.appcompat.widget.LinearLayoutCompat>
 
@@ -109,7 +110,8 @@
             android:layout_marginStart="@dimen/margin_padding_x_small"
             android:text="@string/btn_resend_authentication_code"
             android:textColor="@color/purple_5"
-            android:textSize="@dimen/text_size_small" />
+            android:textSize="@dimen/text_size_small"
+            android:background="?attr/selectableItemBackground"/>
 
     </androidx.appcompat.widget.LinearLayoutCompat>
 

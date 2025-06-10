@@ -29,10 +29,17 @@ class SignUpManager {
     private var passwordCheckCondition = false
     private var passwordValidationMessage = Const.EMPTY_TEXT
 
+    val hasAgreedServiceTerms: Boolean
+        get() = _hasAgreedServiceTerms
+    private var _hasAgreedServiceTerms = false
+    val hasAgreedPrivacyPolicy: Boolean
+        get() = _hasAgreedPrivacyPolicy
+    private var _hasAgreedPrivacyPolicy = false
+    val hasAgreedCommunityRules: Boolean
+        get() = _hasAgreedCommunityRules
+    private var _hasAgreedCommunityRules = false
     val hasAgreedAllTerms: Boolean
-        get() = _hasAgreedAllTerms
-    private var _hasAgreedAllTerms = false
-    private var termsCondition = false
+        get() = _hasAgreedServiceTerms && _hasAgreedPrivacyPolicy && _hasAgreedCommunityRules
 
     fun validateAndSetName(name: String) {
         when (val result = Validator.checkName(name)) {
@@ -97,9 +104,23 @@ class SignUpManager {
     }
 
     fun toggleAllTermsAgreement() {
-        _hasAgreedAllTerms = !_hasAgreedAllTerms
+        hasAgreedAllTerms.let {
+            _hasAgreedServiceTerms = !it
+            _hasAgreedPrivacyPolicy = !it
+            _hasAgreedCommunityRules = !it
+        }
+    }
 
-        termsCondition = _hasAgreedAllTerms // TODO: 약관 설정 이후 condition 수정 필요
+    fun toggleServiceTermsAgreement() {
+        _hasAgreedServiceTerms = !_hasAgreedServiceTerms
+    }
+
+    fun togglePrivacyPolicyAgreement() {
+        _hasAgreedPrivacyPolicy = !_hasAgreedPrivacyPolicy
+    }
+
+    fun toggleCommunityRulesAgreement() {
+        _hasAgreedCommunityRules = !_hasAgreedCommunityRules
     }
 
     fun getConditionBySignUpStep(step: SignUpStep) =
@@ -108,7 +129,7 @@ class SignUpManager {
             SignUpStep.EMAIL -> emailCondition
             SignUpStep.EMAIL_AUTHENTICATION -> emailAuthenticated
             SignUpStep.PASSWORD -> passwordCondition && passwordCheckCondition
-            SignUpStep.TERMS -> termsCondition
+            SignUpStep.TERMS -> _hasAgreedServiceTerms && _hasAgreedPrivacyPolicy && _hasAgreedCommunityRules
         }
 
     fun getValidationMessageBySignUpStep(step: SignUpStep) =

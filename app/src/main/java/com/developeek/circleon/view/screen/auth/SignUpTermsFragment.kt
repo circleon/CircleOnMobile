@@ -50,12 +50,21 @@ class SignUpTermsFragment : Fragment() {
     }
 
     private fun initListener() {
-        setBtnAgreeAllTermsListener()
+        setBtnAgreeTermsListener()
     }
 
-    private fun setBtnAgreeAllTermsListener() {
+    private fun setBtnAgreeTermsListener() {
         binding.btnAgreeAllTerms.setOnClickListener {
             viewModel.toggleAllTermsAgreement()
+        }
+        binding.btnAgreeServiceTerms.setOnClickListener {
+            viewModel.toggleServiceTermsAgreement()
+        }
+        binding.btnAgreePrivacyPolicy.setOnClickListener {
+            viewModel.togglePrivacyPolicyAgreement()
+        }
+        binding.btnAgreeCommunityRules.setOnClickListener {
+            viewModel.toggleCommunityRulesAgreement()
         }
     }
 
@@ -78,14 +87,26 @@ class SignUpTermsFragment : Fragment() {
     }
 
     private fun loadTermsAgreement(context: Context) {
+        binding.checkAgreeAllTerms.imageTintList =
+            getSingleColorStateListByTermState(viewModel.signUpManager.hasAgreedAllTerms, context)
+        binding.checkAgreeServiceTerms.imageTintList =
+            getSingleColorStateListByTermState(viewModel.signUpManager.hasAgreedServiceTerms, context)
+        binding.checkAgreePrivacyPolicy.imageTintList =
+            getSingleColorStateListByTermState(viewModel.signUpManager.hasAgreedPrivacyPolicy, context)
+        binding.checkAgreeCommunityRules.imageTintList =
+            getSingleColorStateListByTermState(viewModel.signUpManager.hasAgreedCommunityRules, context)
+    }
+
+    private fun getSingleColorStateListByTermState(
+        hasAgreed: Boolean,
+        context: Context,
+    ): ColorStateList {
         val color =
-            if (viewModel.signUpManager.hasAgreedAllTerms) {
-                context.getColor(
-                    R.color.purple_5,
-                )
-            } else {
-                context.getColor(R.color.grey_5)
+            when (hasAgreed) {
+                true -> context.getColor(R.color.purple_5)
+                false -> context.getColor(R.color.grey_5)
             }
-        binding.btnAgreeAllTerms.imageTintList = ColorStateList.valueOf(color)
+
+        return ColorStateList.valueOf(color)
     }
 }

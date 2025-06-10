@@ -17,7 +17,11 @@
     <string name="btn_next">다음 단계로</string>
     <string name="btn_sign_up">회원가입하기</string>
     <string name="btn_authenticate">인증</string>
-    <string name="btn_agree_all_terms">약관 전체동의</string>
+    <string name="btn_agree_all_terms">전체동의</string>
+    <string name="btn_show_detail"><u>보기</u></string>
+    <string name="content_title_service_terms">(필수) 서비스 이용약관</string>
+    <string name="content_title_privacy_policy">(필수) 개인정보 처리방침 동의</string>
+    <string name="content_title_community_rules">(필수) 커뮤니티 이용규칙 확인</string>
     <string name="sign_up_content_title_1">반가워요! 이름을 알려주세요</string>
     <string name="info_content_title_1">실명이 아닐 경우 동아리 가입이 제한될 수 있어요</string>
     <string name="sign_up_content_title_2">학교 이메일 인증이 필요해요</string>

@@ -37,6 +37,12 @@ interface SignUpViewModel {
 
     fun toggleAllTermsAgreement()
 
+    fun toggleServiceTermsAgreement()
+
+    fun togglePrivacyPolicyAgreement()
+
+    fun toggleCommunityRulesAgreement()
+
     fun next()
 
     fun previous()
