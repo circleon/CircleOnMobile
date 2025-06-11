@@ -92,26 +92,26 @@
             android:orientation="horizontal">
 
             <androidx.appcompat.widget.AppCompatTextView
-                android:id="@+id/btnSearchIdPassword"
+                android:id="@+id/btnSignUp"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/btn_find_id_password"
-                android:textSize="@dimen/text_size_small"
-                android:textColor="@color/grey_6"/>
+                android:text="@string/btn_send_sign_up_screen"
+                android:textAppearance="@style/small_bold_text"
+                android:textColor="@color/grey_7" />
 
             <androidx.appcompat.widget.AppCompatTextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="|"
-                android:layout_marginHorizontal="@dimen/margin_padding_x_large"/>
+                android:layout_marginHorizontal="@dimen/margin_padding_small"/>
 
             <androidx.appcompat.widget.AppCompatTextView
-                android:id="@+id/btnSignUp"
+                android:id="@+id/btnChangePassword"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/btn_go_sign_up_page"
-                android:textAppearance="@style/small_bold_text"
-                android:textColor="@color/grey_7" />
+                android:text="@string/btn_send_change_password_screen"
+                android:textSize="@dimen/text_size_small"
+                android:textColor="@color/grey_5"/>
 
         </androidx.appcompat.widget.LinearLayoutCompat>
 

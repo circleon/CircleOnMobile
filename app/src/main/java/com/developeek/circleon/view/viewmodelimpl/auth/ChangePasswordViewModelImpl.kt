@@ -9,7 +9,7 @@ import com.developeek.circleon.data.source.Error
 import com.developeek.circleon.data.source.Success
 import com.developeek.circleon.domain.vo.UserEmail
 import com.developeek.circleon.view.Event
-import com.developeek.circleon.view.viewmodel.auth.SignUpViewModel
+import com.developeek.circleon.view.viewmodel.auth.ChangePasswordViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -24,18 +24,18 @@ import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 @HiltViewModel
-class SignUpViewModelImpl
+class ChangePasswordViewModelImpl
     @Inject
-    constructor(private val repository: AuthRepository) : SignUpViewModel, ViewModel() {
+    constructor(private val repository: AuthRepository) : ChangePasswordViewModel, ViewModel() {
         private val _event = MutableSharedFlow<Event>()
         override val event: SharedFlow<Event> = _event
-        private val _screenFlow = MutableStateFlow<SignUpScreen>(SignUpScreen.NormalView)
-        override val screenFlow: StateFlow<SignUpScreen> = _screenFlow
-        private val _signUpScreenEvent = MutableSharedFlow<SignUpScreenEvent>()
-        override val signUpScreenEvent: SharedFlow<SignUpScreenEvent> = _signUpScreenEvent
+        private val _screenFlow = MutableStateFlow<ChangePasswordScreen>(ChangePasswordScreen.NormalView)
+        override val screenFlow: StateFlow<ChangePasswordScreen> = _screenFlow
+        private val _changePasswordScreenEvent = MutableSharedFlow<ChangePasswordScreenEvent>()
+        override val changePasswordScreenEvent: SharedFlow<ChangePasswordScreenEvent> = _changePasswordScreenEvent
 
-        override val signUpManager: SignUpManager = SignUpManager()
-        private var currentStep = SignUpStep.entries.first()
+        override val passwordChangeManager: PasswordChangeManager = PasswordChangeManager()
+        private var currentStep = ChangePasswordStep.entries.first()
 
         override val emailAuthenticationTimer: LiveData<Long>
             get() = timer
@@ -54,9 +54,9 @@ class SignUpViewModelImpl
             }
         }
 
-        override fun signUp() {
+        override fun changePassword() {
             viewModelScope.launch {
-                whenSignUpSuccess()
+                whenChangePasswordSuccess()
             }
             return
 
@@ -64,46 +64,33 @@ class SignUpViewModelImpl
                 if (!it.isCompleted) return
             }
 
-            userRequestJob =
-                viewModelScope.launch {
-                    _screenFlow.emit(SignUpScreen.LoadingView)
-
-                    when (
-                        val result =
-                            repository.signUp(
-                                userName = signUpManager.name,
-                                email = signUpManager.email,
-                                password = signUpManager.password,
-                            )
-                    ) {
-                        is Success -> whenSignUpSuccess()
-                        is Error -> whenSignUpFail(result)
-                    }
-                }
+            //        userRequestJob =
+            //            viewModelScope.launch {
+            //                _screenFlow.emit(SignUpScreen.LoadingView)
+            //
+            //                when (
+            //                    val result =
+            //                        repository.signUp(
+            //                            userName = signUpManager.name,
+            //                            email = signUpManager.email,
+            //                            password = signUpManager.password,
+            //                        )
+            //                ) {
+            //                    is Success -> whenSignUpSuccess()
+            //                    is Error -> whenSignUpFail(result)
+            //                }
+            //            }
         }
 
-        private suspend fun whenSignUpSuccess() {
-            _event.emit(Event.ShowToast(MESSAGE_SUCCESS_SIGN_UP))
-            _screenFlow.emit(SignUpScreen.SuccessView)
+        private suspend fun whenChangePasswordSuccess() {
+            _event.emit(Event.ShowToast(MESSAGE_SUCCESS_CHANGE_PASSWORD))
+            _screenFlow.emit(ChangePasswordScreen.SuccessView)
         }
 
-        private suspend fun whenSignUpFail(result: Error<Unit>) {
+        private suspend fun whenChangePasswordFail(result: Error<Unit>) {
             _event.emit(Event.ShowDialog(result.message()))
-            _screenFlow.emit(SignUpScreen.NormalView)
+            _screenFlow.emit(ChangePasswordScreen.NormalView)
         }
-
-        override fun setName(name: String) {
-            validateDataJob =
-                viewModelScope.launch {
-                    validateAndSetName(name)
-                    updateSignUpProcess(currentStep)
-                }
-        }
-
-        private suspend fun validateAndSetName(name: String) =
-            withContext(defaultDispatcher) {
-                signUpManager.validateAndSetName(name)
-            }
 
         override fun setEmail(email: String) {
             validateDataJob =
@@ -116,7 +103,7 @@ class SignUpViewModelImpl
 
         private suspend fun validateAndSetEmail(email: String) =
             withContext(defaultDispatcher) {
-                signUpManager.validateAndSetEmail(email)
+                passwordChangeManager.validateAndSetEmail(email)
             }
 
         override fun requestEmailCode() {
@@ -126,7 +113,7 @@ class SignUpViewModelImpl
 
             userRequestJob =
                 viewModelScope.launch {
-                    when (val result = requestEmailAuthenticationCode(signUpManager.email)) {
+                    when (val result = requestEmailAuthenticationCode(passwordChangeManager.email)) {
                         is Success -> whenRequestEmailAuthenticationCodeSuccess()
                         is Error -> _event.emit(Event.ShowDialog(result.message()))
                     }
@@ -166,7 +153,7 @@ class SignUpViewModelImpl
 
             userRequestJob =
                 viewModelScope.launch {
-                    when (val result = authenticateEmail(signUpManager.email, code)) {
+                    when (val result = authenticateEmail(passwordChangeManager.email, code)) {
                         is Success -> whenEmailAuthenticationSuccess()
                         is Error -> _event.emit(Event.ShowDialog(result.message()))
                     }
@@ -183,7 +170,7 @@ class SignUpViewModelImpl
 
         private suspend fun whenEmailAuthenticationSuccess() {
             _event.emit(Event.ShowToast(MESSAGE_SUCCESS_EMAIL_AUTHENTICATION))
-            signUpManager.setAsEmailAuthenticated()
+            passwordChangeManager.setAsEmailAuthenticated()
         }
 
         override fun setPassword(
@@ -200,7 +187,7 @@ class SignUpViewModelImpl
 
         private suspend fun validateAndSetPassword(password: String) =
             withContext(defaultDispatcher) {
-                signUpManager.validateAndSetPassword(password)
+                passwordChangeManager.validateAndSetPassword(password)
             }
 
         override fun checkPassword(
@@ -208,7 +195,7 @@ class SignUpViewModelImpl
             passwordCheck: String,
         ) {
             viewModelScope.launch {
-                signUpManager.setPasswordCheck(password, passwordCheck)
+                passwordChangeManager.setPasswordCheck(password, passwordCheck)
                 updateSignUpProcess(currentStep)
             }
         }
@@ -217,35 +204,7 @@ class SignUpViewModelImpl
             password: String,
             passwordCheck: String,
         ) = withContext(defaultDispatcher) {
-            signUpManager.setPasswordCheck(password, passwordCheck)
-        }
-
-        override fun toggleAllTermsAgreement() {
-            viewModelScope.launch {
-                signUpManager.toggleAllTermsAgreement()
-                updateSignUpProcess(currentStep)
-            }
-        }
-
-        override fun toggleServiceTermsAgreement() {
-            viewModelScope.launch {
-                signUpManager.toggleServiceTermsAgreement()
-                updateSignUpProcess(currentStep)
-            }
-        }
-
-        override fun togglePrivacyPolicyAgreement() {
-            viewModelScope.launch {
-                signUpManager.togglePrivacyPolicyAgreement()
-                updateSignUpProcess(currentStep)
-            }
-        }
-
-        override fun toggleCommunityRulesAgreement() {
-            viewModelScope.launch {
-                signUpManager.toggleCommunityRulesAgreement()
-                updateSignUpProcess(currentStep)
-            }
+            passwordChangeManager.setPasswordCheck(password, passwordCheck)
         }
 
         override fun next() {
@@ -256,7 +215,7 @@ class SignUpViewModelImpl
             userRequestJob =
                 viewModelScope.launch {
                     when (currentStep) {
-                        SignUpStep.EMAIL -> requestEmailCodeAndGoNext()
+                        ChangePasswordStep.EMAIL -> requestEmailCodeAndGoNext()
                         else -> goNext()
                     }
                 }
@@ -270,7 +229,7 @@ class SignUpViewModelImpl
             }
 
             _event.emit(Event.ShowProcessing)
-            when (val result = requestEmailAuthenticationCode(signUpManager.email)) {
+            when (val result = requestEmailAuthenticationCode(passwordChangeManager.email)) {
                 is Success -> {
                     whenRequestEmailAuthenticationCodeSuccess()
                     emailCodeRequested = true
@@ -301,12 +260,12 @@ class SignUpViewModelImpl
             updateSignUpProcess(currentStep)
         }
 
-        private suspend fun updateSignUpProcess(step: SignUpStep) {
-            _signUpScreenEvent.emit(
-                SignUpScreenEvent.UpdateSignUpProcess(
+        private suspend fun updateSignUpProcess(step: ChangePasswordStep) {
+            _changePasswordScreenEvent.emit(
+                ChangePasswordScreenEvent.UpdateChangePasswordProcess(
                     step = step,
-                    stepCondition = signUpManager.getConditionBySignUpStep(step),
-                    validationMessage = signUpManager.getValidationMessageBySignUpStep(step),
+                    stepCondition = passwordChangeManager.getConditionByChangePasswordStep(step),
+                    validationMessage = passwordChangeManager.getValidationMessageByChangePasswordStep(step),
                 ),
             )
         }
@@ -314,35 +273,33 @@ class SignUpViewModelImpl
         companion object {
             private const val MESSAGE_SUCCESS_REQUEST_EMAIL_CODE = "이메일 주소로 인증번호를 전송했어요"
             private const val MESSAGE_SUCCESS_EMAIL_AUTHENTICATION = "인증에 성공했어요"
-            private const val MESSAGE_SUCCESS_SIGN_UP = "회원가입이 완료됐어요"
+            private const val MESSAGE_SUCCESS_CHANGE_PASSWORD = "비밀번호 재설정이 완료됐어요"
 
             private const val TIMER_INIT = 300_000L
             private const val TIMER_INTERVAL = 1_000L
         }
     }
 
-sealed class SignUpScreen {
-    data object SuccessView : SignUpScreen()
+sealed class ChangePasswordScreen {
+    data object SuccessView : ChangePasswordScreen()
 
-    data object LoadingView : SignUpScreen()
+    data object LoadingView : ChangePasswordScreen()
 
-    data object NormalView : SignUpScreen()
+    data object NormalView : ChangePasswordScreen()
 }
 
-sealed class SignUpScreenEvent {
-    data class UpdateSignUpProcess(
-        val step: SignUpStep,
+sealed class ChangePasswordScreenEvent {
+    data class UpdateChangePasswordProcess(
+        val step: ChangePasswordStep,
         val stepCondition: Boolean,
         val validationMessage: String,
-    ) : SignUpScreenEvent()
+    ) : ChangePasswordScreenEvent()
 }
 
-enum class SignUpStep {
-    NAME,
+enum class ChangePasswordStep {
     EMAIL,
     EMAIL_AUTHENTICATION,
-    PASSWORD,
-    TERMS, ;
+    PASSWORD, ;
 
     fun getIndex() = entries.indexOf(this)
 

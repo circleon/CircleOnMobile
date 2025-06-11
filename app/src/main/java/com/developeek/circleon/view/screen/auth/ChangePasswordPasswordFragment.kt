@@ -17,24 +17,24 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import com.developeek.circleon.R
-import com.developeek.circleon.databinding.FragmentSignUpPasswordBinding
+import com.developeek.circleon.databinding.FragmentChangePasswordPasswordBinding
 import com.developeek.circleon.domain.utils.Const
-import com.developeek.circleon.view.viewmodel.auth.SignUpViewModel
-import com.developeek.circleon.view.viewmodelimpl.auth.SignUpScreenEvent
-import com.developeek.circleon.view.viewmodelimpl.auth.SignUpStep
-import com.developeek.circleon.view.viewmodelimpl.auth.SignUpViewModelImpl
+import com.developeek.circleon.view.viewmodel.auth.ChangePasswordViewModel
+import com.developeek.circleon.view.viewmodelimpl.auth.ChangePasswordScreenEvent
+import com.developeek.circleon.view.viewmodelimpl.auth.ChangePasswordStep
+import com.developeek.circleon.view.viewmodelimpl.auth.ChangePasswordViewModelImpl
 import kotlinx.coroutines.launch
 
-class SignUpPasswordFragment : Fragment() {
-    private lateinit var binding: FragmentSignUpPasswordBinding
-    private val viewModel: SignUpViewModel by activityViewModels<SignUpViewModelImpl>()
+class ChangePasswordPasswordFragment : Fragment() {
+    private lateinit var binding: FragmentChangePasswordPasswordBinding
+    private val viewModel: ChangePasswordViewModel by activityViewModels<ChangePasswordViewModelImpl>()
 
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?,
     ): View {
-        binding = FragmentSignUpPasswordBinding.inflate(layoutInflater)
+        binding = FragmentChangePasswordPasswordBinding.inflate(layoutInflater)
 
         return binding.root
     }
@@ -48,8 +48,8 @@ class SignUpPasswordFragment : Fragment() {
         initListener()
         lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
-                viewModel.signUpScreenEvent.collect {
-                    handleSignUpScreenEvent(it, requireContext())
+                viewModel.changePasswordScreenEvent.collect {
+                    handleChangePasswordScreenEvent(it, requireContext())
                 }
             }
         }
@@ -72,20 +72,20 @@ class SignUpPasswordFragment : Fragment() {
         }
     }
 
-    private fun handleSignUpScreenEvent(
-        event: SignUpScreenEvent,
+    private fun handleChangePasswordScreenEvent(
+        event: ChangePasswordScreenEvent,
         context: Context,
     ) {
         when (event) {
-            is SignUpScreenEvent.UpdateSignUpProcess -> updateSignUpProcess(event, context)
+            is ChangePasswordScreenEvent.UpdateChangePasswordProcess -> updateChangePasswordProcess(event, context)
         }
     }
 
-    private fun updateSignUpProcess(
-        event: SignUpScreenEvent.UpdateSignUpProcess,
+    private fun updateChangePasswordProcess(
+        event: ChangePasswordScreenEvent.UpdateChangePasswordProcess,
         context: Context,
     ) {
-        if (event.step != SignUpStep.PASSWORD) return
+        if (event.step != ChangePasswordStep.PASSWORD) return
 
         loadValidationResult(event.validationMessage, context)
     }
