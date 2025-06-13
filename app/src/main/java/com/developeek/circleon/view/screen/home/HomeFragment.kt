@@ -184,7 +184,7 @@ class HomeFragment : Fragment() {
     }
 
     private fun handleScreenFlow(screenFlow: HomeScreen) {
-        loadCircleCategory(viewModel.categories)
+        loadCircleCategory(screenFlow.categories)
         when (screenFlow) {
             is HomeScreen.SuccessView -> showSuccessView(screenFlow)
             is HomeScreen.LoadingView -> showLoadingView()
