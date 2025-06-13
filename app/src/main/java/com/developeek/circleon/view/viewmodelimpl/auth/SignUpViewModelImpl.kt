@@ -55,11 +55,6 @@ class SignUpViewModelImpl
         }
 
         override fun signUp() {
-            viewModelScope.launch {
-                whenSignUpSuccess()
-            }
-            return
-
             userRequestJob?.let {
                 if (!it.isCompleted) return
             }

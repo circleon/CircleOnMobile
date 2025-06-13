@@ -8,5 +8,5 @@ object ServiceExceptionMessage {
     const val MESSAGE_FAIL_SERVER_CONNECTION = "서버 연결에 실패하였습니다"
     const val MESSAGE_SOCKET_TIMEOUT_EXCEPTION = "요청 시간이 초과되었습니다. 다시 시도해주세요"
     const val MESSAGE_REFRESH_EXPIRED = "인증이 만료되었습니다. 다시 로그인해주세요"
-    const val MESSAGE_FAIL_REQUEST = "요청에 실패했어요"
+    const val MESSAGE_FAIL_REQUEST = "요청에 실패했어요. 잠시 후 다시 시도해주세요"
 }
