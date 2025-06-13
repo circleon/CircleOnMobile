@@ -10,11 +10,21 @@ data class SignUpRequestBody(
     val password: String,
 )
 
+data class NewPasswordRequestBody(
+    val publicId: String,
+    @SerializedName("newPassword") val password: String,
+)
+
 data class EmailCodeRequestBody(
     val email: String,
 )
 
 data class EmailAuthenticationRequestBody(
     val email: String,
+    val code: String,
+)
+
+data class NewPasswordEmailAuthenticationRequestBody(
+    val policyId: String,
     val code: String,
 )

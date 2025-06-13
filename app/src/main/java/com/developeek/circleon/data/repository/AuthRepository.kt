@@ -1,5 +1,7 @@
 package com.developeek.circleon.data.repository
 
+import com.developeek.circleon.data.dto.auth.PolicyId
+import com.developeek.circleon.data.dto.auth.PublicId
 import com.developeek.circleon.data.source.Result
 import com.developeek.circleon.domain.vo.Password
 import com.developeek.circleon.domain.vo.UserEmail
@@ -17,10 +19,22 @@ interface AuthRepository {
         password: Password,
     ): Result<Unit>
 
+    suspend fun changePassword(
+        publicId: PublicId,
+        password: Password,
+    ): Result<Unit>
+
     suspend fun requestEmailAuthenticationCode(email: UserEmail): Result<Unit>
+
+    suspend fun requestEmailAuthenticationCodeForNewPassword(email: UserEmail): Result<PolicyId>
 
     suspend fun authenticateEmail(
         email: UserEmail,
         code: String,
     ): Result<Unit>
+
+    suspend fun authenticateEmailForNewPassword(
+        policyId: PolicyId,
+        code: String,
+    ): Result<PublicId>
 }

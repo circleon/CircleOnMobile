@@ -1,5 +1,7 @@
 package com.developeek.circleon.view.viewmodelimpl.auth
 
+import com.developeek.circleon.data.dto.auth.PolicyId
+import com.developeek.circleon.data.dto.auth.PublicId
 import com.developeek.circleon.domain.utils.Const
 import com.developeek.circleon.domain.utils.validator.Invalid
 import com.developeek.circleon.domain.utils.validator.Valid
@@ -22,6 +24,13 @@ class PasswordChangeManager {
     private var passwordCheckCondition = false
     private var passwordValidationMessage = Const.EMPTY_TEXT
 
+    val policyId: PolicyId
+        get() = _policyId
+    private lateinit var _policyId: PolicyId
+    val publicId: PublicId
+        get() = _publicId
+    private lateinit var _publicId: PublicId
+
     fun validateAndSetEmail(email: String) {
         emailAuthenticated = false
 
@@ -39,6 +48,14 @@ class PasswordChangeManager {
 
     fun setAsEmailAuthenticated() {
         emailAuthenticated = true
+    }
+
+    fun setPolicyId(policyId: PolicyId) {
+        _policyId = policyId
+    }
+
+    fun setPublicId(publicId: PublicId) {
+        _publicId = publicId
     }
 
     fun validateAndSetPassword(password: String) {

@@ -4,6 +4,8 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.developeek.circleon.data.dto.auth.PolicyId
+import com.developeek.circleon.data.dto.auth.PublicId
 import com.developeek.circleon.data.repository.AuthRepository
 import com.developeek.circleon.data.source.Error
 import com.developeek.circleon.data.source.Success
@@ -55,31 +57,25 @@ class ChangePasswordViewModelImpl
         }
 
         override fun changePassword() {
-            viewModelScope.launch {
-                whenChangePasswordSuccess()
-            }
-            return
-
             userRequestJob?.let {
                 if (!it.isCompleted) return
             }
 
-            //        userRequestJob =
-            //            viewModelScope.launch {
-            //                _screenFlow.emit(SignUpScreen.LoadingView)
-            //
-            //                when (
-            //                    val result =
-            //                        repository.signUp(
-            //                            userName = signUpManager.name,
-            //                            email = signUpManager.email,
-            //                            password = signUpManager.password,
-            //                        )
-            //                ) {
-            //                    is Success -> whenSignUpSuccess()
-            //                    is Error -> whenSignUpFail(result)
-            //                }
-            //            }
+            userRequestJob =
+                viewModelScope.launch {
+                    _screenFlow.emit(ChangePasswordScreen.LoadingView)
+
+                    when (
+                        val result =
+                            repository.changePassword(
+                                passwordChangeManager.publicId,
+                                passwordChangeManager.password,
+                            )
+                    ) {
+                        is Success -> whenChangePasswordSuccess()
+                        is Error -> whenChangePasswordFail(result)
+                    }
+                }
         }
 
         private suspend fun whenChangePasswordSuccess() {
@@ -113,19 +109,20 @@ class ChangePasswordViewModelImpl
 
             userRequestJob =
                 viewModelScope.launch {
-                    when (val result = requestEmailAuthenticationCode(passwordChangeManager.email)) {
-                        is Success -> whenRequestEmailAuthenticationCodeSuccess()
+                    when (val result = requestEmailAuthenticationCodeForNewPassword(passwordChangeManager.email)) {
+                        is Success -> whenRequestEmailAuthenticationCodeSuccess(result)
                         is Error -> _event.emit(Event.ShowDialog(result.message()))
                     }
                 }
         }
 
-        private suspend fun requestEmailAuthenticationCode(email: UserEmail) =
+        private suspend fun requestEmailAuthenticationCodeForNewPassword(email: UserEmail) =
             withContext(ioDispatcher) {
-                repository.requestEmailAuthenticationCode(email)
+                repository.requestEmailAuthenticationCodeForNewPassword(email)
             }
 
-        private suspend fun whenRequestEmailAuthenticationCodeSuccess() {
+        private suspend fun whenRequestEmailAuthenticationCodeSuccess(result: Success<PolicyId>) {
+            passwordChangeManager.setPolicyId(result.data)
             startEmailAuthenticationTimer()
             _event.emit(Event.ShowToast(MESSAGE_SUCCESS_REQUEST_EMAIL_CODE))
         }
@@ -153,22 +150,23 @@ class ChangePasswordViewModelImpl
 
             userRequestJob =
                 viewModelScope.launch {
-                    when (val result = authenticateEmail(passwordChangeManager.email, code)) {
-                        is Success -> whenEmailAuthenticationSuccess()
+                    when (val result = authenticateEmailForNewPassword(passwordChangeManager.policyId, code)) {
+                        is Success -> whenEmailAuthenticationSuccess(result)
                         is Error -> _event.emit(Event.ShowDialog(result.message()))
                     }
                     updateSignUpProcess(currentStep)
                 }
         }
 
-        private suspend fun authenticateEmail(
-            email: UserEmail,
+        private suspend fun authenticateEmailForNewPassword(
+            policyId: PolicyId,
             code: String,
         ) = withContext(ioDispatcher) {
-            repository.authenticateEmail(email, code)
+            repository.authenticateEmailForNewPassword(policyId, code)
         }
 
-        private suspend fun whenEmailAuthenticationSuccess() {
+        private suspend fun whenEmailAuthenticationSuccess(result: Success<PublicId>) {
+            passwordChangeManager.setPublicId(result.data)
             _event.emit(Event.ShowToast(MESSAGE_SUCCESS_EMAIL_AUTHENTICATION))
             passwordChangeManager.setAsEmailAuthenticated()
         }
@@ -229,9 +227,9 @@ class ChangePasswordViewModelImpl
             }
 
             _event.emit(Event.ShowProcessing)
-            when (val result = requestEmailAuthenticationCode(passwordChangeManager.email)) {
+            when (val result = requestEmailAuthenticationCodeForNewPassword(passwordChangeManager.email)) {
                 is Success -> {
-                    whenRequestEmailAuthenticationCodeSuccess()
+                    whenRequestEmailAuthenticationCodeSuccess(result)
                     emailCodeRequested = true
                     goNext()
                 }

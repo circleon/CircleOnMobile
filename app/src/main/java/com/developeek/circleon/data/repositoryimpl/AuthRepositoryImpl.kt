@@ -3,6 +3,10 @@ package com.developeek.circleon.data.repositoryimpl
 import com.developeek.circleon.data.dto.auth.EmailAuthenticationRequestBody
 import com.developeek.circleon.data.dto.auth.EmailCodeRequestBody
 import com.developeek.circleon.data.dto.auth.Login
+import com.developeek.circleon.data.dto.auth.NewPasswordEmailAuthenticationRequestBody
+import com.developeek.circleon.data.dto.auth.NewPasswordRequestBody
+import com.developeek.circleon.data.dto.auth.PolicyId
+import com.developeek.circleon.data.dto.auth.PublicId
 import com.developeek.circleon.data.dto.auth.SignUpRequestBody
 import com.developeek.circleon.data.repository.AuthRepository
 import com.developeek.circleon.data.source.Result
@@ -46,7 +50,19 @@ class AuthRepositoryImpl(
             service.signUp(SignUpRequestBody(email.get(), userName.get(), password.get()))
             Result.success(Unit)
         } catch (e: Exception) {
-            return Result.error(e)
+            Result.error(e)
+        }
+    }
+
+    override suspend fun changePassword(
+        publicId: PublicId,
+        password: Password,
+    ): Result<Unit> {
+        return try {
+            service.changePassword(NewPasswordRequestBody(publicId.data, password.get()))
+            Result.success(Unit)
+        } catch (e: Exception) {
+            Result.error(e)
         }
     }
 
@@ -55,7 +71,16 @@ class AuthRepositoryImpl(
             service.requestEmailAuthenticationCode(EmailCodeRequestBody(email.get()))
             Result.success(Unit)
         } catch (e: Exception) {
-            return Result.error(e)
+            Result.error(e)
+        }
+    }
+
+    override suspend fun requestEmailAuthenticationCodeForNewPassword(email: UserEmail): Result<PolicyId> {
+        return try {
+            val response = service.requestEmailAuthenticationCodeForNewPassword(EmailCodeRequestBody(email.get()))
+            Result.success(PolicyId(response.data))
+        } catch (e: Exception) {
+            Result.error(e)
         }
     }
 
@@ -67,7 +92,22 @@ class AuthRepositoryImpl(
             service.authenticateEmail(EmailAuthenticationRequestBody(email.get(), code))
             Result.success(Unit)
         } catch (e: Exception) {
-            return Result.error(e)
+            Result.error(e)
+        }
+    }
+
+    override suspend fun authenticateEmailForNewPassword(
+        policyId: PolicyId,
+        code: String,
+    ): Result<PublicId> {
+        return try {
+            val response =
+                service.authenticateEmailForNewPassword(
+                    NewPasswordEmailAuthenticationRequestBody(policyId.data, code),
+                )
+            return Result.success(PublicId(response.data))
+        } catch (e: Exception) {
+            Result.error(e)
         }
     }
 }
