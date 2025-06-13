@@ -14,4 +14,6 @@ interface MyPageViewModel {
     fun removeUserProfileImage()
 
     fun logout()
+
+    fun resign()
 }

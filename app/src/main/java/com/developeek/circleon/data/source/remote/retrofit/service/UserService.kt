@@ -57,6 +57,11 @@ interface UserService {
         @Body data: RequestResponseBodyCircleLeave,
     )
 
+    @POST("auth/logout")
+    suspend fun logout(
+        @Body data: LogoutRequestBody,
+    )
+
     // PUT
     @Multipart
     @PUT("users/me/image")
@@ -73,8 +78,6 @@ interface UserService {
     @DELETE("users/me/image")
     suspend fun deleteUserProfileImage()
 
-    @POST("auth/logout")
-    suspend fun logout(
-        @Body data: LogoutRequestBody,
-    )
+    @DELETE("auth/users/me")
+    suspend fun resign()
 }

@@ -21,7 +21,7 @@ import javax.inject.Inject
 class MyPageViewModelImpl
     @Inject
     constructor(
-        private val userRepository: UserRepository,
+        private val repository: UserRepository,
     ) : MyPageViewModel, ViewModel() {
         private val _event = MutableSharedFlow<Event>()
         override val event: SharedFlow<Event> = _event
@@ -49,7 +49,7 @@ class MyPageViewModelImpl
 
         private suspend fun putUserProfileImage(profileImage: File?) =
             withContext(dispatcher) {
-                userRepository.putUserProfileImage(profileImage)
+                repository.putUserProfileImage(profileImage)
             }
 
         private suspend fun whenPutUserProfileImageSuccess(image: File?) {
@@ -61,7 +61,7 @@ class MyPageViewModelImpl
 
         private suspend fun updateUser() =
             withContext(dispatcher) {
-                userRepository.putUser()
+                repository.putUser()
             }
 
         override fun removeUserProfileImage() {
@@ -89,7 +89,7 @@ class MyPageViewModelImpl
 
         private suspend fun deleteUserProfileImage() =
             withContext(dispatcher) {
-                userRepository.deleteUserProfileImage()
+                repository.deleteUserProfileImage()
             }
 
         override fun logout() {
@@ -102,30 +102,48 @@ class MyPageViewModelImpl
                     _event.emit(Event.ShowProcessing)
 
                     when (val result = userLogout()) {
-                        is Success -> whenLogoutSuccess()
-                        is Error -> whenLogoutFail(result)
+                        is Success -> showToastAndSendToLoginScreen(MESSAGE_SUCCESS_LOGOUT)
+                        is Error -> _event.emit(Event.ShowDialog(result.message()))
                     }
                 }
         }
 
         private suspend fun userLogout() =
             withContext(dispatcher) {
-                userRepository.logout()
+                repository.logout()
             }
 
-        private suspend fun whenLogoutSuccess() {
-            _event.emit(Event.ShowToast(MESSAGE_SUCCESS_LOGOUT))
+        private suspend fun showToastAndSendToLoginScreen(message: String) {
+            _event.emit(Event.ShowToast(message))
             _event.emit(Event.SendToLoginScreen)
         }
 
-        private suspend fun whenLogoutFail(result: Error<Unit>) {
-            _event.emit(Event.ShowDialog(result.message()))
+        override fun resign() {
+            userRequestJob?.let {
+                if (!it.isCompleted) return
+            }
+
+            userRequestJob =
+                viewModelScope.launch {
+                    _event.emit(Event.ShowProcessing)
+
+                    when (val result = userResign()) {
+                        is Success -> showToastAndSendToLoginScreen(MESSAGE_SUCCESS_RESIGN)
+                        is Error -> _event.emit(Event.ShowDialog(result.message()))
+                    }
+                }
         }
+
+        private suspend fun userResign() =
+            withContext(dispatcher) {
+                repository.resign()
+            }
 
         companion object {
             private const val MESSAGE_SUCCESS_SET_USER_PROFILE_IMAGE = "프로필 이미지가 수정됐어요"
             private const val MESSAGE_SUCCESS_DELETE_USER_PROFILE_IMAGE = "프로필 이미지가 삭제됐어요"
             private const val MESSAGE_SUCCESS_LOGOUT = "로그아웃이 완료됐어요"
+            private const val MESSAGE_SUCCESS_RESIGN = "회원탈퇴가 완료됐어요"
         }
     }
 

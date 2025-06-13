@@ -325,7 +325,7 @@
                     </androidx.constraintlayout.widget.ConstraintLayout>
 
                     <androidx.constraintlayout.widget.ConstraintLayout
-                        android:id="@+id/btnDeleteAccount"
+                        android:id="@+id/btnResign"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:background="?attr/selectableItemBackground"
@@ -336,7 +336,7 @@
                         <androidx.appcompat.widget.AppCompatTextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="@string/btn_delete_account"
+                            android:text="@string/btn_resign"
                             android:textAppearance="@style/default_bold_text"
                             android:textColor="@color/grey_9"
                             app:layout_constraintBottom_toBottomOf="parent"

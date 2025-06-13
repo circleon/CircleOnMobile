@@ -196,10 +196,11 @@
     <string name="text_privacy_policy">개인정보 처리 방침</string>
     <string name="btn_send_feedback">피드백 남기기</string>
     <string name="btn_logout">로그아웃</string>
-    <string name="btn_delete_account">탈퇴하기</string>
+    <string name="btn_resign">탈퇴하기</string>
     <string name="message_set_user_profile_image">프로필 이미지를 설정하시겠어요?</string>
     <string name="message_remove_user_profile_image">프로필 이미지를 삭제할까요?</string>
     <string name="message_user_logout">로그아웃하시겠어요?</string>
+    <string name="message_user_resign">회원 탈퇴를 진행할까요?</string>
     <string name="version_name">v%s</string>
 
     <!--MY Post-->
