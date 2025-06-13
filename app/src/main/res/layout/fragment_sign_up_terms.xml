@@ -20,8 +20,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/margin_padding_large"
-
-        >
+        android:paddingVertical="@dimen/margin_padding_x_small">
 
         <androidx.appcompat.widget.AppCompatTextView
             android:layout_width="wrap_content"
@@ -81,7 +80,8 @@
             android:id="@+id/checkAgreeServiceTerms"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:src="@drawable/ic_agree"
+            android:padding="@dimen/margin_padding_x_small"
+            android:src="@drawable/ic_agree_borderless"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintBottom_toBottomOf="parent" />
@@ -121,7 +121,8 @@
             android:id="@+id/checkAgreePrivacyPolicy"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:src="@drawable/ic_agree"
+            android:padding="@dimen/margin_padding_x_small"
+            android:src="@drawable/ic_agree_borderless"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintBottom_toBottomOf="parent" />
@@ -161,7 +162,8 @@
             android:id="@+id/checkAgreeCommunityRules"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:src="@drawable/ic_agree"
+            android:padding="@dimen/margin_padding_x_small"
+            android:src="@drawable/ic_agree_borderless"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintBottom_toBottomOf="parent" />

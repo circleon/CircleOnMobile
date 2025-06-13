@@ -2,7 +2,6 @@ package com.developeek.circleon.domain.model
 
 import com.developeek.circleon.domain.enums.PostType
 import com.developeek.circleon.domain.utils.Const
-import java.io.Serializable
 import java.time.LocalDateTime
 
 data class PostModel(
@@ -15,7 +14,7 @@ data class PostModel(
     val updatedAt: LocalDateTime,
     val commentCount: Int,
     val author: AuthorModel,
-) : BaseModel(postId), Serializable {
+) : BaseModel(postId) {
     override fun areContentsSame(target: BaseModel): Boolean {
         if (target !is PostModel) return false
 

@@ -13,27 +13,27 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import com.developeek.circleon.R
-import com.developeek.circleon.databinding.ActivitySignUpBinding
+import com.developeek.circleon.databinding.ActivityChangePasswordBinding
 import com.developeek.circleon.view.Event
-import com.developeek.circleon.view.adapter.SignUpFragmentAdapter
-import com.developeek.circleon.view.viewmodel.auth.SignUpViewModel
-import com.developeek.circleon.view.viewmodelimpl.auth.SignUpScreen
-import com.developeek.circleon.view.viewmodelimpl.auth.SignUpScreenEvent
-import com.developeek.circleon.view.viewmodelimpl.auth.SignUpStep
-import com.developeek.circleon.view.viewmodelimpl.auth.SignUpViewModelImpl
+import com.developeek.circleon.view.adapter.ChangePasswordFragmentAdapter
+import com.developeek.circleon.view.viewmodel.auth.ChangePasswordViewModel
+import com.developeek.circleon.view.viewmodelimpl.auth.ChangePasswordScreen
+import com.developeek.circleon.view.viewmodelimpl.auth.ChangePasswordScreenEvent
+import com.developeek.circleon.view.viewmodelimpl.auth.ChangePasswordStep
+import com.developeek.circleon.view.viewmodelimpl.auth.ChangePasswordViewModelImpl
 import com.developeek.circleon.view.widget.SingleMessageAlertDialog
 import com.developeek.circleon.view.widget.SingleMessageToast
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
-class SignUpActivity : AppCompatActivity() {
-    private lateinit var binding: ActivitySignUpBinding
-    private val viewModel: SignUpViewModel by viewModels<SignUpViewModelImpl>()
+class ChangePasswordActivity : AppCompatActivity() {
+    private lateinit var binding: ActivityChangePasswordBinding
+    private val viewModel: ChangePasswordViewModel by viewModels<ChangePasswordViewModelImpl>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        binding = ActivitySignUpBinding.inflate(layoutInflater)
+        binding = ActivityChangePasswordBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
         initViewPager(supportFragmentManager, lifecycle)
@@ -42,7 +42,7 @@ class SignUpActivity : AppCompatActivity() {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
                 launch {
                     viewModel.event.collect {
-                        handleEvent(it, this@SignUpActivity)
+                        handleEvent(it, this@ChangePasswordActivity)
                     }
                 }
                 launch {
@@ -51,8 +51,8 @@ class SignUpActivity : AppCompatActivity() {
                     }
                 }
                 launch {
-                    viewModel.signUpScreenEvent.collect {
-                        handleSignUpScreenEvent(it, this@SignUpActivity)
+                    viewModel.changePasswordScreenEvent.collect {
+                        handleChangePasswordScreenEvent(it, this@ChangePasswordActivity)
                     }
                 }
             }
@@ -63,9 +63,9 @@ class SignUpActivity : AppCompatActivity() {
         fragmentManager: FragmentManager,
         lifecycle: Lifecycle,
     ) {
-        binding.vpgSignUp.adapter = SignUpFragmentAdapter(fragmentManager, lifecycle)
-        binding.vpgSignUp.isUserInputEnabled = false
-        binding.vpgSignUp.offscreenPageLimit = 1
+        binding.vpgChangePassword.adapter = ChangePasswordFragmentAdapter(fragmentManager, lifecycle)
+        binding.vpgChangePassword.isUserInputEnabled = false
+        binding.vpgChangePassword.offscreenPageLimit = 1
     }
 
     private fun initListener() {
@@ -75,7 +75,7 @@ class SignUpActivity : AppCompatActivity() {
 
     private fun setBtnBackListener() {
         binding.btnBack.setOnClickListener {
-            if (binding.vpgSignUp.currentItem == 0) {
+            if (binding.vpgChangePassword.currentItem == 0) {
                 finish()
                 return@setOnClickListener
             }
@@ -122,33 +122,33 @@ class SignUpActivity : AppCompatActivity() {
         SingleMessageAlertDialog(context, event.message).show()
     }
 
-    private fun handleScreenFlow(screenFlow: SignUpScreen) {
-        if (screenFlow is SignUpScreen.LoadingView) {
+    private fun handleScreenFlow(screenFlow: ChangePasswordScreen) {
+        if (screenFlow is ChangePasswordScreen.LoadingView) {
             switchView(binding.pgbProcessing)
         } else {
             switchView(binding.btnBottom)
         }
         when (screenFlow) {
-            is SignUpScreen.SuccessView -> finish()
+            is ChangePasswordScreen.SuccessView -> finish()
             else -> {}
         }
     }
 
-    private fun handleSignUpScreenEvent(
-        event: SignUpScreenEvent,
+    private fun handleChangePasswordScreenEvent(
+        event: ChangePasswordScreenEvent,
         context: Context,
     ) {
         when (event) {
-            is SignUpScreenEvent.UpdateSignUpProcess -> updateSignUpProcess(event, context)
+            is ChangePasswordScreenEvent.UpdateChangePasswordProcess -> updateChangePasswordProcess(event, context)
         }
     }
 
-    private fun updateSignUpProcess(
-        event: SignUpScreenEvent.UpdateSignUpProcess,
+    private fun updateChangePasswordProcess(
+        event: ChangePasswordScreenEvent.UpdateChangePasswordProcess,
         context: Context,
     ) {
         event.let {
-            binding.vpgSignUp.currentItem = it.step.getIndex()
+            binding.vpgChangePassword.currentItem = it.step.getIndex()
             toggleBtnBottomByStepCondition(it.stepCondition, context)
             switchBtnBottomTextByStep(it.step, context)
             if (it.stepCondition) setBtnBottomListenerByCurrentStep(it.step)
@@ -181,28 +181,28 @@ class SignUpActivity : AppCompatActivity() {
     }
 
     private fun switchBtnBottomTextByStep(
-        step: SignUpStep,
+        step: ChangePasswordStep,
         context: Context,
     ) {
         val btnBottom =
             when (step) {
-                SignUpStep.TERMS -> context.getString(R.string.btn_sign_up)
+                ChangePasswordStep.PASSWORD -> context.getString(R.string.btn_change_password)
                 else -> context.getString(R.string.btn_next)
             }
 
         binding.btnBottom.text = btnBottom
     }
 
-    private fun setBtnBottomListenerByCurrentStep(step: SignUpStep) {
+    private fun setBtnBottomListenerByCurrentStep(step: ChangePasswordStep) {
         when (step) {
-            SignUpStep.TERMS -> setBtnBottomAsSignUp()
+            ChangePasswordStep.PASSWORD -> setBtnBottomAsChangePassword()
             else -> setBtnBottomAsNext()
         }
     }
 
-    private fun setBtnBottomAsSignUp() {
+    private fun setBtnBottomAsChangePassword() {
         binding.btnBottom.setOnClickListener {
-            viewModel.signUp()
+            viewModel.changePassword()
         }
     }
 
@@ -222,7 +222,7 @@ class SignUpActivity : AppCompatActivity() {
         event: KeyEvent?,
     ): Boolean {
         return if (keyCode == KeyEvent.KEYCODE_BACK) {
-            if (binding.vpgSignUp.currentItem == 0) {
+            if (binding.vpgChangePassword.currentItem == 0) {
                 super.onKeyDown(keyCode, event)
             } else {
                 viewModel.previous()

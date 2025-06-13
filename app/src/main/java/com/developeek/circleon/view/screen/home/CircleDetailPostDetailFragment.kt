@@ -216,7 +216,7 @@ class CircleDetailPostDetailFragment : Fragment() {
         user: UserModel,
         context: Context,
     ) {
-        if (user.id == post.author.authorId) {
+        if (user.isSame(post.author)) {
             popupMenu.inflate(R.menu.menu_author_post_settings)
             Utils.changeMenuItemTextColor(
                 popupMenu.menu.findItem(R.id.delete_post),
@@ -320,7 +320,7 @@ class CircleDetailPostDetailFragment : Fragment() {
         user: UserModel,
         context: Context,
     ) {
-        if (user.id == comment.author.authorId) {
+        if (user.isSame(comment.author)) {
             popupMenu.inflate(R.menu.menu_author_comment_settings)
             Utils.changeMenuItemTextColor(
                 popupMenu.menu.findItem(R.id.delete_comment),

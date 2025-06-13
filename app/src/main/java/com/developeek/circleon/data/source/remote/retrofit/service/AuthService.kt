@@ -4,9 +4,14 @@ import com.developeek.circleon.data.dto.auth.EmailAuthenticationRequestBody
 import com.developeek.circleon.data.dto.auth.EmailCodeRequestBody
 import com.developeek.circleon.data.dto.auth.Login
 import com.developeek.circleon.data.dto.auth.LoginResult
+import com.developeek.circleon.data.dto.auth.NewPasswordEmailAuthenticationRequestBody
+import com.developeek.circleon.data.dto.auth.NewPasswordRequestBody
+import com.developeek.circleon.data.dto.auth.PolicyId
+import com.developeek.circleon.data.dto.auth.PublicId
 import com.developeek.circleon.data.dto.auth.SignUpRequestBody
 import retrofit2.http.Body
 import retrofit2.http.POST
+import retrofit2.http.PUT
 
 interface AuthService {
     // POST
@@ -29,4 +34,20 @@ interface AuthService {
     suspend fun authenticateEmail(
         @Body data: EmailAuthenticationRequestBody,
     )
+
+    @POST("auth/password/verification")
+    suspend fun requestEmailAuthenticationCodeForNewPassword(
+        @Body data: EmailCodeRequestBody,
+    ): PolicyId
+
+    // PUT
+    @PUT("auth/password")
+    suspend fun changePassword(
+        @Body data: NewPasswordRequestBody,
+    )
+
+    @PUT("auth/password/verification-code")
+    suspend fun authenticateEmailForNewPassword(
+        @Body data: NewPasswordEmailAuthenticationRequestBody,
+    ): PublicId
 }

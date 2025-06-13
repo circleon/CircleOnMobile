@@ -195,7 +195,7 @@ class CircleDetailNoticeFragment : Fragment() {
                     )
                 }
                 Role.EXECUTIVE, Role.PRESIDENT -> {
-                    if (user.id == item.author.authorId) {
+                    if (user.userId == item.author.authorId) {
                         if (item.isPinned) {
                             popupMenu.inflate(R.menu.menu_pinned_author_notice_settings)
                         } else {

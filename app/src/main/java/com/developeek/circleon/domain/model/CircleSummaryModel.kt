@@ -1,7 +1,6 @@
 package com.developeek.circleon.domain.model
 
 import com.developeek.circleon.domain.enums.Category
-import java.io.Serializable
 import kotlin.math.absoluteValue
 
 data class CircleSummaryModel(
@@ -10,7 +9,7 @@ data class CircleSummaryModel(
     val category: Category,
     val thumbnailUrl: String?,
     val memberId: Int,
-) : BaseModel(circleId), Serializable {
+) : BaseModel(circleId) {
     override fun areContentsSame(target: BaseModel): Boolean {
         if (target !is CircleSummaryModel) return false
 

@@ -105,6 +105,7 @@ class LoginActivity : AppCompatActivity() {
     private fun initListener(activity: Activity) {
         setBtnLoginListener()
         setBtnSignUpListener(activity)
+        setBtnChangePasswordListener(activity)
         setEdtPasswordListener(activity)
     }
 
@@ -118,6 +119,24 @@ class LoginActivity : AppCompatActivity() {
         binding.btnSignUp.setOnClickListener {
             sendUserToSignUpScreen(activity)
         }
+    }
+
+    private fun sendUserToSignUpScreen(activity: Activity) {
+        val intent = Intent(activity, SignUpActivity::class.java)
+
+        startActivity(intent)
+    }
+
+    private fun setBtnChangePasswordListener(activity: Activity) {
+        binding.btnChangePassword.setOnClickListener {
+            sendUserToChangePasswordScreen(activity)
+        }
+    }
+
+    private fun sendUserToChangePasswordScreen(activity: Activity) {
+        val intent = Intent(activity, ChangePasswordActivity::class.java)
+
+        startActivity(intent)
     }
 
     private fun setEdtPasswordListener(context: Context) {
@@ -137,12 +156,6 @@ class LoginActivity : AppCompatActivity() {
             binding.edtEmail.text.toString(),
             binding.edtPassword.text.toString(),
         )
-    }
-
-    private fun sendUserToSignUpScreen(activity: Activity) {
-        val intent = Intent(activity, SignUpActivity::class.java)
-
-        startActivity(intent)
     }
 
     private fun switchView(view: View) {

@@ -1,6 +1,5 @@
 package com.developeek.circleon.view.screen.auth
 
-import android.R
 import android.app.Activity
 import android.content.Context
 import android.content.res.ColorStateList
@@ -17,23 +16,24 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.Observer
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
-import com.developeek.circleon.databinding.FragmentSignUpEmailAuthenticationBinding
-import com.developeek.circleon.view.viewmodel.auth.SignUpViewModel
-import com.developeek.circleon.view.viewmodelimpl.auth.SignUpScreenEvent
-import com.developeek.circleon.view.viewmodelimpl.auth.SignUpStep
-import com.developeek.circleon.view.viewmodelimpl.auth.SignUpViewModelImpl
+import com.developeek.circleon.R
+import com.developeek.circleon.databinding.FragmentChangePasswordEmailAuthenticationBinding
+import com.developeek.circleon.view.viewmodel.auth.ChangePasswordViewModel
+import com.developeek.circleon.view.viewmodelimpl.auth.ChangePasswordScreenEvent
+import com.developeek.circleon.view.viewmodelimpl.auth.ChangePasswordStep
+import com.developeek.circleon.view.viewmodelimpl.auth.ChangePasswordViewModelImpl
 import kotlinx.coroutines.launch
 
-class SignUpEmailAuthenticationFragment : Fragment() {
-    private lateinit var binding: FragmentSignUpEmailAuthenticationBinding
-    private val viewModel: SignUpViewModel by activityViewModels<SignUpViewModelImpl>()
+class ChangePasswordEmailAuthenticationFragment : Fragment() {
+    private lateinit var binding: FragmentChangePasswordEmailAuthenticationBinding
+    private val viewModel: ChangePasswordViewModel by activityViewModels<ChangePasswordViewModelImpl>()
 
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?,
     ): View {
-        binding = FragmentSignUpEmailAuthenticationBinding.inflate(layoutInflater)
+        binding = FragmentChangePasswordEmailAuthenticationBinding.inflate(layoutInflater)
 
         return binding.root
     }
@@ -48,8 +48,8 @@ class SignUpEmailAuthenticationFragment : Fragment() {
         initListener()
         lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
-                viewModel.signUpScreenEvent.collect {
-                    handleSignUpScreenEvent(it, requireContext())
+                viewModel.changePasswordScreenEvent.collect {
+                    handleChangePasswordScreenEvent(it, requireContext())
                 }
             }
         }
@@ -86,20 +86,20 @@ class SignUpEmailAuthenticationFragment : Fragment() {
         }
     }
 
-    private fun handleSignUpScreenEvent(
-        event: SignUpScreenEvent,
+    private fun handleChangePasswordScreenEvent(
+        event: ChangePasswordScreenEvent,
         context: Context,
     ) {
         when (event) {
-            is SignUpScreenEvent.UpdateSignUpProcess -> updateSignUpProcess(event, context)
+            is ChangePasswordScreenEvent.UpdateChangePasswordProcess -> updateChangePasswordProcess(event, context)
         }
     }
 
-    private fun updateSignUpProcess(
-        event: SignUpScreenEvent.UpdateSignUpProcess,
+    private fun updateChangePasswordProcess(
+        event: ChangePasswordScreenEvent.UpdateChangePasswordProcess,
         context: Context,
     ) {
-        if (event.step != SignUpStep.EMAIL_AUTHENTICATION) return
+        if (event.step != ChangePasswordStep.EMAIL_AUTHENTICATION) return
 
         loadValidationResult(event.stepCondition, context)
     }
@@ -119,10 +119,10 @@ class SignUpEmailAuthenticationFragment : Fragment() {
         binding.txtEmailAuthentication.isVisible = false
         binding.edtEmailAuthenticationCode.backgroundTintList =
             ColorStateList(
-                arrayOf(intArrayOf(R.attr.state_focused), intArrayOf()),
+                arrayOf(intArrayOf(android.R.attr.state_focused), intArrayOf()),
                 intArrayOf(
-                    ContextCompat.getColor(context, com.developeek.circleon.R.color.purple_5),
-                    ContextCompat.getColor(context, com.developeek.circleon.R.color.grey_3),
+                    ContextCompat.getColor(context, R.color.purple_5),
+                    ContextCompat.getColor(context, R.color.grey_3),
                 ),
             )
     }
@@ -131,10 +131,10 @@ class SignUpEmailAuthenticationFragment : Fragment() {
         binding.txtEmailAuthentication.isVisible = true
         binding.edtEmailAuthenticationCode.backgroundTintList =
             ColorStateList(
-                arrayOf(intArrayOf(R.attr.state_focused), intArrayOf()),
+                arrayOf(intArrayOf(android.R.attr.state_focused), intArrayOf()),
                 intArrayOf(
-                    ContextCompat.getColor(context, com.developeek.circleon.R.color.error),
-                    ContextCompat.getColor(context, com.developeek.circleon.R.color.grey_3),
+                    ContextCompat.getColor(context, R.color.error),
+                    ContextCompat.getColor(context, R.color.grey_3),
                 ),
             )
     }

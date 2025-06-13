@@ -45,7 +45,7 @@ class ErrorInterceptor
                 val newResponseBody = responseString.toResponseBody(contentType!!.toMediaType())
                 return response.newBuilder().body(newResponseBody).build()
             } catch (e: ClassCastException) {
-                throw IOException(String.format(ServiceExceptionMessage.MESSAGE_FAIL_REQUEST, responseCode))
+                throw IOException(ServiceExceptionMessage.MESSAGE_FAIL_REQUEST)
             }
         }
 
@@ -61,17 +61,26 @@ class ErrorInterceptor
             }
 
             val errorCode = parseErrorCode(data)
+            val errorMessage = parseErrorMessage(data)
 
             try {
                 return StatusCode.entries.single { it.isSame(responseCode, errorCode) }
             } catch (e: NoSuchElementException) {
-                throw IOException(String.format(ServiceExceptionMessage.MESSAGE_FAIL_REQUEST, errorCode))
+                throw IOException(errorMessage)
             }
         }
 
         private fun parseErrorCode(data: JSONObject): String {
             try {
                 return data.getString(PARAM_NAME_ERROR_CODE)
+            } catch (e: JSONException) {
+                throw IOException(ServiceExceptionMessage.MESSAGE_WRONG_RESPONSE_FORMAT)
+            }
+        }
+
+        private fun parseErrorMessage(data: JSONObject): String {
+            try {
+                return data.getString(PARAM_NAME_ERROR_MESSAGE)
             } catch (e: JSONException) {
                 throw IOException(ServiceExceptionMessage.MESSAGE_WRONG_RESPONSE_FORMAT)
             }
@@ -109,6 +118,7 @@ class ErrorInterceptor
 
         companion object {
             private const val PARAM_NAME_ERROR_CODE = "errorCode"
+            private const val PARAM_NAME_ERROR_MESSAGE = "errorMessage"
             private const val PARAM_NAME_CONTENT_TYPE = "content-type"
         }
     }
