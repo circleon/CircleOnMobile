@@ -106,9 +106,7 @@ class ErrorInterceptor
                 StatusCode.WRONG_INPUT_DATA_FORMAT,
                 StatusCode.SERVER_ERROR,
                 -> {
-                    throw IOException(
-                        String.format(ServiceExceptionMessage.MESSAGE_FAIL_REQUEST, statusCode.errorCode()),
-                    )
+                    throw IOException(ServiceExceptionMessage.MESSAGE_FAIL_REQUEST)
                 }
                 else -> {
                     throw IOException(statusCode.message())

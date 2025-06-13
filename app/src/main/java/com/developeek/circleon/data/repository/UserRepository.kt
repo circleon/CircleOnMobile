@@ -55,4 +55,6 @@ interface UserRepository {
     suspend fun deleteUserProfileImage(): Result<Unit>
 
     suspend fun logout(): Result<Unit>
+
+    suspend fun resign(): Result<Unit>
 }

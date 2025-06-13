@@ -177,6 +177,18 @@ class UserRepositoryImpl(
         }
     }
 
+    override suspend fun resign(): Result<Unit> {
+        return try {
+            service.resign()
+            tokenManager.deleteAccessToken()
+            tokenManager.deleteRefreshToken()
+            userManager.deleteUser()
+            Result.success(Unit)
+        } catch (e: Exception) {
+            Result.error(e)
+        }
+    }
+
     companion object {
         private const val IMAGE_CONTENT_TYPE = "image/jpeg; charset=utf-8"
         private const val SORT_LATEST = "createdAt,desc"

@@ -130,6 +130,7 @@ class MyPageFragment : Fragment() {
         setBtnProfileImageListener(context)
         setBtnSendFeedbackListener()
         setBtnLogoutListener(context)
+        setBtnResignListener(context)
     }
 
     private fun setBtnMyPostsListener() {
@@ -181,6 +182,22 @@ class MyPageFragment : Fragment() {
             message = context.getString(R.string.message_user_logout),
             positiveListener = {
                 viewModel.logout()
+            },
+        ).show()
+    }
+
+    private fun setBtnResignListener(context: Context) {
+        binding.btnResign.setOnClickListener {
+            showResignDialog(context)
+        }
+    }
+
+    private fun showResignDialog(context: Context) {
+        PositiveAlertDialog(
+            context,
+            message = context.getString(R.string.message_user_resign),
+            positiveListener = {
+                viewModel.resign()
             },
         ).show()
     }
