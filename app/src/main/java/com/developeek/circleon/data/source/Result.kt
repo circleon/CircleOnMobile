@@ -39,5 +39,6 @@ class Error<T>(private val error: Exception) : Result<T>() {
 
     fun isAuthenticationError() =
         error is ServiceException.RefreshTokenExpiredException ||
-            error is ServiceException.NoRefreshTokenException
+            error is ServiceException.NoRefreshTokenException ||
+            error is ServiceException.NoUserDataException
 }

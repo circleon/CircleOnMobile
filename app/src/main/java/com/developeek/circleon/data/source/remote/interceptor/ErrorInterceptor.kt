@@ -3,6 +3,8 @@ package com.developeek.circleon.data.source.remote.interceptor
 import android.util.Log
 import com.developeek.circleon.data.exception.ServiceException
 import com.developeek.circleon.data.exception.ServiceExceptionMessage
+import com.developeek.circleon.data.source.manager.TokenManager
+import com.developeek.circleon.data.source.manager.UserManager
 import com.developeek.circleon.data.source.remote.retrofit.StatusCode
 import okhttp3.Interceptor
 import okhttp3.MediaType.Companion.toMediaType
@@ -16,7 +18,10 @@ import javax.inject.Inject
 
 class ErrorInterceptor
     @Inject
-    constructor() : Interceptor {
+    constructor(
+        private val tokenManager: TokenManager,
+        private val userManager: UserManager,
+    ) : Interceptor {
         override fun intercept(chain: Interceptor.Chain): Response {
             val request = chain.request()
             val response = chain.proceed(request)
@@ -101,6 +106,10 @@ class ErrorInterceptor
                 StatusCode.NO_CONTENTS -> {
                     throw ServiceException.NoResultException(statusCode.message())
                 }
+                StatusCode.NO_USER_DATA -> {
+                    deleteAllClientData()
+                    throw ServiceException.NoUserDataException(statusCode.message())
+                }
                 // 서버 혹은 통신 문제인 경우
                 StatusCode.WRONG_REQUEST_FORMAT,
                 StatusCode.WRONG_INPUT_DATA_FORMAT,
@@ -112,6 +121,12 @@ class ErrorInterceptor
                     throw IOException(statusCode.message())
                 }
             }
+        }
+
+        private fun deleteAllClientData() {
+            tokenManager.deleteAccessToken()
+            tokenManager.deleteRefreshToken()
+            userManager.deleteUser()
         }
 
         companion object {

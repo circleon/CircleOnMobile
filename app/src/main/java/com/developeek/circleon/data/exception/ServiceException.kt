@@ -11,6 +11,8 @@ object ServiceException {
      */
     class NoResultException(override val message: String) : IOException(message)
 
+    class NoUserDataException(override val message: String) : IOException(message)
+
     class RefreshTokenExpiredException : IOException()
 
     class NoRefreshTokenException : IOException()
