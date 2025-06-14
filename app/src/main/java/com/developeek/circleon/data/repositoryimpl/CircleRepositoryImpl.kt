@@ -515,6 +515,15 @@ class CircleRepositoryImpl(private val service: CircleService) : CircleRepositor
         }
     }
 
+    override suspend fun deleteCircle(circleId: Int): Result<Unit> {
+        return try {
+            service.deleteCircle(circleId)
+            Result.success(Unit)
+        } catch (e: Exception) {
+            Result.error(e)
+        }
+    }
+
     companion object {
         private const val TEXT_CONTENT_TYPE = "text/plain; charset=utf-8"
         private const val IMAGE_CONTENT_TYPE = "image/jpeg; charset=utf-8"

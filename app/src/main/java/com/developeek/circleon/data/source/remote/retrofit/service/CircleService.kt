@@ -225,4 +225,9 @@ interface CircleService {
         @Path("circleId") circleId: Int,
         @Path("memberId") memberId: Int,
     )
+
+    @DELETE("circles/{circleId}")
+    suspend fun deleteCircle(
+        @Path("circleId") circleId: Int,
+    )
 }
