@@ -124,6 +124,7 @@
     <string name="manage_circle_title_approve_circle_join">동아리 가입 승인</string>
     <string name="manage_circle_title_approve_circle_leave">동아리 탈퇴 승인</string>
     <string name="manage_circle_title_request_official_status">동아리 인증 뱃지\n신청하기</string>
+    <string name="manage_circle_title_delete_circle">동아리 삭제하기</string>
     <string name="manage_circle_content_circle_member_default">멤버 0명</string>
     <string name="manage_circle_content_circle_member">멤버 %d명</string>
     <string name="manage_circle_content_join_requested_member_default">대기중인 멤버 0명</string>
@@ -135,6 +136,7 @@
     <string name="message_no_member_leave_requested">탈퇴 대기중인 인원이 없어요!</string>
     <string name="message_request_ban_member">해당 멤버를 추방할까요?</string>
     <string name="message_request_official_status">교내 정식 동아리 인증을 신청하시겠어요?(3~5일 정도 소요돼요)</string>
+    <string name="message_delete_circle">동아리를 삭제하시겠어요?</string>
     <string name="menu_circle_member_settings_edit_role">역할 수정하기</string>
     <string name="menu_circle_member_settings_ban">추방하기</string>
     <string name="btn_edit_circle_member_role">임명하기</string>

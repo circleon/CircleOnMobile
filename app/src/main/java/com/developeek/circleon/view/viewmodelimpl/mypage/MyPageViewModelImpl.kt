@@ -41,8 +41,8 @@ class MyPageViewModelImpl
                     _event.emit(Event.ShowProcessing)
 
                     when (val result = putUserProfileImage(image)) {
-                        is Success -> whenPutUserProfileImageSuccess(image)
-                        is Error -> _event.emit(Event.ShowToast(result.message()))
+                        is Success -> whenPutUserProfileImageSuccess()
+                        is Error -> whenEditUserProfileImageFail(result)
                     }
                 }
         }
@@ -52,11 +52,21 @@ class MyPageViewModelImpl
                 repository.putUserProfileImage(profileImage)
             }
 
-        private suspend fun whenPutUserProfileImageSuccess(image: File?) {
+        private suspend fun whenPutUserProfileImageSuccess() {
             _event.emit(Event.ShowToast(MESSAGE_SUCCESS_SET_USER_PROFILE_IMAGE))
 
             updateUser()
             _myPageScreenEvent.emit(MyPageScreenEvent.SetUserProfileImage)
+        }
+
+        private suspend fun whenEditUserProfileImageFail(result: Error<Unit>) {
+            if (result.isAuthenticationError()) {
+                _event.emit(Event.ShowToast(result.message()))
+                _event.emit(Event.SendToLoginScreen)
+                return
+            }
+
+            _event.emit(Event.ShowDialog(result.message()))
         }
 
         private suspend fun updateUser() =
@@ -75,7 +85,7 @@ class MyPageViewModelImpl
 
                     when (val result = deleteUserProfileImage()) {
                         is Success -> whenDeleteUserProfileImageSuccess()
-                        is Error -> _event.emit(Event.ShowToast(result.message()))
+                        is Error -> whenEditUserProfileImageFail(result)
                     }
                 }
         }

@@ -25,6 +25,7 @@ import com.developeek.circleon.view.Event
 import com.developeek.circleon.view.screen.auth.LoginActivity
 import com.developeek.circleon.view.viewmodel.home.ManageCircleViewModel
 import com.developeek.circleon.view.viewmodelimpl.home.ManageCircleScreen
+import com.developeek.circleon.view.viewmodelimpl.home.ManageCircleScreenEvent
 import com.developeek.circleon.view.viewmodelimpl.home.ManageCircleViewModelImpl
 import com.developeek.circleon.view.widget.PositiveAlertDialog
 import com.developeek.circleon.view.widget.SingleMessageAlertDialog
@@ -86,6 +87,11 @@ class ManageCircleFragment : Fragment() {
                         handleScreenFlow(it, requireContext())
                     }
                 }
+                launch {
+                    viewModel.manageCircleScreenEvent.collect {
+                        handleManageCircleScreenEvent(it)
+                    }
+                }
             }
         }
     }
@@ -105,7 +111,8 @@ class ManageCircleFragment : Fragment() {
 
     private fun initListener(context: Context) {
         setBtnCancelListener()
-        setBtnRequestOfficialStatus(context)
+        setBtnRequestOfficialStatusListener(context)
+        setBtnDeleteCircleListener(context)
     }
 
     private fun setBtnCancelListener() {
@@ -118,7 +125,7 @@ class ManageCircleFragment : Fragment() {
         findNavController().popBackStack()
     }
 
-    private fun setBtnRequestOfficialStatus(context: Context) {
+    private fun setBtnRequestOfficialStatusListener(context: Context) {
         binding.btnRequestOfficialStatus.setOnClickListener {
             showRequestOfficialStatusDialog(context)
         }
@@ -131,6 +138,23 @@ class ManageCircleFragment : Fragment() {
             positiveButton = context.getString(R.string.btn_request),
             positiveListener = {
                 viewModel.requestOfficialStatus()
+            },
+        ).show()
+    }
+
+    private fun setBtnDeleteCircleListener(context: Context) {
+        binding.btnDeleteCircle.setOnClickListener {
+            showDeleteCircleDialog(context)
+        }
+    }
+
+    private fun showDeleteCircleDialog(context: Context) {
+        PositiveAlertDialog(
+            context,
+            message = context.getString(R.string.message_delete_circle),
+            positiveButton = context.getString(R.string.btn_delete),
+            positiveListener = {
+                viewModel.deleteCircle()
             },
         ).show()
     }
@@ -291,5 +315,19 @@ class ManageCircleFragment : Fragment() {
         bundle.putSerializable(Const.TAG_MEMBERS, members)
         bundle.putSerializable(Const.TAG_MEMBERSHIP_STATUS, membershipStatus)
         findNavController().navigate(R.id.action_manageCircleFragment_to_manageCircleMemberFragment, bundle)
+    }
+
+    private fun handleManageCircleScreenEvent(event: ManageCircleScreenEvent) {
+        when (event) {
+            ManageCircleScreenEvent.DeleteCircle -> sendUserToHomeScreen()
+        }
+    }
+
+    private fun sendUserToHomeScreen() {
+        findNavController().popBackStack(R.id.homeFragment, inclusive = false)
+    }
+
+    private fun selectHomeTab(activity: Activity) {
+        activity.findViewById<BottomNavigationView>(R.id.btmNav).selectedItemId = R.id.nav_graph_home
     }
 }

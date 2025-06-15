@@ -43,6 +43,8 @@ class ManageCircleViewModelImpl
         override val event: SharedFlow<Event> = _event
         private val _screenFlow = MutableStateFlow<ManageCircleScreen>(ManageCircleScreen.LoadingView)
         override val screenFlow: StateFlow<ManageCircleScreen> = _screenFlow
+        private val _manageCircleScreenEvent = MutableSharedFlow<ManageCircleScreenEvent>()
+        override val manageCircleScreenEvent: SharedFlow<ManageCircleScreenEvent> = _manageCircleScreenEvent
 
         private var fetchMembersJob: Job? = null
         private var userRequestJob: Job? = null
@@ -213,8 +215,35 @@ class ManageCircleViewModelImpl
             _event.emit(Event.ShowDialog(result.message()))
         }
 
+        override fun deleteCircle() {
+            userRequestJob?.let {
+                if (!it.isCompleted) return
+            }
+
+            userRequestJob =
+                viewModelScope.launch {
+                    _event.emit(Event.ShowProcessing)
+
+                    when (val result = requestDeleteCircle(circle.id)) {
+                        is Success -> whenDeleteCircleSuccess()
+                        is Error -> whenUserRequestFail(result)
+                    }
+                }
+        }
+
+        private suspend fun whenDeleteCircleSuccess() {
+            _event.emit(Event.ShowToast(MESSAGE_SUCCESS_DELETE_CIRCLE))
+            _manageCircleScreenEvent.emit(ManageCircleScreenEvent.DeleteCircle)
+        }
+
+        private suspend fun requestDeleteCircle(circleId: Int) =
+            withContext(dispatcher) {
+                repository.deleteCircle(circleId)
+            }
+
         companion object {
             private const val MESSAGE_SUCCESS_REQUEST_OFFICIAL_STATUS = "동아리 인증 요청이 전송됐어요"
+            private const val MESSAGE_SUCCESS_DELETE_CIRCLE = "동아리 삭제가 완료됐어요"
             private const val SIZE_BY_PAGE = 200 // 멤버 데이터 일괄 호출
             private const val DEFAULT_PAGE = 0
         }
@@ -230,4 +259,8 @@ sealed class ManageCircleScreen {
     data object LoadingView : ManageCircleScreen()
 
     data object NormalView : ManageCircleScreen()
+}
+
+sealed class ManageCircleScreenEvent {
+    data object DeleteCircle : ManageCircleScreenEvent()
 }
