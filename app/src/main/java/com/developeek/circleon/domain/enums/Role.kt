@@ -1,13 +1,14 @@
 package com.developeek.circleon.domain.enums
 
 enum class Role(
-    private val codeName: String,
-    private val roleName: String,
+    val id: Int,
+    val codeName: String,
+    val roleName: String,
 ) {
-    NONE_MEMBER("NONE_MEMBER", "비회원"),
-    MEMBER("MEMBER", "부원"),
-    EXECUTIVE("EXECUTIVE", "임원"),
-    PRESIDENT("PRESIDENT", "회장"),
+    NONE_MEMBER(0, "NONE_MEMBER", "비회원"),
+    MEMBER(1, "MEMBER", "부원"),
+    EXECUTIVE(2, "EXECUTIVE", "임원"),
+    PRESIDENT(3, "PRESIDENT", "회장"),
     ;
 
     fun isMember() = this != NONE_MEMBER
@@ -15,10 +16,6 @@ enum class Role(
     fun isExecutive() = this == EXECUTIVE || this == PRESIDENT
 
     fun isPresident() = this == PRESIDENT
-
-    fun codeName() = codeName
-
-    fun roleName() = roleName
 
     companion object {
         private val default = NONE_MEMBER

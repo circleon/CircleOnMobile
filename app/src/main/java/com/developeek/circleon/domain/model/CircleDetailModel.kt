@@ -27,26 +27,6 @@ data class CircleDetailModel(
     val recruiting: Boolean,
     val members: Models<MemberModel> = Models(),
 ) : BaseModel(circleId) {
-    constructor(circleDetailModel: CircleDetailModel, members: Models<MemberModel>) : this(
-        circleDetailModel.id,
-        circleDetailModel.name,
-        circleDetailModel.category,
-        circleDetailModel.officialStatus,
-        circleDetailModel.role,
-        circleDetailModel.memberId,
-        circleDetailModel.membershipStatus,
-        circleDetailModel.profileImgUrl,
-        circleDetailModel.thumbnailUrl,
-        circleDetailModel.singleLineIntroduction,
-        circleDetailModel.memberCount,
-        circleDetailModel.introImgUrl,
-        circleDetailModel.introduction,
-        circleDetailModel.recruitmentStartDate,
-        circleDetailModel.recruitmentEndDate,
-        circleDetailModel.recruiting,
-        members,
-    )
-
     override fun areContentsSame(target: BaseModel): Boolean {
         if (target !is CircleDetailModel) return false
 
@@ -60,6 +40,8 @@ data class CircleDetailModel(
     fun isUserExecutive() = role.isExecutive()
 
     fun isUserPresident() = role.isPresident()
+
+    fun copyWith(members: Models<MemberModel>) = copy(members = members)
 
     fun fold(
         id: Int = this.id,

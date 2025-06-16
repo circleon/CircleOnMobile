@@ -241,9 +241,7 @@ class CircleDetailPostViewModelImpl
         }
 
         // 현재는 공지사항용 핀 고정 기능이고, 나중에 게시글 고정 기능 추가 시 사용
-        override fun pinAndFetch(postId: Int) {}
-
-        override fun removePinAndFetch(postId: Int) {}
+        override fun togglePin(post: PostModel) {}
 
         companion object {
             private const val MESSAGE_SUCCESS_REQUEST_REMOVE_POST = "게시글이 삭제됐어요"
