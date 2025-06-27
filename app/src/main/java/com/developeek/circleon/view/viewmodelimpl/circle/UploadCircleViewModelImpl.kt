@@ -277,8 +277,8 @@ class UploadCircleViewModelImpl
         private fun isIntroductionImageRemoved() = introductionImage == null && hasIntroductionImageChanged
 
         companion object {
-            private const val MESSAGE_SUCCESS_UPLOAD_CIRCLE = "동아리가 생성됐어요"
-            private const val MESSAGE_SUCCESS_EDIT_CIRCLE = "동아리 정보가 수정됐어요"
+            private const val MESSAGE_SUCCESS_UPLOAD_CIRCLE = "동아리가 성공적으로 생성되었어요"
+            private const val MESSAGE_SUCCESS_EDIT_CIRCLE = "동아리 정보가 수정되었어요"
         }
     }
 

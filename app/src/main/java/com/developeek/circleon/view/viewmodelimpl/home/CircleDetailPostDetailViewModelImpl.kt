@@ -165,7 +165,10 @@ class CircleDetailPostDetailViewModelImpl
                     _event.emit(Event.ShowProcessing)
 
                     when (val result = postCirclePostComment(circleId, post.id, content)) {
-                        is Success -> showToastAndRefresh(MESSAGE_SUCCESS_UPLOAD_COMMENT)
+                        is Success -> {
+                            _event.emit(Event.EndProcessing)
+                            refresh()
+                        }
                         is Error -> whenUserRequestFail(result)
                     }
                 }
@@ -193,7 +196,10 @@ class CircleDetailPostDetailViewModelImpl
                     _event.emit(Event.ShowProcessing)
 
                     when (val result = putCirclePostComment(circleId, post.id, commentId, content)) {
-                        is Success -> showToastAndRefresh(MESSAGE_SUCCESS_EDIT_COMMENT)
+                        is Success -> {
+                            _event.emit(Event.EndProcessing)
+                            refresh()
+                        }
                         is Error -> whenUserRequestFail(result)
                     }
                 }
@@ -349,11 +355,9 @@ class CircleDetailPostDetailViewModelImpl
         }
 
         companion object {
-            private const val MESSAGE_SUCCESS_UPLOAD_COMMENT = "댓글이 작성됐어요"
-            private const val MESSAGE_SUCCESS_EDIT_COMMENT = "댓글이 수정됐어요"
-            private const val MESSAGE_SUCCESS_DELETE_COMMENT = "댓글이 삭제됐어요"
-            private const val MESSAGE_SUCCESS_DELETE_POST = "게시글이 삭제됐어요"
-            private const val MESSAGE_SUCCESS_REQUEST_REPORT = "신고 요청이 완료됐어요"
+            private const val MESSAGE_SUCCESS_DELETE_COMMENT = "댓글이 삭제되었어요"
+            private const val MESSAGE_SUCCESS_DELETE_POST = "게시글이 삭제되었어요"
+            private const val MESSAGE_SUCCESS_REQUEST_REPORT = "신고 요청이 완료되었어요"
             private const val SIZE_BY_PAGE = 20
             private const val DEFAULT_PAGE = 0
         }

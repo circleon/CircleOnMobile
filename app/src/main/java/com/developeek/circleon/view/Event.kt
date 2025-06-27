@@ -14,4 +14,6 @@ sealed class Event {
     data class ShowDialog(val message: String) : Event()
 
     data object ShowProcessing : Event()
+
+    data object EndProcessing : Event()
 }

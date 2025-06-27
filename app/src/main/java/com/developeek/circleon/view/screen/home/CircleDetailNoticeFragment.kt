@@ -227,11 +227,8 @@ class CircleDetailNoticeFragment : Fragment() {
         notice: PostModel,
     ) = PopupMenu.OnMenuItemClickListener {
         when (it.itemId) {
-            R.id.pin_post -> {
-                showPinNoticeRequestDialog(context, notice)
-            }
-            R.id.unpin_post -> {
-                showRemovePinNoticeRequestDialog(context, notice)
+            R.id.pin_post, R.id.unpin_post -> {
+                viewModel.togglePin(notice)
             }
             R.id.edit_post -> {
                 sendUserToEditNoticeScreen(circleDetail.circleId, notice)
@@ -257,34 +254,6 @@ class CircleDetailNoticeFragment : Fragment() {
         bundle.putSerializable(Const.TAG_CIRCLE_POST, item)
         bundle.putBoolean(Const.FLAG_EDIT_SCREEN, true) // 수정 기능 전용 활성화
         findNavController().navigate(R.id.action_circleDetailFragment_to_uploadPostFragment, bundle)
-    }
-
-    private fun showPinNoticeRequestDialog(
-        context: Context,
-        notice: PostModel,
-    ) {
-        PositiveAlertDialog(
-            context,
-            message = context.getString(R.string.message_pin_notice),
-            positiveButton = context.getString(R.string.btn_pin),
-            positiveListener = {
-                viewModel.togglePin(notice)
-            },
-        ).show()
-    }
-
-    private fun showRemovePinNoticeRequestDialog(
-        context: Context,
-        notice: PostModel,
-    ) {
-        PositiveAlertDialog(
-            context,
-            message = context.getString(R.string.message_remove_pin_notice),
-            positiveButton = context.getString(R.string.btn_remove_pin),
-            positiveListener = {
-                viewModel.togglePin(notice)
-            },
-        ).show()
     }
 
     private fun showDeleteNoticeRequestDialog(

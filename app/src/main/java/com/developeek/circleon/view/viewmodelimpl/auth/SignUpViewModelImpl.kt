@@ -38,8 +38,8 @@ class SignUpViewModelImpl
         private var currentStep = SignUpStep.entries.first()
 
         override val emailAuthenticationTimer: LiveData<Long>
-            get() = timer
-        private val timer = MutableLiveData(TIMER_INIT)
+            get() = _emailAuthenticationTimer
+        private val _emailAuthenticationTimer = MutableLiveData(TIMER_INIT)
         private var emailCodeRequested = false
 
         private var userRequestJob: Job? = null
@@ -139,16 +139,22 @@ class SignUpViewModelImpl
         }
 
         private fun startEmailAuthenticationTimer() {
+            countEmailCodeExpirationTimeJob?.let {
+                if (!it.isCompleted) it.cancel()
+            }
+
             countEmailCodeExpirationTimeJob =
                 viewModelScope.launch {
                     withContext(Dispatchers.Default) {
-                        timer.postValue(TIMER_INIT)
+                        _emailAuthenticationTimer.postValue(TIMER_INIT)
                         var time = 0L
 
-                        while (isActive && time < TIMER_INIT) {
+                        while (time < TIMER_INIT) {
                             delay(TIMER_INTERVAL)
                             time += TIMER_INTERVAL
-                            timer.postValue(TIMER_INIT - time)
+
+                            if (!isActive) break
+                            _emailAuthenticationTimer.postValue(TIMER_INIT - time)
                         }
                     }
                 }
@@ -307,9 +313,9 @@ class SignUpViewModelImpl
         }
 
         companion object {
-            private const val MESSAGE_SUCCESS_REQUEST_EMAIL_CODE = "이메일 주소로 인증번호를 전송했어요"
+            private const val MESSAGE_SUCCESS_REQUEST_EMAIL_CODE = "인증번호가 전송되었어요"
             private const val MESSAGE_SUCCESS_EMAIL_AUTHENTICATION = "인증에 성공했어요"
-            private const val MESSAGE_SUCCESS_SIGN_UP = "회원가입이 완료됐어요"
+            private const val MESSAGE_SUCCESS_SIGN_UP = "회원가입 완료! 반가워요 :D"
 
             private const val TIMER_INIT = 300_000L
             private const val TIMER_INTERVAL = 1_000L

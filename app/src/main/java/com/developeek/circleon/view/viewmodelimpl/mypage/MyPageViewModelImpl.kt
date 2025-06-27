@@ -150,10 +150,10 @@ class MyPageViewModelImpl
             }
 
         companion object {
-            private const val MESSAGE_SUCCESS_SET_USER_PROFILE_IMAGE = "프로필 이미지가 수정됐어요"
-            private const val MESSAGE_SUCCESS_DELETE_USER_PROFILE_IMAGE = "프로필 이미지가 삭제됐어요"
-            private const val MESSAGE_SUCCESS_LOGOUT = "로그아웃이 완료됐어요"
-            private const val MESSAGE_SUCCESS_RESIGN = "회원탈퇴가 완료됐어요"
+            private const val MESSAGE_SUCCESS_SET_USER_PROFILE_IMAGE = "프로필 이미지가 수정되었어요"
+            private const val MESSAGE_SUCCESS_DELETE_USER_PROFILE_IMAGE = "프로필 이미지가 삭제되었어요"
+            private const val MESSAGE_SUCCESS_LOGOUT = "로그아웃 완료! 다음에 또 만나요 "
+            private const val MESSAGE_SUCCESS_RESIGN = "회원탈퇴가 완료되었어요"
         }
     }
 

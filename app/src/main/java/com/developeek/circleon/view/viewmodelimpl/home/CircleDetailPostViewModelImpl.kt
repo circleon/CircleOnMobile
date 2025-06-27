@@ -244,8 +244,8 @@ class CircleDetailPostViewModelImpl
         override fun togglePin(post: PostModel) {}
 
         companion object {
-            private const val MESSAGE_SUCCESS_REQUEST_REMOVE_POST = "게시글이 삭제됐어요"
-            private const val MESSAGE_SUCCESS_REQUEST_REPORT = "신고 요청이 완료됐어요"
+            private const val MESSAGE_SUCCESS_REQUEST_REMOVE_POST = "게시글이 삭제되었어요"
+            private const val MESSAGE_SUCCESS_REQUEST_REPORT = "신고 요청이 완료되었어요"
             private const val SIZE_BY_PAGE = 20
             private const val DEFAULT_PAGE = 0
         }

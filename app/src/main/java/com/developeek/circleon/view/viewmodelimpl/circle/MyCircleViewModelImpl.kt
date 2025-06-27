@@ -134,7 +134,7 @@ class MyCircleViewModelImpl
         }
 
         companion object {
-            private const val MESSAGE_SUCCESS_CANCEL_JOIN_REQUEST = "가입 신청이 취소됐어요"
+            private const val MESSAGE_SUCCESS_CANCEL_JOIN_REQUEST = "가입 신청이 취소되었어요"
             private const val SIZE_BY_PAGE = 100 // 동아리 데이터 일괄 호출
             private const val DEFAULT_PAGE = 0
         }

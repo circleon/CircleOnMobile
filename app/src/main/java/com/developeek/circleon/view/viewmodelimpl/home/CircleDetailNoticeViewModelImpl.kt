@@ -168,18 +168,7 @@ class CircleDetailNoticeViewModelImpl
 
                     val toggled = post.togglePinAndGet()
                     when (val result = putPostPin(circleDetail.circleId, post.id, toggled.isPinned)) {
-                        is Success -> {
-                            val message =
-                                if (toggled.isPinned) {
-                                    MESSAGE_SUCCESS_REQUEST_PIN
-                                } else {
-                                    MESSAGE_SUCCESS_REQUEST_REMOVE_PIN
-                                }
-
-                            replacePost(post, toggled)
-                            _event.emit(Event.ShowToast(message))
-                            _screenFlow.emit(CircleDetailPostScreen.SuccessView(posts))
-                        }
+                        is Success -> whenTogglePinSuccess(post, toggled)
                         is Error -> whenUserRequestFail(result)
                     }
                 }
@@ -191,6 +180,22 @@ class CircleDetailNoticeViewModelImpl
             isPinned: Boolean,
         ) = withContext(ioDispatcher) {
             repository.putPostPin(circleId, postId, isPinned)
+        }
+
+        private suspend fun whenTogglePinSuccess(
+            post: PostModel,
+            toggled: PostModel,
+        ) {
+            val message =
+                if (toggled.isPinned) {
+                    MESSAGE_SUCCESS_REQUEST_PIN
+                } else {
+                    MESSAGE_SUCCESS_REQUEST_REMOVE_PIN
+                }
+
+            replacePost(post, toggled)
+            _event.emit(Event.ShowToast(message))
+            _screenFlow.emit(CircleDetailPostScreen.SuccessView(posts))
         }
 
         private suspend fun replacePost(
@@ -259,14 +264,6 @@ class CircleDetailNoticeViewModelImpl
             refresh()
         }
 
-        private suspend fun showToast(message: String) {
-            _event.emit(Event.ShowToast(message))
-        }
-
-        private suspend fun updatePosts(posts: Models<PostModel>) {
-            _screenFlow.emit(CircleDetailPostScreen.SuccessView(posts))
-        }
-
         private suspend fun whenUserRequestFail(result: Error<Unit>) {
             if (result.isAuthenticationError()) {
                 _event.emit(Event.ShowToast(result.message()))
@@ -293,10 +290,10 @@ class CircleDetailNoticeViewModelImpl
         }
 
         companion object {
-            private const val MESSAGE_SUCCESS_REQUEST_PIN = "공지사항이 고정됐어요"
-            private const val MESSAGE_SUCCESS_REQUEST_REMOVE_PIN = "공지사항이 고정이 해제됐어요"
-            private const val MESSAGE_SUCCESS_REQUEST_REMOVE_NOTICE = "공지사항이 삭제됐어요"
-            private const val MESSAGE_SUCCESS_REQUEST_REPORT = "신고 요청이 완료됐어요"
+            private const val MESSAGE_SUCCESS_REQUEST_PIN = "공지사항이 고정되었어요"
+            private const val MESSAGE_SUCCESS_REQUEST_REMOVE_PIN = "공지사항이 고정이 해제되었어요"
+            private const val MESSAGE_SUCCESS_REQUEST_REMOVE_NOTICE = "공지사항이 삭제되었어요"
+            private const val MESSAGE_SUCCESS_REQUEST_REPORT = "신고 요청이 완료되었어요"
             private const val SIZE_BY_PAGE = 20
             private const val DEFAULT_PAGE = 0
         }

@@ -248,9 +248,9 @@ class CircleDetailViewModelImpl
         }
 
         companion object {
-            private const val MESSAGE_SUCCESS_REQUEST_JOIN = "가입 신청이 완료됐어요"
-            private const val MESSAGE_SUCCESS_REQUEST_LEAVE = "탈퇴 신청이 완료됐어요"
-            private const val MESSAGE_SUCCESS_REQUEST_REPORT = "신고 요청이 완료됐어요"
+            private const val MESSAGE_SUCCESS_REQUEST_JOIN = "가입 신청이 완료되었어요"
+            private const val MESSAGE_SUCCESS_REQUEST_LEAVE = "탈퇴 신청이 완료되었어요"
+            private const val MESSAGE_SUCCESS_REQUEST_REPORT = "신고 요청이 완료되었어요"
             private const val MEMBER_SIZE_BY_PAGE = 200
             private const val DEFAULT_PAGE = 0
         }
