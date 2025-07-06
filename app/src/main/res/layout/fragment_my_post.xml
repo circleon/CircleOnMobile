@@ -51,14 +51,29 @@
             android:layout_height="match_parent"
             android:visibility="gone"/>
 
-        <androidx.appcompat.widget.AppCompatTextView
-            android:id="@+id/txtNoResult"
+        <androidx.appcompat.widget.LinearLayoutCompat
+            android:id="@+id/llNoResult"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:gravity="center"
-            android:text="@string/message_no_my_posts"
-            android:textColor="@color/grey_6"
-            android:visibility="gone" />
+            android:orientation="vertical"
+            android:visibility="gone">
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/txtNoResult"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:text="@string/message_no_my_posts"
+                android:textColor="@color/grey_6" />
+
+            <androidx.appcompat.widget.AppCompatImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/margin_padding_large"
+                android:src="@drawable/character_default_situation"/>
+
+        </androidx.appcompat.widget.LinearLayoutCompat>
 
         <com.google.android.material.progressindicator.CircularProgressIndicator
             android:id="@+id/pgbLoading"

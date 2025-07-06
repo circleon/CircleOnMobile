@@ -84,7 +84,7 @@ class MyPostFragment : Fragment() {
                 }
                 launch {
                     viewModel.screenFlow.collect {
-                        handleScreenFlow(it)
+                        handleScreenFlow(it, requireContext())
                     }
                 }
             }
@@ -208,17 +208,28 @@ class MyPostFragment : Fragment() {
         }
     }
 
-    private fun handleScreenFlow(screenFlow: MyPostScreen) {
+    private fun handleScreenFlow(
+        screenFlow: MyPostScreen,
+        context: Context,
+    ) {
         when (screenFlow) {
-            is MyPostScreen.SuccessView -> showSuccessView(screenFlow)
+            is MyPostScreen.SuccessView -> showSuccessView(screenFlow, context)
             is MyPostScreen.LoadingView -> showLoadingView()
             is MyPostScreen.ErrorView -> showErrorView()
         }
     }
 
-    private fun showSuccessView(screenFlow: MyPostScreen.SuccessView) {
+    private fun showSuccessView(
+        screenFlow: MyPostScreen.SuccessView,
+        context: Context,
+    ) {
         if (screenFlow.posts.isEmpty()) {
-            switchView(binding.txtNoResult)
+            switchView(binding.llNoResult)
+            if (isMyPosts) {
+                binding.txtNoResult.text = context.getString(R.string.message_no_my_posts)
+            } else {
+                binding.txtNoResult.text = context.getString(R.string.message_no_my_comment)
+            }
             return
         }
 
@@ -251,7 +262,7 @@ class MyPostFragment : Fragment() {
     private fun switchView(view: View) {
         binding.rvMyPost.isVisible = view == binding.rvMyPost
         binding.pgbLoading.isVisible = view == binding.pgbLoading
-        binding.txtNoResult.isVisible = view == binding.txtNoResult
+        binding.llNoResult.isVisible = view == binding.llNoResult
         binding.llServiceError.isVisible = view == binding.llServiceError
     }
 }
