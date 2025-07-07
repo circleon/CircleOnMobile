@@ -253,7 +253,7 @@ class ManageCircleMemberFragment : Fragment() {
     ) {
         PositiveAlertDialog(
             context,
-            context.getString(R.string.message_request_ban_member),
+            String.format(context.getString(R.string.message_request_ban_member), member.name),
             context.getString(R.string.btn_ban_member),
             positiveListener = {
                 requestRefreshToPreviousScreen()
