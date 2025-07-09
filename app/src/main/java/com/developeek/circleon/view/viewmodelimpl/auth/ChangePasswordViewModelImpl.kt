@@ -277,7 +277,7 @@ class ChangePasswordViewModelImpl
         companion object {
             private const val MESSAGE_SUCCESS_REQUEST_EMAIL_CODE = "인증번호가 전송되었어요"
             private const val MESSAGE_SUCCESS_EMAIL_AUTHENTICATION = "인증에 성공했어요"
-            private const val MESSAGE_SUCCESS_CHANGE_PASSWORD = "비밀번호 재설정되었어요"
+            private const val MESSAGE_SUCCESS_CHANGE_PASSWORD = "비밀번호가 재설정되었어요"
 
             private const val TIMER_INIT = 300_000L
             private const val TIMER_INTERVAL = 1_000L

@@ -1,5 +1,6 @@
 package com.developeek.circleon.view.screen
 
+import android.content.Context
 import android.os.Bundle
 import android.view.KeyEvent
 import android.widget.Toast
@@ -11,6 +12,7 @@ import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.NavigationUI
 import com.developeek.circleon.R
 import com.developeek.circleon.databinding.ActivityHomeBinding
+import com.developeek.circleon.view.widget.SingleMessageToast
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -26,12 +28,12 @@ class HomeActivity : AppCompatActivity() {
         binding = ActivityHomeBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        initView()
+        initView(this)
     }
 
-    private fun initView() {
+    private fun initView(context: Context) {
         initBottomNav()
-        initFinishWaitingToast()
+        initFinishWaitingToast(context)
     }
 
     private fun initBottomNav() {
@@ -72,9 +74,12 @@ class HomeActivity : AppCompatActivity() {
         }
     }
 
-    private fun initFinishWaitingToast() {
+    private fun initFinishWaitingToast(context: Context) {
         finishWaitingToast =
-            Toast.makeText(this, FINISH_WAITING_MESSAGE, Toast.LENGTH_SHORT).also {
+            SingleMessageToast(
+                context,
+                context.getString(R.string.message_finish_waiting),
+            ).also {
                 it.addCallback(
                     object : Toast.Callback() {
                         override fun onToastShown() {
@@ -104,9 +109,5 @@ class HomeActivity : AppCompatActivity() {
             }
         }
         return super.onKeyDown(keyCode, event)
-    }
-
-    companion object {
-        private const val FINISH_WAITING_MESSAGE = "종료를 원하시면 '뒤로'버튼을 한번 더 눌러주세요"
     }
 }

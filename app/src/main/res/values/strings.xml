@@ -64,6 +64,7 @@
     <string name="home_content_title_circle_default">이런 동아리는 어떠신가요?</string>
     <string name="home_content_title_circle">"%s 님 이런 동아리는 어떠신가요?"</string>
     <string name="message_no_circle">등록된 동아리가 없어요</string>
+    <string name="message_finish_waiting">종료를 원하시면 \'뒤로\'버튼을 한번 더 눌러주세요</string>
 
     <!--Search Circle-->
     <string name="message_no_result">검색 결과가 존재하지 않아요</string>
