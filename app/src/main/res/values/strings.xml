@@ -42,6 +42,9 @@
     <string name="condition_password">*영문, 숫자, 특수문자 포함 8~12자</string>
     <string name="text_password_check">비밀번호 확인</string>
     <string name="hint_password_check">비밀번호 입력</string>
+    <string name="site_service_terms">https://bitter-pink-ac9.notion.site/22b4609ab703809e8995daada6f6da6b?source=copy_link</string>
+    <string name="site_privacy_policy">https://bitter-pink-ac9.notion.site/22b4609ab70380799ff0c45b19879ae5?source=copy_link</string>
+    <string name="site_community_rules">https://bitter-pink-ac9.notion.site/22b4609ab7038029b374f930c8f85ac5?source=copy_link</string>
 
     <!--Change Password-->
     <string name="title_change_password">비밀번호 재설정</string>
@@ -193,6 +196,7 @@
     <string name="text_app_version">앱 버전</string>
     <string name="text_service_term">서비스 이용 약관</string>
     <string name="text_privacy_policy">개인정보 처리 방침</string>
+    <string name="text_community_rules">커뮤니티 이용규칙</string>
     <string name="btn_send_feedback">피드백 남기기</string>
     <string name="btn_logout">로그아웃</string>
     <string name="btn_resign">탈퇴하기</string>

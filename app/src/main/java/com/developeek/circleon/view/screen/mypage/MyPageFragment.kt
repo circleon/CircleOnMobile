@@ -3,6 +3,7 @@ package com.developeek.circleon.view.screen.mypage
 import android.app.Activity
 import android.content.Context
 import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -128,7 +129,7 @@ class MyPageFragment : Fragment() {
     private fun initListener(context: Context) {
         setBtnMyPostsListener()
         setBtnProfileImageListener(context)
-        setBtnSendFeedbackListener()
+        setBtnTermsDetailListener(context)
         setBtnLogoutListener(context)
         setBtnResignListener(context)
     }
@@ -162,6 +163,24 @@ class MyPageFragment : Fragment() {
                 pickImage()
             }
         }
+    }
+
+    private fun setBtnTermsDetailListener(context: Context) {
+        binding.btnServiceTermsDetail.setOnClickListener {
+            sendUserToLinkPage(context.getString(R.string.site_service_terms))
+        }
+        binding.btnPrivacyPolicyDetail.setOnClickListener {
+            sendUserToLinkPage(context.getString(R.string.site_privacy_policy))
+        }
+        binding.btnCommunityRulesDetail.setOnClickListener {
+            sendUserToLinkPage(context.getString(R.string.site_community_rules))
+        }
+    }
+
+    private fun sendUserToLinkPage(link: String) {
+        val intent = Intent(Intent.ACTION_VIEW, Uri.parse(link))
+
+        startActivity(intent)
     }
 
     private fun setBtnSendFeedbackListener() {
