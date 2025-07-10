@@ -52,7 +52,7 @@
         android:layout_marginTop="@dimen/margin_padding_xx_large"
         android:spinnerMode="dropdown"
         android:background="@drawable/bg_spinner"
-        android:paddingHorizontal="@dimen/margin_padding_large"
+        android:paddingHorizontal="@dimen/margin_padding_default"
         android:popupBackground="@drawable/bg_card"
         android:popupElevation="0dp"
         app:layout_constraintBottom_toTopOf="@id/llNegativePositive"
@@ -65,37 +65,36 @@
         android:weightSum="1"
         android:layout_marginVertical="@dimen/margin_padding_large"
         android:orientation="horizontal"
+        android:gravity="end"
         app:layout_constraintTop_toBottomOf="@id/spCircleRole"
         app:layout_constraintBottom_toBottomOf="parent">
 
         <androidx.appcompat.widget.AppCompatTextView
             android:id="@+id/btnCancel"
-            android:layout_width="0dp"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginEnd="@dimen/margin_padding_large"
-            android:paddingVertical="@dimen/margin_padding_default"
-            android:layout_weight="0.5"
+            android:layout_marginEnd="@dimen/margin_padding_small"
+            android:paddingVertical="10dp"
+            android:paddingHorizontal="@dimen/margin_padding_large"
             android:gravity="center"
             android:lineSpacingExtra="2sp"
             android:textSize="@dimen/text_size_default"
             android:textColor="@color/grey_6"
             android:text="@string/btn_cancel"
-            android:background="@drawable/bg_rounded_rectangle"
-            android:backgroundTint="@color/grey_3"/>
+            android:background="?attr/selectableItemBackground"/>
 
         <androidx.appcompat.widget.AppCompatTextView
             android:id="@+id/btnEditCircleMemberRole"
-            android:layout_width="0dp"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:paddingVertical="@dimen/margin_padding_default"
-            android:layout_weight="0.5"
+            android:paddingVertical="10dp"
+            android:paddingHorizontal="@dimen/margin_padding_large"
             android:gravity="center"
             android:lineSpacingExtra="2sp"
             android:textSize="@dimen/text_size_default"
-            android:textColor="@color/white"
+            android:textColor="@color/purple_5"
             android:text="@string/btn_edit_circle_member_role"
-            android:background="@drawable/bg_rounded_rectangle"
-            android:backgroundTint="@color/purple_5"/>
+            android:background="?attr/selectableItemBackground" />
 
     </androidx.appcompat.widget.LinearLayoutCompat>
 

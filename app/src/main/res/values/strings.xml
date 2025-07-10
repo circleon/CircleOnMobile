@@ -134,7 +134,7 @@
     <string name="message_no_circle_member">등록된 멤버가 없어요</string>
     <string name="message_no_member_join_requested">가입 대기중인 인원이 없어요..</string>
     <string name="message_no_member_leave_requested">탈퇴 대기중인 인원이 없어요!</string>
-    <string name="message_request_ban_member">%s님을 추방할까요?</string>
+    <string name="message_request_ban_member">%s 님을 추방할까요?</string>
     <string name="message_request_official_status">교내 정식 동아리 인증을 받으시겠어요?(3~5일 소요)</string>
     <string name="message_delete_circle">동아리를 삭제하시겠어요?</string>
     <string name="menu_circle_member_settings_edit_role">역할 수정하기</string>
