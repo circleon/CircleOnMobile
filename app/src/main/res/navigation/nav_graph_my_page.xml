@@ -31,5 +31,14 @@
         android:id="@+id/circleDetailPostDetailFragment2"
         android:name="com.developeek.circleon.view.screen.home.CircleDetailPostDetailFragment"
         android:label="fragment_circle_detail_post_detail"
-        tools:layout="@layout/fragment_circle_detail_post_detail" />
+        tools:layout="@layout/fragment_circle_detail_post_detail" >
+        <action
+            android:id="@+id/action_circleDetailPostDetailFragment2_to_uploadPostFragment2"
+            app:destination="@id/uploadPostFragment2" />
+    </fragment>
+    <fragment
+        android:id="@+id/uploadPostFragment2"
+        android:name="com.developeek.circleon.view.screen.home.UploadPostFragment"
+        android:label="fragment_upload_post"
+        tools:layout="@layout/fragment_upload_post" />
 </navigation>

@@ -3,6 +3,7 @@ package com.developeek.circleon.view.screen
 import android.content.Context
 import android.os.Bundle
 import android.view.KeyEvent
+import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
@@ -30,6 +31,13 @@ class HomeActivity : AppCompatActivity() {
         binding = ActivityHomeBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
+        binding.splash.animate()
+            .alpha(1f)
+            .setDuration(1000L)
+            .withEndAction {
+                binding.splash.visibility = View.GONE
+            }
+            .start()
         initView(this)
     }
 
@@ -64,7 +72,9 @@ class HomeActivity : AppCompatActivity() {
             destination.id == R.id.manageCircleFragment ||
             destination.id == R.id.manageCircleMemberFragment ||
             destination.id == R.id.uploadPostFragment ||
-            destination.id == R.id.circleDetailPostDetailFragment
+            destination.id == R.id.uploadPostFragment2 ||
+            destination.id == R.id.circleDetailPostDetailFragment ||
+            destination.id == R.id.circleDetailPostDetailFragment2
 
     private fun setItemReselectionListener() {
         binding.btmNav.setOnItemReselectedListener {

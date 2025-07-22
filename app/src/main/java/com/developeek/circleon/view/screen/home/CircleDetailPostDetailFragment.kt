@@ -237,7 +237,17 @@ class CircleDetailPostDetailFragment : Fragment() {
     ) = PopupMenu.OnMenuItemClickListener {
         when (it.itemId) {
             R.id.edit_post -> {
-                sendUserToEditPostScreen(circleId, item)
+                findNavController().currentDestination?.let { currentDestination ->
+                    if (currentDestination.id == R.id.circleDetailPostDetailFragment) {
+                        sendUserToEditPostScreen(circleId, item)
+                    } else {
+                        sendUserToEditPostScreen(
+                            circleId,
+                            item,
+                            R.id.action_circleDetailPostDetailFragment2_to_uploadPostFragment2,
+                        )
+                    }
+                }
             }
 
             R.id.delete_post -> {
@@ -290,6 +300,7 @@ class CircleDetailPostDetailFragment : Fragment() {
     private fun sendUserToEditPostScreen(
         circleId: Int,
         item: PostModel,
+        actionId: Int = R.id.action_circleDetailPostDetailFragment_to_uploadPostFragment,
     ) {
         val bundle = Bundle()
 
@@ -297,7 +308,7 @@ class CircleDetailPostDetailFragment : Fragment() {
         bundle.putSerializable(Const.TAG_POST_TYPE, item.type)
         bundle.putSerializable(Const.TAG_CIRCLE_POST, item)
         bundle.putBoolean(Const.FLAG_EDIT_SCREEN, true) // 수정 기능 전용 활성화
-        findNavController().navigate(R.id.action_circleDetailPostDetailFragment_to_uploadPostFragment, bundle)
+        findNavController().navigate(actionId, bundle)
     }
 
     private fun initCommentOverflowMenuAndShow(
