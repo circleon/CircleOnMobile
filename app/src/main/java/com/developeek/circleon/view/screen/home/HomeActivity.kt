@@ -1,4 +1,4 @@
-package com.developeek.circleon.view.screen
+package com.developeek.circleon.view.screen.home
 
 import android.content.Context
 import android.os.Bundle
