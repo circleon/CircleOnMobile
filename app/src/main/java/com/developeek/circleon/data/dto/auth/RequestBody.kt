@@ -8,6 +8,9 @@ data class SignUpRequestBody(
     val email: String,
     @SerializedName("username") val name: String,
     val password: String,
+    val serviceTerms: Boolean,
+    val privacyPolicies: Boolean,
+    val communityRules: Boolean,
 )
 
 data class NewPasswordRequestBody(

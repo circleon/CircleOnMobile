@@ -69,6 +69,9 @@ class SignUpViewModelImpl
                                 userName = signUpManager.name,
                                 email = signUpManager.email,
                                 password = signUpManager.password,
+                                serviceTerms = signUpManager.hasAgreedServiceTerms,
+                                privacyPolicies = signUpManager.hasAgreedPrivacyPolicies,
+                                communityRules = signUpManager.hasAgreedCommunityRules,
                             )
                     ) {
                         is Success -> whenSignUpSuccess()

@@ -113,7 +113,7 @@ class SignUpTermsFragment : Fragment() {
         binding.checkAgreeServiceTerms.imageTintList =
             getSingleColorStateListByTermState(viewModel.signUpManager.hasAgreedServiceTerms, context)
         binding.checkAgreePrivacyPolicy.imageTintList =
-            getSingleColorStateListByTermState(viewModel.signUpManager.hasAgreedPrivacyPolicy, context)
+            getSingleColorStateListByTermState(viewModel.signUpManager.hasAgreedPrivacyPolicies, context)
         binding.checkAgreeCommunityRules.imageTintList =
             getSingleColorStateListByTermState(viewModel.signUpManager.hasAgreedCommunityRules, context)
     }

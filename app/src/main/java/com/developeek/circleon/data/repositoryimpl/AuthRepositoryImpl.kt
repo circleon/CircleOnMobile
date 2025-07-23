@@ -45,9 +45,21 @@ class AuthRepositoryImpl(
         email: UserEmail,
         userName: UserName,
         password: Password,
+        serviceTerms: Boolean,
+        privacyPolicies: Boolean,
+        communityRules: Boolean,
     ): Result<Unit> {
         return try {
-            service.signUp(SignUpRequestBody(email.get(), userName.get(), password.get()))
+            service.signUp(
+                SignUpRequestBody(
+                    email.get(),
+                    userName.get(),
+                    password.get(),
+                    serviceTerms,
+                    privacyPolicies,
+                    communityRules,
+                ),
+            )
             Result.success(Unit)
         } catch (e: Exception) {
             Result.error(e)

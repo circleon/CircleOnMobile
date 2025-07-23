@@ -274,10 +274,12 @@ class HomeFragment : Fragment() {
 
     private fun setBtnNotificationListener(context: Context) {
         binding.btnNotification.setOnClickListener {
-            SingleMessageToast(
-                context,
-                context.getString(R.string.message_not_released),
-            ).show()
+            if (SingleMessageToast.previousFinished()) {
+                SingleMessageToast(
+                    context,
+                    context.getString(R.string.message_not_released),
+                ).show()
+            }
         }
     }
 
