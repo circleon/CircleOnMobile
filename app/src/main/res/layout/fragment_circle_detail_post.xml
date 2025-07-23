@@ -7,11 +7,18 @@
     android:background="@color/grey_1"
     tools:context=".view.screen.home.CircleDetailPostFragment">
 
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/rvCirclePost"
+    <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+        android:id="@+id/swipeCirclePost"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:visibility="gone"/>
+        android:visibility="gone">
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/rvCirclePost"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+
+    </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
 
     <com.facebook.shimmer.ShimmerFrameLayout
         android:id="@+id/shimmerPost"

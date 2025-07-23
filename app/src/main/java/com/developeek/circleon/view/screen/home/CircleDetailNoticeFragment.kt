@@ -308,7 +308,7 @@ class CircleDetailNoticeFragment : Fragment() {
             }
 
         binding.rvCircleNotice.addOnScrollListener(scrollListener)
-        binding.sfCircleNotice.setOnRefreshListener {
+        binding.swipeCircleNotice.setOnRefreshListener {
             viewModel.showLoadingAndRefresh()
         }
     }
@@ -390,13 +390,13 @@ class CircleDetailNoticeFragment : Fragment() {
 
     private fun showSuccessView(screenFlow: CircleDetailPostScreen.SuccessView) {
         binding.shimmerNotice.stopShimmer()
-        binding.sfCircleNotice.isRefreshing = false
+        binding.swipeCircleNotice.isRefreshing = false
         if (screenFlow.posts.isEmpty()) {
             switchView(binding.txtNoNotice)
             return
         }
 
-        switchView(binding.sfCircleNotice)
+        switchView(binding.swipeCircleNotice)
         loadCircleNoticesAndDoAfter(screenFlow.posts) {
             if (screenFlow.hasCollected) {
                 viewModel.currentScrollState?.let {
@@ -426,12 +426,12 @@ class CircleDetailNoticeFragment : Fragment() {
 
     private fun showErrorView() {
         binding.shimmerNotice.stopShimmer()
-        binding.sfCircleNotice.isRefreshing = false
+        binding.swipeCircleNotice.isRefreshing = false
         switchView(binding.llServiceError)
     }
 
     private fun switchView(view: View) {
-        binding.sfCircleNotice.isVisible = view == binding.sfCircleNotice
+        binding.swipeCircleNotice.isVisible = view == binding.swipeCircleNotice
         binding.shimmerNotice.isVisible = view == binding.shimmerNotice
         binding.txtNoNotice.isVisible = view == binding.txtNoNotice
         binding.llServiceError.isVisible = view == binding.llServiceError
