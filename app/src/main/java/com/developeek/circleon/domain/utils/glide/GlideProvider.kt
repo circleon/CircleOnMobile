@@ -7,7 +7,6 @@ import com.bumptech.glide.Glide
 import com.bumptech.glide.load.model.GlideUrl
 import com.bumptech.glide.load.model.LazyHeaders
 import com.developeek.circleon.data.source.manager.TokenManager
-import java.io.File
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -49,19 +48,7 @@ class GlideProvider
                 .into(view)
         }
 
-        fun loadImage(
-            file: File?,
-            context: Context,
-            view: ImageView,
-        ) {
-            Glide.with(context)
-                .load(file)
-                .into(view)
-        }
-
         companion object {
             private const val AUTHORIZATION = "Authorization"
-            private const val CONTENT_TYPE = "Content-Type"
-            private const val EXTENSION_SYMBOL = '.'
         }
     }

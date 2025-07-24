@@ -38,9 +38,12 @@ object RemoteSourceModule {
     @Provides
     @Singleton
     fun provideAuthClient(errorInterceptor: ErrorInterceptor): Builder {
+        val loggingInterceptorLevel =
+            if (BuildConfig.DEBUG) HttpLoggingInterceptor.Level.BODY else HttpLoggingInterceptor.Level.NONE
+
         return OkHttpClient().newBuilder()
             .addInterceptor(errorInterceptor)
-            .addInterceptor(HttpLoggingInterceptor().setLevel(HttpLoggingInterceptor.Level.BODY))
+            .addInterceptor(HttpLoggingInterceptor().setLevel(loggingInterceptorLevel))
     }
 
     @ServiceClient
@@ -51,10 +54,13 @@ object RemoteSourceModule {
         headerInterceptor: HeaderInterceptor,
         tokenAuthenticator: TokenAuthenticator,
     ): Builder {
+        val loggingInterceptorLevel =
+            if (BuildConfig.DEBUG) HttpLoggingInterceptor.Level.BODY else HttpLoggingInterceptor.Level.NONE
+
         return OkHttpClient().newBuilder()
             .addInterceptor(headerInterceptor)
             .addInterceptor(errorInterceptor)
-            .addInterceptor(HttpLoggingInterceptor().setLevel(HttpLoggingInterceptor.Level.BODY))
+            .addInterceptor(HttpLoggingInterceptor().setLevel(loggingInterceptorLevel))
             .authenticator(tokenAuthenticator)
     }
 
