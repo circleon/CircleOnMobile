@@ -2,7 +2,7 @@
 <layer-list xmlns:android="http://schemas.android.com/apk/res/android">
     <item
         android:drawable="@drawable/logo_splash"
-        android:width="48dp"
-        android:height="48dp"
+        android:width="0dp"
+        android:height="0dp"
         android:gravity="center" />
 </layer-list>
