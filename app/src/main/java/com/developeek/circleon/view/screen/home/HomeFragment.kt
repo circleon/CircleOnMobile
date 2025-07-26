@@ -75,7 +75,7 @@ class HomeFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         initView(requireContext())
-        initListener()
+        initListener(requireContext())
         lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
                 launch {
@@ -253,9 +253,10 @@ class HomeFragment : Fragment() {
         }
     }
 
-    private fun initListener() {
+    private fun initListener(context: Context) {
         setBtnSearchCircleListener()
         setBtnRetryListener()
+        setBtnNotificationListener(context)
         setRvCircleListener()
     }
 
@@ -268,6 +269,17 @@ class HomeFragment : Fragment() {
     private fun setBtnRetryListener() {
         binding.btnRetry.setOnClickListener {
             viewModel.refresh()
+        }
+    }
+
+    private fun setBtnNotificationListener(context: Context) {
+        binding.btnNotification.setOnClickListener {
+            if (SingleMessageToast.previousFinished()) {
+                SingleMessageToast(
+                    context,
+                    context.getString(R.string.message_not_released),
+                ).show()
+            }
         }
     }
 

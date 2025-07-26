@@ -242,8 +242,8 @@ class ManageCircleViewModelImpl
             }
 
         companion object {
-            private const val MESSAGE_SUCCESS_REQUEST_OFFICIAL_STATUS = "동아리 인증 요청이 전송됐어요"
-            private const val MESSAGE_SUCCESS_DELETE_CIRCLE = "동아리 삭제가 완료됐어요"
+            private const val MESSAGE_SUCCESS_REQUEST_OFFICIAL_STATUS = "동아리 인증 요청이 전송되었어요"
+            private const val MESSAGE_SUCCESS_DELETE_CIRCLE = "동아리 삭제가 완료되었어요"
             private const val SIZE_BY_PAGE = 200 // 멤버 데이터 일괄 호출
             private const val DEFAULT_PAGE = 0
         }

@@ -7,8 +7,8 @@
     android:background="@color/grey_1"
     tools:context=".view.screen.home.CircleDetailNoticeFragment">
 
-    <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
-        android:id="@+id/sfCircleNotice"
+     <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+        android:id="@+id/swipeCircleNotice"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:visibility="gone">

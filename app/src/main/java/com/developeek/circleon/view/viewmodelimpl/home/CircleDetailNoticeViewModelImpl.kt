@@ -51,6 +51,7 @@ class CircleDetailNoticeViewModelImpl
             get() = _isLastPage
         private var _isLastPage = false
         private var currentPage = DEFAULT_PAGE
+        private val postSortBy = compareByDescending<PostModel> { it.isPinned }.thenByDescending { it.createdAt }
 
         private lateinit var posts: Models<PostModel>
         override val currentScrollState: Parcelable?
@@ -60,7 +61,8 @@ class CircleDetailNoticeViewModelImpl
         private var fetchNoticesJob: Job? = null
         private var scrollOverNoticeJob: Job? = null
         private var userRequestJob: Job? = null
-        private val dispatcher = Dispatchers.IO
+        private val ioDispatcher = Dispatchers.IO
+        private val defaultDispatcher = Dispatchers.Default
 
         init {
             fetchNotices(currentPage, SIZE_BY_PAGE)
@@ -100,7 +102,7 @@ class CircleDetailNoticeViewModelImpl
             circleId: Int,
             page: Int,
             size: Int,
-        ) = withContext(dispatcher) {
+        ) = withContext(ioDispatcher) {
             repository.getCircleNotices(circleId, page, size)
         }
 
@@ -155,18 +157,7 @@ class CircleDetailNoticeViewModelImpl
             }
         }
 
-        override fun pinAndFetch(postId: Int) {
-            togglePinAndFetch(postId, true)
-        }
-
-        override fun removePinAndFetch(postId: Int) {
-            togglePinAndFetch(postId, false)
-        }
-
-        private fun togglePinAndFetch(
-            postId: Int,
-            isPinned: Boolean,
-        ) {
+        override fun togglePin(post: PostModel) {
             userRequestJob?.let {
                 if (!it.isCompleted) return
             }
@@ -175,11 +166,9 @@ class CircleDetailNoticeViewModelImpl
                 viewModelScope.launch {
                     _event.emit(Event.ShowProcessing)
 
-                    when (val result = putPostPin(circleDetail.circleId, postId, isPinned)) {
-                        is Success ->
-                            showToastAndRefresh(
-                                if (isPinned) MESSAGE_SUCCESS_REQUEST_PIN else MESSAGE_SUCCESS_REQUEST_REMOVE_PIN,
-                            )
+                    val toggled = post.togglePinAndGet()
+                    when (val result = putPostPin(circleDetail.circleId, post.id, toggled.isPinned)) {
+                        is Success -> whenTogglePinSuccess(post, toggled)
                         is Error -> whenUserRequestFail(result)
                     }
                 }
@@ -189,8 +178,31 @@ class CircleDetailNoticeViewModelImpl
             circleId: Int,
             postId: Int,
             isPinned: Boolean,
-        ) = withContext(dispatcher) {
+        ) = withContext(ioDispatcher) {
             repository.putPostPin(circleId, postId, isPinned)
+        }
+
+        private suspend fun whenTogglePinSuccess(
+            post: PostModel,
+            toggled: PostModel,
+        ) {
+            val message =
+                if (toggled.isPinned) {
+                    MESSAGE_SUCCESS_REQUEST_PIN
+                } else {
+                    MESSAGE_SUCCESS_REQUEST_REMOVE_PIN
+                }
+
+            replacePost(post, toggled)
+            _event.emit(Event.ShowToast(message))
+            _screenFlow.emit(CircleDetailPostScreen.SuccessView(posts))
+        }
+
+        private suspend fun replacePost(
+            oldPost: PostModel,
+            newPost: PostModel,
+        ) = withContext(defaultDispatcher) {
+            posts = posts.replaceAndGet(oldPost, newPost).sortedWith(postSortBy)
         }
 
         override fun deleteAndFetch(postId: Int) {
@@ -215,7 +227,7 @@ class CircleDetailNoticeViewModelImpl
         private suspend fun deleteCirclePost(
             circleId: Int,
             postId: Int,
-        ) = withContext(dispatcher) {
+        ) = withContext(ioDispatcher) {
             repository.deleteCirclePost(circleId, postId)
         }
 
@@ -243,7 +255,7 @@ class CircleDetailNoticeViewModelImpl
             circleId: Int,
             postId: Int,
             message: String,
-        ) = withContext(dispatcher) {
+        ) = withContext(ioDispatcher) {
             repository.postReportCirclePost(circleId, postId, message)
         }
 
@@ -278,10 +290,10 @@ class CircleDetailNoticeViewModelImpl
         }
 
         companion object {
-            private const val MESSAGE_SUCCESS_REQUEST_PIN = "공지사항이 고정됐어요"
-            private const val MESSAGE_SUCCESS_REQUEST_REMOVE_PIN = "공지사항이 고정이 해제됐어요"
-            private const val MESSAGE_SUCCESS_REQUEST_REMOVE_NOTICE = "공지사항이 삭제됐어요"
-            private const val MESSAGE_SUCCESS_REQUEST_REPORT = "신고 요청이 완료됐어요"
+            private const val MESSAGE_SUCCESS_REQUEST_PIN = "공지사항이 고정되었어요"
+            private const val MESSAGE_SUCCESS_REQUEST_REMOVE_PIN = "공지사항이 고정이 해제되었어요"
+            private const val MESSAGE_SUCCESS_REQUEST_REMOVE_NOTICE = "공지사항이 삭제되었어요"
+            private const val MESSAGE_SUCCESS_REQUEST_REPORT = "신고 요청이 완료되었어요"
             private const val SIZE_BY_PAGE = 20
             private const val DEFAULT_PAGE = 0
         }

@@ -65,13 +65,14 @@
             app:layout_constraintBottom_toBottomOf="parent"/>
 
         <androidx.appcompat.widget.AppCompatTextView
-            android:id="@+id/btnShowServiceTermsDetail"
+            android:id="@+id/btnServiceTermsDetail"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="@dimen/margin_padding_x_small"
             android:textAppearance="@style/small_text"
             android:textColor="@color/grey_5"
             android:text="@string/btn_show_detail"
+            android:background="?attr/selectableItemBackground"
             app:layout_constraintStart_toEndOf="@id/contentTitleServiceTerms"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintBottom_toBottomOf="parent"/>
@@ -106,13 +107,14 @@
             app:layout_constraintBottom_toBottomOf="parent"/>
 
         <androidx.appcompat.widget.AppCompatTextView
-            android:id="@+id/btnShowPrivacyPolicyDetail"
+            android:id="@+id/btnPrivacyPolicyDetail"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="@dimen/margin_padding_x_small"
             android:textAppearance="@style/small_text"
             android:textColor="@color/grey_5"
             android:text="@string/btn_show_detail"
+            android:background="?attr/selectableItemBackground"
             app:layout_constraintStart_toEndOf="@id/contentTitlePrivacyPolicy"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintBottom_toBottomOf="parent"/>
@@ -147,13 +149,14 @@
             app:layout_constraintBottom_toBottomOf="parent"/>
 
         <androidx.appcompat.widget.AppCompatTextView
-            android:id="@+id/btnShowCommunityRulesDetail"
+            android:id="@+id/btnCommunityRulesDetail"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="@dimen/margin_padding_x_small"
             android:textAppearance="@style/small_text"
             android:textColor="@color/grey_5"
             android:text="@string/btn_show_detail"
+            android:background="?attr/selectableItemBackground"
             app:layout_constraintStart_toEndOf="@id/contentTitleCommunityRules"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintBottom_toBottomOf="parent"/>

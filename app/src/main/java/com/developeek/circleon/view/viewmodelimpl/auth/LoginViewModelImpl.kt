@@ -58,7 +58,7 @@ class LoginViewModelImpl
         }
 
         private suspend fun whenLoginSuccess() {
-            _event.emit(Event.ShowToast(MESSAGE_LOGIN_SUCCESS))
+            _event.emit(Event.EndProcessing)
             _loginScreenEvent.emit(LoginScreenEvent.SendToHomeScreen)
         }
 
@@ -71,10 +71,6 @@ class LoginViewModelImpl
             } else {
                 true
             }
-        }
-
-        companion object {
-            private const val MESSAGE_LOGIN_SUCCESS = "환영합니다"
         }
     }
 

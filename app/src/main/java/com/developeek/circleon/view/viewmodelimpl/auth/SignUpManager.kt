@@ -32,14 +32,14 @@ class SignUpManager {
     val hasAgreedServiceTerms: Boolean
         get() = _hasAgreedServiceTerms
     private var _hasAgreedServiceTerms = false
-    val hasAgreedPrivacyPolicy: Boolean
-        get() = _hasAgreedPrivacyPolicy
-    private var _hasAgreedPrivacyPolicy = false
+    val hasAgreedPrivacyPolicies: Boolean
+        get() = _hasAgreedPrivacyPolicies
+    private var _hasAgreedPrivacyPolicies = false
     val hasAgreedCommunityRules: Boolean
         get() = _hasAgreedCommunityRules
     private var _hasAgreedCommunityRules = false
     val hasAgreedAllTerms: Boolean
-        get() = _hasAgreedServiceTerms && _hasAgreedPrivacyPolicy && _hasAgreedCommunityRules
+        get() = _hasAgreedServiceTerms && _hasAgreedPrivacyPolicies && _hasAgreedCommunityRules
 
     fun validateAndSetName(name: String) {
         when (val result = Validator.checkName(name)) {
@@ -106,7 +106,7 @@ class SignUpManager {
     fun toggleAllTermsAgreement() {
         hasAgreedAllTerms.let {
             _hasAgreedServiceTerms = !it
-            _hasAgreedPrivacyPolicy = !it
+            _hasAgreedPrivacyPolicies = !it
             _hasAgreedCommunityRules = !it
         }
     }
@@ -116,7 +116,7 @@ class SignUpManager {
     }
 
     fun togglePrivacyPolicyAgreement() {
-        _hasAgreedPrivacyPolicy = !_hasAgreedPrivacyPolicy
+        _hasAgreedPrivacyPolicies = !_hasAgreedPrivacyPolicies
     }
 
     fun toggleCommunityRulesAgreement() {
@@ -129,7 +129,7 @@ class SignUpManager {
             SignUpStep.EMAIL -> emailCondition
             SignUpStep.EMAIL_AUTHENTICATION -> emailAuthenticated
             SignUpStep.PASSWORD -> passwordCondition && passwordCheckCondition
-            SignUpStep.TERMS -> _hasAgreedServiceTerms && _hasAgreedPrivacyPolicy && _hasAgreedCommunityRules
+            SignUpStep.TERMS -> _hasAgreedServiceTerms && _hasAgreedPrivacyPolicies && _hasAgreedCommunityRules
         }
 
     fun getValidationMessageBySignUpStep(step: SignUpStep) =

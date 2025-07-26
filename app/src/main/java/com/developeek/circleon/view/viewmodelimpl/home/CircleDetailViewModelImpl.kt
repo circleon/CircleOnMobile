@@ -33,7 +33,7 @@ class CircleDetailViewModelImpl
     @AssistedInject
     constructor(
         @Assisted private val circleId: Int,
-        private val CircleRepository: CircleRepository,
+        private val circleRepository: CircleRepository,
         private val userRepository: UserRepository,
     ) : CircleDetailViewModel, ViewModel() {
         @AssistedFactory
@@ -84,11 +84,11 @@ class CircleDetailViewModelImpl
                     withContext(dispatcher) {
                         val circleDetail =
                             async {
-                                CircleRepository.getCircleDetail(circleId)
+                                circleRepository.getCircleDetail(circleId)
                             }
                         val circleMembers =
                             async {
-                                CircleRepository.getCircleMembers(circleId, DEFAULT_PAGE, MEMBER_SIZE_BY_PAGE)
+                                circleRepository.getCircleMembers(circleId, DEFAULT_PAGE, MEMBER_SIZE_BY_PAGE)
                             }
 
                         circleDetailResult = circleDetail.await()
@@ -110,7 +110,7 @@ class CircleDetailViewModelImpl
             circleDetailResult: Success<CircleDetailModel>,
             circleMembersResult: Success<Models<MemberModel>>,
         ) {
-            circleDetail = CircleDetailModel(circleDetailResult.data, circleMembersResult.data)
+            circleDetail = circleDetailResult.data.copyWith(circleMembersResult.data)
             _screenFlow.emit(CircleDetailScreen.SuccessView(circleDetail))
         }
 
@@ -201,7 +201,7 @@ class CircleDetailViewModelImpl
             circleId: Int,
             message: String,
         ) = withContext(dispatcher) {
-            CircleRepository.postReportCircle(circleId, message)
+            circleRepository.postReportCircle(circleId, message)
         }
 
         private suspend fun checkMessageFormat(message: String): Boolean {
@@ -248,9 +248,9 @@ class CircleDetailViewModelImpl
         }
 
         companion object {
-            private const val MESSAGE_SUCCESS_REQUEST_JOIN = "가입 신청이 완료됐어요"
-            private const val MESSAGE_SUCCESS_REQUEST_LEAVE = "탈퇴 신청이 완료됐어요"
-            private const val MESSAGE_SUCCESS_REQUEST_REPORT = "신고 요청이 완료됐어요"
+            private const val MESSAGE_SUCCESS_REQUEST_JOIN = "가입 신청이 완료되었어요"
+            private const val MESSAGE_SUCCESS_REQUEST_LEAVE = "탈퇴 신청이 완료되었어요"
+            private const val MESSAGE_SUCCESS_REQUEST_REPORT = "신고 요청이 완료되었어요"
             private const val MEMBER_SIZE_BY_PAGE = 200
             private const val DEFAULT_PAGE = 0
         }

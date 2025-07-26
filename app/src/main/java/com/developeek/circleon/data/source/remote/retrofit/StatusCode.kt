@@ -19,6 +19,7 @@ enum class StatusCode(
     FAIL_ACCESS_TOKEN_VALIDATION(401, "002", "access 토큰 검증 실패"),
     FAIL_REFRESH_TOKEN_VALIDATION(401, "003", "refresh 토큰 검증 실패"),
     NO_AUTHORIZATION(403, "004", "해당 권한이 없습니다"),
+    FAIL_SIGN_OUT_BY_PRESIDENT(403, "033", "회장 권한 위임 후 탈퇴할 수 있어요"),
     FAIL_LOGIN_NO_MATCH_USER_EMAIL(404, "023", "아이디를 확인해주세요"),
     FAIL_LOGIN_NO_MATCH_USER_PASSWORD(404, "024", "비밀번호를 확인해주세요"),
     NO_USER_DATA(404, "032", "존재하지 않는 사용자 정보입니다"),

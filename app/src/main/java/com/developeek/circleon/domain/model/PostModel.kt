@@ -21,6 +21,8 @@ data class PostModel(
         return this == target
     }
 
+    fun togglePinAndGet() = copy(isPinned = !isPinned)
+
     companion object {
         fun emptyInstance() =
             PostModel(

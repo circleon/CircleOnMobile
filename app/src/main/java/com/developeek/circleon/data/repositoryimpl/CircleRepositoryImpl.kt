@@ -445,7 +445,7 @@ class CircleRepositoryImpl(private val service: CircleService) : CircleRepositor
         role: Role,
     ): Result<Unit> {
         return try {
-            service.putCircleMemberRole(circleId, memberId, RequestBodyEditMemberRole(role.codeName()))
+            service.putCircleMemberRole(circleId, memberId, RequestBodyEditMemberRole(role.codeName))
             Result.success(Unit)
         } catch (e: Exception) {
             Result.error(e)

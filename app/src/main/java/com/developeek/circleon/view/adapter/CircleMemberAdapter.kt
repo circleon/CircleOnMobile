@@ -38,7 +38,7 @@ class CircleMemberAdapter(
 
         private fun load(member: MemberModel) {
             binding.txtMemberName.text = member.name
-            binding.txtMemberRole.text = member.role.roleName()
+            binding.txtMemberRole.text = member.role.roleName
             binding.icRole.isVisible = member.role.isExecutive()
             if (member.role.isPresident()) {
                 binding.icRole.setImageResource(R.drawable.ic_president)

@@ -325,11 +325,11 @@ class ManageCircleMemberViewModelImpl
         }
 
         companion object {
-            private const val MESSAGE_SUCCESS_EDIT_MEMBER_ROLE = "역할 수정이 완료됐어요"
-            private const val MESSAGE_SUCCESS_BAN_MEMBER = "멤버 추방이 완료됐어요"
-            private const val MESSAGE_SUCCESS_ACCEPT_JOIN_REQUEST = "가입 신청이 승인됐어요"
-            private const val MESSAGE_SUCCESS_REJECT_JOIN_REQUEST = "가입 신청이 거절됐어요"
-            private const val MESSAGE_SUCCESS_ACCEPT_LEAVE_REQUEST = "탈퇴 신청이 승인됐어요"
+            private const val MESSAGE_SUCCESS_EDIT_MEMBER_ROLE = "역할 수정이 완료되었어요"
+            private const val MESSAGE_SUCCESS_BAN_MEMBER = "멤버 추방이 완료되었어요"
+            private const val MESSAGE_SUCCESS_ACCEPT_JOIN_REQUEST = "가입 신청이 승인되었어요"
+            private const val MESSAGE_SUCCESS_REJECT_JOIN_REQUEST = "가입 신청이 거절되었어요"
+            private const val MESSAGE_SUCCESS_ACCEPT_LEAVE_REQUEST = "탈퇴 신청이 승인되었어요"
             private const val SIZE_BY_PAGE = 200 // 멤버 데이터 일괄 호출
             private const val DEFAULT_PAGE = 0
         }

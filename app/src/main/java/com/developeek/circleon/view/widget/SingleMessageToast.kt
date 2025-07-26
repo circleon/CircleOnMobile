@@ -1,7 +1,10 @@
 package com.developeek.circleon.view.widget
 
 import android.content.Context
+import android.view.LayoutInflater
+import android.widget.TextView
 import android.widget.Toast
+import com.developeek.circleon.R
 import com.developeek.circleon.domain.utils.Const
 
 class SingleMessageToast(
@@ -9,7 +12,11 @@ class SingleMessageToast(
     private val message: CharSequence,
 ) : Toast(context) {
     init {
-        super.setText(message)
+        val layoutInflater = LayoutInflater.from(context)
+        val view = layoutInflater.inflate(R.layout.toast_single_message, null)
+
+        view.findViewById<TextView>(R.id.txtMessage).text = message
+        super.setView(view)
     }
 
     override fun show() {

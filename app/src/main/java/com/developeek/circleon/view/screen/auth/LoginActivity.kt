@@ -15,7 +15,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import com.developeek.circleon.databinding.ActivityLoginBinding
 import com.developeek.circleon.view.Event
-import com.developeek.circleon.view.screen.HomeActivity
+import com.developeek.circleon.view.screen.home.HomeActivity
 import com.developeek.circleon.view.viewmodel.auth.LoginViewModel
 import com.developeek.circleon.view.viewmodelimpl.auth.LoginScreenEvent
 import com.developeek.circleon.view.viewmodelimpl.auth.LoginViewModelImpl

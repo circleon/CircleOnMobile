@@ -24,6 +24,7 @@ navigationUiKtx = "2.8.4"
 flexbox = "3.0.0"
 shimmer = "0.5.0"
 swiperefresh = "1.1.0"
+splashscreen = "1.0.1"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -49,6 +50,7 @@ androidx-navigation-ui-ktx = { group = "androidx.navigation", name = "navigation
 google-android-flexbox = { group = "com.google.android.flexbox", name = "flexbox", version.ref = "flexbox" }
 facebook-shimmer = { group = "com.facebook.shimmer", name = "shimmer", version.ref = "shimmer" }
 androidx-swiperefresh = { group = "androidx.swiperefreshlayout", name = "swiperefreshlayout", version.ref = "swiperefresh"}
+androidx-splashscreen = { group= "androidx.core", name = "core-splashscreen", version.ref = "splashscreen" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

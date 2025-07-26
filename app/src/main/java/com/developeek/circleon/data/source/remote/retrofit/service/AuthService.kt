@@ -30,17 +30,17 @@ interface AuthService {
         @Body data: EmailCodeRequestBody,
     )
 
-    @POST("auth/verification-code")
-    suspend fun authenticateEmail(
-        @Body data: EmailAuthenticationRequestBody,
-    )
-
     @POST("auth/password/verification")
     suspend fun requestEmailAuthenticationCodeForNewPassword(
         @Body data: EmailCodeRequestBody,
     ): PolicyId
 
     // PUT
+    @PUT("auth/verification-code")
+    suspend fun authenticateEmail(
+        @Body data: EmailAuthenticationRequestBody,
+    )
+
     @PUT("auth/password")
     suspend fun changePassword(
         @Body data: NewPasswordRequestBody,

@@ -17,6 +17,9 @@ interface AuthRepository {
         email: UserEmail,
         userName: UserName,
         password: Password,
+        serviceTerms: Boolean,
+        privacyPolicies: Boolean,
+        communityRules: Boolean,
     ): Result<Unit>
 
     suspend fun changePassword(

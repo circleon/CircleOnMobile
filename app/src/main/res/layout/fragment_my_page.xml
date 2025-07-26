@@ -213,11 +213,10 @@
                     </androidx.constraintlayout.widget.ConstraintLayout>
 
                     <androidx.constraintlayout.widget.ConstraintLayout
-                        android:id="@+id/btnServiceTerm"
+                        android:id="@+id/btnServiceTermsDetail"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:background="?attr/selectableItemBackground"
-                        android:clickable="true"
                         android:paddingVertical="@dimen/margin_padding_large"
                         android:paddingStart="@dimen/margin_padding_xx_large"
                         android:paddingEnd="@dimen/margin_padding_large">
@@ -243,11 +242,10 @@
                     </androidx.constraintlayout.widget.ConstraintLayout>
 
                     <androidx.constraintlayout.widget.ConstraintLayout
-                        android:id="@+id/btnPrivacyPolicy"
+                        android:id="@+id/btnPrivacyPolicyDetail"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:background="?attr/selectableItemBackground"
-                        android:clickable="true"
                         android:paddingVertical="@dimen/margin_padding_large"
                         android:paddingStart="@dimen/margin_padding_xx_large"
                         android:paddingEnd="@dimen/margin_padding_large">
@@ -273,10 +271,40 @@
                     </androidx.constraintlayout.widget.ConstraintLayout>
 
                     <androidx.constraintlayout.widget.ConstraintLayout
+                        android:id="@+id/btnCommunityRulesDetail"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:background="?attr/selectableItemBackground"
+                        android:paddingVertical="@dimen/margin_padding_large"
+                        android:paddingStart="@dimen/margin_padding_xx_large"
+                        android:paddingEnd="@dimen/margin_padding_large">
+
+                        <androidx.appcompat.widget.AppCompatTextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/text_community_rules"
+                            android:textAppearance="@style/default_bold_text"
+                            android:textColor="@color/grey_9"
+                            app:layout_constraintBottom_toBottomOf="parent"
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintTop_toTopOf="parent" />
+
+                        <androidx.appcompat.widget.AppCompatImageView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:src="@drawable/ic_link"
+                            app:layout_constraintBottom_toBottomOf="parent"
+                            app:layout_constraintEnd_toEndOf="parent"
+                            app:layout_constraintTop_toTopOf="parent" />
+
+                    </androidx.constraintlayout.widget.ConstraintLayout>
+
+                    <androidx.constraintlayout.widget.ConstraintLayout
                         android:id="@+id/btnSendFeedback"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:background="?attr/selectableItemBackground"
+                        android:visibility="gone"
                         android:paddingVertical="@dimen/margin_padding_large"
                         android:paddingStart="@dimen/margin_padding_xx_large"
                         android:paddingEnd="@dimen/margin_padding_large">

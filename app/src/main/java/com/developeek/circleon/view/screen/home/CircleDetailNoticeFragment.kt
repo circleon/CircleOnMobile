@@ -227,11 +227,8 @@ class CircleDetailNoticeFragment : Fragment() {
         notice: PostModel,
     ) = PopupMenu.OnMenuItemClickListener {
         when (it.itemId) {
-            R.id.pin_post -> {
-                showPinNoticeRequestDialog(context, notice)
-            }
-            R.id.unpin_post -> {
-                showRemovePinNoticeRequestDialog(context, notice)
+            R.id.pin_post, R.id.unpin_post -> {
+                viewModel.togglePin(notice)
             }
             R.id.edit_post -> {
                 sendUserToEditNoticeScreen(circleDetail.circleId, notice)
@@ -257,34 +254,6 @@ class CircleDetailNoticeFragment : Fragment() {
         bundle.putSerializable(Const.TAG_CIRCLE_POST, item)
         bundle.putBoolean(Const.FLAG_EDIT_SCREEN, true) // 수정 기능 전용 활성화
         findNavController().navigate(R.id.action_circleDetailFragment_to_uploadPostFragment, bundle)
-    }
-
-    private fun showPinNoticeRequestDialog(
-        context: Context,
-        notice: PostModel,
-    ) {
-        PositiveAlertDialog(
-            context,
-            message = context.getString(R.string.message_pin_notice),
-            positiveButton = context.getString(R.string.btn_pin),
-            positiveListener = {
-                viewModel.pinAndFetch(notice.id)
-            },
-        ).show()
-    }
-
-    private fun showRemovePinNoticeRequestDialog(
-        context: Context,
-        notice: PostModel,
-    ) {
-        PositiveAlertDialog(
-            context,
-            message = context.getString(R.string.message_remove_pin_notice),
-            positiveButton = context.getString(R.string.btn_remove_pin),
-            positiveListener = {
-                viewModel.removePinAndFetch(notice.id)
-            },
-        ).show()
     }
 
     private fun showDeleteNoticeRequestDialog(
@@ -339,7 +308,7 @@ class CircleDetailNoticeFragment : Fragment() {
             }
 
         binding.rvCircleNotice.addOnScrollListener(scrollListener)
-        binding.sfCircleNotice.setOnRefreshListener {
+        binding.swipeCircleNotice.setOnRefreshListener {
             viewModel.showLoadingAndRefresh()
         }
     }
@@ -421,13 +390,13 @@ class CircleDetailNoticeFragment : Fragment() {
 
     private fun showSuccessView(screenFlow: CircleDetailPostScreen.SuccessView) {
         binding.shimmerNotice.stopShimmer()
-        binding.sfCircleNotice.isRefreshing = false
+        binding.swipeCircleNotice.isRefreshing = false
         if (screenFlow.posts.isEmpty()) {
             switchView(binding.txtNoNotice)
             return
         }
 
-        switchView(binding.sfCircleNotice)
+        switchView(binding.swipeCircleNotice)
         loadCircleNoticesAndDoAfter(screenFlow.posts) {
             if (screenFlow.hasCollected) {
                 viewModel.currentScrollState?.let {
@@ -457,12 +426,12 @@ class CircleDetailNoticeFragment : Fragment() {
 
     private fun showErrorView() {
         binding.shimmerNotice.stopShimmer()
-        binding.sfCircleNotice.isRefreshing = false
+        binding.swipeCircleNotice.isRefreshing = false
         switchView(binding.llServiceError)
     }
 
     private fun switchView(view: View) {
-        binding.sfCircleNotice.isVisible = view == binding.sfCircleNotice
+        binding.swipeCircleNotice.isVisible = view == binding.swipeCircleNotice
         binding.shimmerNotice.isVisible = view == binding.shimmerNotice
         binding.txtNoNotice.isVisible = view == binding.txtNoNotice
         binding.llServiceError.isVisible = view == binding.llServiceError

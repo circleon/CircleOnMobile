@@ -285,6 +285,9 @@ class CircleDetailPostFragment : Fragment() {
             }
 
         binding.rvCirclePost.addOnScrollListener(scrollListener)
+        binding.swipeCirclePost.setOnRefreshListener {
+            viewModel.showLoadingAndRefresh()
+        }
     }
 
     private fun addScrollLoadingItemAndLoad() {
@@ -364,12 +367,13 @@ class CircleDetailPostFragment : Fragment() {
 
     private fun showSuccessView(screenFlow: CircleDetailPostScreen.SuccessView) {
         binding.shimmerPost.stopShimmer()
+        binding.swipeCirclePost.isRefreshing = false
         if (screenFlow.posts.isEmpty()) {
             switchView(binding.txtNoPost)
             return
         }
 
-        switchView(binding.rvCirclePost)
+        switchView(binding.swipeCirclePost)
         loadCirclePostsAndDoAfter(screenFlow.posts) {
             if (screenFlow.hasCollected) {
                 viewModel.currentScrollState?.let {
@@ -399,11 +403,12 @@ class CircleDetailPostFragment : Fragment() {
 
     private fun showErrorView() {
         binding.shimmerPost.stopShimmer()
+        binding.swipeCirclePost.isRefreshing = false
         switchView(binding.llServiceError)
     }
 
     private fun switchView(view: View) {
-        binding.rvCirclePost.isVisible = view == binding.rvCirclePost
+        binding.swipeCirclePost.isVisible = view == binding.swipeCirclePost
         binding.shimmerPost.isVisible = view == binding.shimmerPost
         binding.txtNoPost.isVisible = view == binding.txtNoPost
         binding.llServiceError.isVisible = view == binding.llServiceError

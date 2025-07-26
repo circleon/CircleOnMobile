@@ -1,7 +1,9 @@
 package com.developeek.circleon.view.screen.auth
 
 import android.content.Context
+import android.content.Intent
 import android.content.res.ColorStateList
+import android.net.Uri
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -39,7 +41,7 @@ class SignUpTermsFragment : Fragment() {
     ) {
         super.onViewCreated(view, savedInstanceState)
 
-        initListener()
+        initListener(requireContext())
         lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
                 viewModel.signUpScreenEvent.collect {
@@ -49,8 +51,9 @@ class SignUpTermsFragment : Fragment() {
         }
     }
 
-    private fun initListener() {
+    private fun initListener(context: Context) {
         setBtnAgreeTermsListener()
+        setBtnTermsDetailListener(context)
     }
 
     private fun setBtnAgreeTermsListener() {
@@ -66,6 +69,24 @@ class SignUpTermsFragment : Fragment() {
         binding.btnAgreeCommunityRules.setOnClickListener {
             viewModel.toggleCommunityRulesAgreement()
         }
+    }
+
+    private fun setBtnTermsDetailListener(context: Context) {
+        binding.btnServiceTermsDetail.setOnClickListener {
+            sendUserToLinkPage(context.getString(R.string.site_service_terms))
+        }
+        binding.btnPrivacyPolicyDetail.setOnClickListener {
+            sendUserToLinkPage(context.getString(R.string.site_privacy_policy))
+        }
+        binding.btnCommunityRulesDetail.setOnClickListener {
+            sendUserToLinkPage(context.getString(R.string.site_community_rules))
+        }
+    }
+
+    private fun sendUserToLinkPage(link: String) {
+        val intent = Intent(Intent.ACTION_VIEW, Uri.parse(link))
+
+        startActivity(intent)
     }
 
     private fun handleSignUpScreenEvent(
@@ -92,7 +113,7 @@ class SignUpTermsFragment : Fragment() {
         binding.checkAgreeServiceTerms.imageTintList =
             getSingleColorStateListByTermState(viewModel.signUpManager.hasAgreedServiceTerms, context)
         binding.checkAgreePrivacyPolicy.imageTintList =
-            getSingleColorStateListByTermState(viewModel.signUpManager.hasAgreedPrivacyPolicy, context)
+            getSingleColorStateListByTermState(viewModel.signUpManager.hasAgreedPrivacyPolicies, context)
         binding.checkAgreeCommunityRules.imageTintList =
             getSingleColorStateListByTermState(viewModel.signUpManager.hasAgreedCommunityRules, context)
     }

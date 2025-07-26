@@ -55,7 +55,7 @@ class CircleMemberRoleEditAlertDialog(
             ArrayAdapter(
                 context,
                 android.R.layout.simple_spinner_dropdown_item,
-                Role.getCircleRoles().map { it.roleName() },
+                Role.getCircleRoles().map { it.roleName },
             )
 
         roleSpinner.adapter = spinnerAdapter

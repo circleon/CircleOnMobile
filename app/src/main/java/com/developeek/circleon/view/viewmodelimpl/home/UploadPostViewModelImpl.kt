@@ -78,13 +78,6 @@ class UploadPostViewModelImpl
         }
 
         private suspend fun whenUploadPostSuccess() {
-            val message =
-                when (postType) {
-                    PostType.POST -> if (isEdit) MESSAGE_SUCCESS_EDIT_POST else MESSAGE_SUCCESS_UPLOAD_POST
-                    PostType.NOTICE -> if (isEdit) MESSAGE_SUCCESS_EDIT_NOTICE else MESSAGE_SUCCESS_UPLOAD_NOTICE
-                }
-
-            _event.emit(Event.ShowToast(message))
             _screenFlow.emit(UploadPostScreen.SuccessView)
         }
 
@@ -143,13 +136,6 @@ class UploadPostViewModelImpl
 
         override fun removePostImage() {
             this.image = null
-        }
-
-        companion object {
-            private const val MESSAGE_SUCCESS_UPLOAD_POST = "게시글이 작성됐어요"
-            private const val MESSAGE_SUCCESS_UPLOAD_NOTICE = "공지사항이 작성됐어요"
-            private const val MESSAGE_SUCCESS_EDIT_POST = "게시글이 수정됐어요"
-            private const val MESSAGE_SUCCESS_EDIT_NOTICE = "공지사항이 수정됐어요"
         }
     }
 
