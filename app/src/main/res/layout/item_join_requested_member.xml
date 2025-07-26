@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginVertical="@dimen/margin_padding_small"
+    android:paddingVertical="@dimen/margin_padding_small"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <androidx.cardview.widget.CardView
+        android:id="@+id/cvMemberProfile"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        app:cardCornerRadius="20dp"
+        app:cardElevation="0dp"
+        android:backgroundTint="@color/grey_3"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/txtMemberName">
+
+        <androidx.appcompat.widget.AppCompatImageView
+            android:id="@+id/imgMemberProfile"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:scaleType="center"/>
+
+    </androidx.cardview.widget.CardView>
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/txtMemberName"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/margin_padding_small"
+        android:textAppearance="@style/default_bold_text"
+        android:textColor="@color/grey_9"
+        tools:text="Name"
+        app:layout_constraintStart_toEndOf="@id/cvMemberProfile"
+        app:layout_constraintEnd_toStartOf="@id/btnShowMemberMessage"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"/>
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/btnShowMemberMessage"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:paddingVertical="6dp"
+        android:paddingHorizontal="@dimen/margin_padding_default"
+        android:background="@drawable/bg_rounded_rectangle"
+        android:backgroundTint="@color/grey_3"
+        android:textColor="@color/grey_6"
+        android:textSize="@dimen/text_size_default"
+        android:text="@string/btn_show_member_join_message"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@id/txtMemberName"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"/>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

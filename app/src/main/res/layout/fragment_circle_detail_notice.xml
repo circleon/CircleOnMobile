@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/grey_1"
+    tools:context=".view.screen.home.CircleDetailNoticeFragment">
+
+     <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+        android:id="@+id/swipeCircleNotice"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:visibility="gone">
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/rvCircleNotice"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+
+    </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
+
+    <com.facebook.shimmer.ShimmerFrameLayout
+        android:id="@+id/shimmerNotice"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:visibility="gone"
+        app:shimmer_duration="2000"
+        app:shimmer_highlight_alpha="0.4"
+        app:shimmer_direction="top_to_bottom"
+        app:shimmer_tilt="0">
+
+        <androidx.appcompat.widget.LinearLayoutCompat
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical">
+
+            <include layout="@layout/item_shimmer_circle_post"/>
+
+            <include layout="@layout/item_shimmer_circle_post"/>
+
+            <include layout="@layout/item_shimmer_circle_post"/>
+
+            <include layout="@layout/item_shimmer_circle_post"/>
+
+            <include layout="@layout/item_shimmer_circle_post"/>
+
+            <include layout="@layout/item_shimmer_circle_post"/>
+
+            <include layout="@layout/item_shimmer_circle_post"/>
+
+            <include layout="@layout/item_shimmer_circle_post"/>
+
+        </androidx.appcompat.widget.LinearLayoutCompat>
+
+    </com.facebook.shimmer.ShimmerFrameLayout>
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/txtNoNotice"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:paddingBottom="140dp"
+        android:gravity="center"
+        android:text="@string/message_no_notice"
+        android:textAppearance="@style/large_text"
+        android:textColor="@color/grey_5"
+        android:visibility="gone"/>
+
+    <androidx.appcompat.widget.LinearLayoutCompat
+        android:id="@+id/llServiceError"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:paddingBottom="182dp"
+        android:gravity="center"
+        android:orientation="vertical"
+        android:visibility="gone">
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/message_service_error"
+            android:textAppearance="@style/large_text"
+            android:textColor="@color/grey_5"/>
+
+        <androidx.appcompat.widget.AppCompatImageView
+            android:id="@+id/btnRetry"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/margin_padding_small"
+            android:src="@drawable/ic_retry" />
+
+    </androidx.appcompat.widget.LinearLayoutCompat>
+
+</FrameLayout>

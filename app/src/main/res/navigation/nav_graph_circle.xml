@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/nav_graph_circle"
+    app:startDestination="@id/circleFragment">
+
+    <fragment
+        android:id="@+id/circleFragment"
+        android:name="com.developeek.circleon.view.screen.circle.CircleFragment"
+        android:label="fragment_circle"
+        tools:layout="@layout/fragment_circle" >
+        <action
+            android:id="@+id/action_circleFragment_to_myCircleFragment"
+            app:destination="@id/myCircleFragment" />
+        <action
+            android:id="@+id/action_circleFragment_to_uploadCircleFragment2"
+            app:destination="@id/uploadCircleFragment2"
+            app:enterAnim="@animator/scale_up"/>
+    </fragment>
+    <fragment
+        android:id="@+id/myCircleFragment"
+        android:name="com.developeek.circleon.view.screen.circle.MyCircleFragment"
+        android:label="fragment_my_circle"
+        tools:layout="@layout/fragment_my_circle" />
+    <fragment
+        android:id="@+id/uploadCircleFragment2"
+        android:name="com.developeek.circleon.view.screen.circle.UploadCircleFragment"
+        android:label="fragment_upload_circle"
+        tools:layout="@layout/fragment_upload_circle" />
+</navigation>

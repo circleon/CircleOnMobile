@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginVertical="@dimen/margin_padding_small"
+    android:paddingVertical="@dimen/margin_padding_large"
+    android:background="@color/white">
+
+    <androidx.appcompat.widget.LinearLayoutCompat
+        android:id="@+id/llContent"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent">
+
+        <androidx.appcompat.widget.LinearLayoutCompat
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="@dimen/margin_padding_large"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:paddingStart="@dimen/margin_padding_large">
+
+            <androidx.cardview.widget.CardView
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:backgroundTint="@color/grey_3"
+                app:cardCornerRadius="20dp"
+                app:cardElevation="0dp">
+
+                <androidx.appcompat.widget.AppCompatImageView
+                    android:id="@+id/imgAuthorProfile"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:scaleType="center"/>
+
+            </androidx.cardview.widget.CardView>
+
+            <androidx.appcompat.widget.LinearLayoutCompat
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/margin_padding_small"
+                android:orientation="vertical">
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/txtAuthorName"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:lineSpacingExtra="2sp"
+                    android:textAppearance="@style/default_bold_text"
+                    android:textColor="@color/grey_9"
+                    android:translationY="-1.06sp"
+                    tools:text="authorName" />
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/txtCreated"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:lineSpacingExtra="2sp"
+                    android:textColor="@color/grey_6"
+                    android:textSize="@dimen/text_size_small"
+                    android:translationY="-0.91sp"
+                    tools:text="created" />
+
+            </androidx.appcompat.widget.LinearLayoutCompat>
+
+        </androidx.appcompat.widget.LinearLayoutCompat>
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/txtPostContent"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingHorizontal="@dimen/margin_padding_large"
+            android:textSize="@dimen/text_size_default"
+            android:textColor="@color/grey_9"
+            android:autoLink="web"
+            android:linksClickable="true"
+            android:textColorLink="@android:color/holo_blue_light"
+            android:lineSpacingExtra="2sp"
+            android:translationY="-1.06sp"
+            tools:text="게시글 컨텐츠"/>
+
+        <androidx.cardview.widget.CardView
+            android:id="@+id/cvPostImage"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/margin_padding_large"
+            android:layout_marginHorizontal="@dimen/margin_padding_large"
+            app:cardCornerRadius="@dimen/round_default"
+            app:cardElevation="0dp">
+
+            <androidx.appcompat.widget.AppCompatImageView
+                android:id="@+id/imgPost"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+
+        </androidx.cardview.widget.CardView>
+
+    </androidx.appcompat.widget.LinearLayoutCompat>
+
+    <androidx.appcompat.widget.AppCompatImageView
+        android:id="@+id/btnPostOverflow"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="@dimen/margin_padding_x_small"
+        android:padding="@dimen/margin_padding_default"
+        android:src="@drawable/ic_overflow"
+        app:tint="@color/purple_5"
+        android:background="?attr/selectableItemBackgroundBorderless"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.appcompat.widget.LinearLayoutCompat xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="@color/white"
+    tools:context=".view.screen.auth.SignUpEmailFragment">
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:paddingVertical="@dimen/margin_padding_large"
+        android:text="@string/sign_up_content_title_3"
+        android:textAppearance="@style/content_title"/>
+
+    <androidx.appcompat.widget.LinearLayoutCompat
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/margin_padding_large"
+        android:orientation="vertical">
+
+        <androidx.appcompat.widget.LinearLayoutCompat
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/text_email_authentication_code"
+                android:textSize="@dimen/text_size_small"/>
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/txtEmailAuthentication"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/margin_padding_small"
+                android:textSize="@dimen/text_size_small"
+                android:textColor="@color/error"
+                android:text="@string/message_authentication_fail"/>
+
+        </androidx.appcompat.widget.LinearLayoutCompat>
+
+        <androidx.appcompat.widget.LinearLayoutCompat
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <FrameLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1">
+
+                <androidx.appcompat.widget.AppCompatEditText
+                    android:id="@+id/edtEmailAuthenticationCode"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:padding="@dimen/margin_padding_large"
+                    android:maxLines="1"
+                    android:maxLength="10"
+                    android:inputType="text"
+                    android:hint="@string/hint_email_authentication_code"
+                    android:textColorHint="@color/grey_5"
+                    android:textColor="@color/grey_7"
+                    android:textSize="@dimen/text_size_default"
+                    android:backgroundTint="@drawable/selector_edit_text"/>
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/timerEmailAuthenticationCode"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="@dimen/margin_padding_default"
+                    android:layout_gravity="end|center_vertical"
+                    android:gravity="center"
+                    android:textColor="@color/grey_7"
+                    android:textSize="@dimen/text_size_default"
+                    tools:text="00:00"/>
+
+            </FrameLayout>
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/btnAuthenticateEmail"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:paddingHorizontal="@dimen/margin_padding_small"
+                android:gravity="center"
+                android:textSize="@dimen/text_size_default"
+                android:textColor="@color/purple_5"
+                android:text="@string/btn_authenticate"
+                android:background="?attr/selectableItemBackground"/>
+
+        </androidx.appcompat.widget.LinearLayoutCompat>
+
+    </androidx.appcompat.widget.LinearLayoutCompat>
+
+    <androidx.appcompat.widget.LinearLayoutCompat
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/margin_padding_default"
+        android:gravity="center_vertical">
+
+        <androidx.appcompat.widget.AppCompatImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/ic_info"/>
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/info_email_no_authentication_code"
+            android:textColor="@color/grey_5"
+            android:textSize="@dimen/text_size_small" />
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/btnResendAuthenticationCode"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/margin_padding_x_small"
+            android:text="@string/btn_resend_authentication_code"
+            android:textColor="@color/purple_5"
+            android:textSize="@dimen/text_size_small"
+            android:background="?attr/selectableItemBackground"/>
+
+    </androidx.appcompat.widget.LinearLayoutCompat>
+
+</androidx.appcompat.widget.LinearLayoutCompat>

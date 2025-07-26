@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/editCircleMemberDialog"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:padding="@dimen/margin_padding_large"
+    android:background="@drawable/bg_rounded_rectangle"
+    android:backgroundTint="@color/white">
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/txtTitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="@style/default_bold_text"
+        android:textColor="@color/grey_9"
+        tools:text="Title"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <androidx.appcompat.widget.AppCompatEditText
+        android:id="@+id/edtContent"
+        android:layout_width="match_parent"
+        android:layout_height="140dp"
+        android:layout_marginTop="@dimen/margin_padding_large"
+        android:paddingVertical="10dp"
+        android:paddingHorizontal="@dimen/margin_padding_large"
+        android:textSize="@dimen/text_size_default"
+        android:textColor="@color/grey_9"
+        android:maxLength="255"
+        android:gravity="top|start"
+        tools:text="content"
+        android:background="@drawable/bg_card"
+        app:layout_constraintTop_toBottomOf="@id/txtTitle"
+        app:layout_constraintBottom_toTopOf="@id/llNegativePositive" />
+
+    <androidx.appcompat.widget.LinearLayoutCompat
+        android:id="@+id/llNegativePositive"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/margin_padding_large"
+        android:orientation="horizontal"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/edtContent"
+        app:layout_constraintBottom_toBottomOf="parent">
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/btnCancel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingVertical="10dp"
+            android:paddingHorizontal="@dimen/margin_padding_large"
+            android:layout_weight="0.5"
+            android:lineSpacingExtra="2sp"
+            android:textSize="@dimen/text_size_default"
+            android:textColor="@color/grey_6"
+            android:text="@string/btn_cancel"
+            android:background="?attr/selectableItemBackground" />
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/btnLeaveRequest"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/margin_padding_small"
+            android:paddingVertical="10dp"
+            android:paddingHorizontal="@dimen/margin_padding_large"
+            android:lineSpacingExtra="2sp"
+            android:textSize="@dimen/text_size_default"
+            android:textColor="@color/purple_5"
+            tools:text="positive"
+            android:background="?attr/selectableItemBackground"/>
+
+    </androidx.appcompat.widget.LinearLayoutCompat>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

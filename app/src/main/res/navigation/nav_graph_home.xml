@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/nav_graph_home"
+    app:startDestination="@id/homeFragment">
+
+    <fragment
+        android:id="@+id/homeFragment"
+        android:name="com.developeek.circleon.view.screen.home.HomeFragment"
+        android:label="fragment_home"
+        tools:layout="@layout/fragment_home" >
+        <action
+            android:id="@+id/action_homeFragment_to_circleDetailFragment"
+            app:destination="@id/circleDetailFragment" />
+        <action
+            android:id="@+id/action_homeFragment_to_searchCircleFragment"
+            app:destination="@id/searchCircleFragment"/>
+    </fragment>
+    <fragment
+        android:id="@+id/searchCircleFragment"
+        android:name="com.developeek.circleon.view.screen.home.SearchCircleFragment"
+        android:label="fragment_search_circle"
+        tools:layout="@layout/fragment_search_circle" >
+        <action
+            android:id="@+id/action_searchCircleFragment_to_circleDetailFragment"
+            app:destination="@id/circleDetailFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/circleDetailFragment"
+        android:name="com.developeek.circleon.view.screen.home.CircleDetailFragment"
+        android:label="fragment_circle_detail"
+        tools:layout="@layout/fragment_circle_detail">
+        <action
+            android:id="@+id/action_circleDetailFragment_to_circleDetailPostDetailFragment"
+            app:destination="@id/circleDetailPostDetailFragment"
+            app:enterAnim="@animator/slide_in_right"
+            app:exitAnim="@animator/slide_out_left"
+            app:popExitAnim="@animator/slide_out_right"
+            app:popEnterAnim="@animator/slide_in_left"/>
+        <action
+            android:id="@+id/action_circleDetailFragment_to_uploadPostFragment"
+            app:destination="@id/uploadPostFragment"
+            app:enterAnim="@animator/scale_up"/>
+        <action
+            android:id="@+id/action_circleDetailFragment_to_uploadCircleFragment"
+            app:destination="@id/uploadCircleFragment"
+            app:enterAnim="@animator/scale_up"/>
+        <action
+            android:id="@+id/action_circleDetailFragment_to_manageCircleFragment"
+            app:destination="@id/manageCircleFragment"
+            app:enterAnim="@animator/scale_up"/>
+        <action
+            android:id="@+id/action_circleDetailFragment_to_manageCircleMemberFragment"
+            app:destination="@id/manageCircleMemberFragment"
+            app:enterAnim="@animator/scale_up"/>
+    </fragment>
+    <fragment
+        android:id="@+id/circleDetailPostDetailFragment"
+        android:name="com.developeek.circleon.view.screen.home.CircleDetailPostDetailFragment"
+        android:label="fragment_circle_detail_post_detail"
+        tools:layout="@layout/fragment_circle_detail_post_detail">
+        <action
+            android:id="@+id/action_circleDetailPostDetailFragment_to_uploadPostFragment"
+            app:destination="@id/uploadPostFragment"
+            app:enterAnim="@animator/scale_up"/>
+    </fragment>
+    <fragment
+        android:id="@+id/uploadPostFragment"
+        android:name="com.developeek.circleon.view.screen.home.UploadPostFragment"
+        android:label="fragment_upload_post"
+        tools:layout="@layout/fragment_upload_post" />
+    <fragment
+        android:id="@+id/uploadCircleFragment"
+        android:name="com.developeek.circleon.view.screen.circle.UploadCircleFragment"
+        android:label="fragment_upload_circle"
+        tools:layout="@layout/fragment_upload_circle" />
+    <fragment
+        android:id="@+id/manageCircleFragment"
+        android:name="com.developeek.circleon.view.screen.home.ManageCircleFragment"
+        android:label="fragment_manage_circle"
+        tools:layout="@layout/fragment_manage_circle" >
+        <action
+            android:id="@+id/action_manageCircleFragment_to_manageCircleMemberFragment"
+            app:destination="@id/manageCircleMemberFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/manageCircleMemberFragment"
+        android:name="com.developeek.circleon.view.screen.home.ManageCircleMemberFragment"
+        android:label="fragment_manage_circle_member"
+        tools:layout="@layout/fragment_manage_circle_member" />
+</navigation>

@@ -1,0 +1,177 @@
+package com.developeek.circleon.view.screen.auth
+
+import android.app.Activity
+import android.content.Context
+import android.content.res.ColorStateList
+import android.os.Bundle
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+import android.view.inputmethod.InputMethodManager
+import androidx.core.content.ContextCompat
+import androidx.core.view.isVisible
+import androidx.core.widget.doOnTextChanged
+import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
+import com.developeek.circleon.R
+import com.developeek.circleon.databinding.FragmentChangePasswordPasswordBinding
+import com.developeek.circleon.domain.utils.Const
+import com.developeek.circleon.view.viewmodel.auth.ChangePasswordViewModel
+import com.developeek.circleon.view.viewmodelimpl.auth.ChangePasswordScreenEvent
+import com.developeek.circleon.view.viewmodelimpl.auth.ChangePasswordStep
+import com.developeek.circleon.view.viewmodelimpl.auth.ChangePasswordViewModelImpl
+import kotlinx.coroutines.launch
+
+class ChangePasswordPasswordFragment : Fragment() {
+    private lateinit var binding: FragmentChangePasswordPasswordBinding
+    private val viewModel: ChangePasswordViewModel by activityViewModels<ChangePasswordViewModelImpl>()
+
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?,
+    ): View {
+        binding = FragmentChangePasswordPasswordBinding.inflate(layoutInflater)
+
+        return binding.root
+    }
+
+    override fun onViewCreated(
+        view: View,
+        savedInstanceState: Bundle?,
+    ) {
+        super.onViewCreated(view, savedInstanceState)
+
+        initListener()
+        lifecycleScope.launch {
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.changePasswordScreenEvent.collect {
+                    handleChangePasswordScreenEvent(it, requireContext())
+                }
+            }
+        }
+    }
+
+    private fun initListener() {
+        setEdtPasswordListener()
+        setEdtPasswordCheckListener()
+    }
+
+    private fun setEdtPasswordListener() {
+        binding.edtPassword.doOnTextChanged { text, _, _, _ ->
+            viewModel.setPassword(text.toString(), binding.edtPasswordCheck.text.toString())
+        }
+    }
+
+    private fun setEdtPasswordCheckListener() {
+        binding.edtPasswordCheck.doOnTextChanged { text, _, _, _ ->
+            viewModel.checkPassword(binding.edtPassword.text.toString(), text.toString())
+        }
+    }
+
+    private fun handleChangePasswordScreenEvent(
+        event: ChangePasswordScreenEvent,
+        context: Context,
+    ) {
+        when (event) {
+            is ChangePasswordScreenEvent.UpdateChangePasswordProcess -> updateChangePasswordProcess(event, context)
+        }
+    }
+
+    private fun updateChangePasswordProcess(
+        event: ChangePasswordScreenEvent.UpdateChangePasswordProcess,
+        context: Context,
+    ) {
+        if (event.step != ChangePasswordStep.PASSWORD) return
+
+        loadValidationResult(event.validationMessage, context)
+    }
+
+    private fun loadValidationResult(
+        validationMessage: String,
+        context: Context,
+    ) {
+        if (validationMessage == Const.EMPTY_TEXT || binding.edtPassword.text.toString().isEmpty()) {
+            changePasswordAsValidatedView(context)
+        } else {
+            changePasswordAsInvalidatedView(context)
+        }
+
+        if (binding.edtPasswordCheck.text.toString() == binding.edtPassword.text.toString() ||
+            binding.edtPasswordCheck.text.toString().isEmpty()
+        ) {
+            changePasswordCheckAsValidatedView(context)
+        } else {
+            changePasswordCheckAsInvalidatedView(context)
+        }
+    }
+
+    private fun changePasswordAsValidatedView(context: Context) {
+        binding.txtPasswordValidation.setTextColor(context.getColor(R.color.grey_6))
+        binding.edtPassword.backgroundTintList =
+            ColorStateList(
+                arrayOf(intArrayOf(android.R.attr.state_focused), intArrayOf()),
+                intArrayOf(
+                    ContextCompat.getColor(context, R.color.purple_5),
+                    ContextCompat.getColor(context, R.color.grey_3),
+                ),
+            )
+    }
+
+    private fun changePasswordCheckAsValidatedView(context: Context) {
+        binding.txtPasswordCheckValidation.isVisible = false
+        binding.edtPasswordCheck.backgroundTintList =
+            ColorStateList(
+                arrayOf(intArrayOf(android.R.attr.state_focused), intArrayOf()),
+                intArrayOf(
+                    ContextCompat.getColor(context, R.color.purple_5),
+                    ContextCompat.getColor(context, R.color.grey_3),
+                ),
+            )
+    }
+
+    private fun changePasswordAsInvalidatedView(context: Context) {
+        binding.txtPasswordValidation.setTextColor(context.getColor(R.color.error))
+        binding.edtPassword.backgroundTintList =
+            ColorStateList(
+                arrayOf(intArrayOf(android.R.attr.state_focused), intArrayOf()),
+                intArrayOf(
+                    ContextCompat.getColor(context, R.color.error),
+                    ContextCompat.getColor(context, R.color.grey_3),
+                ),
+            )
+    }
+
+    private fun changePasswordCheckAsInvalidatedView(context: Context) {
+        binding.txtPasswordCheckValidation.isVisible = true
+        binding.edtPasswordCheck.backgroundTintList =
+            ColorStateList(
+                arrayOf(intArrayOf(android.R.attr.state_focused), intArrayOf()),
+                intArrayOf(
+                    ContextCompat.getColor(context, R.color.error),
+                    ContextCompat.getColor(context, R.color.grey_3),
+                ),
+            )
+    }
+
+    override fun onResume() {
+        super.onResume()
+
+        binding.edtPassword.post {
+            showSoftInput(binding.edtPassword, requireActivity())
+        }
+    }
+
+    private fun showSoftInput(
+        view: View,
+        activity: Activity,
+    ) {
+        if (view.requestFocus()) {
+            val imm = activity.getSystemService(InputMethodManager::class.java)
+            imm.showSoftInput(view, InputMethodManager.SHOW_IMPLICIT)
+        }
+    }
+}

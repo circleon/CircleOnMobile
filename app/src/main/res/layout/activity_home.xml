@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/grey_1"
+    tools:context=".view.screen.home.HomeActivity">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/grey_1">
+
+        <androidx.fragment.app.FragmentContainerView
+            android:id="@+id/containerHome"
+            android:name="androidx.navigation.fragment.NavHostFragment"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:background="@color/white"
+            app:navGraph="@navigation/nav_graph"
+            app:defaultNavHost="true"
+            app:layout_constraintBottom_toTopOf="@+id/btmNav"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constrainedHeight="true"/>
+
+        <com.google.android.material.bottomnavigation.BottomNavigationView
+            android:id="@+id/btmNav"
+            android:layout_width="match_parent"
+            android:layout_height="56dp"
+            android:paddingHorizontal="40dp"
+            app:itemPaddingTop="@dimen/margin_padding_small"
+            app:itemPaddingBottom="@dimen/margin_padding_small"
+            app:itemTextColor="@drawable/selector_bottom_nav"
+            app:itemTextAppearanceActive="@style/bottom_nav_title"
+            app:itemTextAppearanceInactive="@style/bottom_nav_title"
+            app:itemIconTint="@drawable/selector_bottom_nav"
+            app:itemActiveIndicatorStyle="@null"
+            app:itemRippleColor="@null"
+            app:itemTextAppearanceActiveBoldEnabled="false"
+            android:background="@color/white"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/containerHome"
+            app:layout_constrainedHeight="true"
+            app:labelVisibilityMode="labeled"
+            app:menu="@menu/menu_bottom_navigation" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</FrameLayout>

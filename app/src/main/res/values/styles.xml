@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="title">
+        <item name="android:textSize">@dimen/text_size_large</item>
+        <item name="android:textColor">@color/grey_9</item>
+        <item name="android:textFontWeight">600</item>
+    </style>
+    <style name="content_title">
+        <item name="android:textSize">@dimen/text_size_x_large</item>
+        <item name="android:textColor">@color/grey_9</item>
+        <item name="android:textFontWeight">600</item>
+    </style>
+    <style name="bottom_nav_title">
+        <item name="android:textSize">10sp</item>
+    </style>
+    <style name="small_text">
+        <item name="android:textSize">@dimen/text_size_small</item>
+        <item name="android:textStyle">normal</item>
+    </style>
+    <style name="small_bold_style_text">
+        <item name="android:textSize">@dimen/text_size_small</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+    <style name="small_bold_text">
+        <item name="android:textSize">@dimen/text_size_small</item>
+        <item name="android:textFontWeight">600</item>
+    </style>
+    <style name="default_text">
+        <item name="android:textSize">@dimen/text_size_default</item>
+        <item name="android:textStyle">normal</item>
+    </style>
+    <style name="default_bold_text">
+        <item name="android:textSize">@dimen/text_size_default</item>
+        <item name="android:textFontWeight">600</item>
+    </style>
+    <style name="large_text">
+        <item name="android:textSize">@dimen/text_size_large</item>
+        <item name="android:textStyle">normal</item>
+    </style>
+    <style name="large_bold_text">
+        <item name="android:textSize">@dimen/text_size_large</item>
+        <item name="android:textFontWeight">600</item>
+    </style>
+    <style name="pop_up_text" parent="TextAppearance.AppCompat.Widget.PopupMenu.Small">
+        <item name="android:textSize">@dimen/text_size_small</item>
+        <item name="android:textColor">@color/grey_9</item>
+    </style>
+    <style name="pop_up_menu" parent="Widget.AppCompat.PopupMenu">
+        <item name="android:popupBackground">@drawable/bg_overflow_menu</item>
+        <item name="overlapAnchor">false</item>
+        <item name="android:textAppearance">@style/pop_up_text</item>
+        <item name="android:layout_width">48dp</item>
+    </style>
+    <style name="fab_rounded">
+        <item name="cornerFamily">rounded</item>
+    </style>
+    <style name="custom_alert_dialog">
+        <item name="android:windowBackground">@android:color/transparent</item>
+        <item name="android:windowMinWidthMajor">90%</item>
+        <item name="android:windowMinWidthMinor">90%</item>
+        <item name="android:backgroundDimEnabled">true</item>
+        <item name="android:colorBackground">?attr/colorBackgroundFloating</item>
+        <item name="android:windowCloseOnTouchOutside">true</item>
+        <item name="android:windowIsFloating">true</item>
+    </style>
+</resources>

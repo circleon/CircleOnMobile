@@ -1,0 +1,133 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/white"
+    tools:context=".view.screen.auth.LoginActivity">
+
+    <androidx.appcompat.widget.LinearLayoutCompat
+        android:id="@+id/llLogin"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingHorizontal="40dp"
+        android:layout_marginBottom="72dp"
+        android:orientation="vertical"
+        android:gravity="center"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent">
+
+        <androidx.appcompat.widget.AppCompatImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/logo_login" />
+
+        <androidx.appcompat.widget.AppCompatEditText
+            android:id="@+id/edtEmail"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="40dp"
+            android:background="@drawable/bg_rounded_rectangle"
+            android:backgroundTint="@color/grey_3"
+            android:paddingHorizontal="@dimen/margin_padding_large"
+            android:paddingVertical="10dp"
+            android:inputType="textEmailAddress"
+            android:hint="@string/hint_email"
+            android:textColorHint="@color/grey_5"
+            android:textColor="@color/grey_7"
+            android:textSize="@dimen/text_size_default"/>
+
+        <androidx.appcompat.widget.AppCompatEditText
+            android:id="@+id/edtPassword"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/margin_padding_small"
+            android:background="@drawable/bg_rounded_rectangle"
+            android:backgroundTint="@color/grey_3"
+            android:paddingHorizontal="@dimen/margin_padding_large"
+            android:paddingVertical="10dp"
+            android:inputType="textPassword"
+            android:hint="@string/hint_password"
+            android:textColorHint="@color/grey_5"
+            android:textColor="@color/grey_7"
+            android:textSize="@dimen/text_size_default"
+            android:imeOptions="actionDone"/>
+
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="40dp"
+            android:layout_marginTop="@dimen/margin_padding_small"
+            android:background="@drawable/bg_rounded_rectangle"
+            android:backgroundTint="@color/purple_5">
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/btnLogin"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:gravity="center"
+                android:text="@string/btn_login"
+                android:textSize="@dimen/text_size_default"
+                android:textColor="@color/white" />
+
+            <com.google.android.material.progressindicator.CircularProgressIndicator
+                android:id="@+id/pgbLoading"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_gravity="center"
+                app:indicatorColor="@color/white"
+                app:trackColor="@color/grey_3"
+                app:trackThickness="1dp"
+                app:indicatorSize="20dp"
+                android:indeterminate="true"
+                android:visibility="gone"/>
+
+        </FrameLayout>
+
+        <androidx.appcompat.widget.LinearLayoutCompat
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:layout_marginTop="@dimen/margin_padding_large"
+            android:orientation="horizontal">
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/btnSignUp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/btn_send_sign_up_screen"
+                android:textAppearance="@style/small_bold_text"
+                android:textColor="@color/grey_7" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="|"
+                android:layout_marginHorizontal="@dimen/margin_padding_small"/>
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/btnChangePassword"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/btn_send_change_password_screen"
+                android:textSize="@dimen/text_size_small"
+                android:textColor="@color/grey_5"/>
+
+        </androidx.appcompat.widget.LinearLayoutCompat>
+
+    </androidx.appcompat.widget.LinearLayoutCompat>
+
+    <androidx.appcompat.widget.AppCompatImageView
+        android:id="@+id/imgCharacter"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:scaleType="fitXY"
+        android:src="@drawable/img_login_character"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/llLogin"
+        app:layout_constraintDimensionRatio="7:4"
+        app:layout_constraintVertical_bias="1"
+        tools:layout_editor_absoluteX="0dp" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

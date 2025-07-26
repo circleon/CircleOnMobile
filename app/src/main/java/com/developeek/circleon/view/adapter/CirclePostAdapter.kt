@@ -1,0 +1,163 @@
+package com.developeek.circleon.view.adapter
+
+import android.content.Context
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+import androidx.core.view.isVisible
+import androidx.recyclerview.widget.RecyclerView
+import com.developeek.circleon.R
+import com.developeek.circleon.databinding.ItemCirclePostBinding
+import com.developeek.circleon.databinding.ItemLoadingBinding
+import com.developeek.circleon.domain.model.AuthorModel
+import com.developeek.circleon.domain.model.Models
+import com.developeek.circleon.domain.model.PostModel
+import com.developeek.circleon.domain.utils.glide.GlideProvider
+import com.developeek.circleon.view.listener.ItemClickListener
+import com.developeek.circleon.view.listener.ItemListenerInitializer
+import java.time.format.DateTimeFormatter
+import java.util.Locale
+
+class CirclePostAdapter(
+    private val context: Context,
+    private val glideProvider: GlideProvider,
+    private val itemListenerInitializer: ItemListenerInitializer<PostModel>,
+    private val overflowListenerInitializer: ItemListenerInitializer<PostModel>,
+) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
+    private val diffUtil = CustomAsyncListDiffer<PostModel>(this)
+
+    /**
+     * CirclePostAdapterItemViewHolder
+     *
+     * 아이템 리스너의 경우 뷰홀더를 만들 때 설정을 하는 것이 올바르지만, 리스너에서 아이템 각각의 데이터를 필요로하는 경우
+     * onCreateViewHolder 가 아닌 onBind 에서 리스너가 계속 재설정되는 비효율적 방식을 개선하기 위해
+     *
+     * 1. 커스텀 리스너 객체를 뷰홀더에서 저장
+     * 2. 커스텀 리스너는 아이템 id 값만 갱신하는 별도 기능을 통해 onBind 에서 아이템 내용이 바뀌었을 때 식별값만 갱신
+     */
+    inner class CirclePostAdapterItemViewHolder(
+        private val binding: ItemCirclePostBinding,
+        private val overflowClickListener: ItemClickListener<PostModel>,
+        private val itemClickListener: ItemClickListener<PostModel>,
+    ) : RecyclerView.ViewHolder(binding.root) {
+        fun onBind(position: Int) {
+            val post = diffUtil.currentList[position]
+
+            load(post.author)
+            load(post)
+            notifyListenerItemChanged(post)
+        }
+
+        private fun load(author: AuthorModel) {
+            binding.txtAuthorName.text = author.name
+            author.profileImgUrl?.let {
+                glideProvider.fetchImage(it, context, binding.imgAuthorProfile)
+            } ?: binding.imgAuthorProfile.setImageResource(R.drawable.img_user_profile_default)
+        }
+
+        private fun load(post: PostModel) {
+            binding.txtPostContent.text = post.content
+            binding.txtCommentCount.text = post.commentCount.toString()
+            binding.txtCreated.text =
+                post.createdAt.format(
+                    DateTimeFormatter
+                        .ofPattern(CREATED_DATE_FORMAT)
+                        .withLocale(Locale.KOREAN),
+                )
+            post.imgUrl?.let {
+                glideProvider.fetchImage(it, context, binding.imgPost)
+            }
+            binding.imgNoticePin.isVisible = post.isPinned
+        }
+
+        private fun notifyListenerItemChanged(post: PostModel) {
+            itemClickListener.item = post
+            overflowClickListener.item = post
+        }
+    }
+
+    inner class CirclePostAdapterLoadingViewHolder(
+        private val binding: ItemLoadingBinding,
+    ) : RecyclerView.ViewHolder(binding.root)
+
+    override fun onCreateViewHolder(
+        parent: ViewGroup,
+        viewType: Int,
+    ): RecyclerView.ViewHolder {
+        if (viewType == VIEW_TYPE_LOADING) {
+            val binding =
+                ItemLoadingBinding.inflate(
+                    LayoutInflater.from(parent.context),
+                    parent,
+                    false,
+                )
+
+            return CirclePostAdapterLoadingViewHolder(binding)
+        }
+
+        val binding =
+            ItemCirclePostBinding.inflate(
+                LayoutInflater.from(parent.context),
+                parent,
+                false,
+            )
+        val overflowClickListener =
+            object : ItemClickListener<PostModel> {
+                override lateinit var item: PostModel
+
+                override fun onClick(view: View?) {
+                    overflowListenerInitializer.initialize(item, view)
+                }
+            }
+        binding.btnPostOverflow.setOnClickListener(overflowClickListener)
+        val itemClickListener =
+            object : ItemClickListener<PostModel> {
+                override lateinit var item: PostModel
+
+                override fun onClick(p0: View?) {
+                    itemListenerInitializer.initialize(item)
+                }
+            }
+        binding.clItemCirclePost.setOnClickListener(itemClickListener)
+        binding.cvPostImage.isVisible = viewType == VIEW_TYPE_ITEM_WITH_IMAGE
+        return CirclePostAdapterItemViewHolder(binding, overflowClickListener, itemClickListener)
+    }
+
+    override fun getItemCount() = diffUtil.currentList.size
+
+    override fun getItemViewType(position: Int) =
+        if (diffUtil.currentList[position] == PostModel.emptyInstance()) {
+            VIEW_TYPE_LOADING
+        } else if (diffUtil.currentList[position].imgUrl == null) {
+            VIEW_TYPE_ITEM
+        } else {
+            VIEW_TYPE_ITEM_WITH_IMAGE
+        }
+
+    override fun onBindViewHolder(
+        holder: RecyclerView.ViewHolder,
+        position: Int,
+    ) {
+        if (holder is CirclePostAdapterItemViewHolder) holder.onBind(position)
+    }
+
+    fun update(
+        models: Models<PostModel>,
+        commitCallback: Runnable,
+    ) {
+        diffUtil.submitList(models.get(), commitCallback)
+    }
+
+    fun addLoadingItem() {
+        if (diffUtil.currentList.last() == PostModel.emptyInstance()) return
+
+        diffUtil.submitList(diffUtil.currentList + PostModel.emptyInstance())
+    }
+
+    companion object {
+        private const val CREATED_DATE_FORMAT = "M월 d일 HH:mm"
+        private const val VIEW_TYPE_LOADING = 0
+        private const val VIEW_TYPE_ITEM = 1
+        private const val VIEW_TYPE_ITEM_WITH_IMAGE = 2
+    }
+}

@@ -1,0 +1,28 @@
+name: ci
+
+on:
+    pull_request:
+        branches:
+            - release
+            - develop
+
+jobs:
+    ktlint:
+        name: Check Code Quality
+        runs-on: ubuntu-latest
+
+        steps:
+            - name: checkout repo
+              uses: actions/checkout@v3
+
+            - name: set up jdk
+              uses: actions/setup-java@v3
+              with:
+                  distribution: 'temurin'
+                  java-version: '18'
+
+            - name: permission for gradlew
+              run: chmod +x gradlew
+
+            - name: Ktlint Check
+              run: ./gradlew ktlintCheck
