@@ -4,6 +4,7 @@ import android.content.SharedPreferences
 import com.developeek.circleon.data.di.UserSharedPreferences
 import com.developeek.circleon.data.dto.auth.User
 import com.developeek.circleon.domain.model.UserModel
+import java.io.IOException
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -13,21 +14,20 @@ class UserManager
     constructor(
         @UserSharedPreferences private val preferences: SharedPreferences,
     ) {
-        private var user: UserModel? = null
         private val editor = preferences.edit()
 
-        fun getUser(): UserModel? {
+        fun getUser(): UserModel {
             preferences.let {
                 val id = it.getInt(USER_ID_KEY, 0)
                 val name = it.getString(USER_NAME_KEY, null)
                 val univCode = it.getString(USER_UNIV_KEY, null)
                 val profileImgUrl = it.getString(USER_PROFILE_IMAGE_KEY, null)
 
-                if (name != null && univCode != null) {
-                    user = User(id, name, univCode, profileImgUrl).toUserModel()
+                if (name == null || univCode == null) {
+                    throw IOException("No User Data")
                 }
 
-                return user
+                return User(id, name, univCode, profileImgUrl).toUserModel()
             }
         }
 

@@ -4,12 +4,14 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.developeek.circleon.data.repository.CircleRepository
 import com.developeek.circleon.data.repository.Page
+import com.developeek.circleon.data.repository.UserRepository
 import com.developeek.circleon.data.source.Error
 import com.developeek.circleon.data.source.Success
 import com.developeek.circleon.domain.model.BaseModel
 import com.developeek.circleon.domain.model.CommentModel
 import com.developeek.circleon.domain.model.Models
 import com.developeek.circleon.domain.model.PostModel
+import com.developeek.circleon.domain.model.UserModel
 import com.developeek.circleon.domain.utils.validator.Invalid
 import com.developeek.circleon.domain.utils.validator.Validator
 import com.developeek.circleon.view.Event
@@ -34,7 +36,8 @@ class CircleDetailPostDetailViewModelImpl
     constructor(
         @Assisted("circleId") private val circleId: Int,
         @Assisted("post") private val post: PostModel,
-        private val repository: CircleRepository,
+        private val circleRepository: CircleRepository,
+        private val userRepository: UserRepository,
     ) : CircleDetailPostDetailViewModel, ViewModel() {
         @AssistedFactory
         interface CircleDetailPostDetailViewModelFactory {
@@ -42,6 +45,10 @@ class CircleDetailPostDetailViewModelImpl
                 @Assisted("circleId") circleId: Int,
                 @Assisted("post") post: PostModel,
             ): CircleDetailPostDetailViewModelImpl
+        }
+
+        override val user: UserModel by lazy {
+            (userRepository.getUser() as Success).data
         }
 
         private val _event = MutableSharedFlow<Event>()
@@ -100,7 +107,7 @@ class CircleDetailPostDetailViewModelImpl
             page: Int,
             size: Int,
         ) = withContext(dispatcher) {
-            repository.getCirclePostComments(circleId, postId, page, size)
+            circleRepository.getCirclePostComments(circleId, postId, page, size)
         }
 
         private suspend fun whenFetchCommentsSuccess(result: Success<Page<CommentModel>>) {
@@ -179,7 +186,7 @@ class CircleDetailPostDetailViewModelImpl
             postId: Int,
             content: String,
         ) = withContext(dispatcher) {
-            repository.postCirclePostComment(circleId, postId, content)
+            circleRepository.postCirclePostComment(circleId, postId, content)
         }
 
         override fun editComment(
@@ -211,7 +218,7 @@ class CircleDetailPostDetailViewModelImpl
             commentId: Int,
             content: String,
         ) = withContext(dispatcher) {
-            repository.putCirclePostComment(circleId, postId, commentId, content)
+            circleRepository.putCirclePostComment(circleId, postId, commentId, content)
         }
 
         override fun deleteComment(commentId: Int) {
@@ -235,7 +242,7 @@ class CircleDetailPostDetailViewModelImpl
             postId: Int,
             commentId: Int,
         ) = withContext(dispatcher) {
-            repository.deleteCirclePostComment(circleId, postId, commentId)
+            circleRepository.deleteCirclePostComment(circleId, postId, commentId)
         }
 
         override fun delete() {
@@ -261,7 +268,7 @@ class CircleDetailPostDetailViewModelImpl
             circleId: Int,
             postId: Int,
         ) = withContext(dispatcher) {
-            repository.deleteCirclePost(circleId, postId)
+            circleRepository.deleteCirclePost(circleId, postId)
         }
 
         override fun reportPost(message: String) {
@@ -286,7 +293,7 @@ class CircleDetailPostDetailViewModelImpl
             postId: Int,
             content: String,
         ) = withContext(dispatcher) {
-            repository.postReportCirclePost(circleId, postId, content)
+            circleRepository.postReportCirclePost(circleId, postId, content)
         }
 
         override fun reportComment(
@@ -314,7 +321,7 @@ class CircleDetailPostDetailViewModelImpl
             commentId: Int,
             message: String,
         ) = withContext(dispatcher) {
-            repository.postReportCirclePostComment(circleId, commentId, message)
+            circleRepository.postReportCirclePostComment(circleId, commentId, message)
         }
 
         private suspend fun showToastAndRefresh(message: String) {

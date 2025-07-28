@@ -21,7 +21,6 @@ import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.developeek.circleon.R
-import com.developeek.circleon.data.source.manager.UserManager
 import com.developeek.circleon.databinding.FragmentCircleDetailPostBinding
 import com.developeek.circleon.domain.enums.PostType
 import com.developeek.circleon.domain.model.CircleDetailModel
@@ -66,9 +65,6 @@ class CircleDetailPostFragment : Fragment() {
 
     @Inject
     lateinit var glideProvider: GlideProvider
-
-    @Inject
-    lateinit var userManager: UserManager
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -183,20 +179,18 @@ class CircleDetailPostFragment : Fragment() {
         popupMenu: PopupMenu,
         item: PostModel,
     ) {
-        userManager.getUser()?.let {
-            if (it.userId == item.author.authorId) { // 작성자 본인인 경우
-                popupMenu.inflate(R.menu.menu_author_post_settings)
-                Utils.changeMenuItemTextColor(
-                    popupMenu.menu.findItem(R.id.delete_post),
-                    ContextCompat.getColor(context, R.color.error),
-                )
-            } else { // 작성자가 아닌 경우
-                popupMenu.inflate(R.menu.menu_post_settings)
-                Utils.changeMenuItemTextColor(
-                    popupMenu.menu.findItem(R.id.report_post),
-                    ContextCompat.getColor(context, R.color.error),
-                )
-            }
+        if (viewModel.user.userId == item.author.authorId) { // 작성자 본인인 경우
+            popupMenu.inflate(R.menu.menu_author_post_settings)
+            Utils.changeMenuItemTextColor(
+                popupMenu.menu.findItem(R.id.delete_post),
+                ContextCompat.getColor(context, R.color.error),
+            )
+        } else { // 작성자가 아닌 경우
+            popupMenu.inflate(R.menu.menu_post_settings)
+            Utils.changeMenuItemTextColor(
+                popupMenu.menu.findItem(R.id.report_post),
+                ContextCompat.getColor(context, R.color.error),
+            )
         }
     }
 

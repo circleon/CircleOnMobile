@@ -21,7 +21,6 @@ import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.developeek.circleon.R
-import com.developeek.circleon.data.source.manager.UserManager
 import com.developeek.circleon.databinding.FragmentCircleDetailNoticeBinding
 import com.developeek.circleon.domain.enums.PostType
 import com.developeek.circleon.domain.enums.Role
@@ -67,9 +66,6 @@ class CircleDetailNoticeFragment : Fragment() {
 
     @Inject
     lateinit var glideProvider: GlideProvider
-
-    @Inject
-    lateinit var userManager: UserManager
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -185,40 +181,38 @@ class CircleDetailNoticeFragment : Fragment() {
         role: Role,
         item: PostModel,
     ) {
-        userManager.getUser()?.let { user ->
-            when (role) {
-                Role.MEMBER -> {
-                    popupMenu.inflate(R.menu.menu_non_executive_notice_settings)
+        when (role) {
+            Role.MEMBER -> {
+                popupMenu.inflate(R.menu.menu_non_executive_notice_settings)
+                Utils.changeMenuItemTextColor(
+                    popupMenu.menu.findItem(R.id.report_post),
+                    ContextCompat.getColor(context, R.color.error),
+                )
+            }
+            Role.EXECUTIVE, Role.PRESIDENT -> {
+                if (viewModel.user.userId == item.author.authorId) {
+                    if (item.isPinned) {
+                        popupMenu.inflate(R.menu.menu_pinned_author_notice_settings)
+                    } else {
+                        popupMenu.inflate(R.menu.menu_author_notice_settings)
+                    }
+                    Utils.changeMenuItemTextColor(
+                        popupMenu.menu.findItem(R.id.delete_post),
+                        ContextCompat.getColor(context, R.color.error),
+                    )
+                } else {
+                    if (item.isPinned) {
+                        popupMenu.inflate(R.menu.menu_pinned_notice_settings)
+                    } else {
+                        popupMenu.inflate(R.menu.menu_executive_notice_settings)
+                    }
                     Utils.changeMenuItemTextColor(
                         popupMenu.menu.findItem(R.id.report_post),
                         ContextCompat.getColor(context, R.color.error),
                     )
                 }
-                Role.EXECUTIVE, Role.PRESIDENT -> {
-                    if (user.userId == item.author.authorId) {
-                        if (item.isPinned) {
-                            popupMenu.inflate(R.menu.menu_pinned_author_notice_settings)
-                        } else {
-                            popupMenu.inflate(R.menu.menu_author_notice_settings)
-                        }
-                        Utils.changeMenuItemTextColor(
-                            popupMenu.menu.findItem(R.id.delete_post),
-                            ContextCompat.getColor(context, R.color.error),
-                        )
-                    } else {
-                        if (item.isPinned) {
-                            popupMenu.inflate(R.menu.menu_pinned_notice_settings)
-                        } else {
-                            popupMenu.inflate(R.menu.menu_executive_notice_settings)
-                        }
-                        Utils.changeMenuItemTextColor(
-                            popupMenu.menu.findItem(R.id.report_post),
-                            ContextCompat.getColor(context, R.color.error),
-                        )
-                    }
-                }
-                else -> {}
             }
+            else -> {}
         }
     }
 

@@ -5,11 +5,13 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.developeek.circleon.data.repository.CircleRepository
 import com.developeek.circleon.data.repository.Page
+import com.developeek.circleon.data.repository.UserRepository
 import com.developeek.circleon.data.source.Error
 import com.developeek.circleon.data.source.Success
 import com.developeek.circleon.domain.model.CircleDetailModel
 import com.developeek.circleon.domain.model.Models
 import com.developeek.circleon.domain.model.PostModel
+import com.developeek.circleon.domain.model.UserModel
 import com.developeek.circleon.domain.utils.validator.Invalid
 import com.developeek.circleon.domain.utils.validator.Validator
 import com.developeek.circleon.view.Event
@@ -33,13 +35,18 @@ class CircleDetailNoticeViewModelImpl
     @AssistedInject
     constructor(
         @Assisted("circleDetail") private val circleDetail: CircleDetailModel,
-        private val repository: CircleRepository,
+        private val circleRepository: CircleRepository,
+        private val userRepository: UserRepository,
     ) : CircleDetailPostViewModel, ViewModel() {
         @AssistedFactory
         interface CircleDetailNoticeViewModelFactory {
             fun create(
                 @Assisted("circleDetail") circleDetail: CircleDetailModel,
             ): CircleDetailNoticeViewModelImpl
+        }
+
+        override val user: UserModel by lazy {
+            (userRepository.getUser() as Success).data
         }
 
         private val _event = MutableSharedFlow<Event>()
@@ -103,7 +110,7 @@ class CircleDetailNoticeViewModelImpl
             page: Int,
             size: Int,
         ) = withContext(ioDispatcher) {
-            repository.getCircleNotices(circleId, page, size)
+            circleRepository.getCircleNotices(circleId, page, size)
         }
 
         private suspend fun whenFetchNoticesSuccess(result: Success<Page<PostModel>>) {
@@ -179,7 +186,7 @@ class CircleDetailNoticeViewModelImpl
             postId: Int,
             isPinned: Boolean,
         ) = withContext(ioDispatcher) {
-            repository.putPostPin(circleId, postId, isPinned)
+            circleRepository.putPostPin(circleId, postId, isPinned)
         }
 
         private suspend fun whenTogglePinSuccess(
@@ -228,7 +235,7 @@ class CircleDetailNoticeViewModelImpl
             circleId: Int,
             postId: Int,
         ) = withContext(ioDispatcher) {
-            repository.deleteCirclePost(circleId, postId)
+            circleRepository.deleteCirclePost(circleId, postId)
         }
 
         override fun requestReportPost(
@@ -256,7 +263,7 @@ class CircleDetailNoticeViewModelImpl
             postId: Int,
             message: String,
         ) = withContext(ioDispatcher) {
-            repository.postReportCirclePost(circleId, postId, message)
+            circleRepository.postReportCirclePost(circleId, postId, message)
         }
 
         private suspend fun showToastAndRefresh(message: String) {

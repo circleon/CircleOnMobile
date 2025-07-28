@@ -2,7 +2,6 @@ package com.developeek.circleon.view.screen.home
 
 import android.app.Activity
 import android.content.Context
-import android.content.Intent
 import android.os.Build
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -19,7 +18,6 @@ import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.developeek.circleon.R
-import com.developeek.circleon.data.source.manager.UserManager
 import com.developeek.circleon.databinding.FragmentHomeBinding
 import com.developeek.circleon.domain.model.CategoryModel
 import com.developeek.circleon.domain.model.CircleModel
@@ -27,12 +25,11 @@ import com.developeek.circleon.domain.model.Models
 import com.developeek.circleon.domain.model.UserModel
 import com.developeek.circleon.domain.utils.Const
 import com.developeek.circleon.domain.utils.glide.GlideProvider
-import com.developeek.circleon.view.Event
 import com.developeek.circleon.view.adapter.CategoryAdapter
 import com.developeek.circleon.view.adapter.CircleAdapter
 import com.developeek.circleon.view.listener.ItemListenerInitializer
 import com.developeek.circleon.view.listener.RecyclerViewInfiniteScrollListener
-import com.developeek.circleon.view.screen.auth.LoginActivity
+import com.developeek.circleon.view.screen.base.BaseActivity
 import com.developeek.circleon.view.viewmodel.home.HomeViewModel
 import com.developeek.circleon.view.viewmodelimpl.home.HomeScreen
 import com.developeek.circleon.view.viewmodelimpl.home.HomeViewModelImpl
@@ -48,15 +45,6 @@ class HomeFragment : Fragment() {
 
     @Inject
     lateinit var glideProvider: GlideProvider
-
-    @Inject
-    lateinit var userManager: UserManager
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-
-        userManager.getUser() ?: sendUserToLoginScreen(requireActivity())
-    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -76,11 +64,17 @@ class HomeFragment : Fragment() {
 
         initView(requireContext())
         initListener(requireContext())
+        handleEventFlow(requireActivity())
+    }
+
+    private fun handleEventFlow(parent: Activity) {
+        if (parent !is BaseActivity) return
+
         lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
                 launch {
                     viewModel.event.collect {
-                        handleEvent(it, requireActivity(), requireContext())
+                        parent.handleEvent(it, requireContext())
                     }
                 }
                 launch {
@@ -95,9 +89,7 @@ class HomeFragment : Fragment() {
     private fun initView(context: Context) {
         initCategoryRecyclerView(context)
         initCircleRecyclerView(context)
-        userManager.getUser()?.let {
-            loadUserInfo(context, it)
-        }
+        loadUserInfo(context, viewModel.user)
     }
 
     private fun initCategoryRecyclerView(context: Context) {
@@ -171,18 +163,6 @@ class HomeFragment : Fragment() {
         } ?: binding.imgUserProfile.setImageResource(R.drawable.ic_profile)
     }
 
-    private fun handleEvent(
-        event: Event,
-        parentActivity: Activity,
-        context: Context,
-    ) {
-        when (event) {
-            is Event.SendToLoginScreen -> sendUserToLoginScreen(parentActivity)
-            is Event.ShowToast -> showToast(event, context)
-            else -> {}
-        }
-    }
-
     private fun handleScreenFlow(screenFlow: HomeScreen) {
         loadCircleCategory(screenFlow.categories)
         when (screenFlow) {
@@ -236,21 +216,6 @@ class HomeFragment : Fragment() {
     private fun showErrorView() {
         binding.shimmerCircle.stopShimmer()
         switchView(binding.llServiceError)
-    }
-
-    private fun sendUserToLoginScreen(activity: Activity) {
-        val intent = Intent(activity, LoginActivity::class.java)
-        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)
-        startActivity(intent)
-    }
-
-    private fun showToast(
-        event: Event.ShowToast,
-        context: Context,
-    ) {
-        if (SingleMessageToast.previousFinished()) {
-            SingleMessageToast(context, event.message).show()
-        }
     }
 
     private fun initListener(context: Context) {

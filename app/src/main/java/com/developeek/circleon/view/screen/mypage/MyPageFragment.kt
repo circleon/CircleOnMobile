@@ -21,7 +21,6 @@ import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
 import com.developeek.circleon.BuildConfig
 import com.developeek.circleon.R
-import com.developeek.circleon.data.source.manager.UserManager
 import com.developeek.circleon.databinding.FragmentMyPageBinding
 import com.developeek.circleon.domain.model.UserModel
 import com.developeek.circleon.domain.utils.Const
@@ -51,9 +50,6 @@ class MyPageFragment : Fragment() {
                 showSetUserProfileDialog(it.toJPEG(requireContext()), requireContext())
             }
         }
-
-    @Inject
-    lateinit var userManager: UserManager
 
     @Inject
     lateinit var glideProvider: GlideProvider
@@ -102,9 +98,7 @@ class MyPageFragment : Fragment() {
 
     private fun initView(context: Context) {
         initVersionName(context)
-        userManager.getUser()?.let {
-            loadUserInfo(it, context)
-        }
+        loadUserInfo(viewModel.user, context)
     }
 
     private fun initVersionName(context: Context) {
@@ -151,17 +145,15 @@ class MyPageFragment : Fragment() {
     }
 
     private fun setBtnProfileImageListener(context: Context) {
-        userManager.getUser()?.let {
-            it.profileImage?.let { _ ->
-                binding.btnAddOrRemoveUserProfile.setOnClickListener {
-                    showRemoveUserProfileDialog(context)
-                }
-            } ?: binding.btnAddOrRemoveUserProfile.setOnClickListener {
-                pickImage()
+        viewModel.user.profileImage?.let {
+            binding.btnAddOrRemoveUserProfile.setOnClickListener {
+                showRemoveUserProfileDialog(context)
             }
-            binding.btnAddUserProfile.setOnClickListener {
-                pickImage()
-            }
+        } ?: binding.btnAddOrRemoveUserProfile.setOnClickListener {
+            pickImage()
+        }
+        binding.btnAddUserProfile.setOnClickListener {
+            pickImage()
         }
     }
 
@@ -305,7 +297,7 @@ class MyPageFragment : Fragment() {
         binding.btnAddOrRemoveUserProfile.setOnClickListener {
             showRemoveUserProfileDialog(context)
         }
-        userManager.getUser()?.profileImage?.let {
+        viewModel.user.profileImage?.let {
             glideProvider.fetchImage(it, context, binding.btnAddUserProfile)
         }
     }

@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.developeek.circleon.data.repository.UserRepository
 import com.developeek.circleon.data.source.Error
 import com.developeek.circleon.data.source.Success
+import com.developeek.circleon.domain.model.UserModel
 import com.developeek.circleon.view.Event
 import com.developeek.circleon.view.viewmodel.mypage.MyPageViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -23,6 +24,10 @@ class MyPageViewModelImpl
     constructor(
         private val repository: UserRepository,
     ) : MyPageViewModel, ViewModel() {
+        override val user: UserModel by lazy {
+            (repository.getUser() as Success).data
+        }
+
         private val _event = MutableSharedFlow<Event>()
         override val event: SharedFlow<Event> = _event
         private val _myPageScreenEvent = MutableSharedFlow<MyPageScreenEvent>()

@@ -4,10 +4,13 @@ import com.developeek.circleon.data.source.Result
 import com.developeek.circleon.domain.model.CircleSummaryModel
 import com.developeek.circleon.domain.model.Models
 import com.developeek.circleon.domain.model.MyPostModel
+import com.developeek.circleon.domain.model.UserModel
 import java.io.File
 
 interface UserRepository {
     // GET
+    fun getUser(): Result<UserModel>
+
     suspend fun getMyCircles(
         page: Int,
         size: Int,

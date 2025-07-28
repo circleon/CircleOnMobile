@@ -26,7 +26,6 @@ import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.developeek.circleon.R
-import com.developeek.circleon.data.source.manager.UserManager
 import com.developeek.circleon.databinding.FragmentCircleDetailPostDetailBinding
 import com.developeek.circleon.domain.enums.PostType
 import com.developeek.circleon.domain.model.BaseModel
@@ -72,9 +71,6 @@ class CircleDetailPostDetailFragment : Fragment() {
 
     @Inject
     lateinit var glideProvider: GlideProvider
-
-    @Inject
-    lateinit var userManager: UserManager
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -203,9 +199,7 @@ class CircleDetailPostDetailFragment : Fragment() {
     ) {
         val popupMenu = object : PopupMenu(context, view) {}
 
-        userManager.getUser()?.let {
-            inflatePostPopupByUser(popupMenu, post, it, context)
-        }
+        inflatePostPopupByUser(popupMenu, post, viewModel.user, context)
         popupMenu.setOnMenuItemClickListener(postOverflowMenuItemClickListener(context, post))
         popupMenu.show()
     }
@@ -318,9 +312,7 @@ class CircleDetailPostDetailFragment : Fragment() {
     ) {
         val popupMenu = object : PopupMenu(context, view) {}
 
-        userManager.getUser()?.let {
-            inflateCommentPopupByUser(popupMenu, comment, it, context)
-        }
+        inflateCommentPopupByUser(popupMenu, comment, viewModel.user, context)
         popupMenu.setOnMenuItemClickListener(commentOverflowMenuItemClickListener(context, comment))
         popupMenu.show()
     }

@@ -15,7 +15,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import com.developeek.circleon.databinding.ActivityLoginBinding
 import com.developeek.circleon.view.Event
-import com.developeek.circleon.view.screen.home.HomeActivity
+import com.developeek.circleon.view.screen.MainActivity
 import com.developeek.circleon.view.viewmodel.auth.LoginViewModel
 import com.developeek.circleon.view.viewmodelimpl.auth.LoginScreenEvent
 import com.developeek.circleon.view.viewmodelimpl.auth.LoginViewModelImpl
@@ -96,7 +96,7 @@ class LoginActivity : AppCompatActivity() {
     }
 
     private fun sendUserToHomeScreen(activity: Activity) {
-        val intent = Intent(activity, HomeActivity::class.java)
+        val intent = Intent(activity, MainActivity::class.java)
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)
 
         startActivity(intent)

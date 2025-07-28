@@ -4,12 +4,14 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.developeek.circleon.data.repository.CircleRepository
 import com.developeek.circleon.data.repository.Page
+import com.developeek.circleon.data.repository.UserRepository
 import com.developeek.circleon.data.source.Error
 import com.developeek.circleon.data.source.Success
 import com.developeek.circleon.domain.enums.Category
 import com.developeek.circleon.domain.model.CategoryModel
 import com.developeek.circleon.domain.model.CircleModel
 import com.developeek.circleon.domain.model.Models
+import com.developeek.circleon.domain.model.UserModel
 import com.developeek.circleon.view.Event
 import com.developeek.circleon.view.viewmodel.home.HomeViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -27,7 +29,14 @@ import javax.inject.Inject
 @HiltViewModel
 class HomeViewModelImpl
     @Inject
-    constructor(private val repository: CircleRepository) : HomeViewModel, ViewModel() {
+    constructor(
+        private val circleRepository: CircleRepository,
+        private val userRepository: UserRepository,
+    ) : HomeViewModel, ViewModel() {
+        override val user: UserModel by lazy {
+            (userRepository.getUser() as Success).data
+        }
+
         private var categories: Models<CategoryModel> = Models()
         private var circles: Models<CircleModel> = Models()
 
@@ -77,7 +86,7 @@ class HomeViewModelImpl
             size: Int,
             category: Category,
         ) = withContext(dispatcher) {
-            repository.getCircles(page, size, category)
+            circleRepository.getCircles(page, size, category)
         }
 
         private suspend fun whenFetchCirclesSuccess(result: Success<Page<CircleModel>>) {
