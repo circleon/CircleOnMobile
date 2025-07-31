@@ -3,12 +3,23 @@ package com.developeek.circleon.view.screen.base
 import android.content.Context
 import android.content.Intent
 import androidx.fragment.app.Fragment
+import com.developeek.circleon.data.source.manager.TokenManager
+import com.developeek.circleon.data.source.manager.UserManager
 import com.developeek.circleon.view.Event
 import com.developeek.circleon.view.screen.auth.LoginActivity
 import com.developeek.circleon.view.widget.SingleMessageAlertDialog
 import com.developeek.circleon.view.widget.SingleMessageToast
+import dagger.hilt.android.AndroidEntryPoint
+import javax.inject.Inject
 
+@AndroidEntryPoint
 open class BaseFragment : Fragment() {
+    @Inject
+    lateinit var tokenManager: TokenManager
+
+    @Inject
+    lateinit var userManager: UserManager
+
     fun handleEvent(event: Event) {
         when (event) {
             is Event.SendToLoginScreen -> sendUserToLoginScreen(requireActivity())
@@ -23,6 +34,9 @@ open class BaseFragment : Fragment() {
         val intent = Intent(context, LoginActivity::class.java)
         val clearTaskFlags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
 
+        tokenManager.deleteAccessToken()
+        tokenManager.deleteRefreshToken()
+        userManager.deleteUser()
         intent.setFlags(clearTaskFlags)
         startActivity(intent)
     }
