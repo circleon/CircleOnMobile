@@ -1,6 +1,5 @@
 package com.developeek.circleon.view.screen.home
 
-import android.app.Activity
 import android.content.Context
 import android.os.Build
 import android.os.Bundle
@@ -9,7 +8,6 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.core.os.bundleOf
 import androidx.core.view.isVisible
-import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
@@ -29,7 +27,7 @@ import com.developeek.circleon.view.adapter.CategoryAdapter
 import com.developeek.circleon.view.adapter.CircleAdapter
 import com.developeek.circleon.view.listener.ItemListenerInitializer
 import com.developeek.circleon.view.listener.RecyclerViewInfiniteScrollListener
-import com.developeek.circleon.view.screen.base.BaseActivity
+import com.developeek.circleon.view.screen.base.BaseFragment
 import com.developeek.circleon.view.viewmodel.home.HomeViewModel
 import com.developeek.circleon.view.viewmodelimpl.home.HomeScreen
 import com.developeek.circleon.view.viewmodelimpl.home.HomeViewModelImpl
@@ -39,8 +37,10 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @AndroidEntryPoint
-class HomeFragment : Fragment() {
-    private lateinit var binding: FragmentHomeBinding
+class HomeFragment : BaseFragment() {
+    private val binding: FragmentHomeBinding by lazy {
+        FragmentHomeBinding.inflate(layoutInflater)
+    }
     private val viewModel: HomeViewModel by viewModels<HomeViewModelImpl>()
 
     @Inject
@@ -51,8 +51,6 @@ class HomeFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?,
     ): View {
-        binding = FragmentHomeBinding.inflate(layoutInflater)
-
         return binding.root
     }
 
@@ -64,26 +62,7 @@ class HomeFragment : Fragment() {
 
         initView(requireContext())
         initListener(requireContext())
-        handleEventFlow(requireActivity())
-    }
-
-    private fun handleEventFlow(parent: Activity) {
-        if (parent !is BaseActivity) return
-
-        lifecycleScope.launch {
-            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
-                launch {
-                    viewModel.event.collect {
-                        parent.handleEvent(it, requireContext())
-                    }
-                }
-                launch {
-                    viewModel.screenFlow.collect {
-                        handleScreenFlow(it)
-                    }
-                }
-            }
-        }
+        handleEventFlow()
     }
 
     private fun initView(context: Context) {
@@ -163,61 +142,6 @@ class HomeFragment : Fragment() {
         } ?: binding.imgUserProfile.setImageResource(R.drawable.ic_profile)
     }
 
-    private fun handleScreenFlow(screenFlow: HomeScreen) {
-        loadCircleCategory(screenFlow.categories)
-        when (screenFlow) {
-            is HomeScreen.SuccessView -> showSuccessView(screenFlow)
-            is HomeScreen.LoadingView -> showLoadingView()
-            is HomeScreen.ErrorView -> showErrorView()
-        }
-    }
-
-    private fun loadCircleCategory(categories: Models<CategoryModel>) {
-        binding.rvCircleCategory.adapter?.let {
-            (it as CategoryAdapter).update(categories) {}
-        }
-    }
-
-    private fun showSuccessView(screenFlow: HomeScreen.SuccessView) {
-        binding.shimmerCircle.stopShimmer()
-        if (screenFlow.circles.isEmpty()) {
-            switchView(binding.txtNoCircle)
-            return
-        }
-
-        switchView(binding.rvCircle)
-        loadCirclesAndDoAfter(
-            screenFlow.circles,
-            after = {
-                if (!screenFlow.hasCollected) {
-                    binding.rvCircle.scrollToPosition(0)
-                    screenFlow.notifyCollected()
-                }
-            },
-        )
-    }
-
-    private fun loadCirclesAndDoAfter(
-        circles: Models<CircleModel>,
-        after: () -> Unit,
-    ) {
-        binding.rvCircle.adapter?.let {
-            (it as CircleAdapter).update(circles) {
-                after()
-            }
-        }
-    }
-
-    private fun showLoadingView() {
-        switchView(binding.shimmerCircle)
-        binding.shimmerCircle.startShimmer()
-    }
-
-    private fun showErrorView() {
-        binding.shimmerCircle.stopShimmer()
-        switchView(binding.llServiceError)
-    }
-
     private fun initListener(context: Context) {
         setBtnSearchCircleListener()
         setBtnRetryListener()
@@ -270,6 +194,81 @@ class HomeFragment : Fragment() {
 
     private fun sendUserToSearchCircleScreen() {
         findNavController().navigate(R.id.action_homeFragment_to_searchCircleFragment)
+    }
+
+    private fun handleEventFlow() {
+        lifecycleScope.launch {
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                launch {
+                    viewModel.event.collect {
+                        super.handleEvent(it)
+                    }
+                }
+                launch {
+                    viewModel.screenFlow.collect {
+                        handleScreenFlow(it)
+                    }
+                }
+            }
+        }
+    }
+
+    private fun handleScreenFlow(screenFlow: HomeScreen) {
+        loadCircleCategory(screenFlow.categories)
+        if (screenFlow !is HomeScreen.Loading) stopLoadingView()
+        when (screenFlow) {
+            is HomeScreen.Success -> showSuccessView(screenFlow)
+            is HomeScreen.Loading -> startLoadingView()
+            is HomeScreen.Error -> showErrorView()
+        }
+    }
+
+    private fun loadCircleCategory(categories: Models<CategoryModel>) {
+        binding.rvCircleCategory.adapter?.let {
+            (it as CategoryAdapter).update(categories) {}
+        }
+    }
+
+    private fun showSuccessView(screenFlow: HomeScreen.Success) {
+        if (screenFlow.circles.isEmpty()) {
+            switchView(binding.txtNoCircle)
+            return
+        }
+
+        switchView(binding.rvCircle)
+        loadCirclesAndDoAfter(
+            screenFlow.circles,
+            after = {
+                if (!screenFlow.hasCollected) {
+                    binding.rvCircle.scrollToPosition(0)
+                    screenFlow.notifyCollected()
+                }
+            },
+        )
+    }
+
+    private fun loadCirclesAndDoAfter(
+        circles: Models<CircleModel>,
+        after: () -> Unit,
+    ) {
+        binding.rvCircle.adapter?.let {
+            (it as CircleAdapter).update(circles) {
+                after()
+            }
+        }
+    }
+
+    private fun startLoadingView() {
+        switchView(binding.shimmerCircle)
+        binding.shimmerCircle.startShimmer()
+    }
+
+    private fun stopLoadingView() {
+        binding.shimmerCircle.stopShimmer()
+    }
+
+    private fun showErrorView() {
+        switchView(binding.llServiceError)
     }
 
     private fun switchView(view: View) {

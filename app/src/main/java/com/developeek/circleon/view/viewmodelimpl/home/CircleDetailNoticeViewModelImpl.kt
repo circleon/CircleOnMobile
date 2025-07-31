@@ -51,7 +51,7 @@ class CircleDetailNoticeViewModelImpl
 
         private val _event = MutableSharedFlow<Event>()
         override val event: SharedFlow<Event> = _event
-        private val _screenFlow = MutableStateFlow<CircleDetailPostScreen>(CircleDetailPostScreen.LoadingView)
+        private val _screenFlow = MutableStateFlow<CircleDetailPostScreen>(CircleDetailPostScreen.Loading)
         override val screenFlow: StateFlow<CircleDetailPostScreen> = _screenFlow
 
         override val isLastPage: Boolean
@@ -77,7 +77,7 @@ class CircleDetailNoticeViewModelImpl
 
         override fun showLoadingAndRefresh() {
             viewModelScope.launch {
-                _screenFlow.emit(CircleDetailPostScreen.LoadingView)
+                _screenFlow.emit(CircleDetailPostScreen.Loading)
             }
             refresh()
         }
@@ -117,13 +117,13 @@ class CircleDetailNoticeViewModelImpl
             result.data.let {
                 _isLastPage = it.isLastPage
                 posts = Models(it.content)
-                _screenFlow.emit(CircleDetailPostScreen.SuccessView(posts))
+                _screenFlow.emit(CircleDetailPostScreen.Success(posts))
             }
         }
 
         private suspend fun whenFetchNoticesFail(result: Error<Page<PostModel>>) {
             _event.emit(Event.ShowToast(result.message()))
-            _screenFlow.emit(CircleDetailPostScreen.ErrorView)
+            _screenFlow.emit(CircleDetailPostScreen.Error)
 
             if (result.isAuthenticationError()) {
                 _event.emit(Event.SendToLoginScreen)
@@ -151,7 +151,7 @@ class CircleDetailNoticeViewModelImpl
             result.data.let {
                 _isLastPage = it.isLastPage
                 posts = posts.addAllAndGet(it.content)
-                _screenFlow.emit(CircleDetailPostScreen.SuccessView(posts))
+                _screenFlow.emit(CircleDetailPostScreen.Success(posts))
             }
             currentPage++
         }
@@ -172,9 +172,11 @@ class CircleDetailNoticeViewModelImpl
             userRequestJob =
                 viewModelScope.launch {
                     _event.emit(Event.ShowProcessing)
-
                     val toggled = post.togglePinAndGet()
-                    when (val result = putPostPin(circleDetail.circleId, post.id, toggled.isPinned)) {
+                    val result = putPostPin(circleDetail.circleId, post.id, toggled.isPinned)
+                    _event.emit(Event.EndProcessing)
+
+                    when (result) {
                         is Success -> whenTogglePinSuccess(post, toggled)
                         is Error -> whenUserRequestFail(result)
                     }
@@ -202,7 +204,7 @@ class CircleDetailNoticeViewModelImpl
 
             replacePost(post, toggled)
             _event.emit(Event.ShowToast(message))
-            _screenFlow.emit(CircleDetailPostScreen.SuccessView(posts))
+            _screenFlow.emit(CircleDetailPostScreen.Success(posts))
         }
 
         private suspend fun replacePost(
@@ -220,14 +222,13 @@ class CircleDetailNoticeViewModelImpl
             userRequestJob =
                 viewModelScope.launch {
                     _event.emit(Event.ShowProcessing)
+                    val result = deleteCirclePost(circleDetail.circleId, postId)
+                    _event.emit(Event.EndProcessing)
 
-                    userRequestJob =
-                        launch {
-                            when (val result = deleteCirclePost(circleDetail.circleId, postId)) {
-                                is Success -> showToastAndRefresh(MESSAGE_SUCCESS_REQUEST_REMOVE_NOTICE)
-                                is Error -> whenUserRequestFail(result)
-                            }
-                        }
+                    when (result) {
+                        is Success -> showToastAndRefresh(MESSAGE_SUCCESS_REQUEST_REMOVE_NOTICE)
+                        is Error -> whenUserRequestFail(result)
+                    }
                 }
         }
 
@@ -250,8 +251,10 @@ class CircleDetailNoticeViewModelImpl
                 viewModelScope.launch {
                     if (!checkMessageFormat(reportMessage)) return@launch
                     _event.emit(Event.ShowProcessing)
+                    val result = postReportCircleNotice(circleDetail.circleId, postId, reportMessage)
+                    _event.emit(Event.EndProcessing)
 
-                    when (val result = postReportCircleNotice(circleDetail.circleId, postId, reportMessage)) {
+                    when (result) {
                         is Success -> _event.emit(Event.ShowToast(MESSAGE_SUCCESS_REQUEST_REPORT))
                         is Error -> whenUserRequestFail(result)
                     }

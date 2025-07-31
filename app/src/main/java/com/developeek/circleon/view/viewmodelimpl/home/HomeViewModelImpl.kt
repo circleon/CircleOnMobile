@@ -40,7 +40,7 @@ class HomeViewModelImpl
         private var categories: Models<CategoryModel> = Models()
         private var circles: Models<CircleModel> = Models()
 
-        private val _screenFlow = MutableStateFlow<HomeScreen>(HomeScreen.LoadingView(categories))
+        private val _screenFlow = MutableStateFlow<HomeScreen>(HomeScreen.Loading(categories))
         override val screenFlow: StateFlow<HomeScreen> = _screenFlow
         private val _event = MutableSharedFlow<Event>()
         override val event: SharedFlow<Event> = _event
@@ -72,7 +72,7 @@ class HomeViewModelImpl
                     scrollOverCircleJob?.cancel()
                     currentPage = DEFAULT_PAGE // 카테고리를 선택할 때는 circles 를 재사용하지 않기 때문에 currentPage 도 초기화
                     categories = CategoryModel.selectAndGet(category)
-                    _screenFlow.emit(HomeScreen.LoadingView(categories))
+                    _screenFlow.emit(HomeScreen.Loading(categories))
 
                     when (val result = getCircles(currentPage, SIZE_BY_PAGE, category)) {
                         is Success -> whenFetchCirclesSuccess(result)
@@ -93,13 +93,13 @@ class HomeViewModelImpl
             result.data.let {
                 circles = Models(it.content)
                 _isLastPage = it.isLastPage
-                _screenFlow.emit(HomeScreen.SuccessView(categories, circles))
+                _screenFlow.emit(HomeScreen.Success(categories, circles))
             }
         }
 
         private suspend fun whenFetchCirclesFail(result: Error<Page<CircleModel>>) {
             _event.emit(Event.ShowToast(result.message()))
-            _screenFlow.emit(HomeScreen.ErrorView(categories))
+            _screenFlow.emit(HomeScreen.Error(categories))
 
             if (result.isAuthenticationError()) {
                 _event.emit(Event.SendToLoginScreen)
@@ -133,7 +133,7 @@ class HomeViewModelImpl
                 _isLastPage = it.isLastPage
                 circles = circles.addAllAndGet(it.content)
                 _screenFlow.emit(
-                    HomeScreen.SuccessView(categories, circles).apply {
+                    HomeScreen.Success(categories, circles).apply {
                         notifyCollected() // 스크롤 초기화 방지를 위해 collect 처리
                     },
                 )
@@ -156,20 +156,20 @@ class HomeViewModelImpl
     }
 
 sealed class HomeScreen(val categories: Models<CategoryModel>) {
-    val hasCollected: Boolean
-        get() = _hasCollected
-    private var _hasCollected = false
-
-    fun notifyCollected() {
-        _hasCollected = true
-    }
-
-    data class SuccessView(
+    data class Success(
         val currentCategories: Models<CategoryModel>,
         val circles: Models<CircleModel>,
-    ) : HomeScreen(currentCategories)
+    ) : HomeScreen(currentCategories) {
+        val hasCollected: Boolean
+            get() = _hasCollected
+        private var _hasCollected = false
 
-    data class LoadingView(val currentCategories: Models<CategoryModel>) : HomeScreen(currentCategories)
+        fun notifyCollected() {
+            _hasCollected = true
+        }
+    }
 
-    data class ErrorView(val currentCategories: Models<CategoryModel>) : HomeScreen(currentCategories)
+    data class Loading(val currentCategories: Models<CategoryModel>) : HomeScreen(currentCategories)
+
+    data class Error(val currentCategories: Models<CategoryModel>) : HomeScreen(currentCategories)
 }

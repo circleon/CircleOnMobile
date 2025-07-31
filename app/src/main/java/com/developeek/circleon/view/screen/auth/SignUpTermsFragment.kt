@@ -22,7 +22,9 @@ import com.developeek.circleon.view.viewmodelimpl.auth.SignUpViewModelImpl
 import kotlinx.coroutines.launch
 
 class SignUpTermsFragment : Fragment() {
-    private lateinit var binding: FragmentSignUpTermsBinding
+    private val binding: FragmentSignUpTermsBinding by lazy {
+        FragmentSignUpTermsBinding.inflate(layoutInflater)
+    }
     private val viewModel: SignUpViewModel by activityViewModels<SignUpViewModelImpl>()
 
     override fun onCreateView(
@@ -30,8 +32,6 @@ class SignUpTermsFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?,
     ): View {
-        binding = FragmentSignUpTermsBinding.inflate(layoutInflater)
-
         return binding.root
     }
 

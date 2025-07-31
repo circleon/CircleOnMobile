@@ -2,13 +2,11 @@ package com.developeek.circleon.view.screen.home
 
 import android.app.Activity
 import android.content.Context
-import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.core.view.isVisible
-import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
@@ -21,24 +19,21 @@ import com.developeek.circleon.domain.model.CircleDetailModel
 import com.developeek.circleon.domain.model.MemberModel
 import com.developeek.circleon.domain.model.Models
 import com.developeek.circleon.domain.utils.Const
-import com.developeek.circleon.view.Event
-import com.developeek.circleon.view.screen.auth.LoginActivity
+import com.developeek.circleon.view.screen.base.BaseFragment
 import com.developeek.circleon.view.viewmodel.home.ManageCircleViewModel
 import com.developeek.circleon.view.viewmodelimpl.home.ManageCircleScreen
-import com.developeek.circleon.view.viewmodelimpl.home.ManageCircleScreenEvent
 import com.developeek.circleon.view.viewmodelimpl.home.ManageCircleViewModelImpl
 import com.developeek.circleon.view.widget.PositiveAlertDialog
-import com.developeek.circleon.view.widget.SingleMessageAlertDialog
-import com.developeek.circleon.view.widget.SingleMessageToast
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import dagger.hilt.android.AndroidEntryPoint
 import dagger.hilt.android.lifecycle.withCreationCallback
 import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
-class ManageCircleFragment : Fragment() {
-    private lateinit var binding: FragmentManageCircleBinding
-    private lateinit var circle: CircleDetailModel
+class ManageCircleFragment : BaseFragment() {
+    private val binding: FragmentManageCircleBinding by lazy {
+        FragmentManageCircleBinding.inflate(layoutInflater)
+    }
     private val viewModel: ManageCircleViewModel by viewModels<ManageCircleViewModelImpl>(
         extrasProducer = {
             defaultViewModelCreationExtras
@@ -47,6 +42,7 @@ class ManageCircleFragment : Fragment() {
                 }
         },
     )
+    private lateinit var circle: CircleDetailModel
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -61,8 +57,6 @@ class ManageCircleFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?,
     ): View {
-        binding = FragmentManageCircleBinding.inflate(layoutInflater)
-
         return binding.root
     }
 
@@ -75,25 +69,7 @@ class ManageCircleFragment : Fragment() {
         initView(requireActivity())
         initListener(requireContext())
         initRefreshObserver()
-        lifecycleScope.launch {
-            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
-                launch {
-                    viewModel.event.collect {
-                        handleEvent(it, requireActivity(), requireContext())
-                    }
-                }
-                launch {
-                    viewModel.screenFlow.collect {
-                        handleScreenFlow(it, requireContext())
-                    }
-                }
-                launch {
-                    viewModel.manageCircleScreenEvent.collect {
-                        handleManageCircleScreenEvent(it)
-                    }
-                }
-            }
-        }
+        handleEventFlow(requireContext())
     }
 
     private fun initView(parentActivity: Activity) {
@@ -179,57 +155,51 @@ class ManageCircleFragment : Fragment() {
         findNavController().previousBackStackEntry?.savedStateHandle?.set(Const.FLAG_CIRCLE_DATA_CHANGED, true)
     }
 
-    private fun handleEvent(
-        event: Event,
-        parentActivity: Activity,
-        context: Context,
-    ) {
-        binding.pgbLoading.isVisible = event is Event.ShowProcessing
-        when (event) {
-            is Event.SendToLoginScreen -> sendUserToLoginScreen(parentActivity)
-            is Event.ShowToast -> showToast(event, context)
-            is Event.ShowDialog -> showDialog(event, context)
-            else -> {}
+    private fun handleEventFlow(context: Context) {
+        lifecycleScope.launch {
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                launch {
+                    viewModel.event.collect {
+                        super.handleEvent(it)
+                    }
+                }
+                launch {
+                    viewModel.screenFlow.collect {
+                        handleScreenFlow(it, context)
+                    }
+                }
+            }
         }
     }
 
-    private fun sendUserToLoginScreen(parentActivity: Activity) {
-        val intent = Intent(parentActivity, LoginActivity::class.java)
-        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)
-        startActivity(intent)
+    override fun showProcessing() {
+        binding.pgbLoading.isVisible = true
     }
 
-    private fun showToast(
-        event: Event.ShowToast,
-        context: Context,
-    ) {
-        if (SingleMessageToast.previousFinished()) {
-            SingleMessageToast(context, event.message).show()
-        }
-    }
-
-    private fun showDialog(
-        event: Event.ShowDialog,
-        context: Context,
-    ) {
-        SingleMessageAlertDialog(context, event.message).show()
+    override fun endProcessing() {
+        binding.pgbLoading.isVisible = false
     }
 
     private fun handleScreenFlow(
         screenFlow: ManageCircleScreen,
         context: Context,
     ) {
-        binding.pgbLoading.isVisible = screenFlow is ManageCircleScreen.LoadingView
+        binding.pgbLoading.isVisible = screenFlow is ManageCircleScreen.Loading
         when (screenFlow) {
-            is ManageCircleScreen.SuccessView -> showSuccessView(screenFlow, context)
+            is ManageCircleScreen.Success -> showSuccessView(screenFlow, context)
             else -> {}
         }
     }
 
     private fun showSuccessView(
-        screenFlow: ManageCircleScreen.SuccessView,
+        screenFlow: ManageCircleScreen.Success,
         context: Context,
     ) {
+        if (screenFlow.hasDeleted) {
+            sendUserToHomeScreen()
+            return
+        }
+
         screenFlow.let {
             loadMembers(
                 circleMembers = it.circleMembers,
@@ -315,12 +285,6 @@ class ManageCircleFragment : Fragment() {
         bundle.putSerializable(Const.TAG_MEMBERS, members)
         bundle.putSerializable(Const.TAG_MEMBERSHIP_STATUS, membershipStatus)
         findNavController().navigate(R.id.action_manageCircleFragment_to_manageCircleMemberFragment, bundle)
-    }
-
-    private fun handleManageCircleScreenEvent(event: ManageCircleScreenEvent) {
-        when (event) {
-            ManageCircleScreenEvent.DeleteCircle -> sendUserToHomeScreen()
-        }
     }
 
     private fun sendUserToHomeScreen() {

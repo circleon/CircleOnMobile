@@ -4,7 +4,6 @@ import android.animation.Animator
 import android.animation.AnimatorInflater
 import android.app.Activity
 import android.content.Context
-import android.content.Intent
 import android.os.Build
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -17,7 +16,6 @@ import androidx.appcompat.widget.PopupMenu
 import androidx.core.animation.addListener
 import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
-import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
@@ -36,19 +34,16 @@ import com.developeek.circleon.domain.model.UserModel
 import com.developeek.circleon.domain.utils.Const
 import com.developeek.circleon.domain.utils.Utils
 import com.developeek.circleon.domain.utils.glide.GlideProvider
-import com.developeek.circleon.view.Event
 import com.developeek.circleon.view.adapter.PostDetailAdapter
 import com.developeek.circleon.view.listener.ItemListenerInitializer
 import com.developeek.circleon.view.listener.RecyclerViewInfiniteScrollListener
-import com.developeek.circleon.view.screen.auth.LoginActivity
+import com.developeek.circleon.view.screen.base.BaseFragment
 import com.developeek.circleon.view.viewmodel.home.CircleDetailPostDetailViewModel
 import com.developeek.circleon.view.viewmodelimpl.home.CircleDetailPostDetailScreen
 import com.developeek.circleon.view.viewmodelimpl.home.CircleDetailPostDetailViewModelImpl
 import com.developeek.circleon.view.widget.CircleRequestAlertDialog
 import com.developeek.circleon.view.widget.EditCommentAlertDialog
 import com.developeek.circleon.view.widget.PositiveAlertDialog
-import com.developeek.circleon.view.widget.SingleMessageAlertDialog
-import com.developeek.circleon.view.widget.SingleMessageToast
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import dagger.hilt.android.AndroidEntryPoint
 import dagger.hilt.android.lifecycle.withCreationCallback
@@ -56,10 +51,10 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @AndroidEntryPoint
-class CircleDetailPostDetailFragment : Fragment() {
-    private lateinit var binding: FragmentCircleDetailPostDetailBinding
-    private var circleId = 0
-    private lateinit var post: PostModel
+class CircleDetailPostDetailFragment : BaseFragment() {
+    private val binding: FragmentCircleDetailPostDetailBinding by lazy {
+        FragmentCircleDetailPostDetailBinding.inflate(layoutInflater)
+    }
     private val viewModel: CircleDetailPostDetailViewModel by viewModels<CircleDetailPostDetailViewModelImpl>(
         extrasProducer = {
             defaultViewModelCreationExtras
@@ -68,6 +63,8 @@ class CircleDetailPostDetailFragment : Fragment() {
                 }
         },
     )
+    private lateinit var post: PostModel
+    private var circleId = 0
 
     @Inject
     lateinit var glideProvider: GlideProvider
@@ -112,8 +109,6 @@ class CircleDetailPostDetailFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?,
     ): View {
-        binding = FragmentCircleDetailPostDetailBinding.inflate(layoutInflater)
-
         return binding.root
     }
 
@@ -127,20 +122,7 @@ class CircleDetailPostDetailFragment : Fragment() {
         initView(requireActivity())
         initRefreshObserver()
         initListener()
-        lifecycleScope.launch {
-            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
-                launch {
-                    viewModel.event.collect {
-                        handleEvent(it, requireActivity(), requireContext())
-                    }
-                }
-                launch {
-                    viewModel.screenFlow.collect {
-                        handleScreenFlow(it, requireContext())
-                    }
-                }
-            }
-        }
+        handleEventFlow(requireContext())
     }
 
     private fun initView(context: Context) {
@@ -477,40 +459,29 @@ class CircleDetailPostDetailFragment : Fragment() {
         }
     }
 
-    private fun handleEvent(
-        event: Event,
-        parentActivity: Activity,
-        context: Context,
-    ) {
-        binding.pgbLoading.isVisible = event is Event.ShowProcessing
-        when (event) {
-            is Event.SendToLoginScreen -> sendUserToLoginScreen(parentActivity)
-            is Event.ShowToast -> showToast(event, context)
-            is Event.ShowDialog -> showDialog(event, context)
-            else -> {}
+    private fun handleEventFlow(context: Context) {
+        lifecycleScope.launch {
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                launch {
+                    viewModel.event.collect {
+                        super.handleEvent(it)
+                    }
+                }
+                launch {
+                    viewModel.screenFlow.collect {
+                        handleScreenFlow(it, requireContext())
+                    }
+                }
+            }
         }
     }
 
-    private fun sendUserToLoginScreen(activity: Activity) {
-        val intent = Intent(activity, LoginActivity::class.java)
-        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)
-        startActivity(intent)
+    override fun showProcessing() {
+        binding.pgbLoading.isVisible = true
     }
 
-    private fun showToast(
-        event: Event.ShowToast,
-        context: Context,
-    ) {
-        if (SingleMessageToast.previousFinished()) {
-            SingleMessageToast(context, event.message).show()
-        }
-    }
-
-    private fun showDialog(
-        event: Event.ShowDialog,
-        context: Context,
-    ) {
-        SingleMessageAlertDialog(context, event.message).show()
+    override fun endProcessing() {
+        binding.pgbLoading.isVisible = false
     }
 
     private fun handleScreenFlow(
@@ -518,14 +489,14 @@ class CircleDetailPostDetailFragment : Fragment() {
         context: Context,
     ) {
         when (screenFlow) {
-            is CircleDetailPostDetailScreen.SuccessView -> showSuccessView(screenFlow, context)
-            is CircleDetailPostDetailScreen.LoadingView -> showLoadingView()
-            is CircleDetailPostDetailScreen.ErrorView -> showErrorView()
+            is CircleDetailPostDetailScreen.Success -> showSuccessView(screenFlow, context)
+            is CircleDetailPostDetailScreen.Loading -> showLoadingView()
+            is CircleDetailPostDetailScreen.Error -> showErrorView()
         }
     }
 
     private fun showSuccessView(
-        screenFlow: CircleDetailPostDetailScreen.SuccessView,
+        screenFlow: CircleDetailPostDetailScreen.Success,
         context: Context,
     ) {
         if (screenFlow.hasDeleted) {

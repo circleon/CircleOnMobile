@@ -44,8 +44,10 @@ class MyPageViewModelImpl
             userRequestJob =
                 viewModelScope.launch {
                     _event.emit(Event.ShowProcessing)
+                    val result = putUserProfileImage(image)
+                    _event.emit(Event.EndProcessing)
 
-                    when (val result = putUserProfileImage(image)) {
+                    when (result) {
                         is Success -> whenPutUserProfileImageSuccess()
                         is Error -> whenEditUserProfileImageFail(result)
                     }
@@ -87,8 +89,10 @@ class MyPageViewModelImpl
             userRequestJob =
                 viewModelScope.launch {
                     _event.emit(Event.ShowProcessing)
+                    val result = deleteUserProfileImage()
+                    _event.emit(Event.EndProcessing)
 
-                    when (val result = deleteUserProfileImage()) {
+                    when (result) {
                         is Success -> whenDeleteUserProfileImageSuccess()
                         is Error -> whenEditUserProfileImageFail(result)
                     }
@@ -115,8 +119,10 @@ class MyPageViewModelImpl
             userRequestJob =
                 viewModelScope.launch {
                     _event.emit(Event.ShowProcessing)
+                    val result = userLogout()
+                    _event.emit(Event.EndProcessing)
 
-                    when (val result = userLogout()) {
+                    when (result) {
                         is Success -> showToastAndSendToLoginScreen(MESSAGE_SUCCESS_LOGOUT)
                         is Error -> _event.emit(Event.ShowDialog(result.message()))
                     }
@@ -141,8 +147,10 @@ class MyPageViewModelImpl
             userRequestJob =
                 viewModelScope.launch {
                     _event.emit(Event.ShowProcessing)
+                    val result = userResign()
+                    _event.emit(Event.EndProcessing)
 
-                    when (val result = userResign()) {
+                    when (result) {
                         is Success -> showToastAndSendToLoginScreen(MESSAGE_SUCCESS_RESIGN)
                         is Error -> _event.emit(Event.ShowDialog(result.message()))
                     }

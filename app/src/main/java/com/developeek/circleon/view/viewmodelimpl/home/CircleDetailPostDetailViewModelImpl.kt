@@ -54,7 +54,7 @@ class CircleDetailPostDetailViewModelImpl
         private val _event = MutableSharedFlow<Event>()
         override val event: SharedFlow<Event> = _event
         private val _screenFlow =
-            MutableStateFlow<CircleDetailPostDetailScreen>(CircleDetailPostDetailScreen.LoadingView)
+            MutableStateFlow<CircleDetailPostDetailScreen>(CircleDetailPostDetailScreen.Loading)
         override val screenFlow: StateFlow<CircleDetailPostDetailScreen> = _screenFlow
 
         override val isLastPage: Boolean
@@ -75,7 +75,7 @@ class CircleDetailPostDetailViewModelImpl
 
         override fun showLoadingAndRefresh() {
             viewModelScope.launch {
-                _screenFlow.emit(CircleDetailPostDetailScreen.LoadingView)
+                _screenFlow.emit(CircleDetailPostDetailScreen.Loading)
             }
             refresh()
         }
@@ -114,13 +114,13 @@ class CircleDetailPostDetailViewModelImpl
             result.data.let {
                 _isLastPage = it.isLastPage
                 contents = Models(listOf(post) + it.content)
-                _screenFlow.emit(CircleDetailPostDetailScreen.SuccessView(contents, false))
+                _screenFlow.emit(CircleDetailPostDetailScreen.Success(contents, false))
             }
         }
 
         private suspend fun whenFetchCommentsFail(result: Error<Page<CommentModel>>) {
             _event.emit(Event.ShowToast(result.message()))
-            _screenFlow.emit(CircleDetailPostDetailScreen.ErrorView)
+            _screenFlow.emit(CircleDetailPostDetailScreen.Error)
 
             if (result.isAuthenticationError()) {
                 _event.emit(Event.SendToLoginScreen)
@@ -148,7 +148,7 @@ class CircleDetailPostDetailViewModelImpl
             result.data.let {
                 _isLastPage = it.isLastPage
                 contents = contents.addAllAndGet(it.content)
-                _screenFlow.emit(CircleDetailPostDetailScreen.SuccessView(contents, false))
+                _screenFlow.emit(CircleDetailPostDetailScreen.Success(contents, false))
             }
             currentPage++
         }
@@ -170,12 +170,11 @@ class CircleDetailPostDetailViewModelImpl
                 viewModelScope.launch {
                     if (!checkCommentFormat(content)) return@launch
                     _event.emit(Event.ShowProcessing)
+                    val result = postCirclePostComment(circleId, post.id, content)
+                    _event.emit(Event.EndProcessing)
 
-                    when (val result = postCirclePostComment(circleId, post.id, content)) {
-                        is Success -> {
-                            _event.emit(Event.EndProcessing)
-                            refresh()
-                        }
+                    when (result) {
+                        is Success -> refresh()
                         is Error -> whenUserRequestFail(result)
                     }
                 }
@@ -201,12 +200,11 @@ class CircleDetailPostDetailViewModelImpl
                 viewModelScope.launch {
                     if (!checkCommentFormat(content)) return@launch
                     _event.emit(Event.ShowProcessing)
+                    val result = putCirclePostComment(circleId, post.id, commentId, content)
+                    _event.emit(Event.EndProcessing)
 
-                    when (val result = putCirclePostComment(circleId, post.id, commentId, content)) {
-                        is Success -> {
-                            _event.emit(Event.EndProcessing)
-                            refresh()
-                        }
+                    when (result) {
+                        is Success -> refresh()
                         is Error -> whenUserRequestFail(result)
                     }
                 }
@@ -229,8 +227,10 @@ class CircleDetailPostDetailViewModelImpl
             userRequestJob =
                 viewModelScope.launch {
                     _event.emit(Event.ShowProcessing)
+                    val result = deleteCirclePostComment(circleId, post.id, commentId)
+                    _event.emit(Event.EndProcessing)
 
-                    when (val result = deleteCirclePostComment(circleId, post.id, commentId)) {
+                    when (result) {
                         is Success -> showToastAndRefresh(MESSAGE_SUCCESS_DELETE_COMMENT)
                         is Error -> whenUserRequestFail(result)
                     }
@@ -253,11 +253,13 @@ class CircleDetailPostDetailViewModelImpl
             userRequestJob =
                 viewModelScope.launch {
                     _event.emit(Event.ShowProcessing)
+                    val result = deleteCirclePost(circleId, post.id)
+                    _event.emit(Event.EndProcessing)
 
-                    when (val result = deleteCirclePost(circleId, post.id)) {
+                    when (result) {
                         is Success -> {
                             _event.emit(Event.ShowToast(MESSAGE_SUCCESS_DELETE_POST))
-                            _screenFlow.emit(CircleDetailPostDetailScreen.SuccessView(contents, true))
+                            _screenFlow.emit(CircleDetailPostDetailScreen.Success(contents, true))
                         }
                         is Error -> whenUserRequestFail(result)
                     }
@@ -280,8 +282,10 @@ class CircleDetailPostDetailViewModelImpl
                 viewModelScope.launch {
                     if (!checkMessageFormat(message)) return@launch
                     _event.emit(Event.ShowProcessing)
+                    val result = postReportCirclePost(circleId, post.id, message)
+                    _event.emit(Event.EndProcessing)
 
-                    when (val result = postReportCirclePost(circleId, post.id, message)) {
+                    when (result) {
                         is Success -> _event.emit(Event.ShowToast(MESSAGE_SUCCESS_REQUEST_REPORT))
                         is Error -> whenUserRequestFail(result)
                     }
@@ -308,8 +312,10 @@ class CircleDetailPostDetailViewModelImpl
                 viewModelScope.launch {
                     if (!checkMessageFormat(message)) return@launch
                     _event.emit(Event.ShowProcessing)
+                    val result = postReportCirclePostComment(circleId, commentId, message)
+                    _event.emit(Event.EndProcessing)
 
-                    when (val result = postReportCirclePostComment(circleId, commentId, message)) {
+                    when (result) {
                         is Success -> _event.emit(Event.ShowToast(MESSAGE_SUCCESS_REQUEST_REPORT))
                         is Error -> whenUserRequestFail(result)
                     }
@@ -371,9 +377,9 @@ class CircleDetailPostDetailViewModelImpl
     }
 
 sealed class CircleDetailPostDetailScreen {
-    data class SuccessView(val contents: Models<BaseModel>, val hasDeleted: Boolean) : CircleDetailPostDetailScreen()
+    data class Success(val contents: Models<BaseModel>, val hasDeleted: Boolean) : CircleDetailPostDetailScreen()
 
-    data object LoadingView : CircleDetailPostDetailScreen()
+    data object Loading : CircleDetailPostDetailScreen()
 
-    data object ErrorView : CircleDetailPostDetailScreen()
+    data object Error : CircleDetailPostDetailScreen()
 }

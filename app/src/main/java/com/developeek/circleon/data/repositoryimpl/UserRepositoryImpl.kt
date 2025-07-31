@@ -29,7 +29,7 @@ class UserRepositoryImpl(
             val user = userManager.getUser()
             Result.success(user)
         } catch (e: Exception) {
-            Result.error(e)
+            Result.success(UserModel.empty())
         }
     }
 

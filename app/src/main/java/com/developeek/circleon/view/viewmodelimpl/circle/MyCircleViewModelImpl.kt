@@ -38,7 +38,7 @@ class MyCircleViewModelImpl
 
         private val _event = MutableSharedFlow<Event>()
         override val event: SharedFlow<Event> = _event
-        private val _screenFlow = MutableStateFlow<MyCircleScreen>(MyCircleScreen.NormalView)
+        private val _screenFlow = MutableStateFlow<MyCircleScreen>(MyCircleScreen.Normal)
         override val screenFlow: StateFlow<MyCircleScreen> = _screenFlow
 
         private var myCircles = origin
@@ -50,7 +50,7 @@ class MyCircleViewModelImpl
 
         init {
             viewModelScope.launch {
-                _screenFlow.emit(MyCircleScreen.SuccessView(myCircles))
+                _screenFlow.emit(MyCircleScreen.Success(myCircles))
             }
         }
 
@@ -68,7 +68,7 @@ class MyCircleViewModelImpl
 
             fetchCirclesJob =
                 viewModelScope.launch {
-                    _screenFlow.emit(MyCircleScreen.LoadingView)
+                    _screenFlow.emit(MyCircleScreen.Loading)
 
                     when (val result = getMyJoinRequestedCircles(page, size)) {
                         is Success -> whenFetchMyJoinRequestedCirclesSuccess(result)
@@ -85,12 +85,12 @@ class MyCircleViewModelImpl
         }
 
         private suspend fun whenFetchMyJoinRequestedCirclesSuccess(result: Success<Models<CircleSummaryModel>>) {
-            _screenFlow.emit(MyCircleScreen.SuccessView(result.data))
+            _screenFlow.emit(MyCircleScreen.Success(result.data))
         }
 
         private suspend fun whenFetchMyJoinRequestedCirclesFail(result: Error<Models<CircleSummaryModel>>) {
             _event.emit(Event.ShowToast(result.message()))
-            _screenFlow.emit(MyCircleScreen.NormalView)
+            _screenFlow.emit(MyCircleScreen.Normal)
 
             if (result.isAuthenticationError()) {
                 _event.emit(Event.SendToLoginScreen)
@@ -105,8 +105,10 @@ class MyCircleViewModelImpl
             userRequestJob =
                 viewModelScope.launch {
                     _event.emit(Event.ShowProcessing)
+                    val result = deleteCircleJoinRequest(memberId)
+                    _event.emit(Event.EndProcessing)
 
-                    when (val result = deleteCircleJoinRequest(memberId)) {
+                    when (result) {
                         is Success -> showToastAndRefresh(MESSAGE_SUCCESS_CANCEL_JOIN_REQUEST)
                         is Error -> whenUserRequestFail(result)
                     }
@@ -141,9 +143,9 @@ class MyCircleViewModelImpl
     }
 
 sealed class MyCircleScreen {
-    data class SuccessView(val circles: Models<CircleSummaryModel>) : MyCircleScreen()
+    data class Success(val circles: Models<CircleSummaryModel>) : MyCircleScreen()
 
-    data object LoadingView : MyCircleScreen()
+    data object Loading : MyCircleScreen()
 
-    data object NormalView : MyCircleScreen()
+    data object Normal : MyCircleScreen()
 }

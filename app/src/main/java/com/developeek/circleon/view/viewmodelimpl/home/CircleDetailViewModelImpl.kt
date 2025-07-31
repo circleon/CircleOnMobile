@@ -43,7 +43,7 @@ class CircleDetailViewModelImpl
 
         private val _event = MutableSharedFlow<Event>()
         override val event: SharedFlow<Event> = _event
-        private val _screenFlow = MutableStateFlow<CircleDetailScreen>(CircleDetailScreen.LoadingView)
+        private val _screenFlow = MutableStateFlow<CircleDetailScreen>(CircleDetailScreen.Loading)
         override val screenFlow: StateFlow<CircleDetailScreen> = _screenFlow
         private val _tabFlow = MutableSharedFlow<SelectTab>()
         override val tabFlow: SharedFlow<SelectTab> = _tabFlow
@@ -77,7 +77,7 @@ class CircleDetailViewModelImpl
 
             fetchCircleDetailJob =
                 viewModelScope.launch {
-                    _screenFlow.emit(CircleDetailScreen.LoadingView)
+                    _screenFlow.emit(CircleDetailScreen.Loading)
 
                     val circleDetailResult: Result<CircleDetailModel>
                     val circleMembersResult: Result<Models<MemberModel>>
@@ -111,12 +111,12 @@ class CircleDetailViewModelImpl
             circleMembersResult: Success<Models<MemberModel>>,
         ) {
             circleDetail = circleDetailResult.data.copyWith(circleMembersResult.data)
-            _screenFlow.emit(CircleDetailScreen.SuccessView(circleDetail))
+            _screenFlow.emit(CircleDetailScreen.Success(circleDetail))
         }
 
         private suspend fun whenFetchCircleDetailFail(result: Error<CircleDetailModel>) {
             _event.emit(Event.ShowToast(result.message()))
-            _screenFlow.emit(CircleDetailScreen.ErrorView)
+            _screenFlow.emit(CircleDetailScreen.Error)
 
             if (result.isAuthenticationError()) {
                 _event.emit(Event.SendToLoginScreen)
@@ -125,7 +125,7 @@ class CircleDetailViewModelImpl
 
         private suspend fun whenFetchCircleMembersFail(result: Error<Models<MemberModel>>) {
             _event.emit(Event.ShowToast(result.message()))
-            _screenFlow.emit(CircleDetailScreen.ErrorView)
+            _screenFlow.emit(CircleDetailScreen.Error)
 
             if (result.isAuthenticationError()) {
                 _event.emit(Event.SendToLoginScreen)
@@ -141,8 +141,10 @@ class CircleDetailViewModelImpl
                 viewModelScope.launch {
                     if (!checkMessageFormat(joinMessage)) return@launch
                     _event.emit(Event.ShowProcessing)
+                    val result = postMyCircle(circleId, joinMessage)
+                    _event.emit(Event.EndProcessing)
 
-                    when (val result = postMyCircle(circleId, joinMessage)) {
+                    when (result) {
                         is Success -> showToastAndRefresh(MESSAGE_SUCCESS_REQUEST_JOIN)
                         is Error -> whenUserRequestFail(result)
                     }
@@ -165,8 +167,10 @@ class CircleDetailViewModelImpl
                 viewModelScope.launch {
                     if (!checkMessageFormat(leaveMessage)) return@launch
                     _event.emit(Event.ShowProcessing)
+                    val result = postCircleLeaveRequest(circleDetail.memberId, leaveMessage)
+                    _event.emit(Event.EndProcessing)
 
-                    when (val result = postCircleLeaveRequest(circleDetail.memberId, leaveMessage)) {
+                    when (result) {
                         is Success -> showToastAndRefresh(MESSAGE_SUCCESS_REQUEST_LEAVE)
                         is Error -> whenUserRequestFail(result)
                     }
@@ -189,8 +193,10 @@ class CircleDetailViewModelImpl
                 viewModelScope.launch {
                     if (!checkMessageFormat(reportMessage)) return@launch
                     _event.emit(Event.ShowProcessing)
+                    val result = postReportCircle(circleId, reportMessage)
+                    _event.emit(Event.EndProcessing)
 
-                    when (val result = postReportCircle(circleId, reportMessage)) {
+                    when (result) {
                         is Success -> showToastAndRefresh(MESSAGE_SUCCESS_REQUEST_REPORT)
                         is Error -> whenUserRequestFail(result)
                     }
@@ -257,11 +263,11 @@ class CircleDetailViewModelImpl
     }
 
 sealed class CircleDetailScreen {
-    data class SuccessView(val circleDetail: CircleDetailModel) : CircleDetailScreen()
+    data class Success(val circleDetail: CircleDetailModel) : CircleDetailScreen()
 
-    data object LoadingView : CircleDetailScreen()
+    data object Loading : CircleDetailScreen()
 
-    data object ErrorView : CircleDetailScreen()
+    data object Error : CircleDetailScreen()
 }
 
 data class SelectTab(

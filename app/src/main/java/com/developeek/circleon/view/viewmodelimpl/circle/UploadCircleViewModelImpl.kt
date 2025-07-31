@@ -50,7 +50,7 @@ class UploadCircleViewModelImpl
 
         private val _event = MutableSharedFlow<Event>()
         override val event: SharedFlow<Event> = _event
-        private val _screenFlow = MutableStateFlow<UploadCircleScreen>(UploadCircleScreen.NormalView)
+        private val _screenFlow = MutableStateFlow<UploadCircleScreen>(UploadCircleScreen.Normal)
         override val screenFlow: StateFlow<UploadCircleScreen> = _screenFlow
         private val _uploadCircleScreenEvent = MutableSharedFlow<UploadCircleScreenEvent>()
         override val uploadCircleScreenEvent: SharedFlow<UploadCircleScreenEvent> = _uploadCircleScreenEvent
@@ -96,7 +96,7 @@ class UploadCircleViewModelImpl
             uploadCircleJob =
                 viewModelScope.launch {
                     if (!checkCircleFormat(circle)) return@launch
-                    _screenFlow.emit(UploadCircleScreen.LoadingView)
+                    _screenFlow.emit(UploadCircleScreen.Loading)
 
                     when (val result = postCircle(circle, profileImage, introductionImage)) {
                         is Success -> whenUploadCircleSuccess()
@@ -117,12 +117,12 @@ class UploadCircleViewModelImpl
             val message = if (isEdit) MESSAGE_SUCCESS_EDIT_CIRCLE else MESSAGE_SUCCESS_UPLOAD_CIRCLE
 
             _event.emit(Event.ShowToast(message))
-            _screenFlow.emit(UploadCircleScreen.SuccessView)
+            _screenFlow.emit(UploadCircleScreen.Success)
         }
 
         private suspend fun whenUploadCircleFail(result: Error<Unit>) {
             _event.emit(Event.ShowDialog(result.message()))
-            _screenFlow.emit(UploadCircleScreen.NormalView)
+            _screenFlow.emit(UploadCircleScreen.Normal)
 
             if (result.isAuthenticationError()) {
                 _event.emit(Event.SendToLoginScreen)
@@ -137,7 +137,7 @@ class UploadCircleViewModelImpl
             uploadCircleJob =
                 viewModelScope.launch {
                     if (!checkCircleFormat(circle)) return@launch
-                    _screenFlow.emit(UploadCircleScreen.LoadingView)
+                    _screenFlow.emit(UploadCircleScreen.Loading)
 
                     val editCircle =
                         async {
@@ -283,11 +283,11 @@ class UploadCircleViewModelImpl
     }
 
 sealed class UploadCircleScreen {
-    data object SuccessView : UploadCircleScreen()
+    data object Success : UploadCircleScreen()
 
-    data object LoadingView : UploadCircleScreen()
+    data object Loading : UploadCircleScreen()
 
-    data object NormalView : UploadCircleScreen()
+    data object Normal : UploadCircleScreen()
 }
 
 sealed class UploadCircleScreenEvent {

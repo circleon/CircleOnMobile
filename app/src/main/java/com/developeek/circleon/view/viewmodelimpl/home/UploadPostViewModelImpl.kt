@@ -30,7 +30,6 @@ class UploadPostViewModelImpl
     constructor(
         @Assisted("circleId") private val circleId: Int,
         @Assisted("postType") private val postType: PostType,
-        @Assisted("isEdit") private val isEdit: Boolean,
         private val repository: CircleRepository,
     ) : UploadPostViewModel, ViewModel() {
         @AssistedFactory
@@ -38,13 +37,12 @@ class UploadPostViewModelImpl
             fun create(
                 @Assisted("circleId") circleId: Int,
                 @Assisted("postType") postType: PostType,
-                @Assisted("isEdit") isEdit: Boolean,
             ): UploadPostViewModelImpl
         }
 
         private var _event = MutableSharedFlow<Event>()
         override val event: SharedFlow<Event> = _event
-        private var _screenFlow = MutableStateFlow<UploadPostScreen>(UploadPostScreen.NormalView)
+        private var _screenFlow = MutableStateFlow<UploadPostScreen>(UploadPostScreen.Normal)
         override val screenFlow: StateFlow<UploadPostScreen> = _screenFlow
 
         private var image: File? = null
@@ -59,7 +57,7 @@ class UploadPostViewModelImpl
             uploadPostJob =
                 viewModelScope.launch {
                     if (!checkPostFormat(content)) return@launch
-                    _screenFlow.emit(UploadPostScreen.LoadingView)
+                    _screenFlow.emit(UploadPostScreen.Loading)
 
                     when (val result = postCirclePost(circleId, postType, content, image)) {
                         is Success -> whenUploadPostSuccess()
@@ -78,12 +76,12 @@ class UploadPostViewModelImpl
         }
 
         private suspend fun whenUploadPostSuccess() {
-            _screenFlow.emit(UploadPostScreen.SuccessView)
+            _screenFlow.emit(UploadPostScreen.Success)
         }
 
         private suspend fun whenUploadPostFail(result: Error<Unit>) {
             _event.emit(Event.ShowDialog(result.message()))
-            _screenFlow.emit(UploadPostScreen.NormalView)
+            _screenFlow.emit(UploadPostScreen.Normal)
 
             if (result.isAuthenticationError()) {
                 _event.emit(Event.SendToLoginScreen)
@@ -101,7 +99,7 @@ class UploadPostViewModelImpl
             uploadPostJob =
                 viewModelScope.launch {
                     if (!checkPostFormat(content)) return@launch
-                    _screenFlow.emit(UploadPostScreen.LoadingView)
+                    _screenFlow.emit(UploadPostScreen.Loading)
 
                     when (val result = putCirclePost(circleId, postId, postType, content)) {
                         is Success -> whenUploadPostSuccess()
@@ -140,9 +138,9 @@ class UploadPostViewModelImpl
     }
 
 sealed class UploadPostScreen {
-    data object SuccessView : UploadPostScreen()
+    data object Success : UploadPostScreen()
 
-    data object LoadingView : UploadPostScreen()
+    data object Loading : UploadPostScreen()
 
-    data object NormalView : UploadPostScreen()
+    data object Normal : UploadPostScreen()
 }

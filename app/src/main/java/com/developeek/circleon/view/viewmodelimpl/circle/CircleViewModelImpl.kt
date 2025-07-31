@@ -28,7 +28,7 @@ class CircleViewModelImpl
     constructor(private val repository: UserRepository) : CircleViewModel, ViewModel() {
         private val _event = MutableSharedFlow<Event>()
         override val event: SharedFlow<Event> = _event
-        private val _screenFlow = MutableStateFlow<CircleScreen>(CircleScreen.NormalView)
+        private val _screenFlow = MutableStateFlow<CircleScreen>(CircleScreen.Normal)
         override val screenFlow: StateFlow<CircleScreen> = _screenFlow
 
         private var currentPage = DEFAULT_PAGE
@@ -54,7 +54,7 @@ class CircleViewModelImpl
 
             fetchUserCirclesJob =
                 viewModelScope.launch {
-                    _screenFlow.emit(CircleScreen.LoadingView)
+                    _screenFlow.emit(CircleScreen.Loading)
 
                     val myCircles =
                         async {
@@ -90,7 +90,7 @@ class CircleViewModelImpl
             leaveRequestedCircles: Success<Models<CircleSummaryModel>>,
         ) {
             _screenFlow.emit(
-                CircleScreen.SuccessView(
+                CircleScreen.Success(
                     myCircles = myCircles.data,
                     joinRequestedCircles = joinRequestedCircles.data,
                     leaveRequestedCircles = leaveRequestedCircles.data,
@@ -100,7 +100,7 @@ class CircleViewModelImpl
 
         private suspend fun whenFetchMyCirclesFail(result: Error<Models<CircleSummaryModel>>) {
             _event.emit(Event.ShowToast(result.message()))
-            _screenFlow.emit(CircleScreen.NormalView)
+            _screenFlow.emit(CircleScreen.Normal)
 
             if (result.isAuthenticationError()) {
                 _event.emit(Event.SendToLoginScreen)
@@ -135,13 +135,13 @@ class CircleViewModelImpl
     }
 
 sealed class CircleScreen {
-    data class SuccessView(
+    data class Success(
         val myCircles: Models<CircleSummaryModel>,
         val joinRequestedCircles: Models<CircleSummaryModel>,
         val leaveRequestedCircles: Models<CircleSummaryModel>,
     ) : CircleScreen()
 
-    data object LoadingView : CircleScreen()
+    data object Loading : CircleScreen()
 
-    data object NormalView : CircleScreen()
+    data object Normal : CircleScreen()
 }

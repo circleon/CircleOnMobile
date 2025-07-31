@@ -29,7 +29,7 @@ class SignUpViewModelImpl
     constructor(private val repository: AuthRepository) : SignUpViewModel, ViewModel() {
         private val _event = MutableSharedFlow<Event>()
         override val event: SharedFlow<Event> = _event
-        private val _screenFlow = MutableStateFlow<SignUpScreen>(SignUpScreen.NormalView)
+        private val _screenFlow = MutableStateFlow<SignUpScreen>(SignUpScreen.Normal)
         override val screenFlow: StateFlow<SignUpScreen> = _screenFlow
         private val _signUpScreenEvent = MutableSharedFlow<SignUpScreenEvent>()
         override val signUpScreenEvent: SharedFlow<SignUpScreenEvent> = _signUpScreenEvent
@@ -61,7 +61,7 @@ class SignUpViewModelImpl
 
             userRequestJob =
                 viewModelScope.launch {
-                    _screenFlow.emit(SignUpScreen.LoadingView)
+                    _screenFlow.emit(SignUpScreen.Loading)
 
                     when (
                         val result =
@@ -82,12 +82,12 @@ class SignUpViewModelImpl
 
         private suspend fun whenSignUpSuccess() {
             _event.emit(Event.ShowToast(MESSAGE_SUCCESS_SIGN_UP))
-            _screenFlow.emit(SignUpScreen.SuccessView)
+            _screenFlow.emit(SignUpScreen.Success)
         }
 
         private suspend fun whenSignUpFail(result: Error<Unit>) {
             _event.emit(Event.ShowDialog(result.message()))
-            _screenFlow.emit(SignUpScreen.NormalView)
+            _screenFlow.emit(SignUpScreen.Normal)
         }
 
         override fun setName(name: String) {
@@ -274,7 +274,9 @@ class SignUpViewModelImpl
             }
 
             _event.emit(Event.ShowProcessing)
-            when (val result = requestEmailAuthenticationCode(signUpManager.email)) {
+            val result = requestEmailAuthenticationCode(signUpManager.email)
+            _event.emit(Event.EndProcessing)
+            when (result) {
                 is Success -> {
                     whenRequestEmailAuthenticationCodeSuccess()
                     emailCodeRequested = true
@@ -326,11 +328,11 @@ class SignUpViewModelImpl
     }
 
 sealed class SignUpScreen {
-    data object SuccessView : SignUpScreen()
+    data object Success : SignUpScreen()
 
-    data object LoadingView : SignUpScreen()
+    data object Loading : SignUpScreen()
 
-    data object NormalView : SignUpScreen()
+    data object Normal : SignUpScreen()
 }
 
 sealed class SignUpScreenEvent {
@@ -339,18 +341,4 @@ sealed class SignUpScreenEvent {
         val stepCondition: Boolean,
         val validationMessage: String,
     ) : SignUpScreenEvent()
-}
-
-enum class SignUpStep {
-    NAME,
-    EMAIL,
-    EMAIL_AUTHENTICATION,
-    PASSWORD,
-    TERMS, ;
-
-    fun getIndex() = entries.indexOf(this)
-
-    fun getNext() = if (this == entries.last()) this else entries[entries.indexOf(this) + 1]
-
-    fun getPrevious() = if (this == entries.first()) this else entries[entries.indexOf(this) - 1]
 }

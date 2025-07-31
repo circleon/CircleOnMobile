@@ -1,8 +1,6 @@
 package com.developeek.circleon.view.screen.home
 
-import android.app.Activity
 import android.content.Context
-import android.content.Intent
 import android.content.res.ColorStateList
 import android.os.Bundle
 import android.text.Html
@@ -29,16 +27,14 @@ import com.developeek.circleon.domain.model.CircleDetailModel
 import com.developeek.circleon.domain.utils.Const
 import com.developeek.circleon.domain.utils.Utils
 import com.developeek.circleon.domain.utils.glide.GlideProvider
-import com.developeek.circleon.view.Event
 import com.developeek.circleon.view.listener.ItemListenerInitializer
-import com.developeek.circleon.view.screen.auth.LoginActivity
+import com.developeek.circleon.view.screen.base.BaseFragment
 import com.developeek.circleon.view.viewmodel.home.CircleDetailViewModel
 import com.developeek.circleon.view.viewmodelimpl.home.CircleDetailScreen
 import com.developeek.circleon.view.viewmodelimpl.home.CircleDetailViewModelImpl
 import com.developeek.circleon.view.viewmodelimpl.home.SelectTab
 import com.developeek.circleon.view.widget.CircleRequestAlertDialog
 import com.developeek.circleon.view.widget.SingleMessageAlertDialog
-import com.developeek.circleon.view.widget.SingleMessageToast
 import com.google.android.material.tabs.TabLayout
 import dagger.hilt.android.AndroidEntryPoint
 import dagger.hilt.android.lifecycle.withCreationCallback
@@ -46,11 +42,11 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @AndroidEntryPoint
-class CircleDetailFragment : Fragment() {
-    private lateinit var binding: FragmentCircleDetailBinding
+class CircleDetailFragment : BaseFragment() {
+    private val binding: FragmentCircleDetailBinding by lazy {
+        FragmentCircleDetailBinding.inflate(layoutInflater)
+    }
     private lateinit var fragmentManager: FragmentManager
-    private var circleId = 0
-    private var circleName = Const.EMPTY_TEXT
     private val viewModel: CircleDetailViewModel by viewModels<CircleDetailViewModelImpl>(
         extrasProducer = {
             defaultViewModelCreationExtras
@@ -59,6 +55,8 @@ class CircleDetailFragment : Fragment() {
                 }
         },
     )
+    private var circleId = 0
+    private var circleName = Const.EMPTY_TEXT
 
     @Inject
     lateinit var glideProvider: GlideProvider
@@ -71,6 +69,7 @@ class CircleDetailFragment : Fragment() {
             circleId = it.getInt(Const.TAG_CIRCLE_ID)
             circleName = it.getString(Const.TAG_CIRCLE_NAME) ?: Const.EMPTY_TEXT
         }
+        fragmentManager = childFragmentManager
     }
 
     override fun onCreateView(
@@ -78,9 +77,6 @@ class CircleDetailFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?,
     ): View {
-        binding = FragmentCircleDetailBinding.inflate(layoutInflater)
-        fragmentManager = childFragmentManager
-
         return binding.root
     }
 
@@ -93,25 +89,7 @@ class CircleDetailFragment : Fragment() {
         initView()
         initListener()
         initRefreshObserver()
-        lifecycleScope.launch {
-            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
-                launch {
-                    viewModel.event.collect {
-                        handleEvent(it, requireActivity(), requireContext())
-                    }
-                }
-                launch {
-                    viewModel.screenFlow.collect {
-                        handleScreenFlow(it, requireContext())
-                    }
-                }
-                launch {
-                    viewModel.tabFlow.collect {
-                        selectTab(it)
-                    }
-                }
-            }
-        }
+        handleEventFlow(requireContext())
     }
 
     private fun initView() {
@@ -188,55 +166,50 @@ class CircleDetailFragment : Fragment() {
             }
     }
 
-    private fun handleEvent(
-        event: Event,
-        parentActivity: Activity,
-        context: Context,
-    ) {
-        when (event) {
-            is Event.SendToLoginScreen -> sendUserToLoginScreen(parentActivity)
-            is Event.ShowToast -> showToast(event, context)
-            is Event.ShowDialog -> showDialog(event, context)
-            else -> {}
+    private fun handleEventFlow(context: Context) {
+        lifecycleScope.launch {
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                launch {
+                    viewModel.event.collect {
+                        super.handleEvent(it)
+                    }
+                }
+                launch {
+                    viewModel.screenFlow.collect {
+                        handleScreenFlow(it, context)
+                    }
+                }
+                launch {
+                    viewModel.tabFlow.collect {
+                        selectTab(it)
+                    }
+                }
+            }
         }
     }
 
-    private fun sendUserToLoginScreen(activity: Activity) {
-        val intent = Intent(activity, LoginActivity::class.java)
-        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)
-        startActivity(intent)
+    override fun showProcessing() {
+        binding.pgbLoading.isVisible = true
     }
 
-    private fun showToast(
-        event: Event.ShowToast,
-        context: Context,
-    ) {
-        if (SingleMessageToast.previousFinished()) {
-            SingleMessageToast(context, event.message).show()
-        }
-    }
-
-    private fun showDialog(
-        event: Event.ShowDialog,
-        context: Context,
-    ) {
-        SingleMessageAlertDialog(context, event.message).show()
+    override fun endProcessing() {
+        binding.pgbLoading.isVisible = false
     }
 
     private fun handleScreenFlow(
         screenFlow: CircleDetailScreen,
         context: Context,
     ) {
-        binding.pgbLoading.isVisible = screenFlow is CircleDetailScreen.LoadingView
+        binding.pgbLoading.isVisible = screenFlow is CircleDetailScreen.Loading
         when (screenFlow) {
-            is CircleDetailScreen.SuccessView -> showSuccessView(screenFlow, context)
-            is CircleDetailScreen.ErrorView -> showErrorView()
+            is CircleDetailScreen.Success -> showSuccessView(screenFlow, context)
+            is CircleDetailScreen.Error -> showErrorView()
             else -> {}
         }
     }
 
     private fun showSuccessView(
-        screenFlow: CircleDetailScreen.SuccessView,
+        screenFlow: CircleDetailScreen.Success,
         context: Context,
     ) {
         switchView(binding.flCircleDetail)

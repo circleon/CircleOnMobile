@@ -2,7 +2,6 @@ package com.developeek.circleon.view.screen.home
 
 import android.app.Activity
 import android.content.Context
-import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -13,7 +12,6 @@ import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
-import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
@@ -26,13 +24,10 @@ import com.developeek.circleon.domain.model.PostModel
 import com.developeek.circleon.domain.utils.Const
 import com.developeek.circleon.domain.utils.Utils.toJPEG
 import com.developeek.circleon.domain.utils.glide.GlideProvider
-import com.developeek.circleon.view.Event
-import com.developeek.circleon.view.screen.auth.LoginActivity
+import com.developeek.circleon.view.screen.base.BaseFragment
 import com.developeek.circleon.view.viewmodel.home.UploadPostViewModel
 import com.developeek.circleon.view.viewmodelimpl.home.UploadPostScreen
 import com.developeek.circleon.view.viewmodelimpl.home.UploadPostViewModelImpl
-import com.developeek.circleon.view.widget.SingleMessageAlertDialog
-import com.developeek.circleon.view.widget.SingleMessageToast
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import dagger.hilt.android.AndroidEntryPoint
 import dagger.hilt.android.lifecycle.withCreationCallback
@@ -40,12 +35,10 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @AndroidEntryPoint
-class UploadPostFragment : Fragment() {
-    private lateinit var binding: FragmentUploadPostBinding
-    private var circleId = 0
-    private lateinit var postType: PostType // 편집이 아닌 상황에서는 item 전달이 되지 않기 때문에 post type 을 별도로 수신
-    private var isEdit = false
-    private lateinit var post: PostModel
+class UploadPostFragment : BaseFragment() {
+    private val binding: FragmentUploadPostBinding by lazy {
+        FragmentUploadPostBinding.inflate(layoutInflater)
+    }
     private val pickMedia: ActivityResultLauncher<PickVisualMediaRequest> =
         registerForActivityResult(ActivityResultContracts.PickVisualMedia()) {
                 uri ->
@@ -61,10 +54,14 @@ class UploadPostFragment : Fragment() {
         extrasProducer = {
             defaultViewModelCreationExtras
                 .withCreationCallback<UploadPostViewModelImpl.UploadPostViewModelFactory> {
-                    it.create(circleId, postType, isEdit)
+                    it.create(circleId, postType)
                 }
         },
     )
+    private lateinit var post: PostModel
+    private lateinit var postType: PostType // 편집이 아닌 상황에서는 item 전달이 되지 않기 때문에 post type 을 별도로 수신
+    private var circleId = 0
+    private var isEdit = false
 
     @Inject
     lateinit var glideProvider: GlideProvider
@@ -90,8 +87,6 @@ class UploadPostFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?,
     ): View {
-        binding = FragmentUploadPostBinding.inflate(layoutInflater)
-
         return binding.root
     }
 
@@ -103,20 +98,7 @@ class UploadPostFragment : Fragment() {
 
         initView(requireActivity(), requireContext())
         initListener(requireContext())
-        lifecycleScope.launch {
-            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
-                launch {
-                    viewModel.event.collect {
-                        handleEvent(it, requireActivity(), requireContext())
-                    }
-                }
-                launch {
-                    viewModel.screenFlow.collect {
-                        handleScreenFlow(it)
-                    }
-                }
-            }
-        }
+        handleEventFlow()
     }
 
     private fun initView(
@@ -216,45 +198,27 @@ class UploadPostFragment : Fragment() {
         }
     }
 
-    private fun handleEvent(
-        event: Event,
-        parentActivity: Activity,
-        context: Context,
-    ) {
-        when (event) {
-            is Event.SendToLoginScreen -> sendUserToLoginScreen(parentActivity)
-            is Event.ShowToast -> showToast(event, context)
-            is Event.ShowDialog -> showDialog(event, context)
-            else -> {}
+    private fun handleEventFlow() {
+        lifecycleScope.launch {
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                launch {
+                    viewModel.event.collect {
+                        super.handleEvent(it)
+                    }
+                }
+                launch {
+                    viewModel.screenFlow.collect {
+                        handleScreenFlow(it)
+                    }
+                }
+            }
         }
-    }
-
-    private fun sendUserToLoginScreen(parentActivity: Activity) {
-        val intent = Intent(parentActivity, LoginActivity::class.java)
-        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)
-        startActivity(intent)
-    }
-
-    private fun showToast(
-        event: Event.ShowToast,
-        context: Context,
-    ) {
-        if (SingleMessageToast.previousFinished()) {
-            SingleMessageToast(context, event.message).show()
-        }
-    }
-
-    private fun showDialog(
-        event: Event.ShowDialog,
-        context: Context,
-    ) {
-        SingleMessageAlertDialog(context, event.message).show()
     }
 
     private fun handleScreenFlow(screenFlow: UploadPostScreen) {
-        binding.pgbLoading.isVisible = screenFlow is UploadPostScreen.LoadingView
+        binding.pgbLoading.isVisible = screenFlow is UploadPostScreen.Loading
         when (screenFlow) {
-            is UploadPostScreen.SuccessView -> {
+            is UploadPostScreen.Success -> {
                 requestRefreshToPreviousScreen()
                 sendUserToPreviousScreen()
             }

@@ -5,6 +5,7 @@ import android.os.Bundle
 import android.view.KeyEvent
 import android.widget.Toast
 import androidx.activity.viewModels
+import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.isVisible
 import androidx.navigation.NavController
 import androidx.navigation.NavDestination
@@ -12,14 +13,13 @@ import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.NavigationUI
 import com.developeek.circleon.R
 import com.developeek.circleon.databinding.ActivityMainBinding
-import com.developeek.circleon.view.screen.base.BaseActivity
 import com.developeek.circleon.view.viewmodel.MainViewModel
 import com.developeek.circleon.view.viewmodelimpl.MainViewModelImpl
 import com.developeek.circleon.view.widget.SingleMessageToast
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
-class MainActivity : BaseActivity() {
+class MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding
     private lateinit var navController: NavController
     private lateinit var finishWaitingToast: Toast

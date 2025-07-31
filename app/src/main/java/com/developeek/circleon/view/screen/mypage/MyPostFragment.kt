@@ -1,8 +1,6 @@
 package com.developeek.circleon.view.screen.mypage
 
-import android.app.Activity
 import android.content.Context
-import android.content.Intent
 import android.os.Build
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -10,7 +8,6 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.core.os.bundleOf
 import androidx.core.view.isVisible
-import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
@@ -23,23 +20,22 @@ import com.developeek.circleon.databinding.FragmentMyPostBinding
 import com.developeek.circleon.domain.model.Models
 import com.developeek.circleon.domain.model.MyPostModel
 import com.developeek.circleon.domain.utils.Const
-import com.developeek.circleon.view.Event
 import com.developeek.circleon.view.adapter.MyPostAdapter
 import com.developeek.circleon.view.listener.ItemListenerInitializer
 import com.developeek.circleon.view.listener.RecyclerViewInfiniteScrollListener
-import com.developeek.circleon.view.screen.auth.LoginActivity
+import com.developeek.circleon.view.screen.base.BaseFragment
 import com.developeek.circleon.view.viewmodel.mypage.MyPostViewModel
 import com.developeek.circleon.view.viewmodelimpl.mypage.MyPostScreen
 import com.developeek.circleon.view.viewmodelimpl.mypage.MyPostViewModelImpl
-import com.developeek.circleon.view.widget.SingleMessageToast
 import dagger.hilt.android.AndroidEntryPoint
 import dagger.hilt.android.lifecycle.withCreationCallback
 import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
-class MyPostFragment : Fragment() {
-    private lateinit var binding: FragmentMyPostBinding
-    private var isMyPosts = false
+class MyPostFragment : BaseFragment() {
+    private val binding: FragmentMyPostBinding by lazy {
+        FragmentMyPostBinding.inflate(layoutInflater)
+    }
     private val viewModel: MyPostViewModel by viewModels<MyPostViewModelImpl>(
         extrasProducer = {
             defaultViewModelCreationExtras
@@ -48,6 +44,7 @@ class MyPostFragment : Fragment() {
                 }
         },
     )
+    private var isMyPosts = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -62,8 +59,6 @@ class MyPostFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?,
     ): View {
-        binding = FragmentMyPostBinding.inflate(layoutInflater)
-
         return binding.root
     }
 
@@ -75,20 +70,7 @@ class MyPostFragment : Fragment() {
 
         initView(requireContext())
         initListener()
-        lifecycleScope.launch {
-            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
-                launch {
-                    viewModel.event.collect {
-                        handleEvent(it, requireActivity(), requireContext())
-                    }
-                }
-                launch {
-                    viewModel.screenFlow.collect {
-                        handleScreenFlow(it, requireContext())
-                    }
-                }
-            }
-        }
+        handleEventFlow(requireContext())
     }
 
     private fun initView(context: Context) {
@@ -181,30 +163,20 @@ class MyPostFragment : Fragment() {
         }
     }
 
-    private fun handleEvent(
-        event: Event,
-        parentActivity: Activity,
-        context: Context,
-    ) {
-        when (event) {
-            is Event.SendToLoginScreen -> sendUserToLoginScreen(parentActivity)
-            is Event.ShowToast -> showToast(event, context)
-            else -> {}
-        }
-    }
-
-    private fun sendUserToLoginScreen(activity: Activity) {
-        val intent = Intent(activity, LoginActivity::class.java)
-        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)
-        startActivity(intent)
-    }
-
-    private fun showToast(
-        event: Event.ShowToast,
-        context: Context,
-    ) {
-        if (SingleMessageToast.previousFinished()) {
-            SingleMessageToast(context, event.message).show()
+    private fun handleEventFlow(context: Context) {
+        lifecycleScope.launch {
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                launch {
+                    viewModel.event.collect {
+                        super.handleEvent(it)
+                    }
+                }
+                launch {
+                    viewModel.screenFlow.collect {
+                        handleScreenFlow(it, requireContext())
+                    }
+                }
+            }
         }
     }
 
@@ -213,14 +185,14 @@ class MyPostFragment : Fragment() {
         context: Context,
     ) {
         when (screenFlow) {
-            is MyPostScreen.SuccessView -> showSuccessView(screenFlow, context)
-            is MyPostScreen.LoadingView -> showLoadingView()
-            is MyPostScreen.ErrorView -> showErrorView()
+            is MyPostScreen.Success -> showSuccessView(screenFlow, context)
+            is MyPostScreen.Loading -> showLoadingView()
+            is MyPostScreen.Error -> showErrorView()
         }
     }
 
     private fun showSuccessView(
-        screenFlow: MyPostScreen.SuccessView,
+        screenFlow: MyPostScreen.Success,
         context: Context,
     ) {
         if (screenFlow.posts.isEmpty()) {

@@ -8,15 +8,15 @@ import androidx.fragment.app.Fragment
 import com.developeek.circleon.databinding.FragmentCircleDetailActivityPhotoBinding
 
 class CircleDetailActivityPhotoFragment : Fragment() {
-    private lateinit var binding: FragmentCircleDetailActivityPhotoBinding
+    private val binding: FragmentCircleDetailActivityPhotoBinding by lazy {
+        FragmentCircleDetailActivityPhotoBinding.inflate(layoutInflater)
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?,
     ): View {
-        binding = FragmentCircleDetailActivityPhotoBinding.inflate(layoutInflater)
-
         return binding.root
     }
 }

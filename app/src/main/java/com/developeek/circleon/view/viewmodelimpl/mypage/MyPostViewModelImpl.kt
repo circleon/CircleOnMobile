@@ -40,7 +40,7 @@ class MyPostViewModelImpl
 
         private val _event = MutableSharedFlow<Event>()
         override val event: SharedFlow<Event> = _event
-        private val _screenFlow = MutableStateFlow<MyPostScreen>(MyPostScreen.LoadingView)
+        private val _screenFlow = MutableStateFlow<MyPostScreen>(MyPostScreen.Loading)
         override val screenFlow: StateFlow<MyPostScreen> = _screenFlow
 
         override val isLastPage: Boolean
@@ -72,7 +72,7 @@ class MyPostViewModelImpl
 
             fetchMyPostsJob =
                 viewModelScope.launch {
-                    _screenFlow.emit(MyPostScreen.LoadingView)
+                    _screenFlow.emit(MyPostScreen.Loading)
                     scrollOverMyPostsJob?.cancel()
 
                     when (val result = if (isMyPosts) getMyPosts(page, size) else getMyCommentPosts(page, size)) {
@@ -101,12 +101,12 @@ class MyPostViewModelImpl
                 posts = Models(it.content)
                 _isLastPage = it.isLastPage
             }
-            _screenFlow.emit(MyPostScreen.SuccessView(posts))
+            _screenFlow.emit(MyPostScreen.Success(posts))
         }
 
         private suspend fun whenFetchMyPostsFail(result: Error<Page<MyPostModel>>) {
             _event.emit(Event.ShowToast(result.message()))
-            _screenFlow.emit(MyPostScreen.ErrorView)
+            _screenFlow.emit(MyPostScreen.Error)
 
             if (result.isAuthenticationError()) {
                 _event.emit(Event.SendToLoginScreen)
@@ -145,7 +145,7 @@ class MyPostViewModelImpl
             }
             currentPage++
 
-            _screenFlow.emit(MyPostScreen.SuccessView(posts))
+            _screenFlow.emit(MyPostScreen.Success(posts))
         }
 
         private suspend fun whenScrollOverFail(result: Error<Page<MyPostModel>>) {
@@ -163,9 +163,9 @@ class MyPostViewModelImpl
     }
 
 sealed class MyPostScreen {
-    data class SuccessView(val posts: Models<MyPostModel>) : MyPostScreen()
+    data class Success(val posts: Models<MyPostModel>) : MyPostScreen()
 
-    data object LoadingView : MyPostScreen()
+    data object Loading : MyPostScreen()
 
-    data object ErrorView : MyPostScreen()
+    data object Error : MyPostScreen()
 }

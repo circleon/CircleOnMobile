@@ -26,7 +26,9 @@ import com.developeek.circleon.view.viewmodelimpl.auth.SignUpViewModelImpl
 import kotlinx.coroutines.launch
 
 class SignUpPasswordFragment : Fragment() {
-    private lateinit var binding: FragmentSignUpPasswordBinding
+    private val binding: FragmentSignUpPasswordBinding by lazy {
+        FragmentSignUpPasswordBinding.inflate(layoutInflater)
+    }
     private val viewModel: SignUpViewModel by activityViewModels<SignUpViewModelImpl>()
 
     override fun onCreateView(
@@ -34,8 +36,6 @@ class SignUpPasswordFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?,
     ): View {
-        binding = FragmentSignUpPasswordBinding.inflate(layoutInflater)
-
         return binding.root
     }
 

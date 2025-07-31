@@ -5,11 +5,13 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.developeek.circleon.data.repository.CircleRepository
 import com.developeek.circleon.data.repository.Page
+import com.developeek.circleon.data.repository.UserRepository
 import com.developeek.circleon.data.source.Error
 import com.developeek.circleon.data.source.Success
 import com.developeek.circleon.domain.model.CircleDetailModel
 import com.developeek.circleon.domain.model.Models
 import com.developeek.circleon.domain.model.PostModel
+import com.developeek.circleon.domain.model.UserModel
 import com.developeek.circleon.domain.utils.validator.Invalid
 import com.developeek.circleon.domain.utils.validator.Validator
 import com.developeek.circleon.view.Event
@@ -33,7 +35,8 @@ class CircleDetailPostViewModelImpl
     @AssistedInject
     constructor(
         @Assisted("circleDetail") private val circleDetail: CircleDetailModel,
-        private val repository: CircleRepository,
+        private val circleRepository: CircleRepository,
+        private val userRepository: UserRepository,
     ) : CircleDetailPostViewModel, ViewModel() {
         @AssistedFactory
         interface CircleDetailPostViewModelFactory {
@@ -42,9 +45,14 @@ class CircleDetailPostViewModelImpl
             ): CircleDetailPostViewModelImpl
         }
 
+        override val user: UserModel by lazy {
+            (userRepository.getUser() as Success).data
+        }
+
         private val _event = MutableSharedFlow<Event>()
         override val event: SharedFlow<Event> = _event
-        private val _screenFlow = MutableStateFlow<CircleDetailPostScreen>(CircleDetailPostScreen.LoadingView)
+        private val _screenFlow =
+            MutableStateFlow<CircleDetailPostScreen>(CircleDetailPostScreen.Loading)
         override val screenFlow: StateFlow<CircleDetailPostScreen> = _screenFlow
 
         override val isLastPage: Boolean
@@ -68,7 +76,7 @@ class CircleDetailPostViewModelImpl
 
         override fun showLoadingAndRefresh() {
             viewModelScope.launch {
-                _screenFlow.emit(CircleDetailPostScreen.LoadingView)
+                _screenFlow.emit(CircleDetailPostScreen.Loading)
             }
             refresh()
         }
@@ -101,20 +109,20 @@ class CircleDetailPostViewModelImpl
             page: Int,
             size: Int,
         ) = withContext(dispatcher) {
-            repository.getCirclePosts(circleId, page, size)
+            circleRepository.getCirclePosts(circleId, page, size)
         }
 
         private suspend fun whenFetchPostsSuccess(result: Success<Page<PostModel>>) {
             result.data.let {
                 _isLastPage = it.isLastPage
                 posts = Models(it.content)
-                _screenFlow.emit(CircleDetailPostScreen.SuccessView(posts))
+                _screenFlow.emit(CircleDetailPostScreen.Success(posts))
             }
         }
 
         private suspend fun whenFetchPostsFail(result: Error<Page<PostModel>>) {
             _event.emit(Event.ShowToast(result.message()))
-            _screenFlow.emit(CircleDetailPostScreen.ErrorView)
+            _screenFlow.emit(CircleDetailPostScreen.Error)
 
             if (result.isAuthenticationError()) {
                 _event.emit(Event.SendToLoginScreen)
@@ -142,7 +150,7 @@ class CircleDetailPostViewModelImpl
             result.data.let {
                 _isLastPage = it.isLastPage
                 posts = posts.addAllAndGet(it.content)
-                _screenFlow.emit(CircleDetailPostScreen.SuccessView(posts))
+                _screenFlow.emit(CircleDetailPostScreen.Success(posts))
             }
             currentPage++
         }
@@ -163,8 +171,10 @@ class CircleDetailPostViewModelImpl
             userRequestJob =
                 viewModelScope.launch {
                     _event.emit(Event.ShowProcessing)
+                    val result = deleteCirclePost(circleDetail.circleId, postId)
+                    _event.emit(Event.EndProcessing)
 
-                    when (val result = deleteCirclePost(circleDetail.circleId, postId)) {
+                    when (result) {
                         is Success -> showToastAndRefresh(MESSAGE_SUCCESS_REQUEST_REMOVE_POST)
                         is Error -> whenUserRequestFail(result)
                     }
@@ -175,7 +185,7 @@ class CircleDetailPostViewModelImpl
             circleId: Int,
             postId: Int,
         ) = withContext(dispatcher) {
-            repository.deleteCirclePost(circleId, postId)
+            circleRepository.deleteCirclePost(circleId, postId)
         }
 
         override fun requestReportPost(
@@ -190,8 +200,10 @@ class CircleDetailPostViewModelImpl
                 viewModelScope.launch {
                     if (!checkMessageFormat(reportMessage)) return@launch
                     _event.emit(Event.ShowProcessing)
+                    val result = postReportCirclePost(circleDetail.circleId, postId, reportMessage)
+                    _event.emit(Event.EndProcessing)
 
-                    when (val result = postReportCirclePost(circleDetail.circleId, postId, reportMessage)) {
+                    when (result) {
                         is Success -> showToast(MESSAGE_SUCCESS_REQUEST_REPORT)
                         is Error -> whenUserRequestFail(result)
                     }
@@ -203,7 +215,7 @@ class CircleDetailPostViewModelImpl
             postId: Int,
             message: String,
         ) = withContext(dispatcher) {
-            repository.postReportCirclePost(circleId, postId, message)
+            circleRepository.postReportCirclePost(circleId, postId, message)
         }
 
         private suspend fun showToastAndRefresh(message: String) {
@@ -252,17 +264,17 @@ class CircleDetailPostViewModelImpl
     }
 
 sealed class CircleDetailPostScreen {
-    val hasCollected: Boolean
-        get() = _hasCollected
-    private var _hasCollected = false
+    data class Success(val posts: Models<PostModel>) : CircleDetailPostScreen() {
+        val hasCollected: Boolean
+            get() = _hasCollected
+        private var _hasCollected = false
 
-    fun notifyCollected() {
-        _hasCollected = true
+        fun notifyCollected() {
+            _hasCollected = true
+        }
     }
 
-    data class SuccessView(val posts: Models<PostModel>) : CircleDetailPostScreen()
+    data object Loading : CircleDetailPostScreen()
 
-    data object LoadingView : CircleDetailPostScreen()
-
-    data object ErrorView : CircleDetailPostScreen()
+    data object Error : CircleDetailPostScreen()
 }
