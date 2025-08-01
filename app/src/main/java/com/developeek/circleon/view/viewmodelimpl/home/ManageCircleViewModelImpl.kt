@@ -41,10 +41,8 @@ class ManageCircleViewModelImpl
 
         private val _event = MutableSharedFlow<Event>()
         override val event: SharedFlow<Event> = _event
-        private val _screenFlow = MutableStateFlow<ManageCircleScreen>(ManageCircleScreen.LoadingView)
+        private val _screenFlow = MutableStateFlow<ManageCircleScreen>(ManageCircleScreen.Loading)
         override val screenFlow: StateFlow<ManageCircleScreen> = _screenFlow
-        private val _manageCircleScreenEvent = MutableSharedFlow<ManageCircleScreenEvent>()
-        override val manageCircleScreenEvent: SharedFlow<ManageCircleScreenEvent> = _manageCircleScreenEvent
 
         private var fetchMembersJob: Job? = null
         private var userRequestJob: Job? = null
@@ -70,7 +68,7 @@ class ManageCircleViewModelImpl
 
             fetchMembersJob =
                 viewModelScope.launch {
-                    _screenFlow.emit(ManageCircleScreen.LoadingView)
+                    _screenFlow.emit(ManageCircleScreen.Loading)
 
                     val circleMembers =
                         async {
@@ -162,7 +160,7 @@ class ManageCircleViewModelImpl
             leaveRequestedMembers: Success<Models<MemberModel>>,
         ) {
             _screenFlow.emit(
-                ManageCircleScreen.SuccessView(
+                ManageCircleScreen.Success(
                     circleMembers = circleMembers.data,
                     joinRequestedMembers = joinRequestedMembers.data,
                     leaveRequestedMembers = leaveRequestedMembers.data,
@@ -172,7 +170,7 @@ class ManageCircleViewModelImpl
 
         private suspend fun whenFetchMembersFail(result: Error<Models<MemberModel>>) {
             _event.emit(Event.ShowToast(result.message()))
-            _screenFlow.emit(ManageCircleScreen.NormalView)
+            _screenFlow.emit(ManageCircleScreen.Error)
 
             if (result.isAuthenticationError()) {
                 _event.emit(Event.SendToLoginScreen)
@@ -187,8 +185,10 @@ class ManageCircleViewModelImpl
             userRequestJob =
                 viewModelScope.launch {
                     _event.emit(Event.ShowProcessing)
+                    val result = putCircleOfficialStatus(circle.circleId)
+                    _event.emit(Event.EndProcessing)
 
-                    when (val result = putCircleOfficialStatus(circle.circleId)) {
+                    when (result) {
                         is Success -> showToastAndRefresh(MESSAGE_SUCCESS_REQUEST_OFFICIAL_STATUS)
                         is Error -> whenUserRequestFail(result)
                     }
@@ -223,8 +223,10 @@ class ManageCircleViewModelImpl
             userRequestJob =
                 viewModelScope.launch {
                     _event.emit(Event.ShowProcessing)
+                    val result = requestDeleteCircle(circle.id)
+                    _event.emit(Event.EndProcessing)
 
-                    when (val result = requestDeleteCircle(circle.id)) {
+                    when (result) {
                         is Success -> whenDeleteCircleSuccess()
                         is Error -> whenUserRequestFail(result)
                     }
@@ -233,7 +235,7 @@ class ManageCircleViewModelImpl
 
         private suspend fun whenDeleteCircleSuccess() {
             _event.emit(Event.ShowToast(MESSAGE_SUCCESS_DELETE_CIRCLE))
-            _manageCircleScreenEvent.emit(ManageCircleScreenEvent.DeleteCircle)
+            _screenFlow.emit(ManageCircleScreen.Success(hasDeleted = true))
         }
 
         private suspend fun requestDeleteCircle(circleId: Int) =
@@ -250,17 +252,14 @@ class ManageCircleViewModelImpl
     }
 
 sealed class ManageCircleScreen {
-    data class SuccessView(
-        val circleMembers: Models<MemberModel>,
-        val joinRequestedMembers: Models<MemberModel>,
-        val leaveRequestedMembers: Models<MemberModel>,
+    data class Success(
+        val circleMembers: Models<MemberModel> = Models(emptyList()),
+        val joinRequestedMembers: Models<MemberModel> = Models(emptyList()),
+        val leaveRequestedMembers: Models<MemberModel> = Models(emptyList()),
+        val hasDeleted: Boolean = false,
     ) : ManageCircleScreen()
 
-    data object LoadingView : ManageCircleScreen()
+    data object Loading : ManageCircleScreen()
 
-    data object NormalView : ManageCircleScreen()
-}
-
-sealed class ManageCircleScreenEvent {
-    data object DeleteCircle : ManageCircleScreenEvent()
+    data object Error : ManageCircleScreen()
 }

@@ -1,9 +1,10 @@
-package com.developeek.circleon.view.screen.home
+package com.developeek.circleon.view.screen
 
 import android.content.Context
 import android.os.Bundle
 import android.view.KeyEvent
 import android.widget.Toast
+import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.isVisible
 import androidx.navigation.NavController
@@ -11,21 +12,27 @@ import androidx.navigation.NavDestination
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.NavigationUI
 import com.developeek.circleon.R
-import com.developeek.circleon.databinding.ActivityHomeBinding
+import com.developeek.circleon.databinding.ActivityMainBinding
+import com.developeek.circleon.view.viewmodel.MainViewModel
+import com.developeek.circleon.view.viewmodelimpl.MainViewModelImpl
 import com.developeek.circleon.view.widget.SingleMessageToast
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
-class HomeActivity : AppCompatActivity() {
-    private lateinit var binding: ActivityHomeBinding
+class MainActivity : AppCompatActivity() {
+    private lateinit var binding: ActivityMainBinding
     private lateinit var navController: NavController
     private lateinit var finishWaitingToast: Toast
+    private val viewModel: MainViewModel by viewModels<MainViewModelImpl>()
     private var backClicked = false
     private var onMainFragment = true
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        binding = ActivityHomeBinding.inflate(layoutInflater)
+
+        viewModel.checkUser()
+
+        binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
         initView(this)
     }

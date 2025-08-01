@@ -25,7 +25,9 @@ import com.developeek.circleon.view.viewmodelimpl.auth.ChangePasswordViewModelIm
 import kotlinx.coroutines.launch
 
 class ChangePasswordEmailAuthenticationFragment : Fragment() {
-    private lateinit var binding: FragmentChangePasswordEmailAuthenticationBinding
+    private val binding: FragmentChangePasswordEmailAuthenticationBinding by lazy {
+        FragmentChangePasswordEmailAuthenticationBinding.inflate(layoutInflater)
+    }
     private val viewModel: ChangePasswordViewModel by activityViewModels<ChangePasswordViewModelImpl>()
 
     override fun onCreateView(
@@ -33,8 +35,6 @@ class ChangePasswordEmailAuthenticationFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?,
     ): View {
-        binding = FragmentChangePasswordEmailAuthenticationBinding.inflate(layoutInflater)
-
         return binding.root
     }
 

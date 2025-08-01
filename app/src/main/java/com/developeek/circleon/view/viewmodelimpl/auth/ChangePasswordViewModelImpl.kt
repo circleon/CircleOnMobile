@@ -31,7 +31,7 @@ class ChangePasswordViewModelImpl
     constructor(private val repository: AuthRepository) : ChangePasswordViewModel, ViewModel() {
         private val _event = MutableSharedFlow<Event>()
         override val event: SharedFlow<Event> = _event
-        private val _screenFlow = MutableStateFlow<ChangePasswordScreen>(ChangePasswordScreen.NormalView)
+        private val _screenFlow = MutableStateFlow<ChangePasswordScreen>(ChangePasswordScreen.Normal)
         override val screenFlow: StateFlow<ChangePasswordScreen> = _screenFlow
         private val _changePasswordScreenEvent = MutableSharedFlow<ChangePasswordScreenEvent>()
         override val changePasswordScreenEvent: SharedFlow<ChangePasswordScreenEvent> = _changePasswordScreenEvent
@@ -63,7 +63,7 @@ class ChangePasswordViewModelImpl
 
             userRequestJob =
                 viewModelScope.launch {
-                    _screenFlow.emit(ChangePasswordScreen.LoadingView)
+                    _screenFlow.emit(ChangePasswordScreen.Loading)
 
                     when (
                         val result =
@@ -80,12 +80,12 @@ class ChangePasswordViewModelImpl
 
         private suspend fun whenChangePasswordSuccess() {
             _event.emit(Event.ShowToast(MESSAGE_SUCCESS_CHANGE_PASSWORD))
-            _screenFlow.emit(ChangePasswordScreen.SuccessView)
+            _screenFlow.emit(ChangePasswordScreen.Success)
         }
 
         private suspend fun whenChangePasswordFail(result: Error<Unit>) {
             _event.emit(Event.ShowDialog(result.message()))
-            _screenFlow.emit(ChangePasswordScreen.NormalView)
+            _screenFlow.emit(ChangePasswordScreen.Normal)
         }
 
         override fun setEmail(email: String) {
@@ -233,7 +233,10 @@ class ChangePasswordViewModelImpl
             }
 
             _event.emit(Event.ShowProcessing)
-            when (val result = requestEmailAuthenticationCodeForNewPassword(passwordChangeManager.email)) {
+            val result = requestEmailAuthenticationCodeForNewPassword(passwordChangeManager.email)
+            _event.emit(Event.EndProcessing)
+
+            when (result) {
                 is Success -> {
                     whenRequestEmailAuthenticationCodeSuccess(result)
                     emailCodeRequested = true
@@ -285,11 +288,11 @@ class ChangePasswordViewModelImpl
     }
 
 sealed class ChangePasswordScreen {
-    data object SuccessView : ChangePasswordScreen()
+    data object Success : ChangePasswordScreen()
 
-    data object LoadingView : ChangePasswordScreen()
+    data object Loading : ChangePasswordScreen()
 
-    data object NormalView : ChangePasswordScreen()
+    data object Normal : ChangePasswordScreen()
 }
 
 sealed class ChangePasswordScreenEvent {
@@ -298,16 +301,4 @@ sealed class ChangePasswordScreenEvent {
         val stepCondition: Boolean,
         val validationMessage: String,
     ) : ChangePasswordScreenEvent()
-}
-
-enum class ChangePasswordStep {
-    EMAIL,
-    EMAIL_AUTHENTICATION,
-    PASSWORD, ;
-
-    fun getIndex() = entries.indexOf(this)
-
-    fun getNext() = if (this == entries.last()) this else entries[entries.indexOf(this) + 1]
-
-    fun getPrevious() = if (this == entries.first()) this else entries[entries.indexOf(this) - 1]
 }

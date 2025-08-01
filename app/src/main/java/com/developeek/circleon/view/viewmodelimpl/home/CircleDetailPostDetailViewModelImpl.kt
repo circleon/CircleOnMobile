@@ -4,12 +4,14 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.developeek.circleon.data.repository.CircleRepository
 import com.developeek.circleon.data.repository.Page
+import com.developeek.circleon.data.repository.UserRepository
 import com.developeek.circleon.data.source.Error
 import com.developeek.circleon.data.source.Success
 import com.developeek.circleon.domain.model.BaseModel
 import com.developeek.circleon.domain.model.CommentModel
 import com.developeek.circleon.domain.model.Models
 import com.developeek.circleon.domain.model.PostModel
+import com.developeek.circleon.domain.model.UserModel
 import com.developeek.circleon.domain.utils.validator.Invalid
 import com.developeek.circleon.domain.utils.validator.Validator
 import com.developeek.circleon.view.Event
@@ -34,7 +36,8 @@ class CircleDetailPostDetailViewModelImpl
     constructor(
         @Assisted("circleId") private val circleId: Int,
         @Assisted("post") private val post: PostModel,
-        private val repository: CircleRepository,
+        private val circleRepository: CircleRepository,
+        private val userRepository: UserRepository,
     ) : CircleDetailPostDetailViewModel, ViewModel() {
         @AssistedFactory
         interface CircleDetailPostDetailViewModelFactory {
@@ -44,10 +47,14 @@ class CircleDetailPostDetailViewModelImpl
             ): CircleDetailPostDetailViewModelImpl
         }
 
+        override val user: UserModel by lazy {
+            (userRepository.getUser() as Success).data
+        }
+
         private val _event = MutableSharedFlow<Event>()
         override val event: SharedFlow<Event> = _event
         private val _screenFlow =
-            MutableStateFlow<CircleDetailPostDetailScreen>(CircleDetailPostDetailScreen.LoadingView)
+            MutableStateFlow<CircleDetailPostDetailScreen>(CircleDetailPostDetailScreen.Loading)
         override val screenFlow: StateFlow<CircleDetailPostDetailScreen> = _screenFlow
 
         override val isLastPage: Boolean
@@ -68,7 +75,7 @@ class CircleDetailPostDetailViewModelImpl
 
         override fun showLoadingAndRefresh() {
             viewModelScope.launch {
-                _screenFlow.emit(CircleDetailPostDetailScreen.LoadingView)
+                _screenFlow.emit(CircleDetailPostDetailScreen.Loading)
             }
             refresh()
         }
@@ -100,20 +107,20 @@ class CircleDetailPostDetailViewModelImpl
             page: Int,
             size: Int,
         ) = withContext(dispatcher) {
-            repository.getCirclePostComments(circleId, postId, page, size)
+            circleRepository.getCirclePostComments(circleId, postId, page, size)
         }
 
         private suspend fun whenFetchCommentsSuccess(result: Success<Page<CommentModel>>) {
             result.data.let {
                 _isLastPage = it.isLastPage
                 contents = Models(listOf(post) + it.content)
-                _screenFlow.emit(CircleDetailPostDetailScreen.SuccessView(contents, false))
+                _screenFlow.emit(CircleDetailPostDetailScreen.Success(contents, false))
             }
         }
 
         private suspend fun whenFetchCommentsFail(result: Error<Page<CommentModel>>) {
             _event.emit(Event.ShowToast(result.message()))
-            _screenFlow.emit(CircleDetailPostDetailScreen.ErrorView)
+            _screenFlow.emit(CircleDetailPostDetailScreen.Error)
 
             if (result.isAuthenticationError()) {
                 _event.emit(Event.SendToLoginScreen)
@@ -141,7 +148,7 @@ class CircleDetailPostDetailViewModelImpl
             result.data.let {
                 _isLastPage = it.isLastPage
                 contents = contents.addAllAndGet(it.content)
-                _screenFlow.emit(CircleDetailPostDetailScreen.SuccessView(contents, false))
+                _screenFlow.emit(CircleDetailPostDetailScreen.Success(contents, false))
             }
             currentPage++
         }
@@ -163,12 +170,11 @@ class CircleDetailPostDetailViewModelImpl
                 viewModelScope.launch {
                     if (!checkCommentFormat(content)) return@launch
                     _event.emit(Event.ShowProcessing)
+                    val result = postCirclePostComment(circleId, post.id, content)
+                    _event.emit(Event.EndProcessing)
 
-                    when (val result = postCirclePostComment(circleId, post.id, content)) {
-                        is Success -> {
-                            _event.emit(Event.EndProcessing)
-                            refresh()
-                        }
+                    when (result) {
+                        is Success -> refresh()
                         is Error -> whenUserRequestFail(result)
                     }
                 }
@@ -179,7 +185,7 @@ class CircleDetailPostDetailViewModelImpl
             postId: Int,
             content: String,
         ) = withContext(dispatcher) {
-            repository.postCirclePostComment(circleId, postId, content)
+            circleRepository.postCirclePostComment(circleId, postId, content)
         }
 
         override fun editComment(
@@ -194,12 +200,11 @@ class CircleDetailPostDetailViewModelImpl
                 viewModelScope.launch {
                     if (!checkCommentFormat(content)) return@launch
                     _event.emit(Event.ShowProcessing)
+                    val result = putCirclePostComment(circleId, post.id, commentId, content)
+                    _event.emit(Event.EndProcessing)
 
-                    when (val result = putCirclePostComment(circleId, post.id, commentId, content)) {
-                        is Success -> {
-                            _event.emit(Event.EndProcessing)
-                            refresh()
-                        }
+                    when (result) {
+                        is Success -> refresh()
                         is Error -> whenUserRequestFail(result)
                     }
                 }
@@ -211,7 +216,7 @@ class CircleDetailPostDetailViewModelImpl
             commentId: Int,
             content: String,
         ) = withContext(dispatcher) {
-            repository.putCirclePostComment(circleId, postId, commentId, content)
+            circleRepository.putCirclePostComment(circleId, postId, commentId, content)
         }
 
         override fun deleteComment(commentId: Int) {
@@ -222,8 +227,10 @@ class CircleDetailPostDetailViewModelImpl
             userRequestJob =
                 viewModelScope.launch {
                     _event.emit(Event.ShowProcessing)
+                    val result = deleteCirclePostComment(circleId, post.id, commentId)
+                    _event.emit(Event.EndProcessing)
 
-                    when (val result = deleteCirclePostComment(circleId, post.id, commentId)) {
+                    when (result) {
                         is Success -> showToastAndRefresh(MESSAGE_SUCCESS_DELETE_COMMENT)
                         is Error -> whenUserRequestFail(result)
                     }
@@ -235,7 +242,7 @@ class CircleDetailPostDetailViewModelImpl
             postId: Int,
             commentId: Int,
         ) = withContext(dispatcher) {
-            repository.deleteCirclePostComment(circleId, postId, commentId)
+            circleRepository.deleteCirclePostComment(circleId, postId, commentId)
         }
 
         override fun delete() {
@@ -246,11 +253,13 @@ class CircleDetailPostDetailViewModelImpl
             userRequestJob =
                 viewModelScope.launch {
                     _event.emit(Event.ShowProcessing)
+                    val result = deleteCirclePost(circleId, post.id)
+                    _event.emit(Event.EndProcessing)
 
-                    when (val result = deleteCirclePost(circleId, post.id)) {
+                    when (result) {
                         is Success -> {
                             _event.emit(Event.ShowToast(MESSAGE_SUCCESS_DELETE_POST))
-                            _screenFlow.emit(CircleDetailPostDetailScreen.SuccessView(contents, true))
+                            _screenFlow.emit(CircleDetailPostDetailScreen.Success(contents, true))
                         }
                         is Error -> whenUserRequestFail(result)
                     }
@@ -261,7 +270,7 @@ class CircleDetailPostDetailViewModelImpl
             circleId: Int,
             postId: Int,
         ) = withContext(dispatcher) {
-            repository.deleteCirclePost(circleId, postId)
+            circleRepository.deleteCirclePost(circleId, postId)
         }
 
         override fun reportPost(message: String) {
@@ -273,8 +282,10 @@ class CircleDetailPostDetailViewModelImpl
                 viewModelScope.launch {
                     if (!checkMessageFormat(message)) return@launch
                     _event.emit(Event.ShowProcessing)
+                    val result = postReportCirclePost(circleId, post.id, message)
+                    _event.emit(Event.EndProcessing)
 
-                    when (val result = postReportCirclePost(circleId, post.id, message)) {
+                    when (result) {
                         is Success -> _event.emit(Event.ShowToast(MESSAGE_SUCCESS_REQUEST_REPORT))
                         is Error -> whenUserRequestFail(result)
                     }
@@ -286,7 +297,7 @@ class CircleDetailPostDetailViewModelImpl
             postId: Int,
             content: String,
         ) = withContext(dispatcher) {
-            repository.postReportCirclePost(circleId, postId, content)
+            circleRepository.postReportCirclePost(circleId, postId, content)
         }
 
         override fun reportComment(
@@ -301,8 +312,10 @@ class CircleDetailPostDetailViewModelImpl
                 viewModelScope.launch {
                     if (!checkMessageFormat(message)) return@launch
                     _event.emit(Event.ShowProcessing)
+                    val result = postReportCirclePostComment(circleId, commentId, message)
+                    _event.emit(Event.EndProcessing)
 
-                    when (val result = postReportCirclePostComment(circleId, commentId, message)) {
+                    when (result) {
                         is Success -> _event.emit(Event.ShowToast(MESSAGE_SUCCESS_REQUEST_REPORT))
                         is Error -> whenUserRequestFail(result)
                     }
@@ -314,7 +327,7 @@ class CircleDetailPostDetailViewModelImpl
             commentId: Int,
             message: String,
         ) = withContext(dispatcher) {
-            repository.postReportCirclePostComment(circleId, commentId, message)
+            circleRepository.postReportCirclePostComment(circleId, commentId, message)
         }
 
         private suspend fun showToastAndRefresh(message: String) {
@@ -364,9 +377,9 @@ class CircleDetailPostDetailViewModelImpl
     }
 
 sealed class CircleDetailPostDetailScreen {
-    data class SuccessView(val contents: Models<BaseModel>, val hasDeleted: Boolean) : CircleDetailPostDetailScreen()
+    data class Success(val contents: Models<BaseModel>, val hasDeleted: Boolean) : CircleDetailPostDetailScreen()
 
-    data object LoadingView : CircleDetailPostDetailScreen()
+    data object Loading : CircleDetailPostDetailScreen()
 
-    data object ErrorView : CircleDetailPostDetailScreen()
+    data object Error : CircleDetailPostDetailScreen()
 }

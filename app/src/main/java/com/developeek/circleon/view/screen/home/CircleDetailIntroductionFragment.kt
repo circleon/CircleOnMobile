@@ -20,7 +20,9 @@ import javax.inject.Inject
 
 @AndroidEntryPoint
 class CircleDetailIntroductionFragment : Fragment() {
-    private lateinit var binding: FragmentCircleDetailIntroductionBinding
+    private val binding: FragmentCircleDetailIntroductionBinding by lazy {
+        FragmentCircleDetailIntroductionBinding.inflate(layoutInflater)
+    }
     private lateinit var circleDetail: CircleDetailModel
 
     @Inject
@@ -39,8 +41,6 @@ class CircleDetailIntroductionFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?,
     ): View {
-        binding = FragmentCircleDetailIntroductionBinding.inflate(layoutInflater)
-
         return binding.root
     }
 

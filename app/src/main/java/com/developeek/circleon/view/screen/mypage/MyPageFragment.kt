@@ -1,6 +1,5 @@
 package com.developeek.circleon.view.screen.mypage
 
-import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
@@ -13,7 +12,6 @@ import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.view.isVisible
-import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
@@ -21,20 +19,16 @@ import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
 import com.developeek.circleon.BuildConfig
 import com.developeek.circleon.R
-import com.developeek.circleon.data.source.manager.UserManager
 import com.developeek.circleon.databinding.FragmentMyPageBinding
 import com.developeek.circleon.domain.model.UserModel
 import com.developeek.circleon.domain.utils.Const
 import com.developeek.circleon.domain.utils.Utils.toJPEG
 import com.developeek.circleon.domain.utils.glide.GlideProvider
-import com.developeek.circleon.view.Event
-import com.developeek.circleon.view.screen.auth.LoginActivity
+import com.developeek.circleon.view.screen.base.BaseFragment
 import com.developeek.circleon.view.viewmodel.mypage.MyPageViewModel
 import com.developeek.circleon.view.viewmodelimpl.mypage.MyPageScreenEvent
 import com.developeek.circleon.view.viewmodelimpl.mypage.MyPageViewModelImpl
 import com.developeek.circleon.view.widget.PositiveAlertDialog
-import com.developeek.circleon.view.widget.SingleMessageAlertDialog
-import com.developeek.circleon.view.widget.SingleMessageToast
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
@@ -42,8 +36,10 @@ import java.io.File
 import javax.inject.Inject
 
 @AndroidEntryPoint
-class MyPageFragment : Fragment() {
-    private lateinit var binding: FragmentMyPageBinding
+class MyPageFragment : BaseFragment() {
+    private val binding: FragmentMyPageBinding by lazy {
+        FragmentMyPageBinding.inflate(layoutInflater)
+    }
     private val viewModel: MyPageViewModel by viewModels<MyPageViewModelImpl>()
     private val userProfilePickMedia: ActivityResultLauncher<PickVisualMediaRequest> =
         registerForActivityResult(ActivityResultContracts.PickVisualMedia()) { uri ->
@@ -51,9 +47,6 @@ class MyPageFragment : Fragment() {
                 showSetUserProfileDialog(it.toJPEG(requireContext()), requireContext())
             }
         }
-
-    @Inject
-    lateinit var userManager: UserManager
 
     @Inject
     lateinit var glideProvider: GlideProvider
@@ -71,8 +64,6 @@ class MyPageFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?,
     ): View {
-        binding = FragmentMyPageBinding.inflate(layoutInflater)
-
         return binding.root
     }
 
@@ -84,27 +75,12 @@ class MyPageFragment : Fragment() {
 
         initView(requireContext())
         initListener(requireContext())
-        lifecycleScope.launch {
-            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
-                launch {
-                    viewModel.event.collect {
-                        handleEvent(it, requireActivity(), requireContext())
-                    }
-                }
-                launch {
-                    viewModel.myPageScreenEvent.collect {
-                        handleMyPageScreenEvent(it, requireContext())
-                    }
-                }
-            }
-        }
+        handleEventFlow(requireContext())
     }
 
     private fun initView(context: Context) {
         initVersionName(context)
-        userManager.getUser()?.let {
-            loadUserInfo(it, context)
-        }
+        loadUserInfo(viewModel.user, context)
     }
 
     private fun initVersionName(context: Context) {
@@ -151,17 +127,15 @@ class MyPageFragment : Fragment() {
     }
 
     private fun setBtnProfileImageListener(context: Context) {
-        userManager.getUser()?.let {
-            it.profileImage?.let { _ ->
-                binding.btnAddOrRemoveUserProfile.setOnClickListener {
-                    showRemoveUserProfileDialog(context)
-                }
-            } ?: binding.btnAddOrRemoveUserProfile.setOnClickListener {
-                pickImage()
+        viewModel.user.profileImage?.let {
+            binding.btnAddOrRemoveUserProfile.setOnClickListener {
+                showRemoveUserProfileDialog(context)
             }
-            binding.btnAddUserProfile.setOnClickListener {
-                pickImage()
-            }
+        } ?: binding.btnAddOrRemoveUserProfile.setOnClickListener {
+            pickImage()
+        }
+        binding.btnAddUserProfile.setOnClickListener {
+            pickImage()
         }
     }
 
@@ -254,40 +228,29 @@ class MyPageFragment : Fragment() {
         ).show()
     }
 
-    private fun handleEvent(
-        event: Event,
-        parentActivity: Activity,
-        context: Context,
-    ) {
-        binding.pgbLoading.isVisible = event is Event.ShowProcessing
-        when (event) {
-            is Event.SendToLoginScreen -> sendUserToLoginScreen(parentActivity)
-            is Event.ShowToast -> showToast(event, context)
-            is Event.ShowDialog -> showDialog(event, context)
-            else -> {}
+    private fun handleEventFlow(context: Context) {
+        lifecycleScope.launch {
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                launch {
+                    viewModel.event.collect {
+                        super.handleEvent(it)
+                    }
+                }
+                launch {
+                    viewModel.myPageScreenEvent.collect {
+                        handleMyPageScreenEvent(it, requireContext())
+                    }
+                }
+            }
         }
     }
 
-    private fun sendUserToLoginScreen(activity: Activity) {
-        val intent = Intent(activity, LoginActivity::class.java)
-        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)
-        startActivity(intent)
+    override fun showProcessing() {
+        binding.pgbLoading.isVisible = true
     }
 
-    private fun showToast(
-        event: Event.ShowToast,
-        context: Context,
-    ) {
-        if (SingleMessageToast.previousFinished()) {
-            SingleMessageToast(context, event.message).show()
-        }
-    }
-
-    private fun showDialog(
-        event: Event.ShowDialog,
-        context: Context,
-    ) {
-        SingleMessageAlertDialog(context, event.message).show()
+    override fun endProcessing() {
+        binding.pgbLoading.isVisible = false
     }
 
     private fun handleMyPageScreenEvent(
@@ -305,7 +268,7 @@ class MyPageFragment : Fragment() {
         binding.btnAddOrRemoveUserProfile.setOnClickListener {
             showRemoveUserProfileDialog(context)
         }
-        userManager.getUser()?.profileImage?.let {
+        viewModel.user.profileImage?.let {
             glideProvider.fetchImage(it, context, binding.btnAddUserProfile)
         }
     }

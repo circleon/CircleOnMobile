@@ -27,7 +27,7 @@ class SearchViewModelImpl
     constructor(private val repository: CircleRepository) : SearchCircleViewModel, ViewModel() {
         private val _event = MutableSharedFlow<Event>()
         override val event: SharedFlow<Event> = _event
-        private val _screenFlow = MutableStateFlow<SearchCircleScreen>(SearchCircleScreen.LoadingView)
+        private val _screenFlow = MutableStateFlow<SearchCircleScreen>(SearchCircleScreen.Loading)
         override val screenFlow: StateFlow<SearchCircleScreen> = _screenFlow
 
         private lateinit var circleSummaries: Models<CircleSummaryModel>
@@ -51,7 +51,7 @@ class SearchViewModelImpl
 
             fetchCircleSummariesJob =
                 viewModelScope.launch {
-                    _screenFlow.emit(SearchCircleScreen.LoadingView)
+                    _screenFlow.emit(SearchCircleScreen.Loading)
 
                     when (val result = getCircleSummaries()) {
                         is Success -> whenFetchCircleSummariesSuccess(result)
@@ -74,7 +74,7 @@ class SearchViewModelImpl
 
         private suspend fun whenFetchCircleSummariesFail(result: Error<Models<CircleSummaryModel>>) {
             _event.emit(Event.ShowToast(result.message()))
-            _screenFlow.emit(SearchCircleScreen.ErrorView)
+            _screenFlow.emit(SearchCircleScreen.Error)
 
             if (result.isAuthenticationError()) {
                 _event.emit(Event.SendToLoginScreen)
@@ -104,10 +104,10 @@ class SearchViewModelImpl
             keyword: String,
         ) {
             if (keyword == Const.EMPTY_TEXT) {
-                _screenFlow.emit(SearchCircleScreen.SuccessView(Models()))
+                _screenFlow.emit(SearchCircleScreen.Success(Models()))
             } else {
                 _screenFlow.emit(
-                    SearchCircleScreen.SuccessView(
+                    SearchCircleScreen.Success(
                         CircleSummaryModel.findByKeyword(circleSummaries, keyword),
                     ),
                 )
@@ -116,9 +116,9 @@ class SearchViewModelImpl
     }
 
 sealed class SearchCircleScreen {
-    data class SuccessView(val circles: Models<CircleSummaryModel>) : SearchCircleScreen()
+    data class Success(val circles: Models<CircleSummaryModel>) : SearchCircleScreen()
 
-    data object LoadingView : SearchCircleScreen()
+    data object Loading : SearchCircleScreen()
 
-    data object ErrorView : SearchCircleScreen()
+    data object Error : SearchCircleScreen()
 }

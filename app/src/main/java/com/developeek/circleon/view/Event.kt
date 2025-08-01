@@ -13,6 +13,7 @@ sealed class Event {
 
     data class ShowDialog(val message: String) : Event()
 
+    // Loading == 화면 주요 데이터 처리 작업, Processing == 단순 요청 작업
     data object ShowProcessing : Event()
 
     data object EndProcessing : Event()

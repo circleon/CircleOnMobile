@@ -45,7 +45,7 @@ class ManageCircleMemberViewModelImpl
 
         private val _event = MutableSharedFlow<Event>()
         override val event: SharedFlow<Event> = _event
-        private val _screenFlow = MutableStateFlow<ManageCircleMemberScreen>(ManageCircleMemberScreen.NormalView)
+        private val _screenFlow = MutableStateFlow<ManageCircleMemberScreen>(ManageCircleMemberScreen.Loading)
         override val screenFlow: StateFlow<ManageCircleMemberScreen> = _screenFlow
 
         private var members: Models<MemberModel> = origin
@@ -58,7 +58,7 @@ class ManageCircleMemberViewModelImpl
 
         init {
             viewModelScope.launch {
-                _screenFlow.emit(ManageCircleMemberScreen.SuccessView(members))
+                _screenFlow.emit(ManageCircleMemberScreen.Success(members))
             }
         }
 
@@ -73,8 +73,10 @@ class ManageCircleMemberViewModelImpl
             userRequestJob =
                 viewModelScope.launch {
                     _event.emit(Event.ShowProcessing)
+                    val result = putCircleMemberRole(circle.circleId, member.memberId, role)
+                    _event.emit(Event.EndProcessing)
 
-                    when (val result = putCircleMemberRole(circle.circleId, member.memberId, role)) {
+                    when (result) {
                         is Success ->
                             showToastAndDoAfter(
                                 MESSAGE_SUCCESS_EDIT_MEMBER_ROLE,
@@ -123,9 +125,11 @@ class ManageCircleMemberViewModelImpl
 
             fetchMembersJob =
                 viewModelScope.launch {
-                    _screenFlow.emit(ManageCircleMemberScreen.LoadingView)
+                    _event.emit(Event.ShowProcessing)
+                    val result = getCircleMembers(circle.circleId, page, size)
+                    _event.emit(Event.EndProcessing)
 
-                    when (val result = getCircleMembers(circle.circleId, page, size)) {
+                    when (result) {
                         is Success -> whenFetchMembersSuccess(result)
                         is Error -> whenFetchMembersFail(result)
                     }
@@ -142,7 +146,7 @@ class ManageCircleMemberViewModelImpl
 
         private suspend fun whenFetchMembersSuccess(result: Success<Models<MemberModel>>) {
             members = result.data
-            _screenFlow.emit(ManageCircleMemberScreen.SuccessView(members))
+            _screenFlow.emit(ManageCircleMemberScreen.Success(members))
         }
 
         private suspend fun whenFetchMembersFail(result: Error<Models<MemberModel>>) {
@@ -161,8 +165,10 @@ class ManageCircleMemberViewModelImpl
             userRequestJob =
                 viewModelScope.launch {
                     _event.emit(Event.ShowProcessing)
+                    val result = deleteCircleMember(circle.circleId, member.memberId)
+                    _event.emit(Event.EndProcessing)
 
-                    when (val result = deleteCircleMember(circle.circleId, member.memberId)) {
+                    when (result) {
                         is Success ->
                             showToastAndDoAfter(
                                 MESSAGE_SUCCESS_BAN_MEMBER,
@@ -206,8 +212,10 @@ class ManageCircleMemberViewModelImpl
             userRequestJob =
                 viewModelScope.launch {
                     _event.emit(Event.ShowProcessing)
+                    val result = putCircleMemberStatus(circle.circleId, member.memberId, membershipStatus)
+                    _event.emit(Event.EndProcessing)
 
-                    when (val result = putCircleMemberStatus(circle.circleId, member.memberId, membershipStatus)) {
+                    when (result) {
                         is Success -> {
                             var after = {}
                             if (member.status.isJoinRequested()) {
@@ -248,9 +256,11 @@ class ManageCircleMemberViewModelImpl
 
             fetchMembersJob =
                 viewModelScope.launch {
-                    _screenFlow.emit(ManageCircleMemberScreen.LoadingView)
+                    _event.emit(Event.ShowProcessing)
+                    val result = getJoinRequestedMembersWithMessage(circle.circleId, page, size)
+                    _event.emit(Event.EndProcessing)
 
-                    when (val result = getJoinRequestedMembersWithMessage(circle.circleId, page, size)) {
+                    when (result) {
                         is Success -> whenFetchMembersSuccess(result)
                         is Error -> whenFetchMembersFail(result)
                     }
@@ -291,9 +301,11 @@ class ManageCircleMemberViewModelImpl
 
             fetchMembersJob =
                 viewModelScope.launch {
-                    _screenFlow.emit(ManageCircleMemberScreen.LoadingView)
+                    _event.emit(Event.ShowProcessing)
+                    val result = getLeaveRequestedMembersWithMessage(circle.circleId, page, size)
+                    _event.emit(Event.EndProcessing)
 
-                    when (val result = getLeaveRequestedMembersWithMessage(circle.circleId, page, size)) {
+                    when (result) {
                         is Success -> whenFetchMembersSuccess(result)
                         is Error -> whenFetchMembersFail(result)
                     }
@@ -336,9 +348,9 @@ class ManageCircleMemberViewModelImpl
     }
 
 sealed class ManageCircleMemberScreen {
-    data class SuccessView(val members: Models<MemberModel>) : ManageCircleMemberScreen()
+    data class Success(val members: Models<MemberModel>) : ManageCircleMemberScreen()
 
-    data object LoadingView : ManageCircleMemberScreen()
+    data object Loading : ManageCircleMemberScreen()
 
-    data object NormalView : ManageCircleMemberScreen()
+    data object Error : ManageCircleMemberScreen()
 }

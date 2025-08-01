@@ -141,3 +141,17 @@ class SignUpManager {
             SignUpStep.TERMS -> Const.EMPTY_TEXT
         }
 }
+
+enum class SignUpStep {
+    NAME,
+    EMAIL,
+    EMAIL_AUTHENTICATION,
+    PASSWORD,
+    TERMS, ;
+
+    fun getIndex() = entries.indexOf(this)
+
+    fun getNext() = if (this == entries.last()) this else entries[entries.indexOf(this) + 1]
+
+    fun getPrevious() = if (this == entries.first()) this else entries[entries.indexOf(this) - 1]
+}

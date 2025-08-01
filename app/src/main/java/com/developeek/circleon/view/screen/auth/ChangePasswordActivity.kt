@@ -28,35 +28,18 @@ import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
 class ChangePasswordActivity : AppCompatActivity() {
-    private lateinit var binding: ActivityChangePasswordBinding
+    private val binding: ActivityChangePasswordBinding by lazy {
+        ActivityChangePasswordBinding.inflate(layoutInflater)
+    }
     private val viewModel: ChangePasswordViewModel by viewModels<ChangePasswordViewModelImpl>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        binding = ActivityChangePasswordBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
         initViewPager(supportFragmentManager, lifecycle)
         initListener()
-        lifecycleScope.launch {
-            repeatOnLifecycle(Lifecycle.State.STARTED) {
-                launch {
-                    viewModel.event.collect {
-                        handleEvent(it, this@ChangePasswordActivity)
-                    }
-                }
-                launch {
-                    viewModel.screenFlow.collect {
-                        handleScreenFlow(it)
-                    }
-                }
-                launch {
-                    viewModel.changePasswordScreenEvent.collect {
-                        handleChangePasswordScreenEvent(it, this@ChangePasswordActivity)
-                    }
-                }
-            }
-        }
+        handleEventFlow(this)
     }
 
     private fun initViewPager(
@@ -90,18 +73,37 @@ class ChangePasswordActivity : AppCompatActivity() {
         }
     }
 
+    private fun handleEventFlow(context: Context) {
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                launch {
+                    viewModel.event.collect {
+                        handleEvent(it, this@ChangePasswordActivity)
+                    }
+                }
+                launch {
+                    viewModel.screenFlow.collect {
+                        handleScreenFlow(it)
+                    }
+                }
+                launch {
+                    viewModel.changePasswordScreenEvent.collect {
+                        handleChangePasswordScreenEvent(it, context)
+                    }
+                }
+            }
+        }
+    }
+
     private fun handleEvent(
         event: Event,
         context: Context,
     ) {
-        if (event is Event.ShowProcessing) {
-            switchView(binding.pgbProcessing)
-        } else {
-            switchView(binding.btnBottom)
-        }
         when (event) {
             is Event.ShowToast -> showToast(event, context)
             is Event.ShowDialog -> showDialog(event, context)
+            is Event.ShowProcessing -> switchView(binding.pgbProcessing)
+            is Event.EndProcessing -> switchView(binding.btnBottom)
             else -> {}
         }
     }
@@ -123,13 +125,13 @@ class ChangePasswordActivity : AppCompatActivity() {
     }
 
     private fun handleScreenFlow(screenFlow: ChangePasswordScreen) {
-        if (screenFlow is ChangePasswordScreen.LoadingView) {
+        if (screenFlow is ChangePasswordScreen.Loading) {
             switchView(binding.pgbProcessing)
         } else {
             switchView(binding.btnBottom)
         }
         when (screenFlow) {
-            is ChangePasswordScreen.SuccessView -> finish()
+            is ChangePasswordScreen.Success -> finish()
             else -> {}
         }
     }

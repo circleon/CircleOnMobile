@@ -28,12 +28,13 @@ import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
 class SignUpActivity : AppCompatActivity() {
-    private lateinit var binding: ActivitySignUpBinding
+    private val binding: ActivitySignUpBinding by lazy {
+        ActivitySignUpBinding.inflate(layoutInflater)
+    }
     private val viewModel: SignUpViewModel by viewModels<SignUpViewModelImpl>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        binding = ActivitySignUpBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
         initViewPager(supportFragmentManager, lifecycle)
@@ -94,14 +95,11 @@ class SignUpActivity : AppCompatActivity() {
         event: Event,
         context: Context,
     ) {
-        if (event is Event.ShowProcessing) {
-            switchView(binding.pgbProcessing)
-        } else {
-            switchView(binding.btnBottom)
-        }
         when (event) {
             is Event.ShowToast -> showToast(event, context)
             is Event.ShowDialog -> showDialog(event, context)
+            is Event.ShowProcessing -> switchView(binding.pgbProcessing)
+            is Event.EndProcessing -> switchView(binding.btnBottom)
             else -> {}
         }
     }
@@ -123,13 +121,13 @@ class SignUpActivity : AppCompatActivity() {
     }
 
     private fun handleScreenFlow(screenFlow: SignUpScreen) {
-        if (screenFlow is SignUpScreen.LoadingView) {
+        if (screenFlow is SignUpScreen.Loading) {
             switchView(binding.pgbProcessing)
         } else {
             switchView(binding.btnBottom)
         }
         when (screenFlow) {
-            is SignUpScreen.SuccessView -> finish()
+            is SignUpScreen.Success -> finish()
             else -> {}
         }
     }

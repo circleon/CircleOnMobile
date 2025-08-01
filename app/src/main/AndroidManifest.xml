@@ -34,7 +34,7 @@
             android:name=".view.screen.auth.LoginActivity"
             android:exported="false" />
         <activity
-            android:name=".view.screen.home.HomeActivity"
+            android:name=".view.screen.MainActivity"
             android:exported="false"
             android:windowSoftInputMode="adjustPan">
         </activity>

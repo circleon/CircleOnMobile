@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.developeek.circleon.data.repository.UserRepository
 import com.developeek.circleon.data.source.Error
 import com.developeek.circleon.data.source.Success
+import com.developeek.circleon.domain.model.UserModel
 import com.developeek.circleon.view.Event
 import com.developeek.circleon.view.viewmodel.mypage.MyPageViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -23,6 +24,10 @@ class MyPageViewModelImpl
     constructor(
         private val repository: UserRepository,
     ) : MyPageViewModel, ViewModel() {
+        override val user: UserModel by lazy {
+            (repository.getUser() as Success).data
+        }
+
         private val _event = MutableSharedFlow<Event>()
         override val event: SharedFlow<Event> = _event
         private val _myPageScreenEvent = MutableSharedFlow<MyPageScreenEvent>()
@@ -39,8 +44,10 @@ class MyPageViewModelImpl
             userRequestJob =
                 viewModelScope.launch {
                     _event.emit(Event.ShowProcessing)
+                    val result = putUserProfileImage(image)
+                    _event.emit(Event.EndProcessing)
 
-                    when (val result = putUserProfileImage(image)) {
+                    when (result) {
                         is Success -> whenPutUserProfileImageSuccess()
                         is Error -> whenEditUserProfileImageFail(result)
                     }
@@ -82,8 +89,10 @@ class MyPageViewModelImpl
             userRequestJob =
                 viewModelScope.launch {
                     _event.emit(Event.ShowProcessing)
+                    val result = deleteUserProfileImage()
+                    _event.emit(Event.EndProcessing)
 
-                    when (val result = deleteUserProfileImage()) {
+                    when (result) {
                         is Success -> whenDeleteUserProfileImageSuccess()
                         is Error -> whenEditUserProfileImageFail(result)
                     }
@@ -110,8 +119,10 @@ class MyPageViewModelImpl
             userRequestJob =
                 viewModelScope.launch {
                     _event.emit(Event.ShowProcessing)
+                    val result = userLogout()
+                    _event.emit(Event.EndProcessing)
 
-                    when (val result = userLogout()) {
+                    when (result) {
                         is Success -> showToastAndSendToLoginScreen(MESSAGE_SUCCESS_LOGOUT)
                         is Error -> _event.emit(Event.ShowDialog(result.message()))
                     }
@@ -136,8 +147,10 @@ class MyPageViewModelImpl
             userRequestJob =
                 viewModelScope.launch {
                     _event.emit(Event.ShowProcessing)
+                    val result = userResign()
+                    _event.emit(Event.EndProcessing)
 
-                    when (val result = userResign()) {
+                    when (result) {
                         is Success -> showToastAndSendToLoginScreen(MESSAGE_SUCCESS_RESIGN)
                         is Error -> _event.emit(Event.ShowDialog(result.message()))
                     }

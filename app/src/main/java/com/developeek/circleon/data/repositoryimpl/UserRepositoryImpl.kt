@@ -13,6 +13,7 @@ import com.developeek.circleon.domain.enums.MembershipStatus
 import com.developeek.circleon.domain.model.CircleSummaryModel
 import com.developeek.circleon.domain.model.Models
 import com.developeek.circleon.domain.model.MyPostModel
+import com.developeek.circleon.domain.model.UserModel
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.MultipartBody
 import okhttp3.RequestBody.Companion.asRequestBody
@@ -23,6 +24,15 @@ class UserRepositoryImpl(
     private val tokenManager: TokenManager,
     private val userManager: UserManager,
 ) : UserRepository {
+    override fun getUser(): Result<UserModel> {
+        return try {
+            val user = userManager.getUser()
+            Result.success(user)
+        } catch (e: Exception) {
+            Result.success(UserModel.empty())
+        }
+    }
+
     override suspend fun getMyJoinRequestedCircles(
         page: Int,
         size: Int,
