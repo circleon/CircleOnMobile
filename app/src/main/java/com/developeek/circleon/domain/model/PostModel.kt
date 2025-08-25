@@ -23,6 +23,8 @@ data class PostModel(
 
     fun togglePinAndGet() = copy(isPinned = !isPinned)
 
+    fun replaceContentAndGet(content: String) = copy(content = content)
+
     companion object {
         fun emptyInstance() =
             PostModel(
@@ -38,3 +40,9 @@ data class PostModel(
             )
     }
 }
+
+// 게시글 수정 결과 반영 시 사용
+data class PostEditResultModel(
+    val content: String,
+    val postType: PostType,
+)

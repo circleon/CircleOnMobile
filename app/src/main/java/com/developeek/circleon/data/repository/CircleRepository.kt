@@ -11,6 +11,7 @@ import com.developeek.circleon.domain.model.CircleSummaryModel
 import com.developeek.circleon.domain.model.CommentModel
 import com.developeek.circleon.domain.model.MemberModel
 import com.developeek.circleon.domain.model.Models
+import com.developeek.circleon.domain.model.PostEditResultModel
 import com.developeek.circleon.domain.model.PostModel
 import java.io.File
 
@@ -132,7 +133,7 @@ interface CircleRepository {
         postId: Int,
         postType: PostType,
         content: String,
-    ): Result<Unit>
+    ): Result<PostEditResultModel>
 
     suspend fun putCirclePostComment(
         circleId: Int,

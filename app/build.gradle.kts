@@ -9,23 +9,30 @@ plugins {
 
 android {
     namespace = "com.developeek.circleon"
-    compileSdk = 34
+    compileSdk = 35
 
     defaultConfig {
         applicationId = "com.developeek.circleon"
         minSdk = 30
-        targetSdk = 34
-        versionCode = 1
-        versionName = "1.0.0"
+        targetSdk = 35
+        versionCode = 2
+        versionName = "1.0.1"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         buildConfigField("String", "TOKEN_PREFERENCE_KEY", getLocalValue("token.preference.key"))
         buildConfigField("String", "USER_PREFERENCE_KEY", getLocalValue("user.preference.key"))
-        buildConfigField("String", "SERVICE_API_URL", getLocalValue("service.api.url"))
-        buildConfigField("String", "SERVICE_IMAGE_API_URL", getLocalValue("service.image.api.url"))
         buildConfigField("String", "CIRCLE_IMAGE_PATH", getLocalValue("circle.image.path"))
         buildConfigField("String", "POST_IMAGE_PATH", getLocalValue("post.image.path"))
         buildConfigField("String", "USER_IMAGE_PATH", getLocalValue("user.image.path"))
+    }
+
+    signingConfigs {
+        create("release") {
+            storeFile = File(getLocalValue("release.storeFile.dir"))
+            storePassword = getLocalValue("release.storePassword")
+            keyAlias = getLocalValue("release.keyAlias")
+            keyPassword = getLocalValue("release.keyPassword")
+        }
     }
 
     buildTypes {
@@ -35,6 +42,13 @@ android {
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro",
             )
+            buildConfigField("String", "SERVICE_API_URL", getLocalValue("service.api.url"))
+            buildConfigField("String", "SERVICE_IMAGE_API_URL", getLocalValue("service.image.api.url"))
+            signingConfig = signingConfigs.getByName("release")
+        }
+        debug {
+            buildConfigField("String", "SERVICE_API_URL", getLocalValue("dev.service.api.url"))
+            buildConfigField("String", "SERVICE_IMAGE_API_URL", getLocalValue("dev.service.image.api.url"))
         }
     }
 

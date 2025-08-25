@@ -22,6 +22,7 @@ import com.developeek.circleon.domain.model.CircleSummaryModel
 import com.developeek.circleon.domain.model.CommentModel
 import com.developeek.circleon.domain.model.MemberModel
 import com.developeek.circleon.domain.model.Models
+import com.developeek.circleon.domain.model.PostEditResultModel
 import com.developeek.circleon.domain.model.PostModel
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.MultipartBody
@@ -416,10 +417,10 @@ class CircleRepositoryImpl(private val service: CircleService) : CircleRepositor
         postId: Int,
         postType: PostType,
         content: String,
-    ): Result<Unit> {
+    ): Result<PostEditResultModel> {
         return try {
-            service.putCirclePost(circleId, postId, RequestBodyEditPost(postType.code(), content))
-            Result.success(Unit)
+            val response = service.putCirclePost(circleId, postId, RequestBodyEditPost(postType.code(), content))
+            Result.success(PostEditResultModel(response.content, PostType.findOrDefault(response.postType)))
         } catch (e: Exception) {
             Result.error(e)
         }

@@ -240,7 +240,7 @@ class CircleDetailNoticeFragment : BaseFragment() {
             context.getString(R.string.message_delete_notice),
             context.getString(R.string.btn_delete),
             positiveListener = {
-                viewModel.deleteAndFetch(notice.id)
+                viewModel.delete(notice)
             },
         ).show()
     }
@@ -307,11 +307,28 @@ class CircleDetailNoticeFragment : BaseFragment() {
             .currentBackStackEntry
             ?.savedStateHandle
             ?.let {
+                it.getLiveData<Boolean>(Const.FLAG_CIRCLE_POST_DATA_ADDED)
+                    .observe(viewLifecycleOwner) { dataAdded ->
+                        if (dataAdded) {
+                            viewModel.refresh()
+                            it[Const.FLAG_CIRCLE_POST_DATA_ADDED] = false
+                        }
+                    }
                 it.getLiveData<Boolean>(Const.FLAG_CIRCLE_POST_DATA_CHANGED)
                     .observe(viewLifecycleOwner) { dataChanged ->
                         if (dataChanged) {
-                            viewModel.refresh()
+                            val post = it.get<PostModel>(Const.TAG_POST)!!
+                            val newContent = it.get<String>(Const.TAG_POST_CONTENT)!!
+                            viewModel.updatePostItem(post, newContent)
                             it[Const.FLAG_CIRCLE_POST_DATA_CHANGED] = false
+                        }
+                    }
+                it.getLiveData<Boolean>(Const.FLAG_CIRCLE_POST_DATA_DELETED)
+                    .observe(viewLifecycleOwner) { dataDeleted ->
+                        if (dataDeleted) {
+                            val post = it.get<PostModel>(Const.TAG_POST)!!
+                            viewModel.deletePostItem(post)
+                            it[Const.FLAG_CIRCLE_POST_DATA_DELETED] = false
                         }
                     }
             }

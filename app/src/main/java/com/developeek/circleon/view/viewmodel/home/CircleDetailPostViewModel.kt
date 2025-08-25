@@ -23,7 +23,16 @@ interface CircleDetailPostViewModel {
 
     fun togglePin(post: PostModel)
 
-    fun deleteAndFetch(postId: Int)
+    // 네트워크 통신 없이 뷰모델 내부 데이터에서만 진행
+    fun updatePostItem(
+        post: PostModel,
+        content: String,
+    )
+
+    fun delete(post: PostModel)
+
+    // 네트워크 통신 없이 뷰모델 내부 데이터에서만 진행
+    fun deletePostItem(post: PostModel)
 
     fun requestReportPost(
         postId: Int,

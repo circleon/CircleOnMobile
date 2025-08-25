@@ -1,14 +1,11 @@
-<resources xmlns:tools="http://schemas.android.com/tools">
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
     <style name="Theme.CircleOn" parent="Theme.Material3.Light.NoActionBar">
         <item name="android:statusBarColor">@color/grey_3</item>
         <item name="actionOverflowMenuStyle">@style/pop_up_menu</item>
         <item name="popupMenuStyle">@style/pop_up_menu</item>
         <item name="android:windowBackground">@color/grey_1</item>
         <item name="android:windowOptOutEdgeToEdgeEnforcement">true</item>
-    </style>
-    <style name="Theme.App.Splash" parent="Theme.SplashScreen">
-        <item name="windowSplashScreenBackground">@color/purple_5</item>
-        <item name="windowSplashScreenAnimatedIcon">@drawable/layer_splash</item>
-        <item name="postSplashScreenTheme">@style/Theme.CircleOn</item>
     </style>
 </resources>

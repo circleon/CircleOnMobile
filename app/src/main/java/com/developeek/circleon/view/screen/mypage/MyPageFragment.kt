@@ -4,6 +4,7 @@ import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -269,6 +270,7 @@ class MyPageFragment : BaseFragment() {
             showRemoveUserProfileDialog(context)
         }
         viewModel.user.profileImage?.let {
+            Log.d("profileUrl", it)
             glideProvider.fetchImage(it, context, binding.btnAddUserProfile)
         }
     }
