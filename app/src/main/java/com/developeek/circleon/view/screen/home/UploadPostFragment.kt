@@ -227,7 +227,17 @@ class UploadPostFragment : BaseFragment() {
     }
 
     private fun requestRefreshToPreviousScreen() {
-        findNavController().previousBackStackEntry?.savedStateHandle?.set(Const.FLAG_CIRCLE_POST_DATA_CHANGED, true)
+        val flag = if (isEdit) Const.FLAG_CIRCLE_POST_DATA_CHANGED else Const.FLAG_CIRCLE_POST_DATA_ADDED
+
+        findNavController().previousBackStackEntry?.savedStateHandle?.apply {
+            set(flag, true)
+
+            // 수정 case 인 경우 원본 post id, content 전달
+            if (isEdit) {
+                set(Const.TAG_POST, post)
+                set(Const.TAG_POST_CONTENT, viewModel.postEditResult.content)
+            }
+        }
     }
 
     private fun sendUserToPreviousScreen() {

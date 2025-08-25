@@ -23,4 +23,6 @@ open class Models<T : BaseModel>(private val models: List<T> = emptyList()) : Se
         oldItem: T,
         newItem: T,
     ) = Models(models.map { if (it.isSame(oldItem)) newItem else it })
+
+    fun deleteAndGet(item: T) = Models(models.filter { !it.isSame(item) })
 }

@@ -6,6 +6,7 @@ import android.app.Activity
 import android.content.Context
 import android.os.Build
 import android.os.Bundle
+import android.util.Log.*
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -14,6 +15,8 @@ import android.view.inputmethod.InputMethodManager
 import android.widget.EditText
 import androidx.appcompat.widget.PopupMenu
 import androidx.core.animation.addListener
+import androidx.core.app.ActivityCompat.startPostponedEnterTransition
+import androidx.core.content.ContentProviderCompat.requireContext
 import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import androidx.fragment.app.viewModels
@@ -120,7 +123,7 @@ class CircleDetailPostDetailFragment : BaseFragment() {
         postponeEnterTransition()
 
         initView(requireActivity())
-        initRefreshObserver()
+//        initRefreshObserver()
         initListener()
         handleEventFlow(requireContext())
     }
@@ -193,7 +196,7 @@ class CircleDetailPostDetailFragment : BaseFragment() {
         context: Context,
     ) {
         if (user.isSame(post.author)) {
-            popupMenu.inflate(R.menu.menu_author_post_settings)
+            popupMenu.inflate(R.menu.menu_author_post_detail_settings)
             Utils.changeMenuItemTextColor(
                 popupMenu.menu.findItem(R.id.delete_post),
                 ContextCompat.getColor(context, R.color.error),
@@ -401,12 +404,18 @@ class CircleDetailPostDetailFragment : BaseFragment() {
         findNavController()
             .currentBackStackEntry
             ?.savedStateHandle
-            ?.getLiveData<Boolean>(Const.FLAG_CIRCLE_POST_DATA_CHANGED)
-            ?.observe(viewLifecycleOwner) {
-                if (it) {
-                    requestRefreshToPreviousScreen()
-                    sendUserToPreviousScreen()
-                }
+            ?.let {
+                it.getLiveData<Boolean>(Const.FLAG_CIRCLE_POST_DATA_CHANGED)
+                    .observe(viewLifecycleOwner) { dataChanged ->
+                        if (dataChanged) {
+                            d("dataChangedInDetail", "$dataChanged")
+                            findNavController()
+                                .previousBackStackEntry
+                                ?.savedStateHandle
+                                ?.set(Const.FLAG_CIRCLE_POST_DATA_CHANGED, true)
+                            sendUserToPreviousScreen()
+                        }
+                    }
             }
     }
 
@@ -500,7 +509,7 @@ class CircleDetailPostDetailFragment : BaseFragment() {
         context: Context,
     ) {
         if (screenFlow.hasDeleted) {
-            requestRefreshToPreviousScreen()
+            requestPostDeleteToPreviousScreen(post)
             sendUserToPreviousScreen()
             return
         }
@@ -514,6 +523,13 @@ class CircleDetailPostDetailFragment : BaseFragment() {
                 startPostponedEnterTransition()
             },
         )
+    }
+
+    private fun requestPostDeleteToPreviousScreen(post: PostModel) {
+        findNavController().previousBackStackEntry?.savedStateHandle?.apply {
+            set(Const.FLAG_CIRCLE_POST_DATA_DELETED, true)
+            set(Const.TAG_POST, post)
+        }
     }
 
     private fun hideSoftInput(
@@ -542,10 +558,6 @@ class CircleDetailPostDetailFragment : BaseFragment() {
                 after()
             }
         }
-    }
-
-    private fun requestRefreshToPreviousScreen() {
-        findNavController().previousBackStackEntry?.savedStateHandle?.set(Const.FLAG_CIRCLE_POST_DATA_CHANGED, true)
     }
 
     override fun onDestroyView() {

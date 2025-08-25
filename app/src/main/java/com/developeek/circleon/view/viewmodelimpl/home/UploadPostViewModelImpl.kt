@@ -6,6 +6,7 @@ import com.developeek.circleon.data.repository.CircleRepository
 import com.developeek.circleon.data.source.Error
 import com.developeek.circleon.data.source.Success
 import com.developeek.circleon.domain.enums.PostType
+import com.developeek.circleon.domain.model.PostEditResultModel
 import com.developeek.circleon.domain.utils.validator.Invalid
 import com.developeek.circleon.domain.utils.validator.Validator
 import com.developeek.circleon.view.Event
@@ -44,6 +45,7 @@ class UploadPostViewModelImpl
         override val event: SharedFlow<Event> = _event
         private var _screenFlow = MutableStateFlow<UploadPostScreen>(UploadPostScreen.Normal)
         override val screenFlow: StateFlow<UploadPostScreen> = _screenFlow
+        override lateinit var postEditResult: PostEditResultModel
 
         private var image: File? = null
         private var uploadPostJob: Job? = null
@@ -102,8 +104,11 @@ class UploadPostViewModelImpl
                     _screenFlow.emit(UploadPostScreen.Loading)
 
                     when (val result = putCirclePost(circleId, postId, postType, content)) {
-                        is Success -> whenUploadPostSuccess()
-                        is Error -> whenUploadPostFail(result)
+                        is Success -> {
+                            postEditResult = result.data
+                            whenUploadPostSuccess()
+                        }
+                        is Error -> whenEditPostFail(result)
                     }
                 }
         }
@@ -125,6 +130,15 @@ class UploadPostViewModelImpl
                 false
             } else {
                 true
+            }
+        }
+
+        private suspend fun whenEditPostFail(result: Error<PostEditResultModel>) {
+            _event.emit(Event.ShowDialog(result.message()))
+            _screenFlow.emit(UploadPostScreen.Normal)
+
+            if (result.isAuthenticationError()) {
+                _event.emit(Event.SendToLoginScreen)
             }
         }
 

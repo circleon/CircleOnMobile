@@ -83,7 +83,8 @@ class CircleDetailNoticeViewModelImpl
         }
 
         override fun refresh() {
-            fetchNotices(DEFAULT_PAGE, (currentPage + 1) * SIZE_BY_PAGE)
+            _currentScrollState = null
+            fetchNotices(DEFAULT_PAGE, SIZE_BY_PAGE)
         }
 
         private fun fetchNotices(
@@ -214,7 +215,24 @@ class CircleDetailNoticeViewModelImpl
             posts = posts.replaceAndGet(oldPost, newPost).sortedWith(postSortBy)
         }
 
-        override fun deleteAndFetch(postId: Int) {
+        override fun updatePostItem(
+            post: PostModel,
+            content: String,
+        ) {
+            viewModelScope.launch {
+                replacePostContent(post, content)
+                _screenFlow.emit(CircleDetailPostScreen.Success(posts))
+            }
+        }
+
+        private suspend fun replacePostContent(
+            post: PostModel,
+            content: String,
+        ) = withContext(defaultDispatcher) {
+            posts = posts.replaceAndGet(post, post.replaceContentAndGet(content))
+        }
+
+        override fun delete(post: PostModel) {
             userRequestJob?.let {
                 if (!it.isCompleted) return
             }
@@ -222,11 +240,11 @@ class CircleDetailNoticeViewModelImpl
             userRequestJob =
                 viewModelScope.launch {
                     _event.emit(Event.ShowProcessing)
-                    val result = deleteCirclePost(circleDetail.circleId, postId)
+                    val result = deleteCirclePost(circleDetail.circleId, post.id)
                     _event.emit(Event.EndProcessing)
 
                     when (result) {
-                        is Success -> showToastAndRefresh(MESSAGE_SUCCESS_REQUEST_REMOVE_NOTICE)
+                        is Success -> whenDeleteCirclePostSuccess(post)
                         is Error -> whenUserRequestFail(result)
                     }
                 }
@@ -237,6 +255,28 @@ class CircleDetailNoticeViewModelImpl
             postId: Int,
         ) = withContext(ioDispatcher) {
             circleRepository.deleteCirclePost(circleId, postId)
+        }
+
+        private suspend fun whenDeleteCirclePostSuccess(post: PostModel) {
+            deletePost(post)
+            showToast(MESSAGE_SUCCESS_REQUEST_REMOVE_NOTICE)
+            _screenFlow.emit(CircleDetailPostScreen.Success(posts))
+        }
+
+        private suspend fun deletePost(post: PostModel) =
+            withContext(defaultDispatcher) {
+                posts = posts.deleteAndGet(post)
+            }
+
+        override fun deletePostItem(post: PostModel) {
+            viewModelScope.launch {
+                deletePost(post)
+                _screenFlow.emit(CircleDetailPostScreen.Success(posts))
+            }
+        }
+
+        private suspend fun showToast(message: String) {
+            _event.emit(Event.ShowToast(message))
         }
 
         override fun requestReportPost(
@@ -267,11 +307,6 @@ class CircleDetailNoticeViewModelImpl
             message: String,
         ) = withContext(ioDispatcher) {
             circleRepository.postReportCirclePost(circleId, postId, message)
-        }
-
-        private suspend fun showToastAndRefresh(message: String) {
-            _event.emit(Event.ShowToast(message))
-            refresh()
         }
 
         private suspend fun whenUserRequestFail(result: Error<Unit>) {

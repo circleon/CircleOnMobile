@@ -68,12 +68,17 @@ class CircleDetailPostViewModelImpl
         private var fetchPostsJob: Job? = null
         private var scrollOverPostJob: Job? = null
         private var userRequestJob: Job? = null
-        private val dispatcher = Dispatchers.IO
+        private val ioDispatcher = Dispatchers.IO
+        private val defaultDispatcher = Dispatchers.Default
 
         init {
             fetchPosts(currentPage, SIZE_BY_PAGE)
         }
 
+        /**
+         * 로딩 anim 을 활성화한 채로 새로고침
+         * 페이지 전체가 초기화되는 경우 사용(ex. 최초 로딩,  SwipeRefresh ..)
+         */
         override fun showLoadingAndRefresh() {
             viewModelScope.launch {
                 _screenFlow.emit(CircleDetailPostScreen.Loading)
@@ -81,8 +86,10 @@ class CircleDetailPostViewModelImpl
             refresh()
         }
 
+        // TODO: 페이지 유지를 안 하게끔 수정했기 때문에, 게시글 수정 이후 refresh 대신 다른 함수로 업데이트해줘야됨
         override fun refresh() {
-            fetchPosts(DEFAULT_PAGE, (currentPage + 1) * SIZE_BY_PAGE)
+            _currentScrollState = null
+            fetchPosts(DEFAULT_PAGE, SIZE_BY_PAGE)
         }
 
         private fun fetchPosts(
@@ -108,7 +115,7 @@ class CircleDetailPostViewModelImpl
             circleId: Int,
             page: Int,
             size: Int,
-        ) = withContext(dispatcher) {
+        ) = withContext(ioDispatcher) {
             circleRepository.getCirclePosts(circleId, page, size)
         }
 
@@ -163,7 +170,24 @@ class CircleDetailPostViewModelImpl
             }
         }
 
-        override fun deleteAndFetch(postId: Int) {
+        override fun updatePostItem(
+            post: PostModel,
+            content: String,
+        ) {
+            viewModelScope.launch {
+                replacePostContent(post, content)
+                _screenFlow.emit(CircleDetailPostScreen.Success(posts))
+            }
+        }
+
+        private suspend fun replacePostContent(
+            post: PostModel,
+            content: String,
+        ) = withContext(defaultDispatcher) {
+            posts = posts.replaceAndGet(post, post.replaceContentAndGet(content))
+        }
+
+        override fun delete(post: PostModel) {
             userRequestJob?.let {
                 if (!it.isCompleted) return
             }
@@ -171,11 +195,11 @@ class CircleDetailPostViewModelImpl
             userRequestJob =
                 viewModelScope.launch {
                     _event.emit(Event.ShowProcessing)
-                    val result = deleteCirclePost(circleDetail.circleId, postId)
+                    val result = deleteCirclePost(circleDetail.circleId, post.id)
                     _event.emit(Event.EndProcessing)
 
                     when (result) {
-                        is Success -> showToastAndRefresh(MESSAGE_SUCCESS_REQUEST_REMOVE_POST)
+                        is Success -> whenDeleteCirclePostSuccess(post)
                         is Error -> whenUserRequestFail(result)
                     }
                 }
@@ -184,8 +208,26 @@ class CircleDetailPostViewModelImpl
         private suspend fun deleteCirclePost(
             circleId: Int,
             postId: Int,
-        ) = withContext(dispatcher) {
+        ) = withContext(ioDispatcher) {
             circleRepository.deleteCirclePost(circleId, postId)
+        }
+
+        private suspend fun whenDeleteCirclePostSuccess(post: PostModel) {
+            deletePost(post)
+            showToast(MESSAGE_SUCCESS_REQUEST_REMOVE_POST)
+            _screenFlow.emit(CircleDetailPostScreen.Success(posts))
+        }
+
+        private suspend fun deletePost(post: PostModel) =
+            withContext(defaultDispatcher) {
+                posts = posts.deleteAndGet(post)
+            }
+
+        override fun deletePostItem(post: PostModel) {
+            viewModelScope.launch {
+                deletePost(post)
+                _screenFlow.emit(CircleDetailPostScreen.Success(posts))
+            }
         }
 
         override fun requestReportPost(
@@ -214,13 +256,8 @@ class CircleDetailPostViewModelImpl
             circleId: Int,
             postId: Int,
             message: String,
-        ) = withContext(dispatcher) {
+        ) = withContext(ioDispatcher) {
             circleRepository.postReportCirclePost(circleId, postId, message)
-        }
-
-        private suspend fun showToastAndRefresh(message: String) {
-            showToast(message)
-            refresh()
         }
 
         private suspend fun showToast(message: String) {

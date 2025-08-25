@@ -3,6 +3,7 @@ package com.developeek.circleon.view.screen.home
 import android.content.Context
 import android.os.Build
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -217,7 +218,7 @@ class CircleDetailPostFragment : BaseFragment() {
             context.getString(R.string.message_delete_post),
             context.getString(R.string.btn_delete),
             positiveListener = {
-                viewModel.deleteAndFetch(post.id)
+                viewModel.delete(post)
             },
         ).show()
     }
@@ -284,11 +285,29 @@ class CircleDetailPostFragment : BaseFragment() {
             .currentBackStackEntry
             ?.savedStateHandle
             ?.let {
+                it.getLiveData<Boolean>(Const.FLAG_CIRCLE_POST_DATA_ADDED)
+                    .observe(viewLifecycleOwner) { dataAdded ->
+                        if (dataAdded) {
+                            viewModel.refresh()
+                            it[Const.FLAG_CIRCLE_POST_DATA_ADDED] = false
+                        }
+                    }
                 it.getLiveData<Boolean>(Const.FLAG_CIRCLE_POST_DATA_CHANGED)
                     .observe(viewLifecycleOwner) { dataChanged ->
                         if (dataChanged) {
-                            viewModel.refresh()
+                            Log.d("dataChangedInList", "$dataChanged")
+                            val post = it.get<PostModel>(Const.TAG_POST)!!
+                            val newContent = it.get<String>(Const.TAG_POST_CONTENT)!!
+                            viewModel.updatePostItem(post, newContent)
                             it[Const.FLAG_CIRCLE_POST_DATA_CHANGED] = false
+                        }
+                    }
+                it.getLiveData<Boolean>(Const.FLAG_CIRCLE_POST_DATA_DELETED)
+                    .observe(viewLifecycleOwner) { dataDeleted ->
+                        if (dataDeleted) {
+                            val post = it.get<PostModel>(Const.TAG_POST)!!
+                            viewModel.deletePostItem(post)
+                            it[Const.FLAG_CIRCLE_POST_DATA_DELETED] = false
                         }
                     }
             }
