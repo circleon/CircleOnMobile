@@ -408,7 +408,6 @@ class CircleDetailPostDetailFragment : BaseFragment() {
                 it.getLiveData<Boolean>(Const.FLAG_CIRCLE_POST_DATA_CHANGED)
                     .observe(viewLifecycleOwner) { dataChanged ->
                         if (dataChanged) {
-                            d("dataChangedInDetail", "$dataChanged")
                             findNavController()
                                 .previousBackStackEntry
                                 ?.savedStateHandle

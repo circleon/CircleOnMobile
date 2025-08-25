@@ -41,8 +41,18 @@ class UserManager
             }
         }
 
+        fun setUserProfileImageUrl(imageUrl: String) {
+            editor.putString(USER_PROFILE_IMAGE_KEY, imageUrl)
+            editor.apply()
+        }
+
         fun deleteUser() {
             editor.clear()
+            editor.apply()
+        }
+
+        fun deleteUserProfileImageUrl() {
+            editor.remove(USER_PROFILE_IMAGE_KEY)
             editor.apply()
         }
 

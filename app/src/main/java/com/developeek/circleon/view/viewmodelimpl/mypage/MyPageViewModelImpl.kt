@@ -24,9 +24,8 @@ class MyPageViewModelImpl
     constructor(
         private val repository: UserRepository,
     ) : MyPageViewModel, ViewModel() {
-        override val user: UserModel by lazy {
-            (repository.getUser() as Success).data
-        }
+        override val user: UserModel
+            get() = (repository.getUser() as Success).data
 
         private val _event = MutableSharedFlow<Event>()
         override val event: SharedFlow<Event> = _event
@@ -48,7 +47,7 @@ class MyPageViewModelImpl
                     _event.emit(Event.EndProcessing)
 
                     when (result) {
-                        is Success -> whenPutUserProfileImageSuccess()
+                        is Success -> whenPutUserProfileImageSuccess(image)
                         is Error -> whenEditUserProfileImageFail(result)
                     }
                 }
@@ -59,7 +58,7 @@ class MyPageViewModelImpl
                 repository.putUserProfileImage(profileImage)
             }
 
-        private suspend fun whenPutUserProfileImageSuccess() {
+        private suspend fun whenPutUserProfileImageSuccess(image: File?) {
             _event.emit(Event.ShowToast(MESSAGE_SUCCESS_SET_USER_PROFILE_IMAGE))
 
             updateUser()

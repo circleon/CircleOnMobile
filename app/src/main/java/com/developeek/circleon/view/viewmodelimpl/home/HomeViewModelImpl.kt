@@ -33,9 +33,8 @@ class HomeViewModelImpl
         private val circleRepository: CircleRepository,
         private val userRepository: UserRepository,
     ) : HomeViewModel, ViewModel() {
-        override val user: UserModel by lazy {
-            (userRepository.getUser() as Success).data
-        }
+        override val user: UserModel
+            get() = (userRepository.getUser() as Success).data
 
         private var categories: Models<CategoryModel> = Models()
         private var circles: Models<CircleModel> = Models()

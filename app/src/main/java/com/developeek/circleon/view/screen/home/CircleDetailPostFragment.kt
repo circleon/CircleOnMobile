@@ -3,7 +3,6 @@ package com.developeek.circleon.view.screen.home
 import android.content.Context
 import android.os.Build
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -295,7 +294,6 @@ class CircleDetailPostFragment : BaseFragment() {
                 it.getLiveData<Boolean>(Const.FLAG_CIRCLE_POST_DATA_CHANGED)
                     .observe(viewLifecycleOwner) { dataChanged ->
                         if (dataChanged) {
-                            Log.d("dataChangedInList", "$dataChanged")
                             val post = it.get<PostModel>(Const.TAG_POST)!!
                             val newContent = it.get<String>(Const.TAG_POST_CONTENT)!!
                             viewModel.updatePostItem(post, newContent)
