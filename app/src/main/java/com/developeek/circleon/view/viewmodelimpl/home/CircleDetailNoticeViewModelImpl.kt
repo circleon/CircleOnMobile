@@ -84,7 +84,8 @@ class CircleDetailNoticeViewModelImpl
 
         override fun refresh() {
             _currentScrollState = null
-            fetchNotices(DEFAULT_PAGE, SIZE_BY_PAGE)
+            currentPage = DEFAULT_PAGE
+            fetchNotices(currentPage, SIZE_BY_PAGE)
         }
 
         private fun fetchNotices(

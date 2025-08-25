@@ -89,7 +89,8 @@ class CircleDetailPostViewModelImpl
         // TODO: 페이지 유지를 안 하게끔 수정했기 때문에, 게시글 수정 이후 refresh 대신 다른 함수로 업데이트해줘야됨
         override fun refresh() {
             _currentScrollState = null
-            fetchPosts(DEFAULT_PAGE, SIZE_BY_PAGE)
+            currentPage = DEFAULT_PAGE
+            fetchPosts(currentPage, SIZE_BY_PAGE)
         }
 
         private fun fetchPosts(
